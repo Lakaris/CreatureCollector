@@ -1,0 +1,505 @@
+// Farm: idle field generation plus plantable crop plots.
+
+import React, { useState, useMemo, useEffect } from "../../react.js";
+import { useGame } from "../../state/GameContext.js";
+import { MELON_TYPES } from "../../data/types.js";
+import { FARM_PLOT_COSTS, PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_MONEY_RATES, FIELD_SHARD_RATES, FIELD_UPGRADE_COSTS, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
+import { seededRand } from "../../core/random.js";
+import { formatDuration } from "../../core/format.js";
+import { DEV_MODE } from "../../config.js";
+
+function FarmScreen({onBack,onPlant,onGoToStore}){
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount } = useGame();
+  const MAX_PLOTS=6;
+  const MAX_MONEY_PLOTS=4;
+  const [confirm,setConfirm]=useState(false);
+  const [notify,setNotify]=useState(null);
+  const [farmTab,setFarmTab]=useState("field");
+  const [picking,setPicking]=useState(null); // index of plot being picked for, or null
+  const [cancelling,setCancelling]=useState(null); // index of plot being cancelled
+  const [showFieldInfo,setShowFieldInfo]=useState(false);
+  const [showFieldUpgrade,setShowFieldUpgrade]=useState(false);
+  const [speedUpConfirm,setSpeedUpConfirm]=useState(null);
+  const [upgradingPlot,setUpgradingPlot]=useState(null); // index of plot being upgraded
+  const [now,setNow]=useState(()=>Date.now());
+  useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(t);},[]);
+  function showNotify(msg){setNotify(msg);setTimeout(()=>setNotify(null),2000);}
+
+  const rate=FIELD_RATES[farmFieldLevel]||2;
+  const moneyRate=FIELD_MONEY_RATES[farmFieldLevel]||5;
+  const shardRate=FIELD_SHARD_RATES[farmFieldLevel]||1;
+  const elapsedMs=now-farmFieldLastHarvest;
+  const elapsedHours=elapsedMs/3600000;
+  const accumulated=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*rate);
+  const accumulatedMoney=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*moneyRate);
+  const accumulatedShards=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*shardRate);
+  const canHarvest=elapsedHours>=FIELD_MIN_HOURS&&accumulated>=1;
+  const atCap=elapsedHours>=FIELD_CAP_HOURS;
+  const completedHours=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS));
+
+  const fieldBonuses=useMemo(()=>{
+    const bonuses={};
+    for(let h=0;h<completedHours;h++){
+      const s=farmFieldSeed+h*999983;
+      MELON_TYPES.forEach((m,mi)=>{if(seededRand(s+mi*7919)<0.005)bonuses[m.key]=(bonuses[m.key]||0)+1;});
+      if(seededRand(s+500000)<0.005)bonuses.candy=(bonuses.candy||0)+2;
+    }
+    return bonuses;
+  },[completedHours,farmFieldSeed]);
+
+  function harvest(){
+    if(!canHarvest)return;
+    setCurrencies(c=>{
+      const n={...c,food:(c.food||0)+accumulated,money:(c.money||0)+accumulatedMoney,equipShards:(c.equipShards||0)+accumulatedShards};
+      Object.entries(fieldBonuses).forEach(([k,v])=>n[k]=(n[k]||0)+v);
+      return n;
+    });
+    setFarmFieldLastHarvest(Date.now());
+    setFarmFieldSeed(Math.random()*1e9|0);
+    setNow(Date.now());
+    const items=[
+      {emoji:"🍖",label:"Food",amount:accumulated},
+      {emoji:"💰",label:"Money",amount:accumulatedMoney},
+      {emoji:"🔧",label:"Gear Shards",amount:accumulatedShards},
+      ...Object.entries(fieldBonuses).map(([k,v])=>{
+        const m=MELON_TYPES.find(m=>m.key===k);
+        return {emoji:m?m.emoji:"🍬",label:m?m.label:"Candy",amount:v};
+      })
+    ];
+    setHarvestPopup(items);
+    setRevealedCount(0);
+  }
+
+  const fmtTime=(ms)=>formatDuration(ms);
+
+  const maxLevel=FIELD_RATES.length-1;
+  const upgradeCost=farmFieldLevel<maxLevel?FIELD_UPGRADE_COSTS[farmFieldLevel]:null;
+  const canUpgrade=upgradeCost!==null&&(currencies.money||0)>=upgradeCost;
+
+  function upgrade(){
+    if(!canUpgrade)return;
+    setCurrencies(c=>({...c,money:c.money-upgradeCost}));
+    setFarmFieldLevel(l=>l+1);
+    showNotify("Field upgraded to Level "+(farmFieldLevel+1)+"!");
+  }
+
+  const nextCost=farmPlots<MAX_MONEY_PLOTS?FARM_PLOT_COSTS[farmPlots]:null;
+  const canAfford=(currencies.money||0)>=nextCost;
+
+  function unlockPlot(){
+    if(!canAfford)return;
+    setCurrencies(c=>({...c,money:c.money-nextCost}));
+    setFarmPlots(p=>p+1);
+    setConfirm(false);
+  }
+
+  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    React.createElement("div",{style:{padding:"16px 16px 0",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",paddingBottom:12,background:"#fff"}},
+      onBack&&React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+        React.createElement("i",{className:"ti ti-arrow-left"})
+      ),
+      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🌾 Farm"),
+      React.createElement("div",{style:{marginLeft:"auto",fontSize:13,fontWeight:600,background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💰 "+(currencies.money||0).toLocaleString())
+    ),
+    React.createElement("div",{style:{display:"flex",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
+      [{id:"field",label:"Main Field"},{id:"plots",label:"Plots"}].map(t=>
+        React.createElement("button",{key:t.id,onClick:()=>setFarmTab(t.id),style:{
+          flex:1,padding:"10px 0",border:"none",background:"none",cursor:"pointer",
+          fontSize:13,fontWeight:600,
+          color:farmTab===t.id?"#534AB7":"#888",
+          borderBottom:farmTab===t.id?"2px solid #534AB7":"2px solid transparent",
+          transition:"all .15s",
+        }},t.label)
+      )
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:16}},
+    farmTab==="field"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+      DEV_MODE&&React.createElement("div",{style:{background:"#1e1e2e",borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}},
+        React.createElement("span",{style:{fontSize:11,color:"#aaa",fontWeight:600,marginRight:4}},"⏱ Dev"),
+        ...[1,6,12,24].map(h=>React.createElement("button",{key:h,
+          onClick:()=>setFarmFieldLastHarvest(t=>t-h*3600000),
+          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#3C3489",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
+          "+"+h+"h"
+        )),
+        React.createElement("button",{
+          onClick:()=>setFarmFieldLastHarvest(Date.now()),
+          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#555",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",marginLeft:"auto"}},
+          "Reset"
+        )
+      ),
+      React.createElement("div",{style:{
+        background:"#e8f5e9",border:"3px solid #66bb6a",borderRadius:20,
+        padding:"24px 16px",textAlign:"center",position:"relative",
+      }},
+        React.createElement("button",{
+          onClick:e=>{e.stopPropagation();setShowFieldInfo(v=>!v);},
+          style:{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",color:"#555",padding:2,lineHeight:1,opacity:.7}
+        },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}})),
+        React.createElement("div",{style:{position:"absolute",top:10,left:0,right:0,textAlign:"center",fontSize:14,fontWeight:700,color:"#555",pointerEvents:"none"}},"Lv."+farmFieldLevel),
+        React.createElement("div",{style:{fontSize:56,marginBottom:6}},"🌾"),
+        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:2}},accumulated>0?"Ready to harvest":"Growing..."),
+        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+rate+"/hr  •  💰 "+moneyRate+"/hr")
+      ),
+      React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px"}},
+        React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#888",marginBottom:4}},
+          React.createElement("span",null,atCap?"⚠️ Storage full! Harvest now":"Time since last harvest: "+fmtTime(elapsedMs)),
+          React.createElement("span",null,Math.min(Math.round(elapsedHours/FIELD_CAP_HOURS*100),100)+"%")
+        ),
+        React.createElement("div",{style:{height:8,background:"#e0e0e0",borderRadius:4,overflow:"hidden",marginBottom:10}},
+          React.createElement("div",{style:{
+            height:"100%",borderRadius:4,
+            width:Math.min(elapsedHours/FIELD_CAP_HOURS*100,100)+"%",
+            background:atCap?"#e53935":elapsedHours>=1?"#534AB7":"#aaa",
+            transition:"width 1s linear",
+          }})
+        ),
+        (accumulated>0||Object.keys(fieldBonuses).length>0)
+          ?React.createElement("div",{style:{marginBottom:10}},
+            accumulated>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                React.createElement("span",{style:{fontSize:20}},"🍖"),
+                React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Food")
+              ),
+              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulated)
+            ),
+            accumulatedMoney>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                React.createElement("span",{style:{fontSize:20}},"💰"),
+                React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Money")
+              ),
+              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulatedMoney)
+            ),
+            accumulatedShards>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                React.createElement("span",{style:{fontSize:20}},"🔧"),
+                React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Gear Shards")
+              ),
+              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulatedShards)
+            ),
+            ...Object.entries(fieldBonuses).map(([k,v])=>{
+              const m=MELON_TYPES.find(m=>m.key===k);
+              const emoji=m?m.emoji:"🍬";
+              const label=m?m.label:"Candy";
+              return React.createElement("div",{key:k,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
+                React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                  React.createElement("span",{style:{fontSize:20}},emoji),
+                  React.createElement("span",{style:{fontSize:13,fontWeight:600}},label)
+                ),
+                React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},v)
+              );
+            })
+          )
+          :React.createElement("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",padding:"6px 0",marginBottom:10}},"Nothing yet — check back soon"),
+        !canHarvest&&!atCap&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},
+          "Harvest available in "+fmtTime(Math.max(0,farmFieldLastHarvest+3600000-now))
+        ),
+        React.createElement("div",{style:{display:"flex",gap:8,marginBottom:0}},
+          React.createElement("button",{
+            onClick:harvest,
+            disabled:!canHarvest,
+            style:{flex:1,padding:"12px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:15,cursor:canHarvest?"pointer":"default",
+              background:canHarvest?"#4caf50":"#ccc",color:"#fff",transition:"background .2s"},
+          },"Harvest"),
+          !atCap&&React.createElement("button",{
+            onClick:()=>{
+              const msLeft=Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs);
+              const speedCost=Math.ceil(500*msLeft/(FIELD_CAP_HOURS*3600000));
+              if((currencies.gems||0)<speedCost){showNotify("Not enough 💎 Gems!");return;}
+              setSpeedUpConfirm({cost:speedCost,onConfirm:()=>{
+                const t=Date.now();
+                setFarmFieldLastHarvest(h=>h-msLeft);
+                setNow(t);
+              }});
+            },
+            style:{padding:"12px 10px",border:"none",borderRadius:10,fontWeight:700,fontSize:13,
+              cursor:"pointer",background:"#534AB7",color:"#fff",whiteSpace:"nowrap"}
+          },"⚡ "+Math.ceil(500*Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs)/(FIELD_CAP_HOURS*3600000))+" 💎")
+        ),
+        React.createElement("div",{style:{marginTop:10}}),
+        farmFieldLevel>=maxLevel
+          ?React.createElement("div",{style:{textAlign:"center",fontSize:13,color:"#888",padding:"4px 0"}},"Field max level ✅")
+          :React.createElement(React.Fragment,null,
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+              React.createElement("div",null)
+            ),
+            React.createElement("button",{
+              onClick:()=>setShowFieldUpgrade(true),
+              style:{width:"100%",padding:"10px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:14,
+                cursor:"pointer",background:"#534AB7",color:"#fff",transition:"background .2s"},
+            },"Upgrade Field")
+          )
+      ),
+    ),
+    farmTab==="plots"&&React.createElement(React.Fragment,null,
+
+      DEV_MODE&&React.createElement("div",{style:{background:"#1e1e2e",borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}},
+        React.createElement("span",{style:{fontSize:11,color:"#aaa",fontWeight:600,marginRight:4}},"⏱ Dev"),
+        ...[1,6,12].map(h=>React.createElement("button",{key:h,
+          onClick:()=>setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:c.plantedAt-h*3600000}:c)),
+          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#3C3489",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
+          "+"+h+"h"
+        )),
+        React.createElement("button",{
+          onClick:()=>setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:Date.now()}:c)),
+          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#555",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",marginLeft:"auto"}},
+          "Reset"
+        )
+      ),
+
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+        Array.from({length:MAX_PLOTS},(_,i)=>{
+          const isStorePlot=i>=MAX_MONEY_PLOTS;
+          const unlocked=isStorePlot?specialPurchased:i<farmPlots;
+          const isNext=!isStorePlot&&i===farmPlots&&farmPlots<MAX_MONEY_PLOTS;
+          const cost=FARM_PLOT_COSTS[i];
+          const crop=farmCrops[i];
+          const cropDef=crop?PLOT_CROPS.find(c=>c.key===crop.cropKey):null;
+          const elapsed=crop?(now-crop.plantedAt):0;
+          const ready=crop&&elapsed>=PLOT_GROW_MS;
+          const pct=crop?Math.max(0,Math.min(elapsed/PLOT_GROW_MS,1)):0;
+          const msLeft=crop?Math.min(Math.max(PLOT_GROW_MS-elapsed,0),PLOT_GROW_MS):0;
+          const hLeft=Math.floor(msLeft/3600000);
+          const mLeft=Math.floor((msLeft%3600000)/60000);
+          const upgradeLevel=plotUpgrades[i]||0;
+          const effectiveYield=crop?(cropDef.yield+Math.floor(upgradeLevel/cropDef.upgradeEvery)):0;
+          function harvestPlot(){
+            setCurrencies(c=>({...c,[cropDef.key]:(c[cropDef.key]||0)+effectiveYield}));
+            setFarmCrops(fc=>{const a=[...fc];a[i]=null;return a;});
+          }
+          return React.createElement("div",{
+            key:i,
+            onClick:isStorePlot&&!unlocked?()=>onGoToStore():isNext?(canAfford?()=>setConfirm(true):()=>showNotify("Not enough 💰 Money!")):undefined,
+            style:{
+              position:"relative",
+              background:unlocked?(ready?"#fff9c4":crop?"#e3f2fd":"#e8f5e9"):isNext?"#fff":isStorePlot?"#f3e8ff":"#f0f0f0",
+              border:unlocked?(ready?"2px solid #f9a825":crop?"2px solid #42a5f5":"2px solid #66bb6a"):isNext?"2px dashed #aaa":isStorePlot?"2px dashed #9c27b0":"2px dashed #ccc",
+              borderRadius:14,padding:"12px",textAlign:"center",
+              cursor:(isNext||isStorePlot&&!unlocked)?"pointer":"default",
+              opacity:!unlocked&&!isNext&&!isStorePlot?0.5:1,
+              transition:"all .15s",
+              height:160,boxSizing:"border-box",
+              display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+            }
+          },
+            unlocked&&React.createElement("div",{style:{position:"absolute",top:6,left:0,right:0,textAlign:"center",fontSize:12,fontWeight:700,color:"#888"}},"Lv."+((plotUpgrades[i]||0)+1)),
+            unlocked&&crop&&!ready&&React.createElement("button",{
+              onClick:e=>{e.stopPropagation();setCancelling(i);},
+              style:{position:"absolute",top:6,left:8,background:"none",border:"none",fontSize:16,color:"#aaa",cursor:"pointer",lineHeight:1,padding:2}
+            },"×"),
+            React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?cropDef.emoji:"🌱"):"🔒"),
+            unlocked&&!crop&&React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:6}},
+              React.createElement("button",{
+                onClick:e=>{e.stopPropagation();setPicking(i);},
+                style:{padding:"10px 28px",background:"#4caf50",color:"#fff",border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",fontSize:15}
+              },"Grow"),
+              React.createElement("button",{
+                onClick:e=>{e.stopPropagation();setUpgradingPlot(i);},
+                style:{padding:"4px 12px",background:"#1976d2",color:"#fff",border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:11}
+              },"Upgrade")
+            ),
+            unlocked&&crop&&!ready&&React.createElement(React.Fragment,null,
+              React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600,marginBottom:4}},cropDef.label+" × "+effectiveYield),
+              React.createElement("div",{style:{background:"#e0e0e0",borderRadius:4,height:6,margin:"0 4px 6px",overflow:"hidden",width:"100%"}},
+                React.createElement("div",{style:{width:(pct*100)+"%",height:"100%",background:"#534AB7",transition:"width .5s"}})
+              ),
+              React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:6}},hLeft+"h "+mLeft+"m left"),
+              React.createElement("button",{
+                onClick:e=>{
+                  e.stopPropagation();
+                  const speedCost=Math.ceil(500*msLeft/PLOT_GROW_MS);
+                  if((currencies.gems||0)<speedCost){showNotify("Not enough 💎 Gems!");return;}
+                  setSpeedUpConfirm({cost:speedCost,onConfirm:()=>{
+                    setCurrencies(c=>({...c,gems:(c.gems||0)-speedCost}));
+                    const t=Date.now();
+                    setFarmCrops(fc=>{const a=[...fc];a[i]={...a[i],plantedAt:t-PLOT_GROW_MS};return a;});
+                    setNow(t);
+                  }});
+                },
+                style:{padding:"4px 10px",background:"#7b1fa2",color:"#fff",border:"none",borderRadius:7,fontWeight:700,cursor:"pointer",fontSize:11}
+              },"⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎")
+            ),
+            unlocked&&crop&&ready&&React.createElement(React.Fragment,null,
+              React.createElement("div",{style:{fontSize:11,color:"#e65100",fontWeight:600,marginBottom:6}},cropDef.emoji+" "+effectiveYield+" "+cropDef.label+" ready!"),
+              React.createElement("button",{
+                onClick:e=>{e.stopPropagation();harvestPlot();},
+                style:{padding:"6px 14px",background:"#ff9800",color:"#fff",border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:12}
+              },"Harvest")
+            ),
+            isNext&&React.createElement(React.Fragment,null,
+              React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#555",marginBottom:4}},"Plot "+(i+1)),
+              React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#888"}},"💰 "+cost.toLocaleString())
+            ),
+            !unlocked&&!isNext&&React.createElement(React.Fragment,null,
+              React.createElement("div",{style:{fontSize:13,fontWeight:700,color:isStorePlot?"#7b1fa2":"#aaa",marginBottom:4}},"Plot "+(i+1)),
+              isStorePlot
+                ?React.createElement("div",{style:{fontSize:11,color:"#7b1fa2",fontWeight:600,textAlign:"center"}},React.createElement("i",{className:"ti ti-shopping-cart",style:{marginRight:3}}),"Starter Pack")
+                :React.createElement("div",{style:{fontSize:11,color:"#bbb"}},"Locked")
+            )
+          );
+        })
+      ),
+      farmPlots>=MAX_MONEY_PLOTS&&specialPurchased&&React.createElement("div",{style:{textAlign:"center",fontSize:14,fontWeight:600,color:"#2e7d32",padding:20}},"All plots unlocked! 🎉")
+    )
+    ),
+    speedUpConfirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}},
+      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:270,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:32,marginBottom:8}},"⚡"),
+        React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Speed Up?"),
+        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},"This will use 💎 "+speedUpConfirm.cost+" Gems."),
+        React.createElement("div",{style:{display:"flex",gap:8}},
+          React.createElement("button",{onClick:()=>setSpeedUpConfirm(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),
+          React.createElement("button",{onClick:()=>{const cb=speedUpConfirm.onConfirm;setSpeedUpConfirm(null);cb();},style:{flex:1,padding:"10px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Confirm")
+        )
+      )
+    ),
+    showFieldInfo&&React.createElement("div",{
+      onClick:()=>setShowFieldInfo(false),
+      style:{position:"absolute",inset:0,display:"flex",alignItems:"flex-start",justifyContent:"flex-end",padding:"160px 16px 0",zIndex:10}
+    },
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{
+        background:"#fff",borderRadius:12,padding:"12px 14px",
+        boxShadow:"0 4px 20px rgba(0,0,0,0.15)",
+        width:230,textAlign:"left",animation:"fadeIn .15s ease",
+      }},
+        React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#555",marginBottom:6,paddingBottom:4,borderBottom:"0.5px solid rgba(0,0,0,0.08)"}},"Drops per hour"),
+        React.createElement("div",{className:"rates-row"},
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,rate)," 🍖 Food"),
+          React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
+        ),
+        React.createElement("div",{className:"rates-row"},
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,moneyRate)," 💰 Money"),
+          React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
+        ),
+        React.createElement("div",{className:"rates-row"},
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,"2")," 🍬 Candy"),
+          React.createElement("span",{style:{fontSize:12,fontWeight:600}},"0.5%")
+        ),
+        ...MELON_TYPES.map(m=>React.createElement("div",{key:m.key,className:"rates-row"},
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,"1")," "+m.emoji+" "+m.label),
+          React.createElement("span",{style:{fontSize:12,fontWeight:600}},"0.5%")
+        ))
+      )
+    ),
+    showFieldUpgrade&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
+      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},"⬆️ Upgrade Main Field"),
+        React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:16}},"Level "+farmFieldLevel+" → "+(farmFieldLevel+1)),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
+          React.createElement("div",{className:"rates-row"},
+            React.createElement("span",{style:{fontSize:13}},"🍖 Food rate"),
+            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},rate+" → "+(FIELD_RATES[farmFieldLevel+1]||"?")+"/hr")
+          ),
+          React.createElement("div",{className:"rates-row"},
+            React.createElement("span",{style:{fontSize:13}},"💰 Money rate"),
+            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},moneyRate+" → "+(FIELD_MONEY_RATES[farmFieldLevel+1]||"?")+"/hr")
+          ),
+          React.createElement("div",{className:"rates-row"},
+            React.createElement("span",{style:{fontSize:13}},"🔧 Gear Shards rate"),
+            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},shardRate+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]||"?")+"/hr")
+          )
+        ),
+        React.createElement("div",{style:{fontSize:13,color:canUpgrade?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 💰 "+upgradeCost?.toLocaleString()),
+        React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+          React.createElement("button",{onClick:()=>setShowFieldUpgrade(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Close"),
+          React.createElement("button",{
+            disabled:!canUpgrade,
+            onClick:()=>{upgrade();setShowFieldUpgrade(false);},
+            style:{flex:1,padding:"10px 0",background:canUpgrade?"#534AB7":"#ccc",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:canUpgrade?"pointer":"default",fontSize:13}
+          },"Upgrade")
+        )
+      )
+    ),
+    upgradingPlot!==null&&(()=>{
+      const ui=upgradingPlot;
+      const uLevel=plotUpgrades[ui]||0;
+      const uBonus=Math.floor(uLevel/5);
+      const uProgress=uLevel%5;
+      const uCost=100*(uLevel+1);
+      const uCanAfford=(currencies.money||0)>=uCost;
+      return React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
+        React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+          React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},"⬆️ Upgrade Plot "+(ui+1)),
+          React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:12}},"Level "+uLevel+" → "+(uLevel+1)),
+          React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
+            PLOT_CROPS.map(c=>{
+              const cur=c.yield+Math.floor(uLevel/c.upgradeEvery);
+              const nxt=c.yield+Math.floor((uLevel+1)/c.upgradeEvery);
+              const nextBoostLevel=(Math.floor(uLevel/c.upgradeEvery)+1)*c.upgradeEvery;
+              return React.createElement("div",{key:c.key,style:{fontSize:12,display:"flex",alignItems:"center",gap:4,flexWrap:"wrap"}},
+                React.createElement("span",null,c.emoji+" "+c.label+": "),
+                React.createElement("span",{style:{fontWeight:700,color:nxt>cur?"#2e7d32":"#555"}},cur+" → "+nxt),
+                nxt===cur&&React.createElement("span",{style:{color:"#aaa",fontSize:11}},"(+1 at level "+nextBoostLevel+")")
+              );
+            })
+          ),
+          React.createElement("div",{style:{fontSize:13,color:uCanAfford?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 💰 "+uCost.toLocaleString()),
+          !uCanAfford&&React.createElement("div",{style:{fontSize:11,color:"#e53935",marginBottom:8}},"Need 💰 "+(uCost-(currencies.money||0)).toLocaleString()+" more"),
+          React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+            React.createElement("button",{onClick:()=>setUpgradingPlot(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Close"),
+            React.createElement("button",{
+              disabled:!uCanAfford,
+              onClick:()=>{
+                setCurrencies(c=>({...c,money:(c.money||0)-uCost}));
+                setPlotUpgrades(pu=>{const a=[...pu];a[ui]=a[ui]+1;return a;});
+              },
+              style:{flex:1,padding:"10px 0",background:uCanAfford?"#1976d2":"#ccc",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:uCanAfford?"pointer":"default",fontSize:13}
+            },"Upgrade")
+          )
+        )
+      );
+    })(),
+    cancelling!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
+      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:36,marginBottom:8}},"⚠️"),
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:8}},"Cancel Growth?"),
+        React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:16}},"All progress on this crop will be lost."),
+        React.createElement("div",{style:{display:"flex",gap:8}},
+          React.createElement("button",{onClick:()=>setCancelling(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Keep Growing"),
+          React.createElement("button",{onClick:()=>{setFarmCrops(fc=>{const a=[...fc];a[cancelling]=null;return a;});setCancelling(null);},style:{flex:1,padding:"10px 0",background:"#e53935",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel")
+        )
+      )
+    ),
+    picking!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
+      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"14px 12px",width:300,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:14,fontWeight:700,marginBottom:2,textAlign:"center"}},"🌱 What to grow?"),
+        React.createElement("div",{style:{fontSize:11,color:"#888",textAlign:"center",marginBottom:8}},"Time to grow: "+(PLOT_GROW_MS/3600000)+"h"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}},
+          PLOT_CROPS.map(crop=>React.createElement("button",{
+            key:crop.key,
+            onClick:()=>{
+              setFarmCrops(fc=>{const a=[...fc];a[picking]={cropKey:crop.key,plantedAt:Date.now()};return a;});
+              onPlant?.();
+              setPicking(null);
+            },
+            style:{display:"flex",flexDirection:"column",alignItems:"center",padding:"7px 4px",background:"#f5f5f5",border:"2px solid #e0e0e0",borderRadius:10,cursor:"pointer",gap:2}
+          },
+            React.createElement("span",{style:{fontSize:20}},crop.emoji),
+            React.createElement("span",{style:{fontSize:10,fontWeight:700,textAlign:"center",lineHeight:1.2}},crop.label),
+            React.createElement("span",{style:{fontSize:9,color:"#888"}},"x"+(crop.yield+Math.floor((plotUpgrades[picking]||0)/crop.upgradeEvery)))
+          ))
+        ),
+        React.createElement("button",{onClick:()=>setPicking(null),style:{width:"100%",marginTop:8,padding:"8px 0",background:"#eee",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:12}},"Cancel")
+      )
+    ),
+    notify&&React.createElement("div",{style:{position:"absolute",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.75)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,pointerEvents:"none",whiteSpace:"nowrap",zIndex:20}},notify),
+    confirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
+      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:36,marginBottom:8}},"🔓"),
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:6}},"Unlock Plot "+(farmPlots+1)+"?"),
+        React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:4}},"This will cost"),
+        React.createElement("div",{style:{fontSize:22,fontWeight:800,marginBottom:4}},"💰 "+nextCost?.toLocaleString()),
+        !canAfford&&React.createElement("div",{style:{fontSize:12,color:"#e53935",fontWeight:600,marginBottom:8}},"Not enough Money!"),
+        canAfford&&React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:16}},"You have: 💰 "+(currencies.money||0).toLocaleString()),
+        React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+          React.createElement("button",{onClick:()=>setConfirm(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),
+          React.createElement("button",{onClick:unlockPlot,disabled:!canAfford,style:{flex:1,padding:"10px 0",background:canAfford?"#4caf50":"#ccc",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:canAfford?"pointer":"default",fontSize:13}},"Unlock")
+        )
+      )
+    )
+  );
+}
+
+// ── Treasure ────────────────────────────────────────────────────────────────
+
+export default FarmScreen;

@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"PlayScreen,{owned\" \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\creature_collector.html\")",
+      "Bash(grep -v \"arenaTab\\\\|ARENA_TAB\\\\|arenaTab\\\\|setArenaTab\\\\|tabStyle\\\\|//\\\\|type.*tab\\\\|tab.*type\")",
+      "Bash(grep -iv \"//\\\\|color\\\\|cursor\\\\|border\\\\|background\\\\|padding\\\\|margin\\\\|font\\\\|display\\\\|flex\\\\|width\\\\|height\\\\|position\\\\|overflow\\\\|gap\\\\|radius\\\\|shadow\\\\|zIndex\\\\|opacity\\\\|align\\\\|justify\\\\|wrap\\\\|transition\\\\|animation\\\\|transform\\\\|pointer\\\\|user\")",
+      "Bash(grep -v \"//\\\\|farmField\\\\|farmPlot\\\\|farmTab\\\\|farmCrop\\\\|farmCrops\\\\|FARM\\\\|FarmScreen\\\\|onBack\")",
+      "PowerShell($lines = Get-Content \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\creature_collector.html\"; $total = $lines.Count; Write-Host \"Total lines: $total\"; $lines[\\($total-10\\)..\\($total-1\\)])",
+      "PowerShell($content = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\creature_collector.html\"\\); $text = [System.Text.Encoding]::UTF8.GetString\\($content\\); $idx = $text.IndexOf\\(\"ⓘ\"\\); Write-Host \"Index of ⓘ: $idx\"; if\\($idx -ge 0\\){Write-Host \"Context: \" + $text.Substring\\([Math]::Max\\(0,$idx-20\\), 50\\)})",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(find /mnt/c/Users/Annie/Desktop/Stuff/CreatureCollector -name \"creature_collector.html\" -type f)",
+      "Bash(cd /home)",
+      "Bash(mkdir -p /tmp/work)",
+      "Read(//tmp/**)",
+      "PowerShell(python3 --version 2>&1)",
+      "PowerShell(\\(Get-Command npx -ErrorAction SilentlyContinue\\).Source)",
+      "PowerShell(\\(Get-Command node -ErrorAction SilentlyContinue\\).Source; \\(Get-Command npx -ErrorAction SilentlyContinue\\).Source; \\(Get-Command python3 -ErrorAction SilentlyContinue\\).Source)",
+      "PowerShell(Get-Command node,npm,npx,php,ruby,python3 2>$null)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\nodejs\",\"C:\\\\Program Files \\(x86\\)\\\\nodejs\",\"$env:APPDATA\\\\npm\",\"$env:LOCALAPPDATA\\\\Programs\\\\nodejs\" -ErrorAction SilentlyContinue | Select-Object FullName)",
+      "Bash(awk -F: '$2 > 8410')",
+      "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\6f62bc8a-6d05-4de9-be44-6bdbff52a1b9\\\\scratchpad\\\\add_middle_stages.ps1\")",
+      "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\6f62bc8a-6d05-4de9-be44-6bdbff52a1b9\\\\scratchpad\\\\fix_emojis.ps1\")",
+      "PowerShell(Get-Process -Name \"node\",\"python\",\"http-server\",\"live-server\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8765/creature_collector.html\" -UseBasicParsing)",
+      "PowerShell(netstat -ano)",
+      "PowerShell(Select-String -Path \"C:\\\\Users\\\\Annie\\\\.claude\\\\projects\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\6f62bc8a-6d05-4de9-be44-6bdbff52a1b9.jsonl\" -Pattern \"ARENA_TABS\" | Select-Object -First 5 | ForEach-Object { $_.Line.Substring\\(0, [Math]::Min\\(300, $_.Line.Length\\)\\) })",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\Annie\\\\Downloads\\\\Gemini_Generated_Image_rwm0rzrwm0rzrwm0.png\" \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\images\\\\breezekit.png\" -Force; if\\(-not \\(Test-Path \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\images\"\\)\\) { New-Item -ItemType Directory -Path \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\images\" | Out-Null; Copy-Item \"C:\\\\Users\\\\Annie\\\\Downloads\\\\Gemini_Generated_Image_rwm0rzrwm0rzrwm0.png\" \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Stuff\\\\CreatureCollector\\\\images\\\\breezekit.png\" })",
+      "Bash(grep -v \"//\\\\|dungeon\\\\|Dungeon\")",
+      "Bash(node -e ' *)",
+      "Skill(artifact-design)",
+      "Skill(artifact-design:*)"
+    ]
+  }
+}

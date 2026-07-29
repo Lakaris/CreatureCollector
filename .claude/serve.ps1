@@ -10,7 +10,7 @@ while ($listener.IsListening) {
     $res = $ctx.Response
     $path = $req.Url.LocalPath -replace '/', [System.IO.Path]::DirectorySeparatorChar
     $path = $path.TrimStart([System.IO.Path]::DirectorySeparatorChar)
-    if ($path -eq '' -or $path -eq '\') { $path = 'creature_collector.html' }
+    if ($path -eq '' -or $path -eq '\') { $path = 'index.html' }
     $file = Join-Path $root $path
     if (Test-Path $file -PathType Leaf) {
         $ext = [System.IO.Path]::GetExtension($file).ToLower()

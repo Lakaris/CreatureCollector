@@ -45,7 +45,7 @@ export const CREATURES=[
      special:{name:"Stone Shell",upgrades:["+15 DEF for 3s","+22 DEF for 3s","+30 DEF for 3s","+38 DEF for 4s","Also reflects 20% of damage taken during buff"]},
      unique:{name:"Titan Resilience",upgrades:["Passive: reduces all damage taken by 10","Reduces all damage taken by 16","Reduces all damage taken by 22; immune to knockback","Reduces all damage taken by 28; immune to knockback and stun","Reduces all damage taken by 35; immune to all crowd control; reflects 15% of blocked damage"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"pebbit",shardsToAscend:10,ascensionsToEvolve:30,evolutionId:"granitarch"},
-  {id:"breezekit",name:"Breezekit",emoji:"💨",type:"Wind",rarity:"common",description:"Always in motion, this breezy critter can outrun most predators easily.",
+  {id:"breezekit",name:"Breezekit",emoji:"💨",image:"images/breezekit.png",type:"Wind",rarity:"common",description:"Always in motion, this breezy critter can outrun most predators easily.",
    stats:{hp:38,atk:30,def:22,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gust Swipe",upgrades:["Deals 10 dmg","Deals 14 dmg","Deals 18 dmg","Deals 24 dmg","Pushes target back 1 tile"]},

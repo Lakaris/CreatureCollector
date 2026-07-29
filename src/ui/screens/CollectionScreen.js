@@ -142,11 +142,23 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
               d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),
               d.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[d.role].emoji),
               o.ascensions>0&&React.createElement("div",{style:{position:"absolute",top:5,left:0,right:0,textAlign:"center",lineHeight:1}},React.createElement(AscStars,{n:o.ascensions})),
-              React.createElement("div",{className:"creature-emoji"},displayEmoji),
-              React.createElement("div",{className:"creature-name"},d.name),
-              React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
-                React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
-              )
+              d.image
+                ?React.createElement("div",{style:{position:"relative",height:72,borderRadius:8,overflow:"hidden"}},
+                    React.createElement("img",{src:d.image,style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 75%",display:"block"}}),
+                    React.createElement("div",{style:{position:"absolute",left:0,right:0,bottom:0,padding:"10px 4px 4px",background:"linear-gradient(to top,rgba(255,255,255,0.92),rgba(255,255,255,0))"}},
+                      React.createElement("div",{className:"creature-name",style:{marginBottom:2}},d.name),
+                      React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",flexWrap:"wrap",alignItems:"center"}},
+                        React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
+                      )
+                    )
+                  )
+                :[
+                    React.createElement("div",{key:"e",className:"creature-emoji"},displayEmoji),
+                    React.createElement("div",{key:"n",className:"creature-name"},d.name),
+                    React.createElement("div",{key:"l",style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
+                      React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
+                    )
+                  ]
             );
           })
         )

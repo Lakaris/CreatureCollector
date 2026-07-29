@@ -14,6 +14,7 @@ import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../../battle/geom
 import { makeArenaBattle } from "../../../battle/state.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel from "../../../ui/components/UnitInfoPanel.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 
 const REWARD_DISPLAY = {
   gems: ["💎", "Gem", "Gems"],
@@ -409,7 +410,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             onClick: u.hp > 0 ? () => setBattleSelectedUid(u.uid) : undefined,
             style: { position: "absolute", width: ARENA_TILE, height: ARENA_TILE, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: u.hp > 0 ? 1 : 0, zIndex: 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default" },
           },
-            React.createElement("div", { style: { fontSize: 20, lineHeight: 1 } }, CREATURE_MAP[u.creatureId]?.emoji || "❓"),
+            React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: 20 }),
             React.createElement("div", { style: { position: "absolute", bottom: 3, left: 3, right: 3, height: 3, background: "#ddd", borderRadius: 2, overflow: "hidden" } },
               React.createElement("div", { className: "hp-fill", style: { height: "100%", width: (u.hp / u.maxHp * 100) + "%", background: u.uid[0] === "e" ? "#ef4444" : "#22c55e", borderRadius: 2 } })
             )
@@ -417,6 +418,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         ),
         selectedUnit ? React.createElement(UnitInfoPanel, {
           emoji: CREATURE_MAP[selectedUnit.creatureId]?.emoji || "❓",
+          image: CREATURE_MAP[selectedUnit.creatureId]?.image,
           name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
           subtitle: selectedUnit.uid[0] === "e" ? "Enemy" : "Ally",
           hp: selectedUnit.hp, maxHp: selectedUnit.maxHp,
@@ -484,7 +486,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   fontSize: 26, cursor: isPlayerZone ? (creatureId ? "grab" : "default") : "default",
                   boxSizing: "border-box", userSelect: "none",
                 },
-              }, (() => { const d = def || enemyDef; if (!d) return ""; return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), d.emoji); })());
+              }, (() => { const d = def || enemyDef; if (!d) return ""; return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: 26 })); })());
             })).flat()
           )
         ),
@@ -495,7 +497,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
               React.createElement("button", { onClick: () => setEnemyMinimized((p) => !p), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, enemyMinimized ? "＋" : "－"),
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: enemyMinimized ? 0 : 12 } },
-                React.createElement("div", { style: { fontSize: 28, lineHeight: 1 } }, def.emoji),
+                React.createElement(CreatureIcon, { def, size: 28 }),
                 React.createElement("div", null,
                   React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, def.name),
                   React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, def.type + " · " + (def.attackType || "Melee") + " · Lv." + level + " · Enemy")
@@ -518,7 +520,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
               React.createElement("button", { onClick: () => setAllyMinimized((p) => !p), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, allyMinimized ? "＋" : "－"),
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: allyMinimized ? 0 : 12 } },
-                React.createElement("div", { style: { fontSize: 28, lineHeight: 1 } }, def.emoji),
+                React.createElement(CreatureIcon, { def, size: 28 }),
                 React.createElement("div", null,
                   React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, def.name),
                   React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, def.type + " · " + (def.attackType || "Melee") + (oc ? " · Lv." + oc.level : ""))
@@ -589,7 +591,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                 React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
                   React.createElement("div", { style: { position: "absolute", top: -2, left: -6, fontSize: 10, lineHeight: 1 } }, TYPE_EMOJI[def.type] || ""),
                   React.createElement("div", { style: { position: "absolute", top: -2, right: -6, fontSize: 10, lineHeight: 1 } }, def.attackType === "Ranged" ? "🏹" : "⚔️"),
-                  React.createElement("div", { style: { fontSize: 24, lineHeight: 1, marginTop: 6 } }, def.emoji)
+                  React.createElement(CreatureIcon, { def, size: 24, style: { marginTop: 6 } })
                 ),
                 React.createElement("div", { style: { fontSize: 8, color: "#333", fontWeight: 600, textAlign: "center", lineHeight: 1.2, maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, def.name),
                 React.createElement("div", { style: { fontSize: 8, color: "#666", fontWeight: 700 } }, "Lv." + oc.level)

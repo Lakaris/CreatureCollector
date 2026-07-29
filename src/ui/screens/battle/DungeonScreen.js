@@ -14,6 +14,7 @@ import { getBossModule, getHighlightTiles } from "../../../battle/bosses/registr
 import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/context.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 
@@ -309,7 +310,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
           }),
           allUnits.map(u=>{const isBurned=u.uid[0]==="p"&&(u.burnTicks||0)>0;const isDotted=u.uid[0]==="p"&&(u.dotTicks||0)>0;const isWeak=u.uid[0]==="p"&&(u.weakTicks||0)>0;return React.createElement("div",{key:"du"+u.uid,ref:el=>{if(el){const hpEl=el.querySelector(".hp-fill");dUnitRefs.current.set(u.uid,{el,hpEl});el.style.left=(u.col*DUNGEON_TILE)+"px";el.style.top=(u.row*DUNGEON_TILE)+"px";}else dUnitRefs.current.delete(u.uid);},onClick:u.hp>0?()=>setDBattleSelected({type:"unit",uid:u.uid}):undefined,style:{position:"absolute",width:DUNGEON_TILE,height:DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",opacity:u.hp>0?1:0,zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default"}},
             React.createElement("div",{style:{position:"relative",lineHeight:1}},
-              React.createElement("div",{style:{fontSize:20,lineHeight:1}},CREATURE_MAP[u.creatureId]?.emoji||"❓"),
+              React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
               isBurned&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥"),
               isDotted&&React.createElement("div",{style:{position:"absolute",top:-4,left:-6,fontSize:10,lineHeight:1}},"🟣"),
               isWeak&&React.createElement("div",{style:{position:"absolute",bottom:-4,right:-6,fontSize:10,lineHeight:1}},"⬇️")
@@ -321,6 +322,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
         ),
         selectedUnit?React.createElement(UnitInfoPanel,{
           emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||(selectedUnit.creatureId==="__vine_minion"?"🌱":"❓"),
+          image:CREATURE_MAP[selectedUnit.creatureId]?.image,
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||(selectedUnit.creatureId==="__vine_minion"?"Vine":selectedUnit.creatureId),
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
@@ -374,7 +376,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
                 onMouseDown:onHS,onMouseUp:onHE,
                 onTouchStart:onHS?(e)=>{e.preventDefault();onHS();}:undefined,onTouchEnd:onHE,
                 style:{width:DUNGEON_TILE,height:DUNGEON_TILE,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none"}
-              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),d.emoji);})());
+              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:26}));})());
             })).flat()
           ),
           React.createElement("div",{style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*DUNGEON_TILE,top:1*DUNGEON_TILE,width:2*DUNGEON_TILE,height:2*DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,pointerEvents:"none",zIndex:10}},
@@ -419,7 +421,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
             return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
               React.createElement("button",{onClick:()=>setDCreatureMinimized(p=>!p),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dCreatureMinimized?"＋":"－"),
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:dCreatureMinimized?0:12}},
-                React.createElement("div",{style:{fontSize:28,lineHeight:1}},def.emoji),
+                React.createElement(CreatureIcon,{def,size:28}),
                 React.createElement("div",null,
                   React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},def.name),
                   React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))
@@ -474,7 +476,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
                 React.createElement("div",{style:{position:"relative",lineHeight:1}},
                   React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},TYPE_EMOJI[def.type]||""),
                   React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},def.attackType==="Ranged"?"🏹":"⚔️"),
-                  React.createElement("div",{style:{fontSize:24,lineHeight:1,marginTop:6}},def.emoji)
+                  React.createElement(CreatureIcon,{def,size:24,style:{marginTop:6}})
                 ),
                 React.createElement("div",{style:{fontSize:8,color:"#333",fontWeight:600,textAlign:"center",lineHeight:1.2,maxWidth:48,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},def.name),
                 React.createElement("div",{style:{fontSize:8,color:"#666",fontWeight:700}},"Lv."+oc.level)

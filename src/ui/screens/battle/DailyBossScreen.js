@@ -13,6 +13,7 @@ import { makeArenaBattle } from "../../../battle/state.js";
 import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
@@ -445,7 +446,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 // NO left/top — RAF manages those
               }
             },
-              React.createElement("div",{style:{fontSize:20,lineHeight:1}},CREATURE_MAP[u.creatureId]?.emoji||"❓"),
+              React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
               React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
                 React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:"#22c55e",borderRadius:2}})
               )
@@ -454,6 +455,7 @@ function DailyBossScreen({onBack,onViewCreature}){
         ),
         selectedUnit?React.createElement(UnitInfoPanel,{
           emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||"❓",
+          image:CREATURE_MAP[selectedUnit.creatureId]?.image,
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
@@ -527,7 +529,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 userSelect:"none",
               }
             },
-            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),def.emoji):"");
+            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:26})):"");
           })
         ).flat()
       )
@@ -573,7 +575,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           return React.createElement("div",{style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
             React.createElement("button",{onClick:()=>setCreatureMinimized(p=>!p),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},creatureMinimized?"＋":"－"),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:creatureMinimized?0:12}},
-              React.createElement("div",{style:{fontSize:28,lineHeight:1}},def.emoji),
+              React.createElement(CreatureIcon,{def,size:28}),
               React.createElement("div",null,
                 React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
                 React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))
@@ -658,7 +660,7 @@ function DailyBossScreen({onBack,onViewCreature}){
               React.createElement("div",{style:{position:"relative",lineHeight:1}},
                 React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},TYPE_EMOJI[def.type]||""),
               React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},def.attackType==="Ranged"?"🏹":"⚔️"),
-                React.createElement("div",{style:{fontSize:24,lineHeight:1,marginTop:6}},def.emoji)
+                React.createElement(CreatureIcon,{def,size:24,style:{marginTop:6}})
               ),
               React.createElement("div",{style:{fontSize:8,color:"#333",fontWeight:600,textAlign:"center",lineHeight:1.2,maxWidth:48,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},def.name),
               React.createElement("div",{style:{fontSize:8,color:"#666",fontWeight:700}},"Lv."+oc.level)

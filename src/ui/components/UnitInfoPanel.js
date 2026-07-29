@@ -3,6 +3,7 @@
 // snapshot each render, so HP/debuffs stay live while it's open.
 
 import React from "../../react.js";
+import CreatureIcon from "./CreatureIcon.js";
 
 export const DEBUFF_DEFS = [
   { key: "burnTicks", icon: "🔥", label: "Burn" },
@@ -21,13 +22,13 @@ export function debuffsFor(u) {
   return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
 }
 
-function UnitInfoPanel({ emoji, name, subtitle, hp, maxHp, shield, debuffs, onClose }) {
+function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   return React.createElement("div", {
     style: { width: 150, flexShrink: 0, background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", boxSizing: "border-box" },
   },
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
-      React.createElement("div", { style: { fontSize: 20, lineHeight: 1, flexShrink: 0 } }, emoji),
+      React.createElement(CreatureIcon, { def: { emoji, image }, size: 20, style: { flexShrink: 0 } }),
       React.createElement("div", { style: { flex: 1, minWidth: 0 } },
         React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, name),
         subtitle && React.createElement("div", { style: { fontSize: 9, color: "#888", fontWeight: 600 } }, subtitle)

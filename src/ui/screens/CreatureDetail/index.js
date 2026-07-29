@@ -573,7 +573,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         React.createElement("div",{style:{textAlign:"center"}},
           ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
           def.image
-            ?React.createElement("div",{style:{width:"100%",marginBottom:8,borderRadius:16,overflow:"hidden",background:"linear-gradient(160deg,#d6eeff,#e8d6ff)"}},
+            ?React.createElement("div",{style:{width:"100%",marginBottom:8,borderRadius:16,overflow:"hidden",background:"#fff"}},
                 React.createElement("img",{src:def.image,style:{width:"100%",height:220,objectFit:"contain",display:"block",mixBlendMode:"multiply"}}))
             :React.createElement("span",{style:{fontSize:100,lineHeight:1,display:"block",marginBottom:8}},displayEmoji),
           React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:6}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),

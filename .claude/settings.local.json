@@ -42,7 +42,8 @@
       "Bash(grep -oP '\"\\\\d+ dmg[^\"]{0,60}\"' src/data/creatures.js)",
       "Bash(grep -oP '\"Passive:[^\"]{0,80}\"' src/data/creatures.js)",
       "Bash(grep -oP '\"Deals \\\\d+[^\"]{0,40}\"' src/data/creatures.js)",
-      "Bash(grep -oP '\"Regenerates \\\\d+[^\"]{0,40}\"' src/data/creatures.js)"
+      "Bash(grep -oP '\"Regenerates \\\\d+[^\"]{0,40}\"' src/data/creatures.js)",
+      "Bash(find \"C:/Users/Annie/Desktop/Stuff/CreatureCollector\" -iname \"*.png\" -newermt \"2026-07-28\" 2>/dev/null; echo ---; find /tmp -iname \"*.png\" 2>/dev/null | head -50; echo ---; find \"$HOME/AppData/Local/Temp\" -iname \"*.png\" -mmin -120 2>/dev/null | head -50)"
     ]
   }
 }

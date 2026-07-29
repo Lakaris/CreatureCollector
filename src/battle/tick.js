@@ -81,6 +81,7 @@ export function runBattleTick(state, config) {
 
   const allOcc = new Set([...aliveP, ...aliveE].map((u) => u.row + "," + u.col));
   const bossAlive = !!(boss && boss.hp > 0);
+  const damageDealt = state.damageDealt || (state.damageDealt = {});
 
   /** Cells a unit may not path through. */
   const blocked = (r, c) =>
@@ -101,7 +102,9 @@ export function runBattleTick(state, config) {
     // Boss takes priority when in range -- hold position even while on cooldown.
     if (distB <= range && bossAlive) {
       if (u.atkCd <= 0) {
-        damageBoss(boss, playerDamageToBoss(u, boss, aliveP));
+        const dmgToBoss = playerDamageToBoss(u, boss, aliveP);
+        damageBoss(boss, dmgToBoss);
+        damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmgToBoss;
         u.atkCd = attackCooldown(u, penalty);
         newFx.push({ id: now + u.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
       }
@@ -117,7 +120,9 @@ export function runBattleTick(state, config) {
           ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col)
           : aChebDist(u.row, u.col, tgt.row, tgt.col);
         if (dist <= range && u.atkCd <= 0) {
-          tgt.hp = Math.max(0, tgt.hp - unitDamage(u, tgt));
+          const dmg = unitDamage(u, tgt);
+          tgt.hp = Math.max(0, tgt.hp - dmg);
+          damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmg;
           u.atkCd = attackCooldown(u, penalty);
           newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
         } else if (canMove && dist > range) {

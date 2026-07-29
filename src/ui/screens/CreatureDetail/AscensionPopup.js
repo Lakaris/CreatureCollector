@@ -1,7 +1,7 @@
 // Celebration popup shown after an ascension.
 
 import React, { useState, useEffect } from "../../../react.js";
-import { STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../../data/rarity.js";
+import { CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../../data/rarity.js";
 import { calcStats } from "../../../core/creatures.js";
 
 function AscensionPopup({def,displayEmoji,ascPopup,ownedData,onClose}){
@@ -20,10 +20,12 @@ function AscensionPopup({def,displayEmoji,ascPopup,ownedData,onClose}){
     },
       React.createElement("div",{style:{fontSize:60,marginBottom:6}},displayEmoji),
       React.createElement("div",{style:{fontSize:20,fontWeight:700,marginBottom:4}},def.name),
-      React.createElement("div",{style:{fontSize:26,color:"#EF9F27",letterSpacing:3,marginBottom:6}},"★".repeat(ascPopup)),
-      React.createElement("div",{style:{fontSize:14,fontWeight:600,color:"#534AB7",marginBottom:16}},"Ascension "+ascPopup+"!"),
+      React.createElement("div",{style:{marginBottom:16}},
+        React.createElement("span",{style:{fontSize:26,fontWeight:700,color:"#EF9F27",letterSpacing:3}},ascPopup<5?"★".repeat(ascPopup):ascPopup+"★"),
+        React.createElement("span",{style:{fontSize:26,fontWeight:700,color:"#EF9F27"}}," Ascension")
+      ),
       React.createElement("div",{style:{textAlign:"left"}},
-        STAT_CYCLE.map(s=>React.createElement("div",{key:s,className:"stat-row"},
+        CORE_STAT_CYCLE.map(s=>React.createElement("div",{key:s,className:"stat-row"},
           React.createElement("span",{className:"stat-label"},STAT_LABELS[s]),
           React.createElement("div",{className:"stat-bar-bg"},
             React.createElement("div",{className:"stat-bar-fill",style:{width:Math.min(100,Math.round((statsAfter[s]/150)*100))+"%",background:STAT_COLORS[s]}})

@@ -3,15 +3,15 @@
 import React, { useState } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
-import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../data/equipment.js";
+import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION } from "../../data/equipment.js";
 import { FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS } from "../../data/flair.js";
 import { MELON_TYPES } from "../../data/types.js";
 import { DAILY_MISSIONS } from "../../data/quests.js";
-import { makeOwnedCreature } from "../../core/creatures.js";
+import { makeOwnedCreature, getChain, MAX_LEVEL, MAX_ASCENSION } from "../../core/creatures.js";
 import { DEV_MODE } from "../../config.js";
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState } = useGame();
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState } = useGame();
   const [vals,setVals]=useState({gems:"1000",money:"500",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
@@ -41,6 +41,37 @@ function DevPanel(){
     setOwned(all);
   }
   function resetAll(){setOwned({});setCurrencies({gems:1500,food:100,candy:50,money:0,eggs:0,legendaryEggs:0,melonFire:5,melonWater:5,melonNature:5,melonEarth:5,melonWind:5,melonElectric:5,melonLight:5,melonDark:5,melonRainbow:2,flairBanana:500,mythicalFlairBanana:500,ancientFlairBanana:500,flairShard:0});setSkinShards(0);}
+
+  function giveMaxInvestedCreatures(){
+    const all={};
+    CREATURES.filter(c=>!c.evolutionOf).forEach(c=>{
+      const chain=getChain(c.id);
+      const finalDef=CREATURE_MAP[chain[chain.length-1]];
+      const e=makeOwnedCreature(finalDef);
+      e.level=MAX_LEVEL;
+      e.ascensions=MAX_ASCENSION;
+      e.abilityLevels={basic:5,special:5,unique:5};
+      e.unlockedFlair=[];
+      all[finalDef.id]=e;
+    });
+    setOwned(all);
+  }
+  function giveMaxGear(){
+    const lvl={},asc={};
+    EQUIPMENT_DEFS.forEach(item=>{lvl[item.id]=EQUIP_MAX_LEVEL;asc[item.id]=EQUIP_MAX_ASCENSION;});
+    setEquipmentLevels(prev=>({...prev,...lvl}));
+    setEquipmentAscensions(prev=>({...prev,...asc}));
+    setEquipmentCopies(prev=>{const n={...prev};EQUIPMENT_DEFS.forEach(item=>{if(!(n[item.id]>0))n[item.id]=1;});return n;});
+  }
+  function giveMaxFlair(){
+    const allFlairIds=[
+      ...Object.values(FLAIR_TITLES).flat().map(t=>t.name),
+      ...Object.values(FLAIR_AURAS).flat().map(e=>e.id),
+      ...Object.values(FLAIR_BACKGROUNDS).flat().map(e=>e.id),
+      ...Object.values(FLAIR_ITEMS).flat().map(e=>e.id),
+    ];
+    setOwned(prev=>Object.fromEntries(Object.entries(prev).map(([id,c])=>[id,{...c,unlockedFlair:allFlairIds}])));
+  }
 
   function devRow(key,label){
     return React.createElement("div",{key,className:"dev-row"},
@@ -154,15 +185,15 @@ function DevPanel(){
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveAll},"Give all base creatures")
       ),
       React.createElement("div",{className:"dev-row"},
-        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:()=>{
-          const allFlairIds=[
-            ...Object.values(FLAIR_TITLES).flat().map(t=>t.name),
-            ...Object.values(FLAIR_AURAS).flat().map(e=>e.id),
-            ...Object.values(FLAIR_BACKGROUNDS).flat().map(e=>e.id),
-            ...Object.values(FLAIR_ITEMS).flat().map(e=>e.id),
-          ];
-          setOwned(prev=>Object.fromEntries(Object.entries(prev).map(([id,c])=>[id,{...c,unlockedFlair:allFlairIds}])));
-        }},"Unlock all flair")
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxInvestedCreatures},
+          "Give all creatures max invested (Lv "+MAX_LEVEL+", abilities Lv 5, "+MAX_ASCENSION+" ascensions, no flair)")
+      ),
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxGear},
+          "Max all gear (Lv "+EQUIP_MAX_LEVEL+", "+EQUIP_MAX_ASCENSION+" ascensions)")
+      ),
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxFlair},"Unlock all flair (max flair)")
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8,background:"#A32D2D"},onClick:resetAll},"Reset everything")

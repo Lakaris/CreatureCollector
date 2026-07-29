@@ -2,6 +2,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
+import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 
 /**
  * Player HP is multiplied by this so fights last a reasonable number of ticks.
@@ -11,7 +12,7 @@ const HP_SCALE = 4;
 
 /** Attack cooldown in ticks, derived from speed. Faster creatures act sooner. */
 function cooldownFor(spd) {
-  return Math.max(3, Math.round(600 / spd));
+  return Math.max(3, Math.round(COOLDOWN_TICKS_AT_SPD_1 / spd));
 }
 
 /**
@@ -51,7 +52,7 @@ export function makeArenaBattle(
     const stats = oc
       ? computeCombatStats(cdef, oc, equipmentLevels, equipmentAscensions)
       : cdef?.stats || {};
-    const spd = stats.spd || 50;
+    const spd = stats.spd || 1;
     const hp = Math.round((stats.hp || 60) * HP_SCALE);
     return {
       uid: "p" + i,
@@ -74,7 +75,7 @@ export function makeArenaBattle(
 
   const enemyUnits = Object.entries(enemyGrid).map(([key, edef], i) => {
     const [row, col] = key.split(",").map(Number);
-    const spd = edef?.stats?.spd || 50;
+    const spd = edef?.stats?.spd || 1;
     const hp = Math.round((edef?.stats?.hp || 60) * HP_SCALE * (1 + bossLevel * 0.15));
     return {
       uid: "e" + i,

@@ -5,7 +5,7 @@
 // fields are purely cosmetic and do NOT gate the stat bonus.
 
 export const FLAIR_RARITIES=[{id:"common",label:"Common"},{id:"rare",label:"Rare"},{id:"epic",label:"Epic"},{id:"legendary",label:"Legendary"}];
-export const BUFF_STAT_LABEL={hp:"HP",atk:"ATK",def:"DEF",spd:"SPD",abilitySpeed:"Haste"};
+export const BUFF_STAT_LABEL={hp:"Health",atk:"Attack",def:"Defense",spd:"Speed",abilitySpeed:"Haste"};
 export const FLAIR_TITLES={
   common:[
     {name:"Bold",      buff:{stat:"hp",           pct:1}},

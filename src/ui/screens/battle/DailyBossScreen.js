@@ -11,6 +11,8 @@ import { rollDungeonRewards } from "../../../core/gacha.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { aEase } from "../../../battle/geometry.js";
+import DamageChart from "../../../ui/components/DamageChart.js";
+import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
@@ -38,7 +40,6 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [battleLog,setBattleLog]=useState([]);
   const [logStep,setLogStep]=useState(0);
   const [rewards,setRewards]=useState(null);
-  const [lastRewards,setLastRewards]=useState(null);
   const [previewItem,setPreviewItem]=useState(null);
   const ownedList=Object.values(owned||{}).sort((a,b)=>(b.level||1)-(a.level||1));
   const placedIds=new Set(Object.values(planGrid));
@@ -113,6 +114,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   const bossDomRef=React.useRef(null);
   const [bSnap,setBSnap]=useState(null);
   const [atkEffects,setAtkEffects]=useState([]);
+  const [battleSelected,setBattleSelected]=useState(null); // {type:"unit",uid} | {type:"boss"} | null
   const [bossTimeLeft,setBossTimeLeft]=useState(60);
   const easeInOut=aEase;
   // Player units come from the shared builder, so Daily Boss fights now respect
@@ -178,8 +180,9 @@ function DailyBossScreen({onBack,onViewCreature}){
     // shock/splash/dark/slam effects here that they always did there.
     if(newFx.length)setAtkEffects(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:e.isDark?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
     // snapshot only for log + unit lifecycle (not positions — RAF handles those)
-    setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col})),
-      boss:{...s.boss},log:[...s.log]});
+    setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col,
+        burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,dotTicks:u.dotTicks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks})),
+      boss:{...s.boss},log:[...s.log],damageDealt:{...s.damageDealt}});
     const bGameElapsed=(Date.now()-battleStartRef.current)*speedRef.current;
     const bTL=Math.min(60,Math.ceil(Math.max(0,60000-bGameElapsed)/1000));
     setBossTimeLeft(bTL);
@@ -206,7 +209,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     speedRef.current=speedRef.current; moveAnimMsRef.current=Math.round(TICK_MS/speedRef.current*0.84);
     setFoughtBoss(boss);
     bRef.current=initBattle(planGrid);
-    setBSnap(null); setAtkEffects([]); setBattleLog([]);
+    setBSnap(null); setAtkEffects([]); setBattleLog([]); setBattleSelected(null);
     setPhase("battling");setBossTimeLeft(60);battleStartRef.current=Date.now();
     startRenderLoop();
     tickRef.current=setInterval(runTick,TICK_MS);
@@ -220,13 +223,13 @@ function DailyBossScreen({onBack,onViewCreature}){
     if(tickRef.current){clearInterval(tickRef.current);tickRef.current=setInterval(runTick,Math.round(TICK_MS/next));}
   }
   function retry(){
-    stopLoops(); bRef.current=null; setBSnap(null); setAtkEffects([]);
+    stopLoops(); bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
     setPhase("planning"); setBattleLog([]); setLogStep(0);
   }
   useEffect(()=>()=>stopLoops(),[]);
   function collectRewards(){
     setEquipmentCopies(prev=>{const n={...prev};for(const item of rewards)n[item.id]=(n[item.id]||0)+1;return n;});
-    if(phase==="won"){setDailyBossLevel(l=>(l||1)+1);setLastRewards(rewards);}
+    if(phase==="won"){setDailyBossLevel(l=>(l||1)+1);}
     if(phase==="lost") setDailyBossData(prev=>({...prev,rewardsCollectedDate:today}));
     setRewards(null);
     setPhase("idle");
@@ -282,7 +285,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   // Rewards screen
   if(rewards&&(phase==="won"||phase==="lost"))return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"🎁 Daily Boss Rewards"),
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},phase==="won"?"🎁 Victory Rewards":"🎁 Daily Boss Rewards"),
       React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},rewards.length+" items from "+(foughtBoss||boss).name)
     ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
@@ -324,9 +327,11 @@ function DailyBossScreen({onBack,onViewCreature}){
   );
   // Battle screen
   if(phase==="battling"||phase==="lost"){
-    const snap=bSnap||{playerUnits:[],boss:{hp:0,maxHp:1,atk:0},log:[]};
+    const snap=bSnap||{playerUnits:[],boss:{hp:0,maxHp:1,atk:0},log:[],damageDealt:{}};
     const bossMaxHp=snap.boss.maxHp||1;
     const now=Date.now();
+    const selectedUnit=battleSelected?.type==="unit"?snap.playerUnits.find(u=>u.uid===battleSelected.uid):null;
+    const selectedBoss=battleSelected?.type==="boss"?snap.boss:null;
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       // header — boss HP updated via RAF (id="battle-boss-hp"), text via React
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"10px 16px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
@@ -342,11 +347,14 @@ function DailyBossScreen({onBack,onViewCreature}){
       // battle grid
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:bossTimeLeft<=10?"#ef4444":"#534AB7"}},bossTimeLeft+"s ⏱"),
+        React.createElement("div",{style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
+        React.createElement(DamageChart,{damageDealt:snap.damageDealt}),
         React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
           // boss overlay — position managed by RAF
           React.createElement("div",{
             ref:el=>{bossDomRef.current=el;if(el){el.style.left=(snap.boss.col*TILE)+"px";el.style.top=(snap.boss.row*TILE)+"px";}},
-            style:{position:"absolute",width:2*TILE,height:2*TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:10}
+            onClick:()=>setBattleSelected({type:"boss"}),
+            style:{position:"absolute",width:2*TILE,height:2*TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",pointerEvents:"auto",cursor:"pointer",zIndex:10}
           },
             React.createElement("div",{style:{fontSize:36,lineHeight:1}},TYPE_EMOJI[boss.type]||"👾"),
             React.createElement("div",{style:{width:TILE*1.6,height:5,background:"#fdd",borderRadius:3,marginTop:3,overflow:"hidden"}},
@@ -427,12 +435,13 @@ function DailyBossScreen({onBack,onViewCreature}){
                   el.style.top=(u.row*TILE)+"px";
                 }else{unitDomRefs.current.delete(u.uid);}
               },
+              onClick:u.hp>0?()=>setBattleSelected({type:"unit",uid:u.uid}):undefined,
               style:{
                 position:"absolute",
                 width:TILE,height:TILE,
                 display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
                 opacity:u.hp>0?1:0,
-                zIndex:5,pointerEvents:"none",
+                zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default",
                 // NO left/top — RAF manages those
               }
             },
@@ -442,6 +451,22 @@ function DailyBossScreen({onBack,onViewCreature}){
               )
             )
           )
+        ),
+        selectedUnit?React.createElement(UnitInfoPanel,{
+          emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||"❓",
+          name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
+          subtitle:"Ally",
+          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          debuffs:debuffsFor(selectedUnit),
+          onClose:()=>setBattleSelected(null)
+        }):selectedBoss?React.createElement(UnitInfoPanel,{
+          emoji:TYPE_EMOJI[boss.type]||"👾",
+          name:(foughtBoss||boss).name,
+          subtitle:"Boss",
+          hp:selectedBoss.hp,maxHp:selectedBoss.maxHp,shield:selectedBoss.shield,
+          debuffs:[],
+          onClose:()=>setBattleSelected(null)
+        }):React.createElement("div",{style:{width:150,flexShrink:0}})
         )
       )
     );
@@ -653,7 +678,6 @@ function DailyBossScreen({onBack,onViewCreature}){
       React.createElement("div",{style:{fontSize:18,fontWeight:700}},"👹 Daily Boss")
     ),
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 24px",gap:8}},
-      React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#534AB7",textTransform:"uppercase",letterSpacing:1,marginBottom:4}},"Daily Boss"),
       React.createElement("div",{style:{fontSize:100,lineHeight:1,marginBottom:8}},emoji),
       React.createElement("div",{style:{fontSize:24,fontWeight:800,color:"#111",marginBottom:2}},boss.name),
       React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",background:"#f0effe",borderRadius:20,padding:"3px 14px",marginBottom:4}},"Lv. "+level),
@@ -683,16 +707,7 @@ function DailyBossScreen({onBack,onViewCreature}){
               ),
               attemptsLeft>0
                 ?React.createElement("button",{onClick:()=>setPhase("planning"),style:{width:"100%",padding:"15px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"⚔️ Fight")
-                :React.createElement("div",{style:{background:"#fef2f2",borderRadius:12,padding:"12px",color:"#ef4444",fontSize:13,fontWeight:600}},"No attempts left · come back tomorrow"),
-              lastRewards&&React.createElement("div",{style:{marginTop:16,background:"#fff",border:"1px solid #e0e0e0",borderRadius:12,padding:"12px",textAlign:"left"}},
-                React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#534AB7",textTransform:"uppercase",letterSpacing:1,marginBottom:8}},"Last Win Rewards"),
-                React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6}},
-                  lastRewards.map((item,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",gap:4,background:"#f5f5f5",borderRadius:8,padding:"4px 8px",fontSize:12}},
-                    React.createElement("span",{style:{fontSize:16}},item.emoji||"🎁"),
-                    React.createElement("span",{style:{fontWeight:600,color:"#111"}},item.name)
-                  ))
-                )
-              )
+                :React.createElement("div",{style:{background:"#fef2f2",borderRadius:12,padding:"12px",color:"#ef4444",fontSize:13,fontWeight:600}},"No attempts left · come back tomorrow")
             );
           })()
     )

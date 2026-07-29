@@ -3,12 +3,13 @@
 import React, { useState, useMemo, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP, ALL_TYPES } from "../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../data/rarity.js";
+import { RARITY_CONFIG, CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getDisplayEmoji } from "../../core/creatures.js";
 import AscStars from "../../ui/components/AscStars.js";
 import CreatureDetail from "../../ui/screens/CreatureDetail/index.js";
 import DexScreen from "../../ui/screens/DexScreen.js";
+import ScreenHeader from "../../ui/components/ScreenHeader.js";
 
 function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites } = useGame();
@@ -55,7 +56,7 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
           pendingEvo.fromName+" has evolved into "+pendingEvo.toName+"!"
         ),
         pendingEvo.statsBefore&&pendingEvo.statsAfter&&React.createElement("div",{style:{textAlign:"left",marginBottom:16}},
-          STAT_CYCLE.map(s=>React.createElement("div",{key:s,className:"stat-row"},
+          CORE_STAT_CYCLE.map(s=>React.createElement("div",{key:s,className:"stat-row"},
             React.createElement("span",{className:"stat-label"},STAT_LABELS[s]),
             React.createElement("div",{className:"stat-bar-bg"},
               React.createElement("div",{className:"stat-bar-fill",style:{width:Math.min(100,Math.round((pendingEvo.statsAfter[s]/150)*100))+"%",background:STAT_COLORS[s]}})
@@ -83,10 +84,9 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
   );
 
   return React.createElement("div",null,
-    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-      React.createElement("span",{style:{fontSize:16,fontWeight:500,color:"#000"}},"Collection"),
+    React.createElement(ScreenHeader,{title:"Collection",right:
       React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>setShowDex(true),style:{marginBottom:0}},"Dex")
-    ),
+    }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
       React.createElement("input",{
@@ -137,15 +137,13 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
       :React.createElement("div",{className:"creature-grid"},
           filtered.map(({owned:o,def:d})=>{
             const displayEmoji=getDisplayEmoji(d,o,unlockedSkins);
-            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);},style:{position:"relative",paddingTop:22}},
-              React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:12,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
-              d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:11,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),
-              React.createElement("div",{style:{textAlign:"center",marginBottom:2,height:16,lineHeight:"16px"}},o.ascensions>0&&React.createElement(AscStars,{n:o.ascensions})),
+            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);},style:{position:"relative",paddingTop:30}},
+              React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
+              d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),
+              d.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[d.role].emoji),
+              o.ascensions>0&&React.createElement("div",{style:{position:"absolute",top:5,left:0,right:0,textAlign:"center",lineHeight:1}},React.createElement(AscStars,{n:o.ascensions})),
               React.createElement("div",{className:"creature-emoji"},displayEmoji),
               React.createElement("div",{className:"creature-name"},d.name),
-              React.createElement("div",{style:{display:"flex",gap:3,justifyContent:"center",alignItems:"center",flexWrap:"wrap",marginBottom:2}},
-                d.role&&React.createElement("span",{style:{fontSize:11,lineHeight:1}},ROLE_CONFIG[d.role].emoji)
-              ),
               React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
                 React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
               )

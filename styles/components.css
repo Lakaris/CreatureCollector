@@ -46,8 +46,6 @@
 .ability-card{background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:8px}
 .ability-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:10px}
 .ability-name{font-size:13px;font-weight:500;color:#000}
-.ability-type-badge{font-size:10px;padding:2px 6px;border-radius:4px}
-.ab-basic,.ab-special,.ab-unique{background:#e8e8e8;color:#555}
 .ability-desc{font-size:12px;color:#666;line-height:1.5;margin-bottom:6px}
 .pip-row{display:flex;gap:4px;align-items:center;margin-bottom:6px}
 .pip{width:14px;height:6px;border-radius:3px;background:#ddd}

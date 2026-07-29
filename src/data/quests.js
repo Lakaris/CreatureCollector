@@ -114,7 +114,7 @@ export const QUEST_DEFS={
 
 export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg"};
 export const REWARD_DESC={
-  gems:"Used to hatch Eggs and buy items.",
+  gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
   candy:"Used to unlock Skins.",
   equipShards:"Used to upgrade Gear.",
@@ -135,36 +135,36 @@ export const REWARD_DESC={
 };
 
 export const DAILY_REWARDS=[
-  {day:1,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:1,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:2,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:3,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
   {day:4,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
   {day:5,label:"5 Flair Banana",emoji:"🍌",reward:{flairBanana:5}},
-  {day:6,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:6,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:7,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:8,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:9,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
   {day:10,label:"1 Rainbow Melon",emoji:"🍈",reward:{rainbowMelon:1}},
-  {day:11,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:11,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:12,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:13,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
   {day:14,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
   {day:15,label:"1 Mythical Flair Banana",emoji:"🍌✨",reward:{mythicalFlairBanana:1}},
-  {day:16,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:16,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:17,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:18,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:19,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
   {day:20,label:"3 Ascension Melon",emoji:"🍈",reward:{ascensionMelon:3}},
-  {day:21,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:21,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:22,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:23,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
   {day:24,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
   {day:25,label:"1 Ancient Flair Banana",emoji:"🍌⭐",reward:{ancientFlairBanana:1}},
-  {day:26,label:"1 Egg",emoji:"🥚",reward:{egg:1}},
+  {day:26,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:27,label:"50 Food",emoji:"🍖",reward:{food:50}},
   {day:28,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:29,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
-  {day:30,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEgg:1}},
+  {day:30,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
 ];
 
 export const BATTLEPASS_MISSIONS=[

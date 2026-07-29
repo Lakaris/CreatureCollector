@@ -7,6 +7,7 @@ import { RARITY_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain } from "../../core/creatures.js";
 import DexEntry from "../../ui/screens/DexEntry.js";
+import ScreenHeader from "../../ui/components/ScreenHeader.js";
 
 function DexScreen({onBack}){
   const { unlockedSkins, owned } = useGame();
@@ -39,13 +40,9 @@ function DexScreen({onBack}){
   if(selected)return React.createElement(DexEntry,{def:selected,onBack:()=>setSelected(null),onNavigate:(d)=>setSelected(d),unlockedSkins});
 
   return React.createElement("div",null,
-    React.createElement("button",{className:"back-btn",onClick:onBack},
-      React.createElement("i",{className:"ti ti-arrow-left"}),"Collection"
-    ),
-    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-      React.createElement("span",{style:{fontSize:16,fontWeight:500,color:"#000"}},"Pokédex"),
+    React.createElement(ScreenHeader,{title:"Pokédex",onBack,right:
       React.createElement("span",{style:{fontSize:12,color:"#666"}},collectedCount+"/"+FINAL_FORMS.length+" collected")
-    ),
+    }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
       React.createElement("input",{

@@ -7,9 +7,11 @@ import { TYPE_EMOJI } from "../../../data/types.js";
 import { ARENA_TABS } from "../../../data/bosses.js";
 import { REWARD_DESC } from "../../../data/quests.js";
 import { applyRewards } from "../../../core/rewards.js";
-import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, MELEE_RANGE, RANGED_RANGE } from "../../../battle/constants.js";
+import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, MELEE_RANGE, RANGED_RANGE, COOLDOWN_TICKS_AT_SPD_1 } from "../../../battle/constants.js";
 import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
+import DamageChart from "../../../ui/components/DamageChart.js";
+import UnitInfoPanel from "../../../ui/components/UnitInfoPanel.js";
 
 function ArenaScreen({onBack,onFight,onViewCreature}){
   const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards } = useGame();
@@ -31,6 +33,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const [battleOutcome,setBattleOutcome]=useState(null); // null|"won"|"lost"
   const [arenaBSnap,setArenaBSnap]=useState(null);
   const [arenaAtkEffects,setArenaAtkEffects]=useState([]);
+  const [battleSelectedUid,setBattleSelectedUid]=useState(null);
   const _aSpd=parseInt(localStorage.getItem("battleSpeed")||"1")||1;
   const aSpeedRef=React.useRef(_aSpd);
   const aMoveAnimRef=React.useRef(Math.round(500/_aSpd*0.84));
@@ -167,6 +170,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     const s=arenaBRef.current;if(!s)return;
     s.tick++;
     const now=Date.now();
+    const damageDealt=s.damageDealt||(s.damageDealt={});
     const MELEE_RANGE=1,RANGED_RANGE=3;
     const aliveP=s.playerUnits.filter(u=>u.hp>0);
     const aliveE=s.enemyUnits.filter(u=>u.hp>0);
@@ -189,7 +193,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         const rawDmg=u.atk*(0.8+Math.random()*0.4);
         const dmg=Math.max(1,Math.round(Math.max(1,rawDmg-(tgt.def||20)*0.35)));
         tgt.hp=Math.max(0,tgt.hp-dmg);
-        u.atkCd=Math.max(3,Math.round(600/u.spd));
+        if(u.uid[0]==="p")damageDealt[u.creatureId]=(damageDealt[u.creatureId]||0)+dmg;
+        u.atkCd=Math.max(3,Math.round(COOLDOWN_TICKS_AT_SPD_1/u.spd));
         newFx.push({id:now+u.uid,row:tgt.row,col:tgt.col,t:now,isRanged:u.isRanged,fromRow:u.row,fromCol:u.col,isEnemy:u.uid[0]==="e"});
       } else if(dist>range){
         const aBlk=(r2,c2)=>allOcc.has(r2+","+c2)||r2<0||r2>=ARENA_GRID_ROWS||c2<0||c2>=ARENA_GRID_COLS;
@@ -202,7 +207,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     if(newFx.length)setArenaAtkEffects(prev=>[...prev.filter(e=>now-e.t<700),...newFx]);
     setArenaBSnap({
       playerUnits:s.playerUnits.map(u=>({...u})),
-      enemyUnits:s.enemyUnits.map(u=>({...u}))
+      enemyUnits:s.enemyUnits.map(u=>({...u})),
+      damageDealt:{...s.damageDealt}
     });
     const aGameElapsed=(Date.now()-arenaBattleStartRef.current)*aSpeedRef.current;
     const aTL=Math.min(60,Math.ceil(Math.max(0,60000-aGameElapsed)/1000));
@@ -235,6 +241,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     setBattleOutcome(null);
     setArenaBSnap(null);
     setArenaAtkEffects([]);
+    setBattleSelectedUid(null);
     setArenaTimeLeft(60);arenaBattleStartRef.current=Date.now();
     arenaBRef.current=initArenaBattle(planGrid,enemyGrid);
     startArenaRenderLoop();
@@ -293,12 +300,13 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?(isBoss?"Boss Defeated!":"Stage Clear!"):"Defeat!"),
       React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?(isBoss?"Boss stage "+stage+" complete!":"Stage "+stage+" complete!"):""),
       won&&(()=>{const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{candy:5},5:{eggs:5},6:{mythicalFlairBanana:1},7:{deluxeOre:1},8:{candy:5},9:{ancientFlairBanana:1},10:{legendaryEggs:1}};const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
-      React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setPlanGrid({});},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
+      React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setPlanGrid({});setBattleSelectedUid(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
   }
   if(battling){
-    const snap=arenaBSnap||{playerUnits:[],enemyUnits:[]};
+    const snap=arenaBSnap||{playerUnits:[],enemyUnits:[],damageDealt:{}};
     const allUnits=[...snap.playerUnits,...snap.enemyUnits];
+    const selectedUnit=battleSelectedUid?allUnits.find(u=>u.uid===battleSelectedUid):null;
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"10px 16px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
@@ -308,6 +316,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       ),
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:arenaTimeLeft<=10?"#ef4444":"#534AB7"}},arenaTimeLeft+"s ⏱"),
+        React.createElement("div",{style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
+        React.createElement(DamageChart,{damageDealt:snap.damageDealt}),
         React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:`repeat(${ARENA_GRID_COLS},${ARENA_TILE}px)`,gridTemplateRows:`repeat(${ARENA_GRID_ROWS},${ARENA_TILE}px)`,gap:0}},
             Array.from({length:ARENA_GRID_ROWS},(_,r)=>Array.from({length:ARENA_GRID_COLS},(_,c)=>{
@@ -352,13 +362,23 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
               if(el){const hpEl=el.querySelector(".hp-fill");arenaUnitDomRefs.current.set(u.uid,{el,hpEl});el.style.left=(u.col*ARENA_TILE)+"px";el.style.top=(u.row*ARENA_TILE)+"px";}
               else arenaUnitDomRefs.current.delete(u.uid);
             },
-            style:{position:"absolute",width:ARENA_TILE,height:ARENA_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",opacity:u.hp>0?1:0,zIndex:5,pointerEvents:"none"}
+            onClick:u.hp>0?()=>setBattleSelectedUid(u.uid):undefined,
+            style:{position:"absolute",width:ARENA_TILE,height:ARENA_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",opacity:u.hp>0?1:0,zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default"}
           },
             React.createElement("div",{style:{fontSize:20,lineHeight:1}},CREATURE_MAP[u.creatureId]?.emoji||"❓"),
             React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
               React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:u.uid[0]==="e"?"#ef4444":"#22c55e",borderRadius:2}})
             )
           ))
+        ),
+        selectedUnit?React.createElement(UnitInfoPanel,{
+          emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||"❓",
+          name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
+          subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
+          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          debuffs:[],
+          onClose:()=>setBattleSelectedUid(null)
+        }):React.createElement("div",{style:{width:150,flexShrink:0}})
         )
       )
     );

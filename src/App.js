@@ -11,15 +11,16 @@ import { useGame } from "./state/GameContext.js";
 import CreatureOverlayHost from "./ui/components/CreatureOverlayHost.js";
 import CollectionScreen from "./ui/screens/CollectionScreen.js";
 import GachaScreen from "./ui/screens/GachaScreen.js";
-import ProfileScreen from "./ui/screens/ProfileScreen.js";
 import DevPanel from "./ui/screens/DevPanel.js";
 import FarmScreen from "./ui/screens/FarmScreen.js";
 import TreasureScreen from "./ui/screens/TreasureScreen.js";
 import StoreScreen from "./ui/screens/StoreScreen.js";
 import HomeScreen from "./ui/screens/HomeScreen.js";
+import SettingsScreen from "./ui/screens/SettingsScreen.js";
 import DungeonScreen from "./ui/screens/battle/DungeonScreen.js";
 import DailyBossScreen from "./ui/screens/battle/DailyBossScreen.js";
 import ArenaScreen from "./ui/screens/battle/ArenaScreen.js";
+import LabyrinthScreen from "./ui/screens/battle/LabyrinthScreen.js";
 
 const TABS = [
   { id: "home", icon: "ti-home", label: "Home" },
@@ -197,38 +198,26 @@ function HarvestPopup() {
   );
 }
 
-/** Currency chips in the top bar. Which chips show depends on the active tab. */
-function CurrencyBar({ tab, currencies }) {
-  const chip = (emoji, value) =>
-    React.createElement(
-      "div",
-      { className: "chip" },
-      emoji,
-      React.createElement("span", null, (value || 0).toLocaleString())
-    );
-  return React.createElement(
-    "div",
-    { className: "currency-row" },
-    tab === "hatch" && chip("🥚", currencies.eggs),
-    tab === "hatch" && (currencies.legendaryEggs || 0) > 0 && chip("🥚✨", currencies.legendaryEggs),
-    chip("💎", currencies.gems),
-    chip("💰", currencies.money),
-    tab === "collection" && chip("🔧", currencies.equipShards),
-    tab === "play" && chip("🎟️", currencies.dungeonPass)
-  );
-}
-
 function App() {
   const {
     tab, setTab, gameMode, setGameMode,
-    currencies, harvestPopup,
+    harvestPopup,
     collectionDeepLink, setCollectionDeepLink,
     setCreatureOverlay,
-    setDungeonsCleared, setArenaFights, setEggsHatched, setBananasUsed, setPlotsGrown,
+    setDungeonsCleared, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setPlotsGrown,
+    settingsOpen, setSettingsOpen, labyrinthDepth,
   } = useGame();
 
   const contentRef = React.useRef(null);
   const viewCreature = (id) => setCreatureOverlay(id);
+
+  // ── Settings: its own full-screen page, no bottom nav ─────────────────────
+  if (settingsOpen)
+    return React.createElement(
+      "div",
+      { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
+      React.createElement(SettingsScreen, { onBack: () => setSettingsOpen(false) })
+    );
 
   // ── Full-screen game modes ───────────────────────────────────────────────
   if (tab === "play" && gameMode === "dungeon")
@@ -261,6 +250,18 @@ function App() {
       React.createElement(ArenaScreen, {
         onBack: () => setGameMode(null),
         onFight: () => setArenaFights((c) => c + 1),
+        onViewCreature: viewCreature,
+      }),
+      React.createElement(CreatureOverlayHost)
+    );
+
+  if (tab === "play" && gameMode === "labyrinth")
+    return React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(LabyrinthScreen, {
+        onBack: () => setGameMode(null),
+        onFight: () => setLabyrinthFights((c) => c + 1),
         onViewCreature: viewCreature,
       }),
       React.createElement(CreatureOverlayHost)
@@ -302,9 +303,12 @@ function App() {
       { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
       React.createElement(
         "div",
+        { style: { display: "flex", alignItems: "center", gap: 12, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "16px 16px 12px", flexShrink: 0 } },
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 700 } }, "Play")
+      ),
+      React.createElement(
+        "div",
         { style: { padding: "20px 16px 0", flex: 1, overflowY: "auto" } },
-        React.createElement("div", { style: { fontSize: 20, fontWeight: 700, marginBottom: 4 } }, "Play"),
-        React.createElement("div", { style: { fontSize: 13, color: "#888", marginBottom: 20 } }, "Choose a game mode"),
         React.createElement(
           "div",
           { style: { display: "flex", flexDirection: "column", gap: 12 } },
@@ -319,6 +323,17 @@ function App() {
             { onClick: () => setGameMode("dungeon"), style: CARD_BASE },
             React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🏰"),
             React.createElement("div", null, React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Dungeon"))
+          ),
+          React.createElement(
+            "div",
+            { onClick: () => setGameMode("labyrinth"), style: CARD_BASE },
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🌀"),
+            React.createElement(
+              "div",
+              null,
+              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Labyrinth"),
+              React.createElement("div", { style: { fontSize: 12, color: "#888" } }, "Floor " + (labyrinthDepth || 1))
+            )
           ),
           React.createElement(DailyBossCard),
           React.createElement(
@@ -351,24 +366,6 @@ function App() {
     React.createElement("h2", { className: "sr-only" }, "Creature Collector"),
     React.createElement(
       "div",
-      { className: "top-bar", style: { padding: "0 16px" } },
-      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 } }),
-      React.createElement(
-        "div",
-        { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } },
-        React.createElement(CurrencyBar, { tab, currencies }),
-        React.createElement(
-          "button",
-          {
-            onClick: () => setTab("profile"),
-            style: { width: 32, height: 32, borderRadius: "50%", border: "2px solid #e0e0e0", background: "#f0f0f0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, padding: 0 },
-          },
-          "👤"
-        )
-      )
-    ),
-    React.createElement(
-      "div",
       { className: "app-content", ref: contentRef },
       tab === "home" && React.createElement(HomeScreen),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
@@ -378,7 +375,6 @@ function App() {
           deepLinkId: collectionDeepLink,
           onDeepLinkConsumed: () => setCollectionDeepLink(null),
         }),
-      tab === "profile" && React.createElement(ProfileScreen),
       tab === "store" && React.createElement(StoreScreen),
       tab !== "home" && DEV_MODE && React.createElement(DevPanel),
       React.createElement("div", { style: { height: 12 } })

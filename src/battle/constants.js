@@ -27,3 +27,11 @@ export const BATTLE_TIME_MS = 60000;
 
 /** Bosses occupy a 2x2 block anchored at their row/col. */
 export const BOSS_SIZE = 2;
+
+/**
+ * Attack cooldown, in ticks, is COOLDOWN_TICKS_AT_SPD_1 / spd. Every creature's
+ * base Speed is now a normalized 1.0, so this constant alone defines "normal"
+ * attack pace (it replaces the old design where a raw spd around 50 was typical
+ * and cooldown was 600/spd).
+ */
+export const COOLDOWN_TICKS_AT_SPD_1 = 12;

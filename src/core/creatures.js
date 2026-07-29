@@ -3,7 +3,10 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { SKIN_SETS } from "../data/skins.js";
-import { RARITY_STAT_MULT, STAT_CYCLE } from "../data/rarity.js";
+import { RARITY_STAT_MULT, STAT_CYCLE, LEVEL_STAT_CYCLE } from "../data/rarity.js";
+
+export const MAX_LEVEL = 300;
+export const MAX_ASCENSION = 50;
 
 /** Walk `evolutionOf` back to the base form of a chain. */
 export function getRootDef(creatureId) {
@@ -55,7 +58,8 @@ export function makeOwnedCreature(def) {
 /**
  * Base combat stats from level and ascension only.
  *
- * Each level past 1 bumps one stat, rotating through STAT_CYCLE; ascensions
+ * Each level past 1 bumps one stat, rotating through LEVEL_STAT_CYCLE
+ * (HP/ATK/DEF only -- Speed and Haste never grow from leveling); ascensions
  * then scale everything by 8% each. Equipment and flair are layered on top by
  * computeCombatStats in src/core/stats.js -- this function deliberately knows
  * nothing about them.
@@ -67,7 +71,7 @@ export function calcStats(def, ownedData) {
   const lvl = ownedData.level;
   const s = { ...base };
   for (let i = 0; i < lvl - 1; i++) {
-    const k = STAT_CYCLE[i % 5];
+    const k = LEVEL_STAT_CYCLE[i % LEVEL_STAT_CYCLE.length];
     s[k] = (s[k] || 0) + Math.round(base[k] * 0.05 * mult);
   }
   for (const k of STAT_CYCLE) s[k] = Math.round(s[k] * (1 + asc * 0.08));

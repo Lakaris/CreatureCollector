@@ -29,7 +29,20 @@
       "Bash(grep -v \"//\\\\|dungeon\\\\|Dungeon\")",
       "Bash(node -e ' *)",
       "Skill(artifact-design)",
-      "Skill(artifact-design:*)"
+      "Skill(artifact-design:*)",
+      "Bash(node --check src/ui/screens/battle/LabyrinthScreen.js)",
+      "PowerShell(node --check \"src\\\\ui\\\\screens\\\\battle\\\\LabyrinthScreen.js\")",
+      "Bash(grep -v -E \"^stats:\\\\{hp:[0-9]+,atk:[0-9]+,def:[0-9]+,spd:[0-9]+,abilitySpeed:[0-9]+\\\\}$\")",
+      "Bash(sed -i -E 's/spd:[0-9]+,abilitySpeed:[0-9]+/spd:1,abilitySpeed:1/g' src/data/creatures.js)",
+      "Bash(sed -i -E 's/spd:40\\\\}/spd:1,abilitySpeed:1}/' src/data/creatures.js)",
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command node.exe -ErrorAction SilentlyContinue)",
+      "PowerShell(node --version)",
+      "Bash(cut -d'|' -f1 /tmp/chain_data.txt | sort | uniq -c | sort -rn | head -20)",
+      "Bash(grep -oP '\"\\\\d+ dmg[^\"]{0,60}\"' src/data/creatures.js)",
+      "Bash(grep -oP '\"Passive:[^\"]{0,80}\"' src/data/creatures.js)",
+      "Bash(grep -oP '\"Deals \\\\d+[^\"]{0,40}\"' src/data/creatures.js)",
+      "Bash(grep -oP '\"Regenerates \\\\d+[^\"]{0,40}\"' src/data/creatures.js)"
     ]
   }
 }

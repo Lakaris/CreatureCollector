@@ -8,9 +8,10 @@ import { getDisplayEmoji } from "../../core/creatures.js";
 import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
 import QuestsScreen from "../../ui/screens/QuestsScreen.js";
 import DailyScreen from "../../ui/screens/DailyScreen.js";
+import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
 
 function HomeScreen(){
-  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions } = useGame();
+  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen } = useGame();
   const [picking,setPicking]=React.useState(false);
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
@@ -58,7 +59,15 @@ function HomeScreen(){
     );
   }
 
-  return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
+  return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column"}},
+    React.createElement(ScreenHeader,{title:React.createElement("button",{
+      onClick:()=>setSettingsOpen(true),
+      style:{width:36,height:36,borderRadius:"50%",border:"2px solid #e0e0e0",background:"#f5f5f5",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0}
+    },"⚙️"),right:React.createElement(React.Fragment,null,
+      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems}),
+      React.createElement(CurrencyChip,{emoji:"💰",value:currencies.money})
+    )}),
+    React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
     bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
     aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
     React.createElement("button",{
@@ -79,15 +88,19 @@ function HomeScreen(){
     },"Change"),
     React.createElement("button",{
       onClick:()=>setShowBattlepass(true),
-      style:{marginTop:8,padding:"8px 22px",borderRadius:20,border:"2px solid #f59e0b",background:"linear-gradient(135deg,#fffbeb,#fef3c7)",fontSize:13,fontWeight:700,color:"#d97706",cursor:"pointer",display:"flex",alignItems:"center",gap:6}
-    },"🎫 Battle Pass"),
+      style:{position:"absolute",right:16,top:"calc(50% - 88px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid #fbbf24",background:"#fffbeb",fontSize:28,fontWeight:700,color:"#d97706",cursor:"pointer",boxShadow:"0 2px 12px rgba(251,191,36,0.3)"}
+    },
+      "🎫",
+      React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Battle Pass")
+    ),
     React.createElement("button",{
       onClick:()=>setShowDaily(true),
-      style:{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid "+(new Date().toDateString()!==dailyLastClaimed?"#fbbf24":"#e0e0e0"),background:new Date().toDateString()!==dailyLastClaimed?"#fffbeb":"#f5f5f5",fontSize:28,fontWeight:700,color:"#d97706",cursor:"pointer",boxShadow:new Date().toDateString()!==dailyLastClaimed?"0 2px 12px rgba(251,191,36,0.3)":"none",position:"absolute",right:16,top:"50%",transform:"translateY(-50%)"}
+      style:{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid "+(new Date().toDateString()!==dailyLastClaimed?"#fbbf24":"#e0e0e0"),background:new Date().toDateString()!==dailyLastClaimed?"#fffbeb":"#f5f5f5",fontSize:28,fontWeight:700,color:"#d97706",cursor:"pointer",boxShadow:new Date().toDateString()!==dailyLastClaimed?"0 2px 12px rgba(251,191,36,0.3)":"none"}
     },
       "📅",
       React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Daily"),
       new Date().toDateString()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
+    )
     )
   );
 }

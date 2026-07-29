@@ -1,6 +1,7 @@
 // Damage formulas.
 
 import { weakenMultiplier } from "./status.js";
+import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 
 /** Base attack roll: ±20% spread around the attacker's power. */
 export function attackRoll(atk) {
@@ -43,5 +44,5 @@ export function damageBoss(boss, dmg) {
 
 /** Ticks until a unit can act again, slowed by Slow/Shock. */
 export function attackCooldown(unit, penalty = 1) {
-  return Math.max(3, Math.round((600 / unit.spd) * penalty));
+  return Math.max(3, Math.round((COOLDOWN_TICKS_AT_SPD_1 / unit.spd) * penalty));
 }

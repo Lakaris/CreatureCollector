@@ -6,6 +6,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain, getSkinsForCreature } from "../../core/creatures.js";
+import { formatAbilityDisplay, formatUpgradeStep } from "../../core/abilityText.js";
 
 function DexEntry({def,onBack,onNavigate}){
   const { unlockedSkins } = useGame();
@@ -14,7 +15,6 @@ function DexEntry({def,onBack,onNavigate}){
   const chain=getChain(def.id);
   const chainDefs=chain.map(id=>CREATURE_MAP[id]);
   const abilityKeys=["basic","special","unique"];
-  const abilityTypeClass={basic:"ab-basic",special:"ab-special",unique:"ab-unique"};
   const chainSkins=getSkinsForCreature(def.id);
 
   return React.createElement("div",null,
@@ -91,19 +91,27 @@ function DexEntry({def,onBack,onNavigate}){
         const ac=abilityColors[k];
         return React.createElement("div",{key:k,className:"ability-card"},
           React.createElement("div",{className:"ability-header"},
-            React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden"}},
-              abl.icon
-                ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})
-                : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
+            React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
+              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k),
+              React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}},
+                abl.icon
+                  ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})
+                  : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
+              )
             ),
-            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name),
-            React.createElement("span",{className:"ability-type-badge "+abilityTypeClass[k]},k)
+            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name)
           ),
           React.createElement("div",null,
-            abl.upgrades.map((u,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:8,marginBottom:4}},
-              React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#7F77DD",minWidth:14,flexShrink:0}},(i+1)),
-              React.createElement("span",{style:{fontSize:12,color:"#555",lineHeight:1.5}},u)
-            ))
+            abl.upgrades.map((u,i)=>{
+              const isFirst=i===0;
+              const fmt=isFirst?formatAbilityDisplay(u):null;
+              const step=isFirst?null:formatUpgradeStep(u,abl.upgrades[i-1]);
+              return React.createElement("div",{key:i,style:{display:"flex",gap:8,marginBottom:4,alignItems:"baseline"}},
+                React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#7F77DD",minWidth:14,flexShrink:0}},(i+1)),
+                React.createElement("span",{style:{fontSize:12,color:"#555",lineHeight:1.5,flex:1}},isFirst?fmt.label:step),
+                isFirst&&fmt.amount!=null&&React.createElement("span",{style:{fontSize:12,fontWeight:800,color:"#534AB7",flexShrink:0}},fmt.amount)
+              );
+            })
           )
         );
       })

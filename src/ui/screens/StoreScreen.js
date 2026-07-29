@@ -1,9 +1,12 @@
 // Store: bundles and gem packs. Purchases are not wired to a payment provider.
 
 import React from "../../react.js";
+import { useGame } from "../../state/GameContext.js";
 import { STORE_GEM_PACKS, STORE_BUNDLES } from "../../data/store.js";
+import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
 
 function StoreScreen(){
+  const { currencies } = useGame();
   const [popup,setPopup]=React.useState(null);
   function buy(item){setPopup(item);}
   return React.createElement("div",{style:{background:"#f8f8ff",minHeight:"100%"}},
@@ -15,10 +18,7 @@ function StoreScreen(){
         React.createElement("button",{onClick:()=>setPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
       )
     ),
-    React.createElement("div",{style:{padding:"20px 16px 0"}},
-      React.createElement("div",{style:{fontSize:20,fontWeight:800,color:"#111",marginBottom:4}},"Store"),
-      React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:20}},"Support the game and get exclusive items")
-    ),
+    React.createElement(ScreenHeader,{title:"Store",right:React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})}),
     React.createElement("div",{style:{padding:"0 16px 8px"}},
       React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}},"🎁 Bundles"),
       React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},

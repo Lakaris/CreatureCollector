@@ -15,5 +15,17 @@ export const SKIN_TIER_CONFIG={
 export const SKIN_FAIL_SHARDS=3;
 export const RARITY_STAT_MULT={common:1,rare:1.15,epic:1.3,legendary:1.5};
 export const STAT_CYCLE=["hp","atk","def","spd","abilitySpeed"];
-export const STAT_LABELS={hp:"HP",atk:"ATK",def:"DEF",spd:"SPD",abilitySpeed:"Haste"};
+/** HP/ATK/DEF only, excluding Speed and Haste. Shared by the level-up stat rotation and the ascension popup. */
+export const CORE_STAT_CYCLE=["hp","atk","def"];
+/** Stats a level-up can bump. Speed and Haste are excluded -- they stay at their base value from leveling. */
+export const LEVEL_STAT_CYCLE=CORE_STAT_CYCLE;
+export const STAT_LABELS={hp:"Health",atk:"Attack",def:"Defense",spd:"Speed",abilitySpeed:"Haste"};
 export const STAT_COLORS={hp:"#5DCAA5",atk:"#D85A30",def:"#378ADD",spd:"#7F77DD",abilitySpeed:"#EF9F27"};
+/** Plain-language description shown when a stat is tapped on the creature detail page. */
+export const STAT_DESCRIPTIONS={
+  hp:"Affects the creature's Max Health",
+  atk:"Affects how much damage the creature deals to enemies",
+  def:"Reduces the amount of damage the creature receives from enemies",
+  spd:"Rate of Basic attacks",
+  abilitySpeed:"Rate of ability cooldown recovery",
+};

@@ -22,7 +22,7 @@ export function equipBonus(itemId, level, asc = 0) {
   );
 }
 
-/** Human-readable "+12 HP · +8 ATK" summary. */
+/** Human-readable "+12 Health · +8 Attack" summary. */
 export function equipBonusStr(bonuses) {
   return Object.entries(bonuses)
     .map(([s, v]) => "+" + v + " " + STAT_LABELS[s])

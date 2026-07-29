@@ -7,6 +7,7 @@ import { RARITY_CONFIG } from "../../data/rarity.js";
 import { BANNERS } from "../../data/banners.js";
 import { makeOwnedCreature } from "../../core/creatures.js";
 import { rollGacha } from "../../core/gacha.js";
+import ScreenHeader, { CurrencyChip } from "../components/ScreenHeader.js";
 
 function GachaScreen({onHatch}){
   const { owned, setOwned, currencies, setCurrencies, pity, setPity } = useGame();
@@ -109,6 +110,12 @@ function GachaScreen({onHatch}){
   }
 
   return React.createElement("div",null,
+    React.createElement(ScreenHeader,{title:"Hatch",right:React.createElement(React.Fragment,null,
+      React.createElement(CurrencyChip,{emoji:"🥚",value:currencies.eggs}),
+      (currencies.legendaryEggs||0)>0&&React.createElement(CurrencyChip,{emoji:"🥚✨",value:currencies.legendaryEggs}),
+      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems}),
+      React.createElement(CurrencyChip,{emoji:"💰",value:currencies.money})
+    )}),
     React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
       React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i-1+BANNERS.length)%BANNERS.length);setShowRates(false);},
         style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:18,color:"#555",lineHeight:1}},"‹"),

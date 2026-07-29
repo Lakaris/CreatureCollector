@@ -3,12 +3,13 @@
 import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, STAT_LABELS } from "../../../data/rarity.js";
+import { RARITY_CONFIG, STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABELS, STAT_DESCRIPTIONS } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
-import { getRootDef, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost } from "../../../core/creatures.js";
+import { getRootDef, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr } from "../../../core/equipment.js";
+import { formatAbilityStep } from "../../../core/abilityText.js";
 import { getMelonLabel, getMelonAvailable, deductMelon } from "../../../core/melons.js";
 import AscStars from "../../../ui/components/AscStars.js";
 import StatBar from "../../../ui/components/StatBar.js";
@@ -24,6 +25,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const [lastLeveledStat,setLastLeveledStat]=useState(null);
   const [ascPopup,setAscPopup]=useState(null);
   const [confirmMelon,setConfirmMelon]=useState(null);
+  const [statInfoPopup,setStatInfoPopup]=useState(null);
   const def=CREATURE_MAP[ownedData.id];
   const stats=calcStats(def,ownedData);
   const equipBonusStats={hp:0,atk:0,def:0,spd:0,abilitySpeed:0};
@@ -50,8 +52,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     const fb=flairBuffs.filter(b=>b.stat===s).reduce((acc,b)=>acc+Math.ceil(stats[s]*b.pct/100),0);
     return[s,base+fb];
   }));
+  const isMaxLevel=ownedData.level>=MAX_LEVEL;
   const cost=energyCost(ownedData.level);
-  const hasFood=currencies.food>=cost;
+  const hasFood=!isMaxLevel&&currencies.food>=cost;
   const displayEmoji=getDisplayEmoji(def,ownedData,unlockedSkins);
   const [showFlairEffects,setShowFlairEffects]=useState(false);
   const [showEquipPage,setShowEquipPage]=useState(false);
@@ -76,12 +79,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   function notify_(msg,dur=2200){setNotify(msg);setTimeout(()=>setNotify(null),dur);}
 
   function doLevelUp(){
-    if(!hasFood)return;
-    const gainedStat=STAT_CYCLE[ownedData.nextStatIdx];
+    if(!hasFood||isMaxLevel)return;
+    const gainedStat=LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length];
     setCurrencies(c=>({...c,food:c.food-cost}));
     setOwned(prev=>{
       const e={...prev[ownedData.id]};
-      e.level=e.level+1;e.nextStatIdx=(e.nextStatIdx+1)%5;
+      if(e.level>=MAX_LEVEL)return prev;
+      e.level=e.level+1;e.nextStatIdx=(e.nextStatIdx+1)%LEVEL_STAT_CYCLE.length;
       return{...prev,[e.id]:e};
     });
     setLastLeveledStat(gainedStat);
@@ -102,7 +106,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   }
 
   const rootDef=getRootDef(def.id);
+  const isMaxAscension=ownedData.ascensions>=MAX_ASCENSION;
   function doAscend(){
+    if(isMaxAscension)return;
     const needed=rootDef.shardsToAscend;
     const melons=currencies.ascensionMelon||0;
     const shardsUsed=Math.min(ownedData.shards,needed);
@@ -117,6 +123,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     if(melonsUsed>0) setCurrencies(c=>({...c,ascensionMelon:(c.ascensionMelon||0)-melonsUsed}));
     setOwned(prev=>{
       const e={...prev[ownedData.id]};
+      if(e.ascensions>=MAX_ASCENSION)return prev;
       e.shards=e.shards-shardsUsed;e.ascensions=newAsc;
       if(willEvolve){
         const evoDef=CREATURE_MAP[def.evolutionId];
@@ -143,7 +150,6 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const [equipSlotPicker,setEquipSlotPicker]=useState(null); // slot index being picked
   const [equipConflict,setEquipConflict]=useState(null); // {itemId,slotIdx,otherPetId,otherPetName}
   const abilityKeys=["basic","special","unique"];
-  const abilityTypeClass={basic:"ab-basic",special:"ab-special",unique:"ab-unique"};
   const allMaxed=abilityKeys.every(k=>ownedData.abilityLevels[k]>=5);
   const shardsProgress=Math.min(1,ownedData.shards/rootDef.shardsToAscend);
   const canEvolve=def.evolutionId&&ownedData.ascensions>=def.ascensionsToEvolve;
@@ -219,6 +225,14 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
 
   const tabs=[{id:"levelup",label:"Level Up"},{id:"abilities",label:"Abilities"},{id:"flair",label:"Flair"},{id:"skins",label:"Skins"}];
 
+  const statInfoPopupEl=statInfoPopup&&React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
+      React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
+      React.createElement("button",{onClick:()=>setStatInfoPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+    )
+  );
+
   if(equipDetailPage){
     const pi=EQUIPMENT_MAP[equipDetailPage];
     if(!pi) {setEquipDetailPage(null);}
@@ -274,6 +288,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   if(showEquipPage){
     const equipped=ownedData.equipped||[null,null,null,null];
     return React.createElement("div",null,
+      statInfoPopupEl,
       notify&&React.createElement(Notify,{msg:notify}),
       equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
         React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
@@ -297,12 +312,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#666",marginBottom:6}},"Lv "+ownedData.level),
             React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap"}},
               def.type&&React.createElement("span",{style:{fontSize:11,fontWeight:600,background:"#f0f0f0",color:"#444",borderRadius:8,padding:"2px 7px"}},(TYPE_EMOJI[def.type]||"")+" "+def.type),
-              def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},ROLE_CONFIG[def.role].emoji+" "+def.role)
+              def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},ROLE_CONFIG[def.role].emoji+" "+def.role),
+              def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
             )
           )
         ),
         React.createElement("div",{style:{display:"flex",gap:4}},
-          STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s}))
+          STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))
         )
       ),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
@@ -509,6 +525,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   }
 
   return React.createElement("div",null,
+    statInfoPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
     React.createElement("button",{className:"back-btn",onClick:onBack},
       React.createElement("i",{className:"ti ti-arrow-left"}),"Back"
@@ -567,7 +584,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         flairBuffs.length>0&&React.createElement("button",{onClick:()=>setShowFlairEffects(true),style:{position:"absolute",top:0,right:0,padding:"4px 10px",fontSize:11,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer"}},"✨ Flair Effects")
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},
-        STAT_CYCLE.map(s=>{const fb=flairBuffs.filter(b=>b.stat===s).reduce((acc,b)=>acc+Math.ceil(stats[s]*b.pct/100),0);return React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],bonus:(equipBonusStats[s]||0)+fb,highlight:lastLeveledStat===s});})
+        STAT_CYCLE.map(s=>{const fb=flairBuffs.filter(b=>b.stat===s).reduce((acc,b)=>acc+Math.ceil(stats[s]*b.pct/100),0);return React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],bonus:(equipBonusStats[s]||0)+fb,highlight:lastLeveledStat===s,onClick:setStatInfoPopup});})
       )
     ),
     showFlairEffects&&(()=>{
@@ -652,13 +669,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     tab==="levelup"&&React.createElement(React.Fragment,null,
       React.createElement("div",{className:"card",style:{marginBottom:10}},
         React.createElement("div",{className:"section-label"},"Level Up"),
-        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#666",marginBottom:6}},
-          React.createElement("span",null,"Lv "+ownedData.level+" → "+(ownedData.level+1)),
-          React.createElement("span",null,"🍖 "+cost+" Food")
-        ),
-        React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[STAT_CYCLE[ownedData.nextStatIdx]]),
+        isMaxLevel
+          ? React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:8}},"Lv "+ownedData.level+" — Max level reached")
+          : React.createElement(React.Fragment,null,
+              React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#666",marginBottom:6}},
+                React.createElement("span",null,"Lv "+ownedData.level+" → "+(ownedData.level+1)),
+                React.createElement("span",null,"🍖 "+cost+" Food")
+              ),
+              React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length]])
+            ),
         React.createElement("button",{className:"btn btn-primary",onClick:doLevelUp,disabled:!hasFood,style:{marginBottom:0}},
-          "Level Up — 🍖 "+cost
+          isMaxLevel?"MAX LEVEL":"Level Up — 🍖 "+cost
         )
       ),
       React.createElement("div",{className:"card",style:{marginBottom:10}},
@@ -680,6 +701,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           "✨ Ready to evolve into "+CREATURE_MAP[def.evolutionId].name+"!"
         ),
         (()=>{
+          if(isMaxAscension)return React.createElement("button",{className:"btn btn-primary",disabled:true,style:{marginBottom:0}},"MAX ASCENSION");
           const needed=rootDef.shardsToAscend;
           const melons=currencies.ascensionMelon||0;
           const shardsUsed=Math.min(ownedData.shards,needed);
@@ -704,18 +726,22 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         const sel=previewPip[k];
         const hasSel=sel!=null;
         const selLocked=hasSel&&sel>=lvl;
+        const displayIdx=hasSel?sel:(isMax?4:lvl);
         const displayText=hasSel?abl.upgrades[sel]:(isMax?abl.upgrades[4]:abl.upgrades[lvl]||abl.upgrades[0]);
+        const displayFmt=formatAbilityStep(displayText,displayIdx>0?abl.upgrades[displayIdx-1]:null);
         const abilityColors={basic:{bg:"#EAF3DE",color:"#173404"},special:{bg:"#EEEDFE",color:"#26215C"},unique:{bg:"#FFF3CD",color:"#5A3E00"}};
         const ac=abilityColors[k];
         return React.createElement("div",{key:k,className:"ability-card"},
           React.createElement("div",{className:"ability-header"},
-            React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden"}},
-              abl.icon
-                ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})
-                : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
+            React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
+              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k),
+              React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}},
+                abl.icon
+                  ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})
+                  : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
+              )
             ),
-            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name),
-            React.createElement("span",{className:"ability-type-badge "+abilityTypeClass[k]},k)
+            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name)
           ),
           React.createElement(PipRow,{filled:lvl,total:5,isMax,
             selectedPip:hasSel?sel:undefined,
@@ -724,8 +750,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           hasSel&&React.createElement("div",{style:{fontSize:10,fontWeight:600,color:selLocked?"#aaa":"#534AB7",marginBottom:4}},
             selLocked?"🔒 Level "+(sel+1)+" — not yet unlocked":"Level "+(sel+1)
           ),
-          React.createElement("p",{className:"ability-desc",style:{color:selLocked?"#aaa":"inherit"}},displayText),
-          !hasSel&&!isMax&&React.createElement("div",{style:{fontSize:11,color:"#888"}},"Next: "+abl.upgrades[lvl])
+          React.createElement("p",{className:"ability-desc",style:{color:selLocked?"#aaa":"inherit",display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:8}},
+            React.createElement("span",null,displayFmt.isPercent?displayFmt.text:displayFmt.label),
+            !selLocked&&displayFmt.amount!=null&&React.createElement("span",{style:{fontWeight:800,color:"#534AB7",flexShrink:0}},displayFmt.amount)
+          )
         );
       })
     ),

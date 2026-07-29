@@ -34,6 +34,12 @@ export function GameProvider({ children }) {
   const [collectionDeepLink, setCollectionDeepLink] = useState(null);
   const [creatureOverlay, setCreatureOverlay] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
+  const [username, setUsername] = useState("Player");
+  const [profileEmoji, setProfileEmoji] = useState("🧑‍✈️");
+  const [profileAvatarId, setProfileAvatarId] = useState("default");
+  const [profileFrame, setProfileFrame] = useState("none");
+  const [profileTitle, setProfileTitle] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [harvestPopup, setHarvestPopup] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
 
@@ -46,6 +52,10 @@ export function GameProvider({ children }) {
   );
   const [unlockedSkins, setUnlockedSkins] = useState([]);
   const [skinShards, setSkinShards] = useState(0);
+  // Every creature id ever owned, including pre-evolution forms that `owned`
+  // drops once they evolve -- kept around so their icon stays pickable as a
+  // profile avatar forever.
+  const [everOwnedCreatureIds, setEverOwnedCreatureIds] = useState(() => new Set(Object.keys(owned)));
 
   // ── Equipment (identity is per-creature; level/ascension are global) ──────
   const [equipmentLevels, setEquipmentLevels] = useState({});
@@ -63,6 +73,13 @@ export function GameProvider({ children }) {
   const [arenaProgress, setArenaProgress] = useState(() =>
     Object.fromEntries(ARENA_TABS.map((t) => [t.id, 1]))
   );
+
+  // ── Labyrinth ────────────────────────────────────────────────────────────
+  // A single endless track (unlike Arena's per-tab tiers): depth climbs by one
+  // on every win and never resets on loss, so the player just retries the same
+  // depth.
+  const [labyrinthDepth, setLabyrinthDepth] = useState(1);
+  const [labyrinthBestDepth, setLabyrinthBestDepth] = useState(1);
 
   // ── Farm ─────────────────────────────────────────────────────────────────
   const [farmPlots, setFarmPlots] = useState(1);
@@ -89,6 +106,7 @@ export function GameProvider({ children }) {
   const [eggsHatched, setEggsHatched] = useState(0);
   const [dungeonsCleared, setDungeonsCleared] = useState(0);
   const [arenaFights, setArenaFights] = useState(0);
+  const [labyrinthFights, setLabyrinthFights] = useState(0);
   const [bananasUsed, setBananasUsed] = useState(0);
   const [dailyBossFights, setDailyBossFights] = useState(0);
   const [plotsGrown, setPlotsGrown] = useState(0);
@@ -119,6 +137,18 @@ export function GameProvider({ children }) {
   // ── Treasure ─────────────────────────────────────────────────────────────
   const [collectedTreasures, setCollectedTreasures] = useState(new Set());
   const [completedTreasureSets, setCompletedTreasureSets] = useState(new Set());
+
+  // Track every creature id ever owned so pre-evolution icons stay available
+  // as profile avatars after `owned` drops them on evolution.
+  useEffect(() => {
+    setEverOwnedCreatureIds((prev) => {
+      const ownedIds = Object.keys(owned);
+      if (ownedIds.every((id) => prev.has(id))) return prev;
+      const next = new Set(prev);
+      ownedIds.forEach((id) => next.add(id));
+      return next;
+    });
+  }, [owned]);
 
   // Dungeon passes regenerate, and recharge counts reset, at noon local time.
   // This is deliberately a NOON reset, unlike the midnight resets used by daily
@@ -159,9 +189,11 @@ export function GameProvider({ children }) {
     () => ({
       owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
       eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
+      labyrinthDepth, labyrinthBestDepth, labyrinthFights,
     }),
     [owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
-     eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown]
+     eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
+     labyrinthDepth, labyrinthBestDepth, labyrinthFights]
   );
 
   const value = {
@@ -170,10 +202,15 @@ export function GameProvider({ children }) {
     collectionDeepLink, setCollectionDeepLink,
     creatureOverlay, setCreatureOverlay,
     featuredCreatureId, setFeaturedCreatureId,
+    username, setUsername, profileEmoji, setProfileEmoji,
+    profileAvatarId, setProfileAvatarId,
+    profileFrame, setProfileFrame, profileTitle, setProfileTitle,
+    settingsOpen, setSettingsOpen,
     harvestPopup, setHarvestPopup, revealedCount, setRevealedCount,
     // currencies + collection
     currencies, setCurrencies, owned, setOwned,
     unlockedSkins, setUnlockedSkins, skinShards, setSkinShards,
+    everOwnedCreatureIds,
     // equipment
     equipmentLevels, setEquipmentLevels,
     equipmentAscensions, setEquipmentAscensions,
@@ -183,6 +220,8 @@ export function GameProvider({ children }) {
     pity, setPity,
     // arena
     arenaLevels, setArenaLevels, arenaProgress, setArenaProgress,
+    // labyrinth
+    labyrinthDepth, setLabyrinthDepth, labyrinthBestDepth, setLabyrinthBestDepth,
     // farm
     farmPlots, setFarmPlots, farmFieldLevel, setFarmFieldLevel,
     farmFieldLastHarvest, setFarmFieldLastHarvest,
@@ -196,7 +235,7 @@ export function GameProvider({ children }) {
     devTimeOffset, setDevTimeOffset, nowMs,
     // counters
     eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared,
-    arenaFights, setArenaFights, bananasUsed, setBananasUsed,
+    arenaFights, setArenaFights, labyrinthFights, setLabyrinthFights, bananasUsed, setBananasUsed,
     dailyBossFights, setDailyBossFights, plotsGrown, setPlotsGrown,
     // quests
     questBatchIdx, setQuestBatchIdx, claimedQuests, setClaimedQuests,

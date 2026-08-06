@@ -12,3 +12,5 @@
 @keyframes meleeSwing{0%{opacity:0.85;transform:translate(-50%,-50%) scale(0.5)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
 @keyframes bossShockwave{0%{opacity:0.85;transform:translate(-50%,-50%) scale(0.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(4)}}
 @keyframes earthEmpSlam{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.1)}20%{opacity:1}70%{opacity:0.6}100%{opacity:0;transform:translate(-50%,-50%) scale(5)}}
+@keyframes windGust{0%{opacity:0;transform:scaleX(0.2)}30%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
+@keyframes windCollision{0%{opacity:1;transform:translate(-50%,-50%) scale(0.2) rotate(0deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(25deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(45deg)}}

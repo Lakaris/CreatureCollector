@@ -3,6 +3,7 @@
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
+import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
 /**
  * Player HP is multiplied by this so fights last a reasonable number of ticks.
@@ -70,8 +71,16 @@ export function makeArenaBattle(
       isRanged: cdef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
       abilCd: 0, // reserved; decremented but not yet read by any ability
+      abilityLevels: oc?.abilityLevels ? { ...oc.abilityLevels } : { basic: 0, special: 0, unique: 0 },
     };
   });
+
+  // Battle-start passives (e.g. Blazehornet's Starlit DEF synergy) run once,
+  // after every unit exists, so ally-presence checks see the full roster.
+  for (const u of playerUnits) {
+    const mod = getPlayerAbilityModule(u.creatureId);
+    if (mod?.onBattleStart) mod.onBattleStart(u, playerUnits);
+  }
 
   const enemyUnits = Object.entries(enemyGrid).map(([key, edef], i) => {
     const [row, col] = key.split(",").map(Number);

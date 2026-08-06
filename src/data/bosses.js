@@ -56,6 +56,11 @@ export const DUNGEON_BOSSES=[
     special:{name:"Cursed Veil",description:"Deals damage to all enemies and inflicts Weak (reduces attack) and Heal Immunity (blocks healing)"},
     unique:{name:"Dark Shroud",description:"Receives reduced damage for each debuffed enemy on the field"},
   }},
+  {...makeBoss("wind","Wind Boss","Wind"),abilities:{
+    basic:{name:"Gust Strike",description:"Melee attack that knocks the target back 1 tile"},
+    special:{name:"Cyclone",description:"Deals damage to all enemies and pulls them 2 tiles closer"},
+    unique:{name:"Turbulence",description:"Enemies take bonus damage when a knockback or pull slams them into a wall or another unit"},
+  }},
 ];
 
 export const ARENA_TABS=[

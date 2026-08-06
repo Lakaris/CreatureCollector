@@ -1063,23 +1063,23 @@ export const CREATURES=[
   {id:"blazehornet",name:"Blazehornet",emoji:"🐝",type:"Fire",rarity:"epic",description:"A giant hornet whose stinger is pure white-hot plasma. Extremely territorial about everything.",
    stats:{hp:58,atk:105,def:35,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Plasma Sting",upgrades:["20 dmg+burn 6/s 3s","26 dmg","33 dmg","42 dmg","Burn 9/s 4s; -12% DEF per sting stack"]},
-     special:{name:"Hornet Dive",upgrades:["Dive; 80 dmg+stun 0.5s+burn 4s","96 dmg","116 dmg","140 dmg","Stun 1s; burn spreads to 2 nearby"]},
-     unique:{name:"Swarm Instinct",upgrades:["Passive: each basic attack spawns phantom sting 40% dmg","Phantom 52%","Phantom 65%; crits on burning foes","Phantom 80%; crits on burning","Phantom 100%; crits on burning; 3 phantoms on crit; Blazehornet immune to fire+burn"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"infernohive"},
+     basic:{name:"Twin Sting",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
+     special:{name:"Charging Pierce",upgrades:["70 dmg.","74 dmg","74 dmg; increased damage range","81 dmg; increased damage range","81 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
+     unique:{name:"Burning Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +10% DEF","+20% DEF","+30% DEF","+40% DEF","+40% DEF; deals additional damage for every 5 Burn stacks on the target"]}
+   },role:"Attacker",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"infernohive"},
   {id:"infernohive",name:"Infernohive",emoji:"🐝",type:"Fire",rarity:"epic",description:"Blazehornet's swarm begins to merge into a living plasma engine. It treats the air as fuel and enemies as sparks.",
    stats:{hp:80,atk:144,def:48,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Plasma Sting",upgrades:["20 dmg+burn 6/s 3s","26 dmg","33 dmg","42 dmg","Burn 9/s 4s; -12% DEF per sting stack"]},
-     special:{name:"Hornet Dive",upgrades:["Dive; 80 dmg+stun 0.5s+burn 4s","96 dmg","116 dmg","140 dmg","Stun 1s; burn spreads to 2 nearby"]},
-     unique:{name:"Hive Instinct",upgrades:["Passive: each basic spawns phantom sting 60% dmg; crits on burning foes","Phantom 74%","Phantom 88%; burn stacks faster","Phantom 104%; burn +12% dmg","Phantom 122%; burn +22% dmg; 2 phantoms on crit; Infernohive immune to fire+burn"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"blazehornet",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"infernoswarm"},  {id:"infernoswarm",name:"Infernoswarm",emoji:"🐝",type:"Fire",rarity:"epic",description:"Blazehornet multiplied beyond counting. Technically one creature. Practically a wildfire.",
+     basic:{name:"Twin Sting",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
+     special:{name:"Charging Pierce",upgrades:["70 dmg.","74 dmg","74 dmg; increased damage range","81 dmg; increased damage range","81 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
+     unique:{name:"Hive Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +15% DEF","+25% DEF","+35% DEF","+45% DEF","+45% DEF; deals additional damage for every 5 Burn stacks on the target; burn deals 15% more damage"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"blazehornet",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"infernoswarm"},  {id:"infernoswarm",name:"Infernoswarm",emoji:"🐝",type:"Fire",rarity:"epic",description:"Blazehornet multiplied beyond counting. Technically one creature. Practically a wildfire.",
    stats:{hp:94,atk:170,def:56,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Plasma Sting",upgrades:["20 dmg+burn","26 dmg","33 dmg","42 dmg","Burn 9/s 4s; DEF-12%/stack"]},
-     special:{name:"Swarm Dive",upgrades:["Full swarm dive; 120 dmg+stun 1s+burn all","144 dmg","172 dmg","204 dmg","Stun 1.5s; burn all nearby; burn ignores 25% DEF"]},
-     unique:{name:"Living Wildfire",upgrades:["Passive: phantom stings 100% dmg; crits on burning foes always crit; burn +28% dmg","Burn +36%","Burn +46%","Burn +58%","Burn +72%; Infernoswarm immune to all fire; each sting on a burned foe heals 8 HP; on kill explode 80 dmg AOE"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"infernohive",shardsToAscend:20,ascensionsToEvolve:null},
+     basic:{name:"Twin Sting",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
+     special:{name:"Swarm Pierce",upgrades:["105 dmg.","111 dmg","111 dmg; increased damage range","122 dmg; increased damage range","122 dmg; increased damage range; leaves behind a larger, longer-lasting fire trail, damaging enemies it touches"]},
+     unique:{name:"Wildfire Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +20% DEF","+30% DEF","+40% DEF","+50% DEF","+50% DEF; deals additional damage for every 5 Burn stacks on the target; burn deals 25% more damage; Infernoswarm is immune to fire and Burn"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"infernohive",shardsToAscend:20,ascensionsToEvolve:null},
   // Water line 1
   {id:"coralleviathan",name:"Coralleviathan",emoji:"🐙",type:"Water",rarity:"epic",description:"A coral-encrusted leviathan the size of a reef. Marine biologists consider it a protected ecosystem.",
    stats:{hp:108,atk:55,def:118,spd:1,abilitySpeed:1},
@@ -1419,25 +1419,25 @@ export const CREATURES=[
      unique:{name:"Celestial Sovereign",upgrades:["Passive: light +40%; all heals +36%; crits heal all 40 HP; Celestidrake immune to all dmg while healing","Light +50%; heals +44%; crit heals 52 HP","Light +62%; heals +54%; crit heals 66 HP","Light +76%; heals +66%; crit heals 84 HP","Light +92%; heals +80%; crit heals 105 HP; Celestidrake revives twice each time as a supernova healing all allies 200 HP+dealing 200 dmg"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"lumadrak",shardsToAscend:20,ascensionsToEvolve:null},
   // Light line 2
-  {id:"sacredwasp",name:"Vespura",emoji:"🐝",type:"Light",rarity:"epic",description:"A wasp whose stinger delivers blessing instead of venom. Theology departments find it very confusing.",
+  {id:"sacredwasp",name:"Starlit",emoji:"🐝",type:"Light",rarity:"epic",description:"A wasp whose stinger delivers blessing instead of venom. Theology departments find it very confusing.",
    stats:{hp:58,atk:42,def:65,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Blessed Sting",upgrades:["10 dmg+blind 18% 1s; heal 1 ally 18 HP","13 dmg","16 dmg","21 dmg","Blind 26% 1.5s; heal all allies 10 HP; cleanse 1 debuff from healed"]},
-     special:{name:"Sacred Aura",upgrades:["All allies +22% ATK+DEF+Ability Speed 5s; remove all debuffs","Aura +28%","Aura +34%","Aura +42%","Aura +52%; grant immunity to all debuffs 6s; regen 18/s 5s all allies"]},
-     unique:{name:"Sacred Wings",upgrades:["Passive: all Ability Speed +32%; each ability heals all allies 14 HP; abilities cleanse 1 debuff from all","Ability Speed +40%; heals 18 HP","Ability Speed +50%; heals 24 HP","Ability Speed +62%; heals 32 HP","Ability Speed +76%; heals 42 HP; 20% chance ability is free; Sacredwasp immune to dmg while casting"]}
+     basic:{name:"Piercing Blessing",upgrades:["10 dmg","10 dmg","11 dmg","11 dmg; enemy hit: -10% Haste for 3s","11 dmg; enemy hit: -10% Haste for 3s; ally hit: +10% Haste for 3s"]},
+     special:{name:"Radiant Exchange",upgrades:["18 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","20 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP"]},
+     unique:{name:"Starlit Wings",upgrades:["Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +10% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +20% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +30% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK","Gain 50% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"divinedrone"},
-  {id:"divinedrone",name:"Divinedrone",emoji:"🐝",type:"Light",rarity:"epic",description:"A wasp so sacred the concept of harm has agreed to avoid it. It stings with pure blessings. Theologians are keeping notes.",
+  {id:"divinedrone",name:"Starbright",emoji:"🐝",type:"Light",rarity:"epic",description:"A wasp so sacred the concept of harm has agreed to avoid it. It stings with pure blessings. Theologians are keeping notes.",
    stats:{hp:80,atk:58,def:89,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Blessed Sting",upgrades:["10 dmg+blind 18% 1s; heal 1 ally 18 HP","13 dmg","16 dmg","21 dmg","Blind 26% 1.5s; heal all allies 10 HP; cleanse 1 debuff from healed"]},
-     special:{name:"Sacred Aura",upgrades:["All allies +22% ATK+DEF+Ability Speed 5s; remove all debuffs","Aura +28%","Aura +34%","Aura +42%","Aura +52%; grant immunity to all debuffs 6s; regen 18/s 5s all allies"]},
-     unique:{name:"Divine Wings",upgrades:["Passive: all Ability Speed +40%; each ability heals all allies 20 HP+cleanse 1 debuff; 18% chance free ability","Ability Speed +50%; heal 26 HP; 22% free","Ability Speed +62%; heal 34 HP; 28% free","Ability Speed +76%; heal 44 HP; 35% free","Ability Speed +92%; heal 56 HP; 44% free; Divinedrone immune to dmg while any ally is at full HP; buffs last 2s longer"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"sacredwasp",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"holyswarm"},  {id:"holyswarm",name:"Holyswarm",emoji:"🐝",type:"Light",rarity:"epic",description:"Sacredwasp became a divine swarm that is simultaneously everywhere and everywhere healing. Theologians have updated their texts.",
+     basic:{name:"Piercing Blessing",upgrades:["10 dmg","10 dmg","11 dmg","11 dmg; enemy hit: -10% Haste for 3s","11 dmg; enemy hit: -10% Haste for 3s; ally hit: +10% Haste for 3s"]},
+     special:{name:"Radiant Exchange",upgrades:["18 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","20 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP"]},
+     unique:{name:"Starlit Wings",upgrades:["Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +10% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +20% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +30% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK","Gain 50% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"sacredwasp",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"holyswarm"},  {id:"holyswarm",name:"Starburn",emoji:"🐝",type:"Light",rarity:"epic",description:"Sacredwasp became a divine swarm that is simultaneously everywhere and everywhere healing. Theologians have updated their texts.",
    stats:{hp:95,atk:68,def:105,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Divine Sting",upgrades:["14 dmg+blind 26% 2s; heal all allies 18 HP; cleanse 1 debuff all","18 dmg","23 dmg","30 dmg","Blind 36% 2.5s; heal all 28 HP; cleanse all debuffs from all allies"]},
-     special:{name:"Divine Aura",upgrades:["All allies +35% ATK+DEF+Ability Speed; remove all debuffs; grant immune all debuffs 6s; regen 22/s","Aura +44%","Aura +55%","Aura +68%","Aura +84%; regen 32/s; grant invincible 1.5s; revive 1 fallen ally 32% HP"]},
-     unique:{name:"Divine Resonance",upgrades:["Passive: Ability Speed +55% all allies; each ability heals all 28 HP+cleanse 1 debuff; 25% chance free ability","Ability Speed +66%; heal 36 HP; 30% free","Ability Speed +80%; heal 46 HP; 36% free","Ability Speed +96%; heal 58 HP; 44% free","Ability Speed +115%; heal 72 HP; 54% free; Holyswarm immune to all dmg while any ally is alive; revives 3 times"]}
+     basic:{name:"Piercing Blessing",upgrades:["10 dmg","10 dmg","11 dmg","11 dmg; enemy hit: -10% Haste for 3s","11 dmg; enemy hit: -10% Haste for 3s; ally hit: +10% Haste for 3s"]},
+     special:{name:"Radiant Exchange",upgrades:["18 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","20 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP","22 dmg; enemy hit: -15% ATK for 3s; ally hit: +15% ATK for 3s and recover HP"]},
+     unique:{name:"Starlit Wings",upgrades:["Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +10% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +20% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +30% ATK","Gain 20% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK","Gain 50% Speed and +2 Range; if Blazehornet is on the field, both gain +40% ATK"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"divinedrone",shardsToAscend:20,ascensionsToEvolve:null},
   // Light line 3
   {id:"lumigator",name:"Lumigator",emoji:"🦎",type:"Light",rarity:"epic",description:"A massive albino alligator that glows from within. It was protecting a sacred pool of light. Now it protects everything.",

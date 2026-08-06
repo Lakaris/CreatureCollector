@@ -33,6 +33,7 @@ export function GameProvider({ children }) {
   const [gameMode, setGameMode] = useState(null);
   const [collectionDeepLink, setCollectionDeepLink] = useState(null);
   const [creatureOverlay, setCreatureOverlay] = useState(null);
+  const [dexOverlay, setDexOverlay] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [username, setUsername] = useState("Player");
   const [profileEmoji, setProfileEmoji] = useState("🧑‍✈️");
@@ -110,6 +111,7 @@ export function GameProvider({ children }) {
   const [bananasUsed, setBananasUsed] = useState(0);
   const [dailyBossFights, setDailyBossFights] = useState(0);
   const [plotsGrown, setPlotsGrown] = useState(0);
+  const [fieldHarvests, setFieldHarvests] = useState(0);
 
   // ── Quests / daily missions ──────────────────────────────────────────────
   const [questBatchIdx, setQuestBatchIdx] = useState({
@@ -121,7 +123,8 @@ export function GameProvider({ children }) {
   const [dailyMissionsDate, setDailyMissionsDate] = useState(null);
   const [dailyMissionsSnapshot, setDailyMissionsSnapshot] = useState({
     eggsHatched: 0, dungeonsCleared: 0, arenaFights: 0,
-    bananasUsed: 0, dailyBossFights: 0, plotsGrown: 0, currencies: {},
+    bananasUsed: 0, dailyBossFights: 0, plotsGrown: 0,
+    labyrinthFights: 0, fieldHarvests: 0, currencies: {},
   });
   const [dailyMissionsDone, setDailyMissionsDone] = useState(new Set());
   const [dailyCompletionClaimed, setDailyCompletionClaimed] = useState(false);
@@ -189,11 +192,11 @@ export function GameProvider({ children }) {
     () => ({
       owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
       eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
-      labyrinthDepth, labyrinthBestDepth, labyrinthFights,
+      labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
     }),
     [owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
      eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
-     labyrinthDepth, labyrinthBestDepth, labyrinthFights]
+     labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests]
   );
 
   const value = {
@@ -201,6 +204,7 @@ export function GameProvider({ children }) {
     tab, setTab, gameMode, setGameMode,
     collectionDeepLink, setCollectionDeepLink,
     creatureOverlay, setCreatureOverlay,
+    dexOverlay, setDexOverlay,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,
     profileAvatarId, setProfileAvatarId,
@@ -237,6 +241,7 @@ export function GameProvider({ children }) {
     eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared,
     arenaFights, setArenaFights, labyrinthFights, setLabyrinthFights, bananasUsed, setBananasUsed,
     dailyBossFights, setDailyBossFights, plotsGrown, setPlotsGrown,
+    fieldHarvests, setFieldHarvests,
     // quests
     questBatchIdx, setQuestBatchIdx, claimedQuests, setClaimedQuests,
     dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed,

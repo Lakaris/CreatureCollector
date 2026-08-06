@@ -138,3 +138,27 @@ export function bossBlocked(nr, nc, occupied) {
   }
   return false;
 }
+
+/**
+ * Nearest cell to (sr,sc) -- including itself -- for which `isBlocked` is
+ * false, via BFS ring expansion. Used when a unit needs to land somewhere
+ * that turned out to be occupied (e.g. a charge attack bouncing off a wall).
+ * Returns null if the whole grid is blocked.
+ */
+export function nearestOpenCell(sr, sc, isBlocked, gridRows, gridCols) {
+  if (!isBlocked(sr, sc)) return [sr, sc];
+  const visited = new Set([sr + "," + sc]);
+  const queue = [[sr, sc]];
+  while (queue.length) {
+    const [r, c] = queue.shift();
+    for (const [nr, nc] of [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]]) {
+      if (nr < 0 || nr >= gridRows || nc < 0 || nc >= gridCols) continue;
+      const key = nr + "," + nc;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      if (!isBlocked(nr, nc)) return [nr, nc];
+      queue.push([nr, nc]);
+    }
+  }
+  return null;
+}

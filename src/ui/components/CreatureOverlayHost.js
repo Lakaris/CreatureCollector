@@ -6,10 +6,35 @@
 
 import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
+import { CREATURE_MAP } from "../../data/creatures.js";
 import CreatureDetail from "../screens/CreatureDetail/index.js";
+import DexEntry from "../screens/DexEntry.js";
 
 function CreatureOverlayHost() {
-  const { creatureOverlay, setCreatureOverlay, owned, setBananasUsed } = useGame();
+  const { creatureOverlay, setCreatureOverlay, dexOverlay, setDexOverlay, owned, setBananasUsed, unlockedSkins } = useGame();
+
+  if (dexOverlay && CREATURE_MAP[dexOverlay]) {
+    return React.createElement(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          inset: 0,
+          zIndex: 501,
+          background: "#f5f5f5",
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: "0 16px 80px",
+        },
+      },
+      React.createElement(DexEntry, {
+        def: CREATURE_MAP[dexOverlay],
+        onBack: () => setDexOverlay(null),
+        onNavigate: (d) => setDexOverlay(d.id),
+        unlockedSkins,
+      })
+    );
+  }
 
   if (!creatureOverlay || !owned[creatureOverlay]) return null;
 
@@ -22,7 +47,8 @@ function CreatureOverlayHost() {
         zIndex: 500,
         background: "#f5f5f5",
         overflowY: "auto",
-        padding: "0 0 80px",
+        overflowX: "hidden",
+        padding: "0 16px 80px",
       },
     },
     React.createElement(CreatureDetail, {

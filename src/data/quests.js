@@ -6,7 +6,7 @@ import { CREATURE_MAP } from "./creatures.js";
 
 export const QUEST_TABS=[
   {id:"daily",label:"Daily",emoji:"📅"},
-  {id:"general",label:"General",emoji:"📋"},
+  {id:"general",label:"Progression",emoji:"📋"},
   {id:"creature",label:"Creature",emoji:"🐾"},
   {id:"gear",label:"Gear",emoji:"⚔️"},
   {id:"dungeon",label:"Dungeon",emoji:"🏰"},
@@ -22,6 +22,8 @@ export const DAILY_MISSIONS=[
   {id:"dm_farm",   label:"Grow a Plot",           emoji:"🌱", reward:{gems:20}, points:20, check:(c,s)=>(c.plotsGrown-s.plotsGrown)>=1,                              progress:(c,s)=>({cur:Math.min(c.plotsGrown-s.plotsGrown,1),max:1})},
   {id:"dm_arena",  label:"Attempt an Arena Fight",emoji:"🏟️",reward:{gems:20}, points:25, check:(c,s)=>(c.arenaFights-s.arenaFights)>=1,                            progress:(c,s)=>({cur:Math.min(c.arenaFights-s.arenaFights,1),max:1})},
   {id:"dm_banana", label:"Use a Flair Banana",    emoji:"🍌", reward:{gems:20}, points:20, check:(c,s)=>(c.bananasUsed-s.bananasUsed)>=1,                            progress:(c,s)=>({cur:Math.min(c.bananasUsed-s.bananasUsed,1),max:1})},
+  {id:"dm_labyrinth",label:"Attempt a Labyrinth Fight",emoji:"🌀",reward:{gems:20},points:25, check:(c,s)=>(c.labyrinthFights-s.labyrinthFights)>=1,                  progress:(c,s)=>({cur:Math.min(c.labyrinthFights-s.labyrinthFights,1),max:1})},
+  {id:"dm_harvest",label:"Harvest Field",         emoji:"🌾", reward:{gems:20}, points:20, check:(c,s)=>(c.fieldHarvests-s.fieldHarvests)>=1,                        progress:(c,s)=>({cur:Math.min(c.fieldHarvests-s.fieldHarvests,1),max:1})},
 ];
 
 export const QUEST_DEFS={

@@ -15,6 +15,7 @@ import DevPanel from "./ui/screens/DevPanel.js";
 import FarmScreen from "./ui/screens/FarmScreen.js";
 import TreasureScreen from "./ui/screens/TreasureScreen.js";
 import StoreScreen from "./ui/screens/StoreScreen.js";
+import EquipmentScreen from "./ui/screens/EquipmentScreen.js";
 import HomeScreen from "./ui/screens/HomeScreen.js";
 import SettingsScreen from "./ui/screens/SettingsScreen.js";
 import DungeonScreen from "./ui/screens/battle/DungeonScreen.js";
@@ -28,6 +29,7 @@ const TABS = [
   { id: "collection", icon: "ti-layout-grid", label: "Collection" },
   { id: "play", icon: "ti-sword", label: "Play" },
   { id: "farm", icon: "ti-plant", label: "Farm" },
+  { id: "equipment", icon: "ti-tool", label: "Equipment" },
   { id: "store", icon: "ti-shopping-cart", label: "Store" },
 ];
 
@@ -290,8 +292,8 @@ function App() {
       !harvestPopup &&
         React.createElement(
           "div",
-          { style: { position: "fixed", bottom: 0, left: 0, right: 0, padding: "0 16px 12px", background: "rgba(245,245,245,0.95)", backdropFilter: "blur(8px)" } },
-          React.createElement(NavBar, { tab, setTab, style: { marginBottom: 0 } })
+          { style: { position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,245,245,0.95)", backdropFilter: "blur(8px)" } },
+          React.createElement(NavBar, { tab, setTab })
         ),
       React.createElement(HarvestPopup)
     );
@@ -354,7 +356,7 @@ function App() {
       ),
       React.createElement(
         "div",
-        { style: { padding: "0 16px 14px", background: "#f5f5f5" } },
+        { style: { background: "#f5f5f5" } },
         React.createElement(NavBar, { tab, setTab, onNavigate: () => window.scrollTo(0, 0) })
       )
     );
@@ -376,6 +378,7 @@ function App() {
           onDeepLinkConsumed: () => setCollectionDeepLink(null),
         }),
       tab === "store" && React.createElement(StoreScreen),
+      tab === "equipment" && React.createElement(EquipmentScreen),
       tab !== "home" && DEV_MODE && React.createElement(DevPanel),
       React.createElement("div", { style: { height: 12 } })
     ),

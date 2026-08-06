@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP, FINAL_FORMS, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
+import { EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain } from "../../core/creatures.js";
 import DexEntry from "../../ui/screens/DexEntry.js";
@@ -40,7 +41,7 @@ function DexScreen({onBack}){
   if(selected)return React.createElement(DexEntry,{def:selected,onBack:()=>setSelected(null),onNavigate:(d)=>setSelected(d),unlockedSkins});
 
   return React.createElement("div",null,
-    React.createElement(ScreenHeader,{title:"Pokédex",onBack,right:
+    React.createElement(ScreenHeader,{title:"Creature Dex",onBack,right:
       React.createElement("span",{style:{fontSize:12,color:"#666"}},collectedCount+"/"+FINAL_FORMS.length+" collected")
     }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
@@ -53,18 +54,15 @@ function DexScreen({onBack}){
     ),
     React.createElement("div",{style:{marginBottom:10}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
-        React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Show"),
-        React.createElement("button",{
-          className:"filter-chip"+(missingOnly?" active":""),
-          onClick:()=>setMissingOnly(p=>!p)
-        },"Missing only")
-      ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Rarity"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.entries(RARITY_CONFIG).map(([r,cfg])=>
             React.createElement("button",{key:r,className:"filter-chip"+(activeRarities.has(r)?" active":""),onClick:()=>toggleRarity(r)},cfg.label)
-          )
+          ),
+          React.createElement("button",{
+            className:"filter-chip"+(missingOnly?" active":""),
+            onClick:()=>setMissingOnly(p=>!p)
+          },"Missing only")
         )
       ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
@@ -75,7 +73,7 @@ function DexScreen({onBack}){
           )
         )
       ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Role"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.keys(ROLE_CONFIG).map(r=>
@@ -101,16 +99,14 @@ function DexScreen({onBack}){
             const chain=getChain(def.id);
             const isCollected=!!owned[def.id];
             const inProgress=!isCollected&&chain.some(id=>owned[id]);
-            return React.createElement("div",{key:def.id,className:"creature-card",onClick:()=>{setSelected(def);const c=document.querySelector('.app-content');if(c)c.scrollTop=0;},style:{position:"relative",paddingBottom:30}},
-              React.createElement("span",{style:{position:"absolute",top:7,left:8,fontSize:16,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
-              def.attackType&&React.createElement("span",{style:{position:"absolute",top:7,right:6,fontSize:10,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"1px 5px",lineHeight:1.4}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType),
-              isCollected&&React.createElement("span",{style:{position:"absolute",top:24,right:8,fontSize:11,background:"#EAF3DE",color:"#173404",borderRadius:10,padding:"1px 6px",fontWeight:600}},"✓"),
+            const rarCfg=EQUIP_RARITY_CONFIG[def.rarity];
+            return React.createElement("div",{key:def.id,className:"creature-card",onClick:()=>{setSelected(def);const c=document.querySelector('.app-content');if(c)c.scrollTop=0;},style:{position:"relative",paddingTop:30,paddingBottom:10,background:rarCfg.bg,border:"1px solid "+rarCfg.color+"44"}},
+              React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
+              def.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[def.attackType].emoji),
+              def.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[def.role].emoji),
+              isCollected&&React.createElement("span",{style:{position:"absolute",top:20,left:5,fontSize:11,background:"#EAF3DE",color:"#173404",borderRadius:10,padding:"1px 6px",fontWeight:600}},"✓"),
               React.createElement("div",{className:"creature-emoji"},def.emoji),
-              React.createElement("div",{className:"creature-name"},def.name),
-              React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",alignItems:"center",flexWrap:"wrap",marginBottom:2}},
-                def.role&&React.createElement("span",{style:{fontSize:10,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"1px 5px"}},ROLE_CONFIG[def.role].emoji+" "+def.role)
-              ),
-              React.createElement("span",{style:{position:"absolute",bottom:7,left:"50%",transform:"translateX(-50%)",whiteSpace:"nowrap"},className:"badge "+RARITY_CONFIG[def.rarity].color},RARITY_CONFIG[def.rarity].label)
+              React.createElement("div",{className:"creature-name"},def.name)
             );
           })
         )

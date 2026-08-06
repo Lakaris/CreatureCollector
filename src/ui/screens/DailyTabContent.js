@@ -20,7 +20,7 @@ function DailyTabContent({setRewardPopup}){
   React.useEffect(()=>{
     if(dailyMissionsDate!==today){
       setDailyMissionsDate(today);
-      setDailyMissionsSnapshot({eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,currencies:{...questState.currencies}});
+      setDailyMissionsSnapshot({eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,labyrinthFights:questState.labyrinthFights||0,fieldHarvests:questState.fieldHarvests||0,currencies:{...questState.currencies}});
       setDailyMissionsDone(new Set());
       setDailyCompletionClaimed(false);
       setDailySelectedMissions(pickDailyMissions());
@@ -28,7 +28,7 @@ function DailyTabContent({setRewardPopup}){
       setDailySelectedMissions(pickDailyMissions());
     }
   },[today]);
-  const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,currencies:{}};
+  const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}};
   const qs=questState||{};
   function showReward(reward){
     const entries=Object.entries(reward);

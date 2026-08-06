@@ -1,3 +1,5 @@
+import { getRootDef } from "./creatures.js";
+
 // Parses the leading damage number out of an ability upgrade string, for display
 // purposes only -- the underlying strings in data/creatures.js are left untouched.
 //
@@ -76,6 +78,15 @@ export function formatUpgradeStep(text, prevText) {
  * previous level instead of dropping the number entirely -- the ability
  * still hits for that much, the upgrade just didn't change it.
  */
+/** Heal amount out of a "heal all allies 12 HP" / "recover 10 HP" clause, or null if none found. */
+export function extractHeal(text) {
+  if (!text) return null;
+  const m = /(?:heal|recover)[^\d]{0,40}?(\d+)\s*HP/i.exec(text);
+  if (!m) return null;
+  const amount = Number(m[1]);
+  return Number.isFinite(amount) ? amount : null;
+}
+
 export function formatAbilityStep(text, prevText) {
   const cur = extractLeadingDamage(text);
   if (prevText) {
@@ -89,4 +100,57 @@ export function formatAbilityStep(text, prevText) {
     }
   }
   return { isPercent: false, ...formatAbilityDisplay(text) };
+}
+
+/** Small mechanic tags shown on ability cards (e.g. Blazehornet's Charging Pierce); click opens a definition popup. */
+export const ABILITY_TAG_DEFS = {
+  pierce: { label: "Pierce", description: "Deal damage to all enemies this attack passes through." },
+  closest: { label: "Closest", description: "Targets the closest enemy in range" },
+  farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range" },
+  burn: { label: "🔥 Burn", description: "Deals damage over time" },
+};
+
+/** sacredwasp/divinedrone/holyswarm (Starlit/Starbright/Starburn) currently share identical ability values. */
+export function isStarlitAbilityLine(creatureId) {
+  return creatureId === "sacredwasp" || creatureId === "divinedrone" || creatureId === "holyswarm";
+}
+
+/** Mechanic tag keys (into ABILITY_TAG_DEFS) for a given creature id + ability key ("basic"/"special"/"unique"). */
+export function getAbilityTags(creatureId, key) {
+  const isBlazehornetLine = getRootDef(creatureId)?.id === "blazehornet";
+  const isStarlitLine = isStarlitAbilityLine(creatureId);
+  const tags = [];
+  if (key === "special" && isBlazehornetLine) tags.push("pierce", "closest");
+  if (key === "basic" && isBlazehornetLine) tags.push("closest");
+  if (key === "unique" && isBlazehornetLine) tags.push("burn");
+  if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
+  if (key === "special" && isStarlitLine) tags.push("closest");
+  return tags;
+}
+
+// Mirror basicHealByLevel/specialHealByLevel in battle/playerAbilities/starlitLine.js (sacredwasp/
+// divinedrone/holyswarm) -- Piercing Blessing's and Radiant Exchange's text no longer spell out
+// the heal amount at every level (it's shown as its own badge instead), so the badge sources the
+// real per-level value directly instead of parsing text.
+const STARLIT_BASIC_HEAL_BY_LEVEL = [12, 13, 13, 13, 13];
+const STARLIT_SPECIAL_HEAL_BY_LEVEL = [0, 0, 0, 5, 10];
+
+/**
+ * Piercing Blessing's and Radiant Exchange's levels are written as self-contained, cumulative
+ * sentences (see creatures.js) rather than incremental diffs, so they're shown as-is instead of
+ * being run through formatAbilityStep/formatUpgradeStep's "+X% damage" bump-message logic.
+ * Returns {label, amount, healAmt} for one level of a Starlit-line basic/special ability, or
+ * null when this doesn't apply (any other creature, or the unique ability) -- callers should
+ * fall back to the generic formatting in that case.
+ */
+export function formatStarlitAbilityLevel(creatureId, key, upgrades, idx) {
+  if (!isStarlitAbilityLine(creatureId) || (key !== "basic" && key !== "special")) return null;
+  const text = upgrades[idx];
+  const hit = extractLeadingDamage(text);
+  const phrase = key === "basic" ? "Deal damage to enemies and heal allies" : "Deal damage to an enemy";
+  const label = hit ? hit.prefix + phrase + hit.rest : text;
+  const amount = hit ? hit.amount : null;
+  const healTable = key === "basic" ? STARLIT_BASIC_HEAL_BY_LEVEL : STARLIT_SPECIAL_HEAL_BY_LEVEL;
+  const healAmt = healTable[Math.min(idx, healTable.length - 1)] || null;
+  return { label, amount, healAmt };
 }

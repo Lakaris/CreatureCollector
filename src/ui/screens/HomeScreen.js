@@ -11,7 +11,7 @@ import DailyScreen from "../../ui/screens/DailyScreen.js";
 import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
 
 function HomeScreen(){
-  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen } = useGame();
+  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth } = useGame();
   const [picking,setPicking]=React.useState(false);
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
@@ -36,9 +36,9 @@ function HomeScreen(){
 
   if(picking){
     return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:0}},
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid #f0f0f0"}},
-        React.createElement("button",{onClick:()=>setPicking(false),style:{background:"none",border:"none",fontSize:22,cursor:"pointer",padding:0,lineHeight:1}},"←"),
-        React.createElement("div",{style:{fontWeight:700,fontSize:16}},`Featured Creature`)
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"16px 16px 12px",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
+        React.createElement("button",{onClick:()=>setPicking(false),style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
+        React.createElement("div",{style:{fontSize:18,fontWeight:700}},"Featured Creature")
       ),
       React.createElement("div",{style:{flex:1,overflowY:"auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:12}},
         ownedList.map(o=>{
@@ -62,7 +62,7 @@ function HomeScreen(){
   return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column"}},
     React.createElement(ScreenHeader,{title:React.createElement("button",{
       onClick:()=>setSettingsOpen(true),
-      style:{width:36,height:36,borderRadius:"50%",border:"2px solid #e0e0e0",background:"#f5f5f5",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0}
+      style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
     },"⚙️"),right:React.createElement(React.Fragment,null,
       React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems}),
       React.createElement(CurrencyChip,{emoji:"💰",value:currencies.money})
@@ -100,6 +100,14 @@ function HomeScreen(){
       "📅",
       React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Daily"),
       new Date().toDateString()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
+    ),
+    React.createElement("button",{
+      onClick:()=>{setGameMode("labyrinth");setTab("play");},
+      style:{position:"fixed",left:"calc(75vw - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}
+    },
+      "🌀",
+      React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#4f46e5"}},"Descend"),
+      React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#6366f1"}},"Floor "+(labyrinthDepth||1))
     )
     )
   );

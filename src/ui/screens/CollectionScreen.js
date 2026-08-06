@@ -47,7 +47,7 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
 
   if(showDex)return React.createElement(DexScreen,{onBack:()=>setShowDex(false),unlockedSkins,owned});
 
-  if(selected&&owned[selected])return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",zIndex:50,padding:"0 0 80px"}},
+  if(selected&&owned[selected])return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",zIndex:50,padding:"0 16px 80px"}},
     pendingEvo&&React.createElement("div",{className:"modal-overlay"},
       React.createElement("div",{className:"modal-box"},
         React.createElement("span",{className:"modal-emoji"},pendingEvo.toEmoji),
@@ -85,7 +85,7 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
 
   return React.createElement("div",null,
     React.createElement(ScreenHeader,{title:"Collection",right:
-      React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>setShowDex(true),style:{marginBottom:0}},"Dex")
+      React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>setShowDex(true),style:{marginBottom:0,padding:"4px 12px",border:"none",lineHeight:1.2}},"Dex")
     }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
@@ -112,7 +112,7 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
           )
         )
       ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Role"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.keys(ROLE_CONFIG).map(r=>

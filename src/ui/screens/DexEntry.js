@@ -6,11 +6,13 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain, getSkinsForCreature } from "../../core/creatures.js";
-import { formatAbilityDisplay, formatUpgradeStep } from "../../core/abilityText.js";
+import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel } from "../../core/abilityText.js";
+import ScreenHeader from "../../ui/components/ScreenHeader.js";
 
 function DexEntry({def,onBack,onNavigate}){
   const { unlockedSkins } = useGame();
   const [skinPreview,setSkinPreview]=useState(null);
+  const [abilityTagPopup,setAbilityTagPopup]=useState(null);
   const [tab,setTab]=useState("abilities");
   const chain=getChain(def.id);
   const chainDefs=chain.map(id=>CREATURE_MAP[id]);
@@ -18,6 +20,13 @@ function DexEntry({def,onBack,onNavigate}){
   const chainSkins=getSkinsForCreature(def.id);
 
   return React.createElement("div",null,
+    abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[abilityTagPopup].label),
+        React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[abilityTagPopup].description),
+        React.createElement("button",{onClick:()=>setAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+      )
+    ),
     skinPreview&&React.createElement("div",{className:"modal-overlay",onClick:()=>setSkinPreview(null)},
       React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
         React.createElement("div",{style:{fontSize:16,fontWeight:600,color:"#000",marginBottom:4}},skinPreview.name),
@@ -35,9 +44,7 @@ function DexEntry({def,onBack,onNavigate}){
       )
     ),
 
-    React.createElement("button",{className:"back-btn",onClick:onBack},
-      React.createElement("i",{className:"ti ti-arrow-left"}),"Dex"
-    ),
+    React.createElement(ScreenHeader,{title:def.name,onBack}),
     React.createElement("div",{className:"card",style:{marginBottom:12}},
       React.createElement("div",{style:{textAlign:"center",marginBottom:12}},
         React.createElement("span",{style:{fontSize:100,lineHeight:1,display:"block",marginBottom:10}},def.emoji),
@@ -89,6 +96,7 @@ function DexEntry({def,onBack,onNavigate}){
         const abl=def.abilities[k];
         const abilityColors={basic:{bg:"#EAF3DE",color:"#173404"},special:{bg:"#EEEDFE",color:"#26215C"},unique:{bg:"#FFF3CD",color:"#5A3E00"}};
         const ac=abilityColors[k];
+        const abilityTags=getAbilityTags(def.id,k);
         return React.createElement("div",{key:k,className:"ability-card"},
           React.createElement("div",{className:"ability-header"},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
@@ -99,17 +107,31 @@ function DexEntry({def,onBack,onNavigate}){
                   : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
               )
             ),
-            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name)
+            React.createElement("div",{style:{flex:1,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
+              React.createElement("span",{className:"ability-name"},abl.name),
+              React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
+                ...abilityTags.map(tag=>React.createElement("button",{
+                  key:tag,
+                  onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},
+                  style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                },ABILITY_TAG_DEFS[tag].label))
+              )
+            )
           ),
           React.createElement("div",null,
             abl.upgrades.map((u,i)=>{
               const isFirst=i===0;
-              const fmt=isFirst?formatAbilityDisplay(u):null;
-              const step=isFirst?null:formatUpgradeStep(u,abl.upgrades[i-1]);
+              const starlitFmt=formatStarlitAbilityLevel(def.id,k,abl.upgrades,i);
+              const fmt=starlitFmt||(isFirst?formatAbilityDisplay(u):null);
+              const step=starlitFmt||isFirst?null:formatUpgradeStep(u,abl.upgrades[i-1]);
+              const numBits=[
+                fmt&&fmt.amount!=null?fmt.amount+" dmg":null,
+                starlitFmt&&starlitFmt.healAmt!=null?starlitFmt.healAmt+" heal":null,
+              ].filter(Boolean).join(" · ");
               return React.createElement("div",{key:i,style:{display:"flex",gap:8,marginBottom:4,alignItems:"baseline"}},
                 React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#7F77DD",minWidth:14,flexShrink:0}},(i+1)),
-                React.createElement("span",{style:{fontSize:12,color:"#555",lineHeight:1.5,flex:1}},isFirst?fmt.label:step),
-                isFirst&&fmt.amount!=null&&React.createElement("span",{style:{fontSize:12,fontWeight:800,color:"#534AB7",flexShrink:0}},fmt.amount)
+                React.createElement("span",{style:{fontSize:12,color:"#555",lineHeight:1.5,flex:1}},fmt?fmt.label:step),
+                numBits&&React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#999",flexShrink:0,whiteSpace:"nowrap"}},numBits)
               );
             })
           )

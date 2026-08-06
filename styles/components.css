@@ -33,6 +33,26 @@
 .creature-list{scrollbar-width:none;-ms-overflow-style:none;}
 .creature-list::-webkit-scrollbar{display:none;}
 
+/* Battle screens (Arena/Dungeon/Labyrinth/Daily Boss): the damage chart and
+   creature/boss info panel sit beside the grid on wide screens. Below the
+   breakpoint there's no room for three columns, so the grid wraps onto its
+   own full-width line and the two side panels wrap onto the line under it,
+   side by side rather than each getting its own row (which pushed the info
+   panel below the fold). */
+@media (max-width:700px){
+  .battle-row{flex-direction:column !important;align-items:center !important;overflow-x:visible !important;}
+  .battle-grid{order:1;}
+  .battle-side-panel{order:2;}
+}
+
+/* Daily Boss planning phase: the boss's persistent info card doesn't fit next
+   to the grid on narrow screens, so it's hidden there -- press-and-hold the
+   boss on the grid opens the same info as a popup instead (see bossPopupOpen
+   in DailyBossScreen.js). */
+@media (max-width:700px){
+  .daily-boss-panel{display:none;}
+}
+
 /* Filters */
 .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}

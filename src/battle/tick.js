@@ -13,16 +13,53 @@
 // owns React state, timers, rewards, and win/lose handling; this function only
 // advances the simulation and reports what happened.
 
-import { MELEE_RANGE, RANGED_RANGE } from "./constants.js";
+import { MELEE_RANGE, RANGED_RANGE, BOSS_SIZE } from "./constants.js";
 import {
   aChebDist, aCardinalDist, aBestStep,
-  bossOccupies, distToBoss, nearestOpenBossAdj,
+  bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty } from "./status.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickAtkMod } from "./status.js";
 import { tickMinionSpecials } from "./minions.js";
 import { unitDamage, playerDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
 import { getBossModule } from "./bosses/registry.js";
 import { makeBossContext } from "./bosses/context.js";
+import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
+
+/** Rate applied to a player-inflicted Burn's stored source ATK, per tick. */
+const PLAYER_BURN_RATE = 0.035;
+/** Rate applied to a fire trail's stored source ATK, per tick (e.g. Blazehornet's Charging Pierce lvl 5). */
+const FIRE_TRAIL_RATE = 0.03;
+
+/** Context passed to a player creature's `special(unit, ctx)` / `basicAttack(unit, ctx)` ability hooks. */
+function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep }) {
+  return {
+    aliveE, aliveP, boss, gridRows, gridCols, newFx, now, canMove,
+    blocked,
+    addDamageDealt(amount) {
+      const dd = state.damageDealt || (state.damageDealt = {});
+      dd[unit.creatureId] = (dd[unit.creatureId] || 0) + amount;
+    },
+    nearestOpenCell(r, c) {
+      return nearestOpenCell(r, c, blocked, gridRows, gridCols);
+    },
+    relocate(nr, nc) {
+      allOcc.delete(unit.row + "," + unit.col);
+      unit.prevRow = unit.row;
+      unit.prevCol = unit.col;
+      unit.lastMoveTime = now;
+      unit.row = nr;
+      unit.col = nc;
+      allOcc.add(nr + "," + nc);
+    },
+    addFireTrail(cells, ticks, sourceAtk) {
+      (state.fireTrails || (state.fireTrails = [])).push({ cells: new Set(cells), ticksLeft: ticks, sourceAtk });
+    },
+    /** Take one BFS step toward (tr,tc); no-ops when rooted. */
+    stepToward(tr, tc) {
+      return canMove ? doStep(tr, tc) : false;
+    },
+  };
+}
 
 /** Move a unit one BFS step toward (tr,tc), keeping the occupancy set in sync. */
 function stepUnit(u, tr, tc, blocked, allOcc, now) {
@@ -93,18 +130,47 @@ export function runBattleTick(state, config) {
   for (const u of aliveP) {
     u.atkCd = Math.max(0, u.atkCd - 1);
     u.abilCd = Math.max(0, (u.abilCd || 0) - 1);
+    tickAtkMod(u);
 
     const canMove = !isRooted(u);
     const penalty = speedPenalty(u);
     const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
     const distB = bossAlive ? distToBoss(boss, u.row, u.col) : Infinity;
 
+    const abilMod = getPlayerAbilityModule(u.creatureId);
+    const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
+    const dmgMult = abilMod?.dmgMultForAttack ? abilMod.dmgMultForAttack(u) : 1;
+
+    // Special abilities (e.g. Blazehornet's Charging Pierce) run on their own
+    // cooldown, independent of the basic-attack loop below -- they can move
+    // the unit, so they run first and everything after sees the new position.
+    if (abilMod?.special && u.abilCd <= 0 && canMove && (aliveE.length || bossAlive)) {
+      const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now) });
+      abilMod.special(u, specialCtx);
+      u.abilCd = abilMod.specialCooldown ? abilMod.specialCooldown(u) : 20;
+    }
+
+    // A custom basicAttack hook (e.g. Starlit's piercing beam) fully replaces
+    // the default "attack the nearest thing" flow below -- it owns targeting,
+    // damage/healing, and chase-movement for this unit's turn.
+    if (abilMod?.basicAttack) {
+      const basicCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now) });
+      abilMod.basicAttack(u, basicCtx);
+      continue;
+    }
+
     // Boss takes priority when in range -- hold position even while on cooldown.
     if (distB <= range && bossAlive) {
       if (u.atkCd <= 0) {
-        const dmgToBoss = playerDamageToBoss(u, boss, aliveP);
-        damageBoss(boss, dmgToBoss);
-        damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmgToBoss;
+        let totalDmg = 0;
+        for (let i = 0; i < hits && boss.hp > 0; i++) {
+          const dmgToBoss = Math.max(1, Math.round(playerDamageToBoss(u, boss, aliveP) * dmgMult));
+          damageBoss(boss, dmgToBoss);
+          totalDmg += dmgToBoss;
+          const bonus = abilMod?.onHit ? abilMod.onHit(u, boss) : 0;
+          if (bonus) { damageBoss(boss, bonus); totalDmg += bonus; }
+        }
+        damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
         u.atkCd = attackCooldown(u, penalty);
         newFx.push({ id: now + u.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
       }
@@ -120,9 +186,15 @@ export function runBattleTick(state, config) {
           ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col)
           : aChebDist(u.row, u.col, tgt.row, tgt.col);
         if (dist <= range && u.atkCd <= 0) {
-          const dmg = unitDamage(u, tgt);
-          tgt.hp = Math.max(0, tgt.hp - dmg);
-          damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmg;
+          let totalDmg = 0;
+          for (let i = 0; i < hits && tgt.hp > 0; i++) {
+            const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMult));
+            tgt.hp = Math.max(0, tgt.hp - dmg);
+            totalDmg += dmg;
+            const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
+            if (bonus) { tgt.hp = Math.max(0, tgt.hp - bonus); totalDmg += bonus; }
+          }
+          damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
           u.atkCd = attackCooldown(u, penalty);
           newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
         } else if (canMove && dist > range) {
@@ -142,6 +214,7 @@ export function runBattleTick(state, config) {
   // ── 2. Enemy minions ─────────────────────────────────────────────────────
   for (const u of aliveE) {
     u.atkCd = Math.max(0, u.atkCd - 1);
+    tickAtkMod(u);
     const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
     const { atkTgt, moveTgt } = selectTarget(u, aliveP);
     const tgt = atkTgt || moveTgt;
@@ -165,11 +238,58 @@ export function runBattleTick(state, config) {
   // ── 4. Status effects ────────────────────────────────────────────────────
   tickStatusEffects(aliveP, boss, newFx, now);
 
+  // Player-inflicted Burn (e.g. Blazehornet's Burning Bond) on minions/boss.
+  // Separate from tickStatusEffects above, which only handles boss->player DoT.
+  for (const u of aliveE) {
+    if ((u.burnTicks || 0) > 0) {
+      const dmg = Math.max(1, Math.round((u.burnSourceAtk || 10) * PLAYER_BURN_RATE));
+      u.hp = Math.max(0, u.hp - dmg);
+      u.burnTicks--;
+      newFx.push({ id: now + "pbrn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
+    }
+  }
+  if (bossAlive && (boss.burnTicks || 0) > 0) {
+    const dmg = Math.max(1, Math.round((boss.burnSourceAtk || 10) * PLAYER_BURN_RATE));
+    damageBoss(boss, dmg);
+    boss.burnTicks--;
+    newFx.push({ id: now + "pbrn" + "boss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
+  }
+
+  // Fire trails left behind by player abilities (e.g. Blazehornet's Charging
+  // Pierce lvl 5) damage any enemy standing on them, then expire.
+  if (state.fireTrails && state.fireTrails.length) {
+    state.fireTrails = state.fireTrails.filter((trail) => {
+      for (const u of aliveE) {
+        if (trail.cells.has(u.row + "," + u.col)) {
+          const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
+          u.hp = Math.max(0, u.hp - dmg);
+          newFx.push({ id: now + "trail" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
+        }
+      }
+      if (bossAlive) {
+        let onTrail = false;
+        for (let dr = 0; dr < BOSS_SIZE && !onTrail; dr++) {
+          for (let dc = 0; dc < BOSS_SIZE && !onTrail; dc++) {
+            if (trail.cells.has((boss.row + dr) + "," + (boss.col + dc))) onTrail = true;
+          }
+        }
+        if (onTrail) {
+          const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
+          damageBoss(boss, dmg);
+          newFx.push({ id: now + "trailboss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
+        }
+      }
+      trail.ticksLeft--;
+      return trail.ticksLeft > 0;
+    });
+  }
+
   // ── 5. Boss ──────────────────────────────────────────────────────────────
   if (bossAlive) {
     boss.atkCd = Math.max(0, boss.atkCd - 1);
     boss.moveCd = Math.max(0, boss.moveCd - 1);
     boss.specialCd = Math.max(0, boss.specialCd - 1);
+    tickAtkMod(boss);
 
     const mod = getBossModule(boss._bossKey);
     if (mod) {

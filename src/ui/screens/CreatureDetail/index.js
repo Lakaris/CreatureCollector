@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABELS, STAT_DESCRIPTIONS } from "../../../data/rarity.js";
+import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABELS, STAT_DESCRIPTIONS } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
-import { getRootDef, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
+import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr } from "../../../core/equipment.js";
-import { formatAbilityStep } from "../../../core/abilityText.js";
+import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine } from "../../../core/abilityText.js";
 import { getMelonLabel, getMelonAvailable, deductMelon } from "../../../core/melons.js";
 import AscStars from "../../../ui/components/AscStars.js";
 import StatBar from "../../../ui/components/StatBar.js";
@@ -18,14 +18,16 @@ import Notify from "../../../ui/components/Notify.js";
 import SkinSection from "../../../ui/screens/CreatureDetail/SkinSection.js";
 import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js";
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
+import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 
 function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites } = useGame();
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay } = useGame();
   const [notify,setNotify]=useState(null);
   const [lastLeveledStat,setLastLeveledStat]=useState(null);
   const [ascPopup,setAscPopup]=useState(null);
   const [confirmMelon,setConfirmMelon]=useState(null);
   const [statInfoPopup,setStatInfoPopup]=useState(null);
+  const [abilityTagPopup,setAbilityTagPopup]=useState(null);
   const def=CREATURE_MAP[ownedData.id];
   const stats=calcStats(def,ownedData);
   const equipBonusStats={hp:0,atk:0,def:0,spd:0,abilitySpeed:0};
@@ -97,12 +99,14 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     const eligible=["basic","special","unique"].filter(k=>ownedData.abilityLevels[k]<5);
     if(!eligible.length){notify_("All abilities maxed!");return;}
     const chosen=eligible[Math.floor(Math.random()*eligible.length)];
+    const newLevel=ownedData.abilityLevels[chosen]+1;
     setCurrencies(c=>deductMelon(c,def.type));
     setOwned(prev=>{
       const e={...prev[ownedData.id]};
-      e.abilityLevels={...e.abilityLevels,[chosen]:e.abilityLevels[chosen]+1};
+      e.abilityLevels={...e.abilityLevels,[chosen]:newLevel};
       return{...prev,[e.id]:e};
     });
+    setPreviewPip(p=>({...p,[chosen]:Math.min(newLevel,4)}));
   }
 
   const rootDef=getRootDef(def.id);
@@ -154,6 +158,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const shardsProgress=Math.min(1,ownedData.shards/rootDef.shardsToAscend);
   const canEvolve=def.evolutionId&&ownedData.ascensions>=def.ascensionsToEvolve;
   const nextAscendWillEvolve=def.evolutionId&&(ownedData.ascensions+1)>=def.ascensionsToEvolve;
+
+  const chainDefs=getChain(def.id).map(id=>CREATURE_MAP[id]);
 
   const equipped=(ownedData.equipped||[null,null,null,null]);
 
@@ -233,6 +239,14 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     )
   );
 
+  const abilityTagPopupEl=abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[abilityTagPopup].label),
+      React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[abilityTagPopup].description),
+      React.createElement("button",{onClick:()=>setAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+    )
+  );
+
   if(equipDetailPage){
     const pi=EQUIPMENT_MAP[equipDetailPage];
     if(!pi) {setEquipDetailPage(null);}
@@ -255,6 +269,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         ),
         React.createElement("div",{className:"card",style:{marginTop:8,padding:"24px 20px",position:"relative",display:"flex",flexDirection:"column",minHeight:"calc(100vh - 90px)"}},
           rarCfg&&React.createElement("div",{style:{position:"absolute",top:10,left:12,fontSize:10,fontWeight:700,color:rarCfg.color,background:rarCfg.bg,borderRadius:4,padding:"2px 7px"}},rarCfg.label),
+          (pi.element||pi.role)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
+            [pi.element,pi.role].filter(Boolean).join(" · ")+" exclusive"
+          ),
           React.createElement("div",{style:{textAlign:"center",marginBottom:16}},
             React.createElement("div",{style:{fontSize:64,marginBottom:4}},pi.emoji),
             React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#000",marginBottom:2}},pi.name),
@@ -405,7 +422,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Stat"),
             React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
-              STAT_CYCLE.map(s=>
+              CORE_STAT_CYCLE.map(s=>
                 React.createElement("button",{key:s,className:"filter-chip"+(equipFilterStats.has(s)?" active":""),onClick:()=>toggleEquipStat(s)},STAT_LABELS[s])
               )
             )
@@ -469,9 +486,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             const isEquippedSlot1=equipped[1]===item.id;
             const equippedByPet=owned&&Object.values(owned).find(p=>p.id!==ownedData.id&&(p.equipped||[]).includes(item.id));
             const equippedByDef=equippedByPet?CREATURE_MAP[equippedByPet.id]:null;
-            const disabled=false;
+            const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role);
             const onTapClick=equipSlotPicker!==null
               ? ()=>{if(didLongPress.current){didLongPress.current=false;return;}
+                  if(disabled&&!isEquippedHere)return;
                   if(isEquippedHere){setSlot(equipSlotPicker,null);}
                   else if(isEquippedOtherSlot){
                     // swap: find which slot has this item and swap with the picker slot
@@ -491,8 +509,11 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
               onMouseDown:onPressStart,onMouseUp:onPressEnd,onMouseLeave:onPressEnd,
               onTouchStart:onPressStart,onTouchEnd:onPressEnd,onTouchCancel:onPressEnd,
               style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled)?"pointer":"default",width:"calc(50% - 4px)",boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
-              React.createElement("div",{style:{position:"absolute",top:6,left:8}},
-                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=EQUIP_MAX_LEVEL?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=EQUIP_MAX_LEVEL?"MAX":"Lv "+lvl)
+              React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
+                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=EQUIP_MAX_LEVEL?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=EQUIP_MAX_LEVEL?"MAX":"Lv "+lvl),
+                (item.element||item.role)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
+                  [item.element,item.role].filter(Boolean).join(" · ")+" exclusive"
+                )
               ),
               React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
               asc>0&&React.createElement("div",{style:{position:"absolute",top:4,left:0,right:0,textAlign:"center",fontSize:10,fontWeight:700,color:"#f59e0b",lineHeight:"14px",pointerEvents:"none"}},asc>=EQUIP_MAX_ASCENSION?"✦".repeat(10):(asc<=5?"★".repeat(asc):"★".repeat(5)+"★".repeat(asc-5))),
@@ -526,10 +547,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
 
   return React.createElement("div",null,
     statInfoPopupEl,
+    abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
-    React.createElement("button",{className:"back-btn",onClick:onBack},
-      React.createElement("i",{className:"ti ti-arrow-left"}),"Back"
-    ),
+    React.createElement(ScreenHeader,{title:def.name,onBack,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+      onClick:()=>setDexOverlay(def.id),
+      style:{padding:"6px 12px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+    },"Evolutions")}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
@@ -573,8 +596,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         React.createElement("div",{style:{textAlign:"center"}},
           ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
           def.image
-            ?React.createElement("div",{style:{width:"100%",marginBottom:8,borderRadius:16,overflow:"hidden",background:"#fff"}},
-                React.createElement("img",{src:def.image,style:{width:"100%",height:220,objectFit:"contain",display:"block",mixBlendMode:"multiply"}}))
+            ?React.createElement("div",{style:{width:100,height:100,margin:"0 auto 8px",borderRadius:16,overflow:"hidden",background:"#fff"}},
+                React.createElement("img",{src:def.image,style:{width:"100%",height:"100%",objectFit:"contain",display:"block",mixBlendMode:"multiply"}}))
             :React.createElement("span",{style:{fontSize:100,lineHeight:1,display:"block",marginBottom:8}},displayEmoji),
           React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:6}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
           React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",justifyContent:"center"}},
@@ -723,16 +746,26 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         const abl=def.abilities[k];
         const lvl=ownedData.abilityLevels[k];
         const isMax=lvl>=5;
+        const unlocked=isMax?5:lvl+1;
         const sel=previewPip[k];
         const hasSel=sel!=null;
-        const selLocked=hasSel&&sel>=lvl;
+        const selLocked=hasSel&&sel>=unlocked;
         const displayIdx=hasSel?sel:(isMax?4:lvl);
         const displayText=hasSel?abl.upgrades[sel]:(isMax?abl.upgrades[4]:abl.upgrades[lvl]||abl.upgrades[0]);
-        const displayFmt=formatAbilityStep(displayText,displayIdx>0?abl.upgrades[displayIdx-1]:null);
         const abilityColors={basic:{bg:"#EAF3DE",color:"#173404"},special:{bg:"#EEEDFE",color:"#26215C"},unique:{bg:"#FFF3CD",color:"#5A3E00"}};
         const ac=abilityColors[k];
+        const isStarlitLine=isStarlitAbilityLine(def.id);
+        const starlitFmt=formatStarlitAbilityLevel(def.id,k,abl.upgrades,displayIdx);
+        const displayFmt=starlitFmt
+          ? {isPercent:false, label:starlitFmt.label, amount:starlitFmt.amount}
+          : formatAbilityStep(displayText,displayIdx>0?abl.upgrades[displayIdx-1]:null);
+        let healAmt=starlitFmt?starlitFmt.healAmt:null;
+        if(!starlitFmt){
+          for(let i=displayIdx;i>=0;i--){healAmt=extractHeal(abl.upgrades[i]);if(healAmt!=null)break;}
+        }
+        const abilityTags=getAbilityTags(def.id,k);
         return React.createElement("div",{key:k,className:"ability-card"},
-          React.createElement("div",{className:"ability-header"},
+          React.createElement("div",{className:"ability-header",style:{alignItems:"center"}},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
               React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k),
               React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}},
@@ -741,18 +774,29 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
                   : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
               )
             ),
-            React.createElement("span",{className:"ability-name",style:{flex:1}},abl.name)
+            React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:4}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
+                React.createElement("span",{className:"ability-name"},abl.name),
+                React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
+                  ...abilityTags.map(tag=>React.createElement("button",{
+                    key:tag,
+                    onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},
+                    style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                  },ABILITY_TAG_DEFS[tag].label))
+                )
+              ),
+              React.createElement(PipRow,{filled:unlocked,total:5,isMax,
+                selectedPip:hasSel?sel:undefined,
+                onPipClick:(i)=>setPreviewPip(p=>({...p,[k]:p[k]===i?null:i}))
+              })
+            )
           ),
-          React.createElement(PipRow,{filled:lvl,total:5,isMax,
-            selectedPip:hasSel?sel:undefined,
-            onPipClick:(i)=>setPreviewPip(p=>({...p,[k]:p[k]===i?null:i}))
-          }),
-          hasSel&&React.createElement("div",{style:{fontSize:10,fontWeight:600,color:selLocked?"#aaa":"#534AB7",marginBottom:4}},
-            selLocked?"🔒 Level "+(sel+1)+" — not yet unlocked":"Level "+(sel+1)
-          ),
-          React.createElement("p",{className:"ability-desc",style:{color:selLocked?"#aaa":"inherit",display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:8}},
+          React.createElement("p",{className:"ability-desc",style:{color:selLocked?"#aaa":"inherit",display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}},
             React.createElement("span",null,displayFmt.isPercent?displayFmt.text:displayFmt.label),
-            !selLocked&&displayFmt.amount!=null&&React.createElement("span",{style:{fontWeight:800,color:"#534AB7",flexShrink:0}},displayFmt.amount)
+            React.createElement("span",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",flexShrink:0}},
+              (!selLocked||(isStarlitLine&&(k==="basic"||k==="special")))&&displayFmt.amount!=null&&React.createElement("span",{style:{fontWeight:800,color:"#534AB7"}},displayFmt.amount+" DMG"),
+              (!selLocked||(isStarlitLine&&(k==="basic"||k==="special")))&&healAmt!=null&&React.createElement("span",{style:{fontWeight:800,color:"#2E8B57"}},healAmt+" HEAL")
+            )
           )
         );
       })

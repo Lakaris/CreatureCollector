@@ -9,7 +9,7 @@ import { formatDuration } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
-  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount } = useGame();
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests } = useGame();
   const MAX_PLOTS=6;
   const MAX_MONEY_PLOTS=4;
   const [confirm,setConfirm]=useState(false);
@@ -56,6 +56,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     });
     setFarmFieldLastHarvest(Date.now());
     setFarmFieldSeed(Math.random()*1e9|0);
+    setFieldHarvests(c=>c+1);
     setNow(Date.now());
     const items=[
       {emoji:"🍖",label:"Food",amount:accumulated},

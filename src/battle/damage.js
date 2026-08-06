@@ -1,6 +1,6 @@
 // Damage formulas.
 
-import { weakenMultiplier } from "./status.js";
+import { weakenMultiplier, atkModMultiplier } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 
 /** Base attack roll: ±20% spread around the attacker's power. */
@@ -13,7 +13,7 @@ export function attackRoll(atk) {
  * Used for player-vs-minion and minion-vs-player alike.
  */
 export function unitDamage(attacker, defender) {
-  const raw = attackRoll(attacker.atk) * weakenMultiplier(attacker);
+  const raw = attackRoll(attacker.atk) * weakenMultiplier(attacker) * atkModMultiplier(attacker);
   return Math.max(1, Math.round(Math.max(1, raw - (defender.def || 20) * 0.35)));
 }
 
@@ -26,7 +26,7 @@ export function unitDamage(attacker, defender) {
  * more debuffs the party is carrying, the less it hurts the boss (floor 30%).
  */
 export function playerDamageToBoss(attacker, boss, aliveP) {
-  let dmg = Math.max(1, Math.round(attackRoll(attacker.atk) * weakenMultiplier(attacker)));
+  let dmg = Math.max(1, Math.round(attackRoll(attacker.atk) * weakenMultiplier(attacker) * atkModMultiplier(attacker)));
   if (boss._bossKey === "dark") {
     const debuffed = aliveP.filter(
       (p) => (p.dotTicks || 0) > 0 || (p.weakTicks || 0) > 0 || (p.healImmuneTicks || 0) > 0

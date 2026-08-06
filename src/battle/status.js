@@ -56,3 +56,20 @@ export function speedPenalty(u) {
 export function weakenMultiplier(u) {
   return (u.weakTicks || 0) > 0 ? 0.7 : 1;
 }
+
+/**
+ * Generic timed ATK modifier, positive (buff) or negative (debuff) -- e.g.
+ * Starlit's Radiant Exchange, which buffs allies and debuffs enemies at once.
+ * Works on any unit (player, minion, or boss); a fresh application always
+ * overwrites rather than stacking, since `atkModPct` is just reassigned, never
+ * added to.
+ */
+export function atkModMultiplier(u) {
+  if ((u.atkModTicks || 0) <= 0) return 1;
+  return 1 + (u.atkModPct || 0) / 100;
+}
+
+/** Decrement `atkModTicks` on a single unit (player, minion, or boss). */
+export function tickAtkMod(u) {
+  if ((u.atkModTicks || 0) > 0) u.atkModTicks--;
+}

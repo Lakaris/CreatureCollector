@@ -12,8 +12,10 @@ import electric from "./electric.js";
 import water from "./water.js";
 import light from "./light.js";
 import dark from "./dark.js";
+import wind from "./wind.js";
+import daily from "./daily.js";
 
-export const BOSS_MODULES = { fire, nature, earth, electric, water, light, dark };
+export const BOSS_MODULES = { fire, nature, earth, electric, water, light, dark, wind, daily };
 
 /** Look up a boss's ability module. Returns undefined for unknown keys. */
 export function getBossModule(key) {

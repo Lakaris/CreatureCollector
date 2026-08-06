@@ -5,6 +5,7 @@ import { useGame } from "../../../state/GameContext.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
+import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 
 function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
   const { setOwned, currencies, setCurrencies } = useGame();
@@ -62,9 +63,7 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
   }
   const selCount=currencies[selectedBanana.id]||0;
   return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:10,display:"flex",flexDirection:"column",overflow:"hidden"}},
-    React.createElement("button",{className:"back-btn",style:{flexShrink:0},onClick:onBack},
-      React.createElement("i",{className:"ti ti-arrow-left"}),"Back"
-    ),
+    React.createElement(ScreenHeader,{title:def.name,onBack,edgeToEdge:false}),
     React.createElement("div",{style:{textAlign:"center",padding:"12px 0 12px",flexShrink:0,position:"relative"}},
       React.createElement("span",{style:{fontSize:64,lineHeight:1,display:"block",marginBottom:6}},displayEmoji),
       React.createElement("div",{style:{fontSize:18,fontWeight:600,color:"#000"}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),

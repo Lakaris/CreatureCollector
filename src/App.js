@@ -368,7 +368,7 @@ function App() {
     React.createElement("h2", { className: "sr-only" }, "Creature Collector"),
     React.createElement(
       "div",
-      { className: "app-content", ref: contentRef },
+      { className: "app-content", ref: contentRef, style: tab === "home" ? { overflow: "hidden" } : undefined },
       tab === "home" && React.createElement(HomeScreen),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
       tab === "collection" &&

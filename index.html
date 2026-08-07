@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#534AB7">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Creatures">
 <link rel="apple-touch-icon" href="images/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="images/icons/favicon-32.png">
@@ -22,6 +22,10 @@
 <div id="error-display" style="display:none;position:fixed;inset:0;background:#fff;padding:24px;font-family:monospace;font-size:13px;z-index:99999;overflow:auto;white-space:pre-wrap;color:red"></div>
 <script>
 window.onerror=function(msg,src,line,col,err){
+  // Opaque "Script error." with no location is the browser's generic
+  // catch-all for errors it won't disclose details of (commonly fired by
+  // Safari's own Share Sheet page-preview capture) -- not an app bug.
+  if(msg==='Script error.'&&!src&&!line&&!col)return;
   var d=document.getElementById('error-display');
   d.style.display='block';
   d.textContent='JS ERROR:\n'+msg+'\n\nFile: '+src+'\nLine: '+line+', Col: '+col+'\n\nStack:\n'+(err&&err.stack||'(no stack)');

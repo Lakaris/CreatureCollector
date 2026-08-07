@@ -17,6 +17,7 @@ import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { LABYRINTH_REWARD_DISPLAY as REWARD_DISPLAY, getDepthReward, MAX_LABYRINTH_DEPTH, getEnemyLevelForDepth, getEnemyEvolutionMixForDepth, getDifficultyMultipliers, getEnemyAbilityLevelForDepth } from "../../../core/labyrinth.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
+import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
 function seedFor(depth) {
   return (depth * 2654435761) >>> 0;
@@ -172,18 +173,27 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     setPlanGrid(grid);
   }
 
-  function handleCellDrop(r, c) {
+  function applyDrop(r, c, { id, fromCell }) {
     const key = r + "," + c;
-    if (dragCell && dragCell !== key) {
-      const cid = planGrid[dragCell];
-      setPlanGrid((p) => { const n = { ...p }; delete n[dragCell]; if (cid) n[key] = cid; return n; });
-    } else if (dragId) {
-      if (!placedIds.has(dragId) && Object.keys(planGrid).length < ARENA_MAX_DEPLOYED) {
-        setPlanGrid((p) => ({ ...p, [key]: dragId }));
+    if (fromCell && fromCell !== key) {
+      const cid = planGrid[fromCell];
+      setPlanGrid((p) => { const n = { ...p }; delete n[fromCell]; if (cid) n[key] = cid; return n; });
+    } else if (id) {
+      if (!placedIds.has(id) && Object.keys(planGrid).length < ARENA_MAX_DEPLOYED) {
+        setPlanGrid((p) => ({ ...p, [key]: id }));
       }
     }
+  }
+  function handleCellDrop(r, c) {
+    applyDrop(r, c, { id: dragId, fromCell: dragCell });
     setDragId(null); setDragCell(null);
   }
+  const touchDrag = useTouchDragPlacement({
+    cellSelector: "[data-cell]",
+    applyDrop,
+    onCancelHold: () => { endHold(); if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } },
+    onCancelDrop: (fromCell) => setPlanGrid((p) => { const n = { ...p }; delete n[fromCell]; return n; }),
+  });
 
   function stopLoops() {
     if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = null; }
@@ -477,19 +487,19 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setEnemyMinimized(false); setEnemyInfo(enemyDef.id); expandPanel("enemy"); }, 180); })
                   : undefined;
               const onHoldEnd = isPlayerZone && creatureId
-                ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } if (!ghs.current.fired) { setPlanGrid((p) => { const n = { ...p }; delete n[key]; return n; }); } })
+                ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } if (!ghs.current.fired && !touchDrag.dragRef.current.active) { setPlanGrid((p) => { const n = { ...p }; delete n[key]; return n; }); } })
                 : enemyDef
                   ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } })
                   : undefined;
               return React.createElement("div", {
-                key,
+                key, "data-cell": key,
                 draggable: !!(isPlayerZone && creatureId),
                 onDragStart: isPlayerZone && creatureId ? (e) => { e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
                 onDragOver: isPlayerZone ? (e) => e.preventDefault() : undefined,
                 onDrop: isPlayerZone ? (e) => { e.preventDefault(); handleCellDrop(r, c); } : undefined,
                 onMouseDown: onHoldStart,
                 onMouseUp: onHoldEnd,
-                onTouchStart: onHoldStart ? (e) => { e.preventDefault(); onHoldStart(); } : undefined,
+                onTouchStart: onHoldStart ? (e) => { e.preventDefault(); onHoldStart(); if (isPlayerZone && creatureId) touchDrag.start(e, { fromCell: key, cellId: creatureId }); } : undefined,
                 onTouchEnd: onHoldEnd,
                 style: {
                   width: ARENA_TILE, height: ARENA_TILE,
@@ -608,7 +618,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               onDragStart: !isPlaced ? (e) => { if (dragScroll.current.intentScroll) { e.preventDefault(); return; } if (hs.current.id === oc.id) { e.preventDefault(); return; } endHold(); e.dataTransfer.effectAllowed = "move"; setDragId(oc.id); setDragCell(null); } : undefined,
               onMouseDown: () => beginHold(oc.id),
               onMouseUp: endHold,
-              onTouchStart: (e) => { e.preventDefault(); beginHold(oc.id); },
+              onTouchStart: (e) => { e.preventDefault(); beginHold(oc.id); if (!isPlaced) touchDrag.start(e, { id: oc.id }); },
               onTouchEnd: endHold,
               style: {
                 flexShrink: 0, width: 52, height: 58, position: "relative",
@@ -634,7 +644,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             );
           })
         )
-      )
+      ),
+      touchDrag.ghost && (() => { const gdef = CREATURE_MAP[touchDrag.ghost.id]; if (!gdef) return null; return React.createElement("div", { style: { position: "fixed", left: touchDrag.ghost.x - 26, top: touchDrag.ghost.y - 29, width: 52, height: 52, pointerEvents: "none", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.85, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))" } }, React.createElement(CreatureIcon, { def: gdef, size: 36 })); })()
     );
 }
 

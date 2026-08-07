@@ -18,6 +18,7 @@ import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
+import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
 function DungeonScreen({onBack,onClear,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins } = useGame();
@@ -186,13 +187,22 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     ranged.slice(0,rangedPick).forEach((s,i)=>{if(i<DUNGEON_GRID_COLS)grid[(DUNGEON_GRID_ROWS-1)+","+i]=s.id;});
     setDPlanGrid(grid);
   }
-  function handleDCellDrop(r,c){
+  function dApplyDrop(r,c,{id,fromCell}){
     if(r<DUNGEON_PLAYER_START_ROW)return;
     const key=r+","+c;
-    if(dDragCell&&dDragCell!==key){const cid=dPlanGrid[dDragCell];setDPlanGrid(p=>{const n={...p};delete n[dDragCell];if(cid&&r>=DUNGEON_PLAYER_START_ROW)n[key]=cid;return n;});}
-    else if(dDragId){if(!dPlacedIds.has(dDragId)&&Object.keys(dPlanGrid).length<DUNGEON_MAX_DEPLOYED)setDPlanGrid(p=>({...p,[key]:dDragId}));}
+    if(fromCell&&fromCell!==key){const cid=dPlanGrid[fromCell];setDPlanGrid(p=>{const n={...p};delete n[fromCell];if(cid&&r>=DUNGEON_PLAYER_START_ROW)n[key]=cid;return n;});}
+    else if(id){if(!dPlacedIds.has(id)&&Object.keys(dPlanGrid).length<DUNGEON_MAX_DEPLOYED)setDPlanGrid(p=>({...p,[key]:id}));}
+  }
+  function handleDCellDrop(r,c){
+    dApplyDrop(r,c,{id:dDragId,fromCell:dDragCell});
     setDDragId(null);setDDragCell(null);
   }
+  const dTouchDrag=useTouchDragPlacement({
+    cellSelector:"[data-cell]",
+    applyDrop:dApplyDrop,
+    onCancelHold:()=>{dEndHold();if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}},
+    onCancelDrop:(fromCell)=>setDPlanGrid(p=>{const n={...p};delete n[fromCell];return n;}),
+  });
   function dEndHoldDoc(){dEndHold();document.removeEventListener('mouseup',dEndHoldDoc);document.removeEventListener('touchend',dEndHoldDoc);}
   function dBeginHold(id){
     if(dhs.current.delay)clearTimeout(dhs.current.delay);
@@ -413,13 +423,13 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
               const enemyDef=!isPlayerZone?enemyGrid[key]:null;
               const isDivider=r===DUNGEON_PLAYER_START_ROW;const BORDER="1px solid #bbb";
               const onHS=isPlayerZone&&creatureId?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;setDGridInfoCreature(creatureId);},180);}):enemyDef?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;setDGridInfoCreature(enemyDef.id);},180);}):undefined;
-              const onHE=isPlayerZone&&creatureId?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}if(!dhs.current.fired){setDPlanGrid(p=>{const n={...p};delete n[key];return n;});}dEndHold();}):enemyDef?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}}):undefined;
-              return React.createElement("div",{key,draggable:!!(isPlayerZone&&creatureId),
+              const onHE=isPlayerZone&&creatureId?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}if(!dhs.current.fired&&!dTouchDrag.dragRef.current.active){setDPlanGrid(p=>{const n={...p};delete n[key];return n;});}dEndHold();}):enemyDef?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}}):undefined;
+              return React.createElement("div",{key,"data-cell":key,draggable:!!(isPlayerZone&&creatureId),
                 onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDDragCell(key);setDDragId(null);}:undefined,
                 onDragOver:isPlayerZone?(e)=>e.preventDefault():undefined,
                 onDrop:isPlayerZone?(e)=>{e.preventDefault();handleDCellDrop(r,c);}:undefined,
                 onMouseDown:onHS,onMouseUp:onHE,
-                onTouchStart:onHS?(e)=>{e.preventDefault();onHS();}:undefined,onTouchEnd:onHE,
+                onTouchStart:onHS?(e)=>{e.preventDefault();onHS();if(isPlayerZone&&creatureId)dTouchDrag.start(e,{fromCell:key,cellId:creatureId});}:undefined,onTouchEnd:onHE,
                 style:{width:DUNGEON_TILE,height:DUNGEON_TILE,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none"}
               },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:26}));})());
             })).flat()
@@ -532,7 +542,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
             return React.createElement("div",{key:oc.id,"data-creature":oc.id,draggable:!isPlaced,
               onDragStart:!isPlaced?(e)=>{if(dDragScroll.current.intentScroll){e.preventDefault();return;}if(dhs.current.id===oc.id){e.preventDefault();return;}dEndHold();e.dataTransfer.effectAllowed="move";setDDragId(oc.id);setDDragCell(null);}:undefined,
               onMouseDown:()=>dBeginHold(oc.id),onMouseUp:dEndHold,
-              onTouchStart:(e)=>{e.preventDefault();dBeginHold(oc.id);},onTouchEnd:dEndHold,
+              onTouchStart:(e)=>{e.preventDefault();dBeginHold(oc.id);if(!isPlaced)dTouchDrag.start(e,{id:oc.id});},onTouchEnd:dEndHold,
               style:{flexShrink:0,width:52,height:58,position:"relative",background:isPlaced?"#f0f0f0":"#fff",border:"none",borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,cursor:isPlaced?"default":"grab",userSelect:"none"}
             },
               isHolding&&dHoldPct>15&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"},viewBox:"0 0 52 58"},React.createElement("circle",{cx:26,cy:29,r:18,fill:"none",stroke:"#534AB7",strokeWidth:3,strokeDasharray:CIRC,strokeDashoffset:CIRC*(1-dHoldPct/100),strokeLinecap:"round",transform:"rotate(-90 26 29)"})),
@@ -548,7 +558,8 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
             );
           })
         )
-      )
+      ),
+      dTouchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[dTouchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:dTouchDrag.ghost.x-26,top:dTouchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})()
     );
   }
   if(rewards)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},

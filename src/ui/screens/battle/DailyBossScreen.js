@@ -17,6 +17,7 @@ import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
+import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
@@ -291,30 +292,39 @@ function DailyBossScreen({onBack,onViewCreature}){
     setPhase("idle");
   }
   const MAX_DEPLOYED=10;
-  function handleCellDrop(r,c){
+  function applyDrop(r,c,{id,fromCell}){
     const key=r+","+c;
-    if(dragId){
+    if(id){
       // from creature list — only allow if under limit or replacing an occupied cell
       const deployedCount=Object.keys(planGrid).length;
       if(!planGrid[key]&&deployedCount>=MAX_DEPLOYED)return;
-      setPlanGrid(prev=>({...prev,[key]:dragId}));
-    } else if(dragCell&&dragCell!==key){
+      setPlanGrid(prev=>({...prev,[key]:id}));
+    } else if(fromCell&&fromCell!==key){
       // from another grid cell — swap if target is occupied
       setPlanGrid(prev=>{
         const n={...prev};
-        const moved=n[dragCell];
+        const moved=n[fromCell];
         const existing=n[key];
-        if(existing)n[dragCell]=existing; else delete n[dragCell];
+        if(existing)n[fromCell]=existing; else delete n[fromCell];
         if(moved)n[key]=moved;
         return n;
       });
     }
+  }
+  function handleCellDrop(r,c){
+    applyDrop(r,c,{id:dragId,fromCell:dragCell});
     setDragId(null);
     setDragCell(null);
   }
   function removeFromGrid(key){
     setPlanGrid(prev=>{const n={...prev};delete n[key];return n;});
   }
+  const touchDrag=useTouchDragPlacement({
+    cellSelector:"[data-cell]",
+    applyDrop,
+    onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}},
+    onCancelDrop:(fromCell)=>removeFromGrid(fromCell),
+  });
   function autoDeploy(){
     const bossType=boss.type;
     const weakType=TYPE_STRONG_AGAINST[bossType];
@@ -599,15 +609,15 @@ function DailyBossScreen({onBack,onViewCreature}){
             const isDivider=r===PLAYER_START_ROW;
             const BORDER="1px solid #bbb";
             return React.createElement("div",{
-              key,
+              key,"data-cell":key,
               draggable:!!(isPlayerZone&&creatureId),
               onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
               onDragOver:isPlayerZone?(e)=>e.preventDefault():undefined,
               onDrop:isPlayerZone?(e)=>{e.preventDefault();handleCellDrop(r,c);}:undefined,
               onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);}):undefined,
-              onMouseUp:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired)removeFromGrid(key);}):undefined,
-              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);}):undefined,
-              onTouchEnd:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired)removeFromGrid(key);}):undefined,
+              onMouseUp:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
+              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
+              onTouchEnd:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
               style:{
                 width:TILE,height:TILE,
                 background:isPlayerZone?"#f0f0f0":"#fdf7f7",
@@ -740,7 +750,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             }:undefined,
             onMouseDown:()=>beginHold(oc.id),
             onMouseUp:endHold,
-            onTouchStart:(e)=>{e.preventDefault();beginHold(oc.id);},
+            onTouchStart:(e)=>{e.preventDefault();beginHold(oc.id);if(!isPlaced)touchDrag.start(e,{id:oc.id});},
             onTouchEnd:endHold,
             style:{
               flexShrink:0,
@@ -774,6 +784,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       )
     )
   ),
+  touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
   bossPopupOpen&&isNarrowScreen&&(()=>{
     const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
     const dailyAbilities={

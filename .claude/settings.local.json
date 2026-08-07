@@ -57,7 +57,8 @@
       "Bash(curl -s -o /dev/null -w \"manifest.json: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/manifest.json)",
       "Bash(curl -s https://lakaris.github.io/CreatureCollector/manifest.json)",
       "Bash(curl -s -o /dev/null -w \"start_url\\(/index.html\\): %{http_code}\\\\n\" https://lakaris.github.io/index.html)",
-      "Bash(curl -s -o /dev/null -w \"apple-touch-icon: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/images/icons/apple-touch-icon.png)"
+      "Bash(curl -s -o /dev/null -w \"apple-touch-icon: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/images/icons/apple-touch-icon.png)",
+      "Bash(curl -s https://lakaris.github.io/CreatureCollector/index.html)"
     ]
   }
 }

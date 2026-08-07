@@ -51,7 +51,13 @@
       "Bash(python -c \"import PIL; print\\('PIL ok'\\)\")",
       "Bash(python3 -c \"from PIL import Image; print\\('PIL available'\\)\")",
       "Bash(find /c/Users/Annie -maxdepth 3 -iname \"icon-512.png\" -o -iname \"apple-touch-icon.png\" 2>/dev/null)",
-      "Bash(mkdir -p \"/c/Users/Annie/Desktop/Stuff/CreatureCollector/images/icons\" *)"
+      "Bash(mkdir -p \"/c/Users/Annie/Desktop/Stuff/CreatureCollector/images/icons\" *)",
+      "Bash(curl -sI https://unpkg.com/react@18/umd/react.production.min.js)",
+      "Bash(curl -s -o /dev/null -w \"index.html: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/)",
+      "Bash(curl -s -o /dev/null -w \"manifest.json: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/manifest.json)",
+      "Bash(curl -s https://lakaris.github.io/CreatureCollector/manifest.json)",
+      "Bash(curl -s -o /dev/null -w \"start_url\\(/index.html\\): %{http_code}\\\\n\" https://lakaris.github.io/index.html)",
+      "Bash(curl -s -o /dev/null -w \"apple-touch-icon: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/images/icons/apple-touch-icon.png)"
     ]
   }
 }

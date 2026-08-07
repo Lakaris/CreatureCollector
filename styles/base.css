@@ -1,7 +1,8 @@
 /* Reset, document shell, and top-level app layout. */
 *{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%}
 body{font-family:system-ui,sans-serif;background:#f5f5f5}
-.app{width:100%;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding:0}
+.app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:0}
 .app-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px;min-height:0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 .nav{display:flex;gap:4px;background:#fff;border-top:1px solid #e0e0e0;padding:6px 6px calc(6px + env(safe-area-inset-bottom));flex-shrink:0}

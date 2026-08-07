@@ -30,10 +30,14 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
       if (ts.fromCell) {
         if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
       } else {
-        // Tray items also scroll horizontally -- only claim the gesture as a
-        // drag once vertical intent is clear, otherwise let the browser scroll.
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) { end(null); return; }
-        if (Math.abs(dy) < 8) return;
+        // Tray items also scroll horizontally. Real fingers rarely move in a
+        // straight line, so only concede the gesture to a scroll once it's
+        // decisively horizontal -- otherwise a natural, slightly-diagonal lift
+        // toward the grid above would misfire as a scroll and the drag would
+        // never start. Vertical intent (picking the creature up) wins ties.
+        if (Math.abs(dy) >= 10) { /* fall through to claim as drag */ }
+        else if (Math.abs(dx) > 16 && Math.abs(dx) > Math.abs(dy) * 1.5) { end(null); return; }
+        else return;
       }
       ts.active = true;
       onCancelHold && onCancelHold();

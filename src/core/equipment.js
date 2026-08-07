@@ -22,6 +22,19 @@ export function equipBonus(itemId, level, asc = 0) {
   );
 }
 
+/**
+ * Whether an item touches a given stat -- either directly (flat `stats`) or
+ * through an effect (no item has flat Speed/Haste stats, only effects that
+ * grant them situationally, e.g. Cyclone Guard's "+10% SPD" or Jetstream
+ * Band's "abilities recharge 40% faster"). Used by the stat filter so those
+ * effect-only items are still findable under Speed/Haste.
+ */
+export function itemAffectsStat(item, stat) {
+  if (stat === "spd") return !!item.speedEffect;
+  if (stat === "abilitySpeed") return !!item.hasteEffect;
+  return stat in item.stats;
+}
+
 /** Human-readable "+12 Health · +8 Attack" summary. */
 export function equipBonusStr(bonuses) {
   return Object.entries(bonuses)
@@ -45,4 +58,19 @@ export function totalEquipBonus(ownedData, equipmentLevels, equipmentAscensions)
     for (const stat in bonus) totals[stat] = (totals[stat] || 0) + bonus[stat];
   }
   return totals;
+}
+
+/**
+ * Equipped items whose passive effect is a flat "gain X% more STAT" buff
+ * (e.g. Fury Relic's "Gain 25% more ATK"). Percentage, not flat, so the
+ * gain is computed against the creature's base stat by the caller.
+ */
+export function equippedStatBonuses(ownedData) {
+  const out = [];
+  for (const itemId of ownedData?.equipped || []) {
+    if (!itemId) continue;
+    const e = EQUIPMENT_MAP[itemId];
+    if (e?.statBonus) out.push({ itemId, name: e.name, emoji: e.emoji, ...e.statBonus });
+  }
+  return out;
 }

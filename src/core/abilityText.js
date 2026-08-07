@@ -115,6 +115,28 @@ export function isStarlitAbilityLine(creatureId) {
   return creatureId === "sacredwasp" || creatureId === "divinedrone" || creatureId === "holyswarm";
 }
 
+/**
+ * Passive self stat buffs some unique abilities grant unconditionally (e.g. Starlit Wings'
+ * "Gain 20% Speed"). Mirrors battle/playerAbilities/starlitLine.js's `selfSpeedByLevel` -- keep
+ * these numbers in sync if that ever changes, since this copy exists only so the stat display
+ * doesn't have to import the battle simulation module.
+ */
+const ABILITY_STAT_BONUSES = {
+  sacredwasp: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+  divinedrone: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+  holyswarm: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+};
+
+/** The passive self stat buff (if any) a creature's unique ability grants at its current level. */
+export function getAbilityStatBonus(creatureId, abilityLevels) {
+  const cfg = ABILITY_STAT_BONUSES[creatureId];
+  if (!cfg) return null;
+  const idx = Math.min(abilityLevels?.unique || 0, cfg.byLevel.length - 1);
+  const pct = cfg.byLevel[idx];
+  if (!pct) return null;
+  return { stat: cfg.stat, pct };
+}
+
 /** Mechanic tag keys (into ABILITY_TAG_DEFS) for a given creature id + ability key ("basic"/"special"/"unique"). */
 export function getAbilityTags(creatureId, key) {
   const isBlazehornetLine = getRootDef(creatureId)?.id === "blazehornet";

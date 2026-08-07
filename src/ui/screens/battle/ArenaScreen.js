@@ -13,6 +13,7 @@ import { makeArenaBattle } from "../../../battle/state.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 
 // Arena tab id -> creature type it restricts deployment to. "ice" is the arena tab id
 // for the Water-type arena (ARENA_TABS labels it "Water" but keeps the legacy id).
@@ -22,6 +23,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards } = useGame();
   const [arenaTab,setArenaTab]=useState("all");
   const [rewardPopup,setRewardPopup]=useState(null);
+  const [arenaAbilityTagPopup,setArenaAbilityTagPopup]=useState(null);
   const ARENA_STAGE_REWARDS_DISPLAY=[
     {emoji:"🥚",label:"5 Eggs",key:"eggs",qty:5},
     {emoji:"🍌",label:"3 Flair Bananas",key:"flairBanana",qty:3},
@@ -259,6 +261,11 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       setTimeout(()=>setBattleOutcome("lost"),600);
     }
   }
+  function restartFight(){
+    stopArenaLoops();
+    setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setBattleSelectedUid(null);
+    setPlanning(true);
+  }
   function fight(){
     stopArenaLoops();
     savedPlanGridRef.current={...planGrid};
@@ -339,6 +346,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+tabDef.label+" Arena — Stage "+stage+(isBoss?" (Boss)":""))
         ),
+        React.createElement("button",{onClick:restartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
         React.createElement("button",{onClick:cycleArenaSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},arenaBattleSpeed+"x ⚡")
       ),
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
@@ -419,6 +427,13 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     const enemyGrid=getEnemyLayout(arenaTab,stage,level);
     const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+      arenaAbilityTagPopup&&React.createElement("div",{onClick:()=>setArenaAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+          React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[arenaAbilityTagPopup].label),
+          React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[arenaAbilityTagPopup].description),
+          React.createElement("button",{onClick:()=>setArenaAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+        )
+      ),
       // header
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
         React.createElement("button",{onClick:()=>{setPlanning(false);setPlanGrid({});setGridInfoCreature(null);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
@@ -496,8 +511,18 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
               ),
               !arenaEnemyMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
                 if(!abl)return null;
+                const abilityTags=getAbilityTags(def.id,k);
                 return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                      ...abilityTags.map(tag=>React.createElement("button",{
+                        key:tag,
+                        onClick:(e)=>{e.stopPropagation();setArenaAbilityTagPopup(tag);},
+                        style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                      },ABILITY_TAG_DEFS[tag].label))
+                    )
+                  ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
                   React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.upgrades?abl.upgrades[0]:"")
                 );
@@ -522,8 +547,18 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 if(!abl)return null;
                 const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
                 const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
+                const abilityTags=getAbilityTags(def.id,k);
                 return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                      ...abilityTags.map(tag=>React.createElement("button",{
+                        key:tag,
+                        onClick:(e)=>{e.stopPropagation();setArenaAbilityTagPopup(tag);},
+                        style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                      },ABILITY_TAG_DEFS[tag].label))
+                    )
+                  ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
                   desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
                 );

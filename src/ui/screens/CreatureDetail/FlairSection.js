@@ -77,9 +77,9 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
       },t.label))
     ),
     React.createElement("div",{style:{flex:1,overflow:"hidden",display:"flex",flexDirection:"column"}},
-      flairTab==="feed"&&React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",padding:"0 16px 16px",position:"relative"}},
+      flairTab==="feed"&&React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",padding:"0 16px 16px",position:"relative"}},
         // Result area
-        React.createElement("div",{style:{flex:1,display:"flex",alignItems:(feedResult&&feedResult.type==="multi")?"flex-start":"center",justifyContent:"center",paddingTop:(feedResult&&feedResult.type==="multi")?4:0}},
+        React.createElement("div",{style:{flex:1,minHeight:0,overflowY:"auto",display:"flex",alignItems:(feedResult&&feedResult.type==="multi")?"flex-start":"center",justifyContent:"center",paddingTop:(feedResult&&feedResult.type==="multi")?4:0}},
           feedResult
             ? (feedResult.type==="single"&&feedResult.results[0]
                 ? (feedResult.results[0].won
@@ -140,15 +140,8 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
                           visible&&!r.won&&React.createElement("div",{style:{fontSize:8,color:"#7986cb",fontWeight:700,marginTop:1}},"+"+r.shards+" 🔷")
                         );
                       }
-                      return React.createElement(React.Fragment,null,
-                        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:6}},
-                          feedResult.results.slice(0,9).map((r,i)=>renderCard(r,i))
-                        ),
-                        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}},
-                          React.createElement("div",null),
-                          renderCard(feedResult.results[9],9),
-                          React.createElement("div",null)
-                        )
+                      return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}},
+                        feedResult.results.map((r,i)=>renderCard(r,i))
                       );
                     })()
                   )
@@ -158,7 +151,7 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
                 React.createElement("div",{style:{fontSize:13,fontWeight:600}},"Select a banana and feed!")
               )
         ),
-        // Skip button — fixed above rightmost banana, only during 10-pull reveal
+        // Skip button — fixed above rightmost banana, only during 9-pull reveal
         feedResult&&feedResult.type==="multi"&&visibleCount<feedResult.results.length&&React.createElement("button",{
           onClick:()=>setVisibleCount(feedResult.results.length),
           style:{position:"absolute",bottom:158,right:16,fontSize:13,fontWeight:600,padding:"7px 18px",border:"1px solid #ccc",borderRadius:20,background:"#fff",cursor:"pointer",color:"#666",zIndex:5}
@@ -207,16 +200,16 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
           (()=>{
             const revealing=feedResult&&feedResult.type==="multi"&&visibleCount<feedResult.results.length;
             const dis1=selCount<1||revealing;
-            const dis10=selCount<10||revealing;
+            const dis10=selCount<9||revealing;
             return React.createElement(React.Fragment,null,
               React.createElement("button",{onClick:()=>doFeed(1),disabled:dis1,style:{
                 flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis1?"default":"pointer",
                 background:dis1?"#e0e0e0":selectedBanana.color,color:dis1?"#aaa":"#fff"}
               },"Feed ×1"),
-              React.createElement("button",{onClick:()=>doFeed(10),disabled:dis10,style:{
+              React.createElement("button",{onClick:()=>doFeed(9),disabled:dis10,style:{
                 flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis10?"default":"pointer",
                 background:dis10?"#e0e0e0":selectedBanana.color,color:dis10?"#aaa":"#fff"}
-              },"Feed ×10")
+              },"Feed ×9")
             );
           })()
         )

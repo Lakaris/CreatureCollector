@@ -18,9 +18,24 @@ export const PLOT_CROPS=[
   {key:"ascensionMelon",label:"Ascension Melon",emoji:"🍈", yield:1, upgradeEvery:5},
 ];
 
-export const FIELD_RATES=[0,2,5,10,18,30]; // food per hour at each level (index=level)
-export const FIELD_MONEY_RATES=[0,5,12,25,45,80]; // money per hour at each level (index=level)
-export const FIELD_SHARD_RATES=[0,50,60,75,95,120]; // equipment shards per hour at each level (index=level)
-export const FIELD_UPGRADE_COSTS=[0,200,500,1000,2000]; // cost to upgrade from level i to i+1
+// Main Field: 100 levels, one Ancient Fertilizer each (see FarmScreen.js) --
+// deliberately 1:1 with the 100 total Ancient Fertilizer a full 5000-floor
+// Labyrinth clear pays out (1 every 50 floors). A player who spends
+// fertilizer as they climb keeps field level roughly in step with floor/50,
+// which lines up with Labyrinth's difficulty tiers (getEnemyLevelForDepth in
+// core/labyrinth.js: enemy level = floor/10) and with energyCost's growth in
+// core/creatures.js, so food production scales fast enough to keep pace with
+// each tier's target creature level. A player who never spends fertilizer
+// stays near the level-1 rate, where even modest leveling takes weeks.
+const FIELD_MAX_LEVEL = 100;
+export const FIELD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
+  l === 0 ? 0 : Math.round(8.2 * Math.pow(l, 1.72))
+); // food per hour at each level (index=level)
+export const FIELD_MONEY_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
+  l === 0 ? 0 : Math.round(2.5 * FIELD_RATES[l])
+); // money per hour at each level (index=level)
+export const FIELD_SHARD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
+  l === 0 ? 0 : Math.round(20 + FIELD_RATES[l] * 0.5)
+); // equipment shards per hour at each level (index=level)
 export const FIELD_CAP_HOURS=24;
 export const FIELD_MIN_HOURS=1;

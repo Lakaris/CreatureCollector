@@ -25,7 +25,10 @@ function cooldownFor(spd) {
  * ascensions did nothing in a fight while the detail screen claimed otherwise.
  *
  * Enemy units have no owned record, so they keep the original level-scaled
- * base-stat math.
+ * base-stat math. Arena/Dungeon/DailyBoss pass a small `bossLevel` and use
+ * that formula as-is; Labyrinth's floors span a much wider difficulty range
+ * (5000 floors) so it passes `difficultyOverride` (from
+ * getDifficultyMultipliers in core/labyrinth.js) to replace it entirely.
  *
  * @param {Object} playerGrid  "row,col" -> creatureId
  * @param {Object} enemyGrid   "row,col" -> creature definition
@@ -34,6 +37,7 @@ function cooldownFor(spd) {
  * @param {number} animMs
  * @param {Object} [equipmentLevels]     itemId -> level (global)
  * @param {Object} [equipmentAscensions] itemId -> ascension (global)
+ * @param {{hpMult:number,atkMult:number,defMult:number}} [difficultyOverride]
  */
 export function makeArenaBattle(
   playerGrid,
@@ -42,7 +46,8 @@ export function makeArenaBattle(
   bossLevel,
   animMs,
   equipmentLevels,
-  equipmentAscensions
+  equipmentAscensions,
+  difficultyOverride
 ) {
   const now = Date.now();
 
@@ -82,10 +87,15 @@ export function makeArenaBattle(
     if (mod?.onBattleStart) mod.onBattleStart(u, playerUnits);
   }
 
+  const { hpMult, atkMult, defMult } = difficultyOverride || {
+    hpMult: bossLevel * 0.15,
+    atkMult: bossLevel * 0.1,
+    defMult: 0,
+  };
   const enemyUnits = Object.entries(enemyGrid).map(([key, edef], i) => {
     const [row, col] = key.split(",").map(Number);
     const spd = edef?.stats?.spd || 1;
-    const hp = Math.round((edef?.stats?.hp || 60) * HP_SCALE * (1 + bossLevel * 0.15));
+    const hp = Math.round((edef?.stats?.hp || 60) * HP_SCALE * (1 + hpMult));
     return {
       uid: "e" + i,
       creatureId: edef.id,
@@ -96,8 +106,8 @@ export function makeArenaBattle(
       lastMoveTime: now - animMs,
       hp,
       maxHp: hp,
-      atk: Math.round((edef?.stats?.atk || 30) * (1 + bossLevel * 0.1)),
-      def: edef?.stats?.def || 20,
+      atk: Math.round((edef?.stats?.atk || 30) * (1 + atkMult)),
+      def: Math.round((edef?.stats?.def || 20) * (1 + defMult)),
       spd,
       isRanged: edef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),

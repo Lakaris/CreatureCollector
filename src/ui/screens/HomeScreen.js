@@ -9,6 +9,7 @@ import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
 import QuestsScreen from "../../ui/screens/QuestsScreen.js";
 import DailyScreen from "../../ui/screens/DailyScreen.js";
 import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
+import { getDepthReward, nextRewardDepth, formatLabyrinthReward } from "../../core/labyrinth.js";
 
 function HomeScreen(){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth } = useGame();
@@ -101,6 +102,16 @@ function HomeScreen(){
       React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Daily"),
       new Date().toDateString()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
+    (()=>{
+      const depth=labyrinthDepth||1;
+      const reward=getDepthReward(depth);
+      const onCurrent=Object.keys(reward).length>0;
+      const next=onCurrent?null:nextRewardDepth(depth);
+      const rewardEmoji=onCurrent?formatLabyrinthReward(reward):(next?formatLabyrinthReward(next.reward):null);
+      if(!rewardEmoji)return null;
+      const label=onCurrent?"Victory reward:":"Floor "+next.depth+" Victory reward:";
+      return React.createElement("div",{style:{position:"fixed",left:"calc(75vw - 8px)",transform:"translateX(-50%)",bottom:222,whiteSpace:"nowrap",fontSize:14,fontWeight:700,color:"#4f46e5",background:"#eef2ff",border:"2px solid #c7d2fe",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(99,102,241,0.15)",zIndex:5}},label+" "+rewardEmoji);
+    })(),
     React.createElement("button",{
       onClick:()=>{setGameMode("labyrinth");setTab("play");},
       style:{position:"fixed",left:"calc(75vw - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}

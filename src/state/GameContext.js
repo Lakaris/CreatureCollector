@@ -25,6 +25,7 @@ const INITIAL_CURRENCIES = {
   melonWind: 5, melonElectric: 5, melonLight: 5, melonDark: 5, melonRainbow: 2,
   flairBanana: 500, mythicalFlairBanana: 500, ancientFlairBanana: 500, flairShard: 0,
   mysteriousOre: 5, deluxeOre: 0, rainbowOre: 0, treasureShards: 0,
+  ancientFertilizer: 0,
 };
 
 export function GameProvider({ children }) {

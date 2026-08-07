@@ -17,6 +17,7 @@ import { runBattleTick } from "../../../battle/tick.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 
 function DungeonScreen({onBack,onClear,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins } = useGame();
@@ -28,6 +29,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
   const [dPlanHighlight,setDPlanHighlight]=useState(null);
   const [dBossMinimized,setDBossMinimized]=useState(false);
   const [dCreatureMinimized,setDCreatureMinimized]=useState(false);
+  const [dAbilityTagPopup,setDAbilityTagPopup]=useState(null);
   const [dBattling,setDBattling]=useState(false);
   const [dBattleOutcome,setDBattleOutcome]=useState(null);
   const [dBSnap,setDBSnap]=useState(null);
@@ -135,6 +137,11 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
       stopDLoops();
       setTimeout(()=>setDBattleOutcome("lost"),600);
     }
+  }
+  function dRestartFight(){
+    stopDLoops();
+    setDBattling(false);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDBattleSelected(null);
+    setDPlanning(true);
   }
   function dFight(){
     stopDLoops();
@@ -285,6 +292,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
             )
           )
         ),
+        React.createElement("button",{onClick:dRestartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
         React.createElement("button",{onClick:cycleDSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},dSpeed+"x ⚡")
       ),
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
@@ -382,6 +390,13 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     const planGeo=makePlanGeometry(PLAN_BOSS_ROW,PLAN_BOSS_COL,DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_PLAYER_START_ROW);
     const highlightCells=getHighlightTiles(boss.key,dPlanHighlight,planGeo);
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+      dAbilityTagPopup&&React.createElement("div",{onClick:()=>setDAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+          React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[dAbilityTagPopup].label),
+          React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[dAbilityTagPopup].description),
+          React.createElement("button",{onClick:()=>setDAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+        )
+      ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
         React.createElement("button",{onClick:()=>{setDPlanning(false);setDPlanGrid({});},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
         React.createElement("div",{style:{flex:1,textAlign:"center"}},
@@ -458,8 +473,18 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
                 if(!abl)return null;
                 const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
                 const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
+                const abilityTags=getAbilityTags(def.id,k);
                 return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                      ...abilityTags.map(tag=>React.createElement("button",{
+                        key:tag,
+                        onClick:(e)=>{e.stopPropagation();setDAbilityTagPopup(tag);},
+                        style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                      },ABILITY_TAG_DEFS[tag].label))
+                    )
+                  ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
                   desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
                 );

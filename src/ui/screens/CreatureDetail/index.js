@@ -8,8 +8,8 @@ import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQ
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
-import { equipUpgradeCost, equipBonus, equipBonusStr } from "../../../core/equipment.js";
-import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine } from "../../../core/abilityText.js";
+import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat } from "../../../core/equipment.js";
+import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus } from "../../../core/abilityText.js";
 import { getMelonLabel, getMelonAvailable, deductMelon } from "../../../core/melons.js";
 import AscStars from "../../../ui/components/AscStars.js";
 import StatBar from "../../../ui/components/StatBar.js";
@@ -19,6 +19,24 @@ import SkinSection from "../../../ui/screens/CreatureDetail/SkinSection.js";
 import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js";
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
+
+/** Percent-of-base gain for a stat bonus (equip effect / flair / ability). Speed and Haste are
+ * allowed to be fractional (e.g. 20% of a base-1 stat is 0.2, not rounded up to 1); every other
+ * stat stays a whole number since they're discrete counts in the UI. */
+function statPctGain(stat,base,pct){
+  const raw=base*pct/100;
+  if(stat==="spd"||stat==="abilitySpeed")return Math.round(raw*10)/10;
+  return Math.ceil(raw);
+}
+
+/** Sums every flair buff's raw (unrounded) contribution to a stat before rounding once,
+ * so a pile of small percentages (e.g. many 0.2% Speed flairs) doesn't get zeroed out by
+ * rounding each source individually. */
+function flairStatGain(stat,base,buffs){
+  const raw=buffs.filter(b=>b.stat===stat).reduce((acc,b)=>acc+base*b.pct/100,0);
+  if(stat==="spd"||stat==="abilitySpeed")return Math.round(raw*10)/10;
+  return Math.ceil(raw);
+}
 
 function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay } = useGame();
@@ -42,6 +60,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
       equipBonusStats[stat]=(equipBonusStats[stat]||0)+Math.round(item.stats[stat]*mult);
     }
   });
+  (ownedData.equipped||[null,null,null,null]).forEach(itemId=>{
+    if(!itemId)return;
+    const item=EQUIPMENT_MAP[itemId];
+    if(!item||!item.statBonus)return;
+    const{stat,pct}=item.statBonus;
+    equipBonusStats[stat]=(equipBonusStats[stat]||0)+statPctGain(stat,stats[stat],pct);
+  });
+  const abilityStatBonus=getAbilityStatBonus(def.id,ownedData.abilityLevels);
+  if(abilityStatBonus){
+    equipBonusStats[abilityStatBonus.stat]=(equipBonusStats[abilityStatBonus.stat]||0)+statPctGain(abilityStatBonus.stat,stats[abilityStatBonus.stat],abilityStatBonus.pct);
+  }
   const flairBuffs=(ownedData.unlockedFlair||[]).map(key=>{
     const t=FLAIR_TITLE_MAP[key];if(t)return t.buff;
     const a=FLAIR_AURA_MAP[key];if(a)return a.buff;
@@ -51,8 +80,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   }).filter(Boolean);
   const statsWithEquip=Object.fromEntries(STAT_CYCLE.map(s=>{
     const base=stats[s]+(equipBonusStats[s]||0);
-    const fb=flairBuffs.filter(b=>b.stat===s).reduce((acc,b)=>acc+Math.ceil(stats[s]*b.pct/100),0);
-    return[s,base+fb];
+    const fb=flairStatGain(s,stats[s],flairBuffs);
+    return[s,Math.round((base+fb)*10)/10];
   }));
   const isMaxLevel=ownedData.level>=MAX_LEVEL;
   const cost=energyCost(ownedData.level);
@@ -69,6 +98,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const [equipFilterStats,setEquipFilterStats]=useState(new Set());
   const [equipFilterHasEffect,setEquipFilterHasEffect]=useState(false);
   const [equipFilterFavorites,setEquipFilterFavorites]=useState(false);
+  const [equipFilterHideIncompatible,setEquipFilterHideIncompatible]=useState(false);
   const [equipFilterElements,setEquipFilterElements]=useState(new Set());
   const [equipFilterRoles,setEquipFilterRoles]=useState(new Set());
   function toggleEquipRarity(r){setEquipFilterRarities(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
@@ -163,6 +193,35 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
 
   const equipped=(ownedData.equipped||[null,null,null,null]);
 
+  function getStatSources(stat){
+    const sources=[];
+    equipped.forEach(itemId=>{
+      if(!itemId)return;
+      const item=EQUIPMENT_MAP[itemId];
+      if(!item||!item.stats||!(stat in item.stats))return;
+      const lvl=equipmentLevels?.[itemId]||1;
+      const asc=equipmentAscensions?.[itemId]||0;
+      const value=equipBonus(itemId,lvl,asc)[stat]||0;
+      if(value)sources.push({type:"equip",emoji:item.emoji,label:item.name,value});
+    });
+    equipped.forEach(itemId=>{
+      if(!itemId)return;
+      const item=EQUIPMENT_MAP[itemId];
+      if(!item||!item.statBonus||item.statBonus.stat!==stat)return;
+      const value=statPctGain(stat,stats[stat],item.statBonus.pct);
+      if(value)sources.push({type:"equip-effect",emoji:item.emoji,label:item.name+" (Effect)",value,pct:item.statBonus.pct});
+    });
+    const flairValue=flairStatGain(stat,stats[stat],flairBuffs);
+    if(flairValue)sources.push({type:"flair",emoji:"✨",label:"Flair bonus ("+STAT_LABELS[stat]+")",value:flairValue});
+    const abilityBonus=getAbilityStatBonus(def.id,ownedData.abilityLevels);
+    if(abilityBonus&&abilityBonus.stat===stat){
+      const value=statPctGain(stat,stats[stat],abilityBonus.pct);
+      const abilityName=def.abilities?.unique?.name||"Ability";
+      if(value)sources.push({type:"ability",emoji:"✦",label:abilityName+" (Ability)",value,pct:abilityBonus.pct});
+    }
+    return sources;
+  }
+
   function setSlot(slotIdx,itemId,force=false){
     if(itemId&&!force){
       // check if another pet already has this item equipped
@@ -231,13 +290,36 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
 
   const tabs=[{id:"levelup",label:"Level Up"},{id:"abilities",label:"Abilities"},{id:"flair",label:"Flair"},{id:"skins",label:"Skins"}];
 
-  const statInfoPopupEl=statInfoPopup&&React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-      React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
-      React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
-      React.createElement("button",{onClick:()=>setStatInfoPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
-    )
-  );
+  const statInfoPopupEl=statInfoPopup&&(()=>{
+    const sources=getStatSources(statInfoPopup);
+    const base=stats[statInfoPopup];
+    const total=statsWithEquip[statInfoPopup];
+    const bonusTotal=Math.round((total-base)*10)/10;
+    return React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:280,maxHeight:"70vh",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
+        React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
+        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
+          React.createElement("span",{style:{fontSize:12,color:"#888"}},"Base"),
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#222"}},base)
+        ),
+        sources.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
+          React.createElement("span",{style:{fontSize:12,color:"#555",display:"flex",alignItems:"center",gap:5}},
+            React.createElement("span",null,s.emoji),
+            React.createElement("span",null,s.label),
+            s.pct&&React.createElement("span",{style:{fontSize:10,color:"#aaa"}},"("+(s.pct>0?"+":"")+s.pct+"%)")
+          ),
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},"+"+s.value)
+        )),
+        sources.length===0&&React.createElement("div",{style:{padding:"10px 0",fontSize:12,color:"#bbb",textAlign:"center",borderTop:"1px solid #eee"}},"No equipment or flair boosting this stat"),
+        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderTop:"2px solid #ddd",marginTop:4,marginBottom:16}},
+          React.createElement("span",{style:{fontSize:12,fontWeight:700,color:"#111"}},"Total"),
+          React.createElement("span",{style:{fontSize:14,fontWeight:800,color:"#111"}},total+(bonusTotal>0?" (+"+bonusTotal+")":""))
+        ),
+        React.createElement("button",{onClick:()=>setStatInfoPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+      )
+    );
+  })();
 
   const abilityTagPopupEl=abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
     React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
@@ -318,9 +400,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           )
         )
       ),
-      React.createElement("button",{className:"back-btn",onClick:()=>{setShowEquipPage(false);setEquipSlotPicker(null);}},
-        React.createElement("i",{className:"ti ti-arrow-left"}),"Back"
-      ),
+      React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+        onClick:()=>setDexOverlay(def.id),
+        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+      },"Evolutions")}),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
           React.createElement("span",{style:{fontSize:52,lineHeight:1}},displayEmoji),
@@ -422,7 +505,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Stat"),
             React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
-              CORE_STAT_CYCLE.map(s=>
+              [...CORE_STAT_CYCLE,"spd","abilitySpeed"].map(s=>
                 React.createElement("button",{key:s,className:"filter-chip"+(equipFilterStats.has(s)?" active":""),onClick:()=>toggleEquipStat(s)},STAT_LABELS[s])
               )
             )
@@ -446,7 +529,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:10}},
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Show"),
             React.createElement("button",{className:"filter-chip"+(equipFilterFavorites?" active":""),onClick:()=>setEquipFilterFavorites(p=>!p)},"★ Favorites"),
-            React.createElement("button",{className:"filter-chip"+(equipFilterHasEffect?" active":""),onClick:()=>setEquipFilterHasEffect(p=>!p)},"Has Effect")
+            React.createElement("button",{className:"filter-chip"+(equipFilterHasEffect?" active":""),onClick:()=>setEquipFilterHasEffect(p=>!p)},"Has Effect"),
+            React.createElement("button",{className:"filter-chip"+(equipFilterHideIncompatible?" active":""),onClick:()=>setEquipFilterHideIncompatible(p=>!p)},"Hide Incompatible")
           )
         ),
         React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:12}},
@@ -456,15 +540,19 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
               .filter(item=>{
                 if(!(equipmentCopies[item.id]>0)&&!(equipmentAscensions[item.id]>0)&&!equipped.includes(item.id))return false;
                 if(equipFilterRarities.size>0&&!equipFilterRarities.has(item.rarity))return false;
-                if(equipFilterStats.size>0&&![...equipFilterStats].every(s=>s in item.stats))return false;
+                if(equipFilterStats.size>0&&![...equipFilterStats].every(s=>itemAffectsStat(item,s)))return false;
                 if(equipFilterFavorites&&!equipFavorites.has(item.id))return false;
                 if(equipFilterHasEffect&&!item.effect)return false;
                 if(equipFilterElements.size>0&&!equipFilterElements.has(item.element))return false;
                 if(equipFilterRoles.size>0&&!equipFilterRoles.has(item.role))return false;
+                if(equipFilterHideIncompatible&&!equipped.includes(item.id)&&((item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)))return false;
                 return true;
               })
               .sort((a,b)=>{
   const ea=equipped.includes(a.id)?1:0,eb=equipped.includes(b.id)?1:0;if(eb!==ea)return eb-ea;
+  const dA=((a.element&&def.type!==a.element)||(a.role&&def.role!==a.role))?1:0;
+  const dB=((b.element&&def.type!==b.element)||(b.role&&def.role!==b.role))?1:0;
+  if(dA!==dB)return dA-dB;
   const ascA=equipmentAscensions[a.id]||0,ascB=equipmentAscensions[b.id]||0;
   const copA=equipmentCopies[a.id]||0,copB=equipmentCopies[b.id]||0;
   const canAscA=(ascA<EQUIP_MAX_ASCENSION&&copA>=EQUIP_ASC_COSTS[ascA])?1:0;
@@ -551,7 +639,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
     React.createElement(ScreenHeader,{title:def.name,onBack,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
       onClick:()=>setDexOverlay(def.id),
-      style:{padding:"6px 12px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+      style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
     },"Evolutions")}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
@@ -607,12 +695,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         flairBuffs.length>0&&React.createElement("button",{onClick:()=>setShowFlairEffects(true),style:{position:"absolute",top:0,right:0,padding:"4px 10px",fontSize:11,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer"}},"✨ Flair Effects")
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},
-        STAT_CYCLE.map(s=>{const fb=flairBuffs.filter(b=>b.stat===s).reduce((acc,b)=>acc+Math.ceil(stats[s]*b.pct/100),0);return React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],bonus:(equipBonusStats[s]||0)+fb,highlight:lastLeveledStat===s,onClick:setStatInfoPopup});})
+        STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))
       )
     ),
     showFlairEffects&&(()=>{
       const totals=Object.fromEntries(Object.keys(BUFF_STAT_LABEL).map(s=>[s,0]));
       flairBuffs.forEach(b=>{totals[b.stat]=(totals[b.stat]||0)+b.pct;});
+      Object.keys(totals).forEach(s=>{totals[s]=Math.round(totals[s]*100)/100;});
       return React.createElement("div",{onClick:()=>setShowFlairEffects(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
         React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
           React.createElement("div",{style:{fontSize:15,fontWeight:700,textAlign:"center",marginBottom:4}},"✨ Flair Effects"),
@@ -620,7 +709,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
             Object.entries(BUFF_STAT_LABEL).map(([stat,label])=>{
               const pct=totals[stat]||0;
-              const gain=flairBuffs.filter(b=>b.stat===stat).reduce((acc,b)=>acc+Math.ceil(stats[stat]*b.pct/100),0);
+              const gain=flairStatGain(stat,stats[stat],flairBuffs);
               return React.createElement("div",{key:stat,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:8,background:pct>0?"#f0effe":"#f5f5f5"}},
                 React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#444"}},label),
                 pct>0
@@ -702,7 +791,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
               React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length]])
             ),
         React.createElement("button",{className:"btn btn-primary",onClick:doLevelUp,disabled:!hasFood,style:{marginBottom:0}},
-          isMaxLevel?"MAX LEVEL":"Level Up — 🍖 "+cost
+          isMaxLevel?"Lv "+ownedData.level:"Level Up — 🍖 "+cost
         )
       ),
       React.createElement("div",{className:"card",style:{marginBottom:10}},

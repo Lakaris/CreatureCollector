@@ -11,7 +11,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG } from "../../data/types.js";
-import { equipBonus, equipBonusStr } from "../../core/equipment.js";
+import { equipBonus, equipBonusStr, itemAffectsStat } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
@@ -54,7 +54,7 @@ function EquipmentScreen() {
     .filter((item) => {
       if (!(equipmentCopies[item.id] > 0) && !(equipmentAscensions[item.id] > 0) && !equippedAnywhere.has(item.id)) return false;
       if (filterRarities.size > 0 && !filterRarities.has(item.rarity)) return false;
-      if (filterStats.size > 0 && ![...filterStats].every((s) => s in item.stats)) return false;
+      if (filterStats.size > 0 && ![...filterStats].every((s) => itemAffectsStat(item, s))) return false;
       if (filterFavorites && !equipFavorites.has(item.id)) return false;
       if (filterHasEffect && !item.effect) return false;
       if (filterElements.size > 0 && !filterElements.has(item.element)) return false;
@@ -106,7 +106,7 @@ function EquipmentScreen() {
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Stat"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          CORE_STAT_CYCLE.map((s) => React.createElement("button", { key: s, className: "filter-chip" + (filterStats.has(s) ? " active" : ""), onClick: () => toggleStat(s) }, STAT_LABELS[s]))
+          [...CORE_STAT_CYCLE, "spd", "abilitySpeed"].map((s) => React.createElement("button", { key: s, className: "filter-chip" + (filterStats.has(s) ? " active" : ""), onClick: () => toggleStat(s) }, STAT_LABELS[s]))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },

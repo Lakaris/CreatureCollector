@@ -61,9 +61,9 @@ function DexEntry({def,onBack,onNavigate}){
 
     chainDefs.length>1&&React.createElement("div",{className:"card",style:{marginBottom:12}},
       React.createElement("div",{className:"section-label"},"Evolution Line"),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4,flexWrap:"wrap"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"flex-start",gap:4,flexWrap:"wrap"}},
         chainDefs.map((d,i)=>React.createElement(React.Fragment,{key:d.id},
-          i>0&&React.createElement("span",{style:{color:"#aaa",fontSize:16,margin:"0 2px"}},"→"),
+          i>0&&React.createElement("span",{style:{color:"#aaa",fontSize:16,margin:"0 2px",lineHeight:"30px"}},"→"),
           React.createElement("div",{
             style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 8px",borderRadius:8,
               background:d.id===def.id?"#EEEDFE":"transparent",

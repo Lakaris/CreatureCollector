@@ -5,7 +5,7 @@
 // equipment, ascensions, and flair entirely. Everything now routes through here.
 
 import { calcStats } from "./creatures.js";
-import { totalEquipBonus } from "./equipment.js";
+import { totalEquipBonus, equippedStatBonuses } from "./equipment.js";
 import { STAT_CYCLE } from "../data/rarity.js";
 import {
   FLAIR_TITLE_MAP,
@@ -35,9 +35,10 @@ export function getFlairBuffs(ownedData) {
 
 /**
  * Final stats for a creature: level/ascension curve, plus flat equipment
- * bonuses, plus percentage flair buffs.
+ * bonuses, plus percentage flair buffs and percentage equipment effects
+ * (e.g. Fury Relic's "Gain 25% more ATK").
  *
- * Flair percentages apply to the PRE-equipment base, matching the detail UI.
+ * Percentages apply to the PRE-equipment base, matching the detail UI.
  *
  * @returns {{hp:number, atk:number, def:number, spd:number, abilitySpeed:number}}
  */
@@ -52,13 +53,17 @@ export function computeCombatStats(
 
   const equip = totalEquipBonus(ownedData, equipmentLevels, equipmentAscensions);
   const buffs = getFlairBuffs(ownedData);
+  const equipPct = equippedStatBonuses(ownedData);
 
   const out = {};
   for (const stat of STAT_CYCLE) {
     const flair = buffs
       .filter((b) => b.stat === stat)
       .reduce((acc, b) => acc + Math.ceil(base[stat] * (b.pct / 100)), 0);
-    out[stat] = base[stat] + (equip[stat] || 0) + flair;
+    const equipEffect = equipPct
+      .filter((b) => b.stat === stat)
+      .reduce((acc, b) => acc + Math.ceil(base[stat] * (b.pct / 100)), 0);
+    out[stat] = base[stat] + (equip[stat] || 0) + flair + equipEffect;
   }
   return out;
 }

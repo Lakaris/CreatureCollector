@@ -16,6 +16,7 @@ import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
@@ -70,6 +71,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [gridInfoCreature,setGridInfoCreature]=useState(null);
   const [bossMinimized,setBossMinimized]=useState(false);
   const [creatureMinimized,setCreatureMinimized]=useState(false);
+  const [dailyAbilityTagPopup,setDailyAbilityTagPopup]=useState(null);
   const rightPanelRef=React.useRef(null);
   React.useLayoutEffect(()=>{
     if(!rightPanelRef.current)return;
@@ -93,6 +95,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     });
   }
   const ghs=React.useRef({timer:null,fired:false});
+  const [confirmForfeitOpen,setConfirmForfeitOpen]=useState(false);
   const [bossPopupOpen,setBossPopupOpen]=useState(false);
   const bhs=React.useRef({timer:null,fired:false});
   // The boss popup only makes sense once the persistent boss panel is hidden
@@ -218,12 +221,19 @@ function DailyBossScreen({onBack,onViewCreature}){
     const bGameElapsed=(Date.now()-battleStartRef.current)*speedRef.current;
     const bTL=Math.min(60,Math.ceil(Math.max(0,60000-bGameElapsed)/1000));
     setBossTimeLeft(bTL);
-    if(bTL<=0){stopLoops();setDailyBossData(prev=>({...prev,date:today,fights:(isToday?(prev.fights||0):0)+1,wins:(isToday?(prev.wins||0):0)}));setTimeout(()=>setPhase("lost"),600);return;}
+    if(bTL<=0){
+      stopLoops();
+      setDailyBossData(prev=>({...prev,date:today,fights:(isToday?(prev.fights||0):0)+1,wins:(isToday?(prev.wins||0):0)}));
+      if(!rewardsCollectedToday){
+        const consolation=rollDungeonRewards(5,boss.type,level);
+        setRewards(consolation);
+      }
+      setTimeout(()=>setPhase("lost"),600);
+      return;
+    }
     const anyAlive=s.playerUnits.some(u=>u.hp>0);
     if(s.boss.hp<=0){
       stopLoops();
-      const rolled=rollDungeonRewards(5,boss.type,level);
-      setRewards(rolled);
       setDailyBossData(prev=>({...prev,date:today,fights:0,wins:0,rewardsCollectedDate:null}));
       setTimeout(()=>setPhase("won"),600);
     } else if(!anyAlive){
@@ -258,12 +268,26 @@ function DailyBossScreen({onBack,onViewCreature}){
     stopLoops(); bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
     setPhase("planning"); setBattleLog([]); setLogStep(0);
   }
+  function forfeitFight(){
+    stopLoops();
+    setDailyBossData(prev=>({...prev,date:today,fights:(isToday?(prev.fights||0):0)+1,wins:(isToday?(prev.wins||0):0)}));
+    if(!rewardsCollectedToday){
+      const consolation=rollDungeonRewards(5,boss.type,level);
+      setRewards(consolation);
+    }
+    bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
+    setPhase("lost"); setPlanGrid({}); setBattleLog([]); setLogStep(0);
+    setConfirmForfeitOpen(false);
+  }
   useEffect(()=>()=>stopLoops(),[]);
   function collectRewards(){
     setEquipmentCopies(prev=>{const n={...prev};for(const item of rewards)n[item.id]=(n[item.id]||0)+1;return n;});
-    if(phase==="won"){setDailyBossLevel(l=>(l||1)+1);}
-    if(phase==="lost") setDailyBossData(prev=>({...prev,rewardsCollectedDate:today}));
+    setDailyBossData(prev=>({...prev,rewardsCollectedDate:today}));
     setRewards(null);
+    setPhase("idle");
+  }
+  function continueAfterWin(){
+    setDailyBossLevel(l=>(l||1)+1);
     setPhase("idle");
   }
   const MAX_DEPLOYED=10;
@@ -314,11 +338,17 @@ function DailyBossScreen({onBack,onViewCreature}){
     selectedRanged.forEach((s,i)=>{if(i<GRID_COLS)grid[(GRID_ROWS-1)+","+i]=s.id;});
     setPlanGrid(grid);
   }
-  // Rewards screen
-  if(rewards&&(phase==="won"||phase==="lost"))return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  // Victory screen — no item rewards, matches Dungeon/Arena's plain victory screen
+  if(phase==="won")return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
+    React.createElement("div",{style:{fontSize:64,marginBottom:12}},"✅"),
+    React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#534AB7",marginBottom:4}},"Victory!"),
+    React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},"Daily rewards have been refreshed"),
+    React.createElement("button",{onClick:continueAfterWin,style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
+  );
+  // Rewards screen (consolation reward for a loss)
+  if(rewards&&phase==="lost")return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},phase==="won"?"🎁 Victory Rewards":"🎁 Daily Boss Rewards"),
-      React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},rewards.length+" items from "+(foughtBoss||boss).name)
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"Rewards")
     ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
       rewards.map((item,i)=>{
@@ -374,6 +404,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             React.createElement("div",{id:"battle-boss-hp-pct",style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:"#fff",textShadow:"0 1px 2px rgba(0,0,0,0.5)",pointerEvents:"none"}},Math.ceil(snap.boss.hp/bossMaxHp*100)+"%")
           )
         ),
+        phase==="battling"&&React.createElement("button",{onClick:()=>setConfirmForfeitOpen(true),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏳 Forfeit"),
         React.createElement("button",{onClick:cycleSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},battleSpeed+"x ⚡")
       ),
       // battle grid
@@ -507,11 +538,30 @@ function DailyBossScreen({onBack,onViewCreature}){
           onClose:()=>setBattleSelected(null)
         }):React.createElement("div",{style:{width:150,flexShrink:0}}))
         )
+      ),
+      confirmForfeitOpen&&React.createElement("div",{onClick:()=>setConfirmForfeitOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
+        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320,textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:40,marginBottom:8}},"🏳"),
+          React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:6}},"Forfeit this fight?"),
+          React.createElement("div",{style:{fontSize:13,color:"#888",lineHeight:1.5,marginBottom:18}},"This counts as a loss and uses one of today's attempts."),
+          React.createElement("div",{style:{display:"flex",gap:10}},
+            React.createElement("button",{onClick:()=>setConfirmForfeitOpen(false),style:{flex:1,padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Cancel"),
+            React.createElement("button",{onClick:forfeitFight,style:{flex:1,padding:"11px 0",fontSize:14,fontWeight:700,background:"#ef4444",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"Forfeit")
+          )
+        )
       )
     );
   }
   // Planning screen
-  if(phase==="planning")return React.createElement(React.Fragment,null,React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  if(phase==="planning")return React.createElement(React.Fragment,null,
+    dailyAbilityTagPopup&&React.createElement("div",{onClick:()=>setDailyAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[dailyAbilityTagPopup].label),
+        React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[dailyAbilityTagPopup].description),
+        React.createElement("button",{onClick:()=>setDailyAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
+      )
+    ),
+    React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     // header
     React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
       React.createElement("button",{onClick:()=>{setPhase("idle");setPlanGrid({});},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
@@ -628,8 +678,18 @@ function DailyBossScreen({onBack,onViewCreature}){
               if(!abl)return null;
               const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
               const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
+              const abilityTags=getAbilityTags(def.id,k);
               return React.createElement("div",{key:k,style:{marginBottom:10}},
-                React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+                React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+                  abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                    ...abilityTags.map(tag=>React.createElement("button",{
+                      key:tag,
+                      onClick:(e)=>{e.stopPropagation();setDailyAbilityTagPopup(tag);},
+                      style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                    },ABILITY_TAG_DEFS[tag].label))
+                  )
+                ),
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
                 desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
               );
@@ -761,26 +821,27 @@ function DailyBossScreen({onBack,onViewCreature}){
             React.createElement("div",{style:{fontSize:12,color:"#666",marginTop:4}},"Come back tomorrow for a new boss")
           )
         :(()=>{
-            const noon=new Date(nowMs);noon.setDate(noon.getDate()+1);noon.setHours(12,0,0,0);
-            const s=Math.max(0,Math.floor((noon-nowMs)/1000));
+            const resetAt=new Date(nowMs);resetAt.setDate(resetAt.getDate()+1);resetAt.setHours(0,0,0,0);
+            const s=Math.max(0,Math.floor((resetAt-nowMs)/1000));
             const hh=String(Math.floor(s/3600)).padStart(2,"0");
             const mm=String(Math.floor(s%3600/60)).padStart(2,"0");
             const ss=String(s%60).padStart(2,"0");
             return React.createElement("div",{style:{width:"100%",maxWidth:300,textAlign:"center"}},
-              rewardsCollectedToday&&React.createElement("div",{style:{background:"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:10,padding:"10px 12px",marginBottom:12,textAlign:"center"}},
-                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#16a34a",marginBottom:2}},"✅ Rewards Collected Today"),
-                React.createElement("div",{style:{fontSize:11,color:"#15803d"}},"Defeat the boss for more rewards")
+              rewardsCollectedToday&&React.createElement("div",{style:{marginBottom:12,textAlign:"center"}},
+                React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#16a34a",marginBottom:2}},"✅ Rewards Collected Today"),
+                React.createElement("div",{style:{fontSize:14,color:"#15803d"}},"Defeat the boss for more rewards")
               ),
               React.createElement("div",{style:{textAlign:"center",marginBottom:16}},
-                React.createElement("div",{style:{fontWeight:700,fontSize:14,color:"#534AB7",marginBottom:3}},attemptsLeft+"/"+MAX_ATTEMPTS+" Attempts Left"),
-                React.createElement("div",{style:{fontSize:12,color:"#aaa"}},
+                React.createElement("div",{style:{fontSize:15,color:"#aaa"}},
                   "Resets in ",
                   React.createElement("span",{style:{fontVariantNumeric:"tabular-nums",fontWeight:600,color:"#888"}},hh+":"+mm+":"+ss)
                 )
               ),
               attemptsLeft>0
-                ?React.createElement("button",{onClick:()=>setPhase("planning"),style:{width:"100%",padding:"15px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"⚔️ Fight")
-                :React.createElement("div",{style:{background:"#fef2f2",borderRadius:12,padding:"12px",color:"#ef4444",fontSize:13,fontWeight:600}},"No attempts left · come back tomorrow")
+                &&React.createElement("button",{onClick:()=>setPhase("planning"),style:{width:"100%",padding:"15px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}},
+                    React.createElement("span",null,"⚔️ Fight"),
+                    React.createElement("span",{style:{fontSize:12,fontWeight:600,opacity:0.8}},attemptsLeft+"/"+MAX_ATTEMPTS+" Attempts Left")
+                  )
             );
           })()
     )

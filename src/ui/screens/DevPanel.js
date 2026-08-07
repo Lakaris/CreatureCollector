@@ -8,11 +8,16 @@ import { FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS } from "../..
 import { MELON_TYPES } from "../../data/types.js";
 import { DAILY_MISSIONS } from "../../data/quests.js";
 import { makeOwnedCreature, getChain, MAX_LEVEL, MAX_ASCENSION } from "../../core/creatures.js";
+import { MAX_LABYRINTH_DEPTH } from "../../core/labyrinth.js";
+import { FIELD_RATES } from "../../data/farm.js";
 import { DEV_MODE } from "../../config.js";
 
+const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
+const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
+
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState } = useGame();
-  const [vals,setVals]=useState({gems:"1000",money:"500",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5"});
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel } = useGame();
+  const [vals,setVals]=useState({gems:"1000",money:"500",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
   function sv(k,v){setVals(p=>({...p,[k]:v}));}
@@ -63,6 +68,11 @@ function DevPanel(){
     setEquipmentAscensions(prev=>({...prev,...asc}));
     setEquipmentCopies(prev=>{const n={...prev};EQUIPMENT_DEFS.forEach(item=>{if(!(n[item.id]>0))n[item.id]=1;});return n;});
   }
+  function jumpToFloor(n){
+    const d=Math.max(1,Math.min(MAX_LABYRINTH_DEPTH,n));
+    setLabyrinthDepth(d);
+    setLabyrinthBestDepth(b=>Math.max(b||1,d));
+  }
   function giveMaxFlair(){
     const allFlairIds=[
       ...Object.values(FLAIR_TITLES).flat().map(t=>t.name),
@@ -82,7 +92,7 @@ function DevPanel(){
     );
   }
 
-  const devTabs=[{id:"general",label:"General"},{id:"eggs",label:"Eggs"},{id:"melons",label:"Melons"},{id:"bananas",label:"Bananas"},{id:"equipment",label:"Equip"},{id:"actions",label:"Actions"},{id:"daily",label:"Daily"},{id:"treasure",label:"Treasure"}];
+  const devTabs=[{id:"general",label:"General"},{id:"eggs",label:"Eggs"},{id:"melons",label:"Melons"},{id:"bananas",label:"Bananas"},{id:"equipment",label:"Equip"},{id:"labyrinth",label:"Labyrinth"},{id:"actions",label:"Actions"},{id:"daily",label:"Daily"},{id:"treasure",label:"Treasure"}];
 
   return React.createElement("div",{className:"dev-panel"},
     React.createElement("div",{className:"dev-title"},
@@ -102,6 +112,7 @@ function DevPanel(){
       devRow("food","🍖 Food"),
       devRow("candy","🍬 Candy"),
       devRow("skinShards","🔮 Skin Shards"),
+      devRow("ancientFertilizer","🪴 Ancient Fertilizer"),
       React.createElement("div",{className:"dev-row"},
         React.createElement("span",{className:"dev-label"},"🔶 Shards"),
         React.createElement("input",{className:"dev-input",type:"text",value:vals.shardId,onChange:e=>sv("shardId",e.target.value),placeholder:"creature id"}),
@@ -144,6 +155,24 @@ function DevPanel(){
           React.createElement("button",{className:"dev-btn",onClick:()=>setEquipmentCopies(prev=>({...prev,[item.id]:(prev[item.id]||0)+1}))},"+1"),
           React.createElement("button",{className:"dev-btn",onClick:()=>setEquipmentCopies(prev=>({...prev,[item.id]:(prev[item.id]||0)+5}))},"+5")
         )
+      )
+    ),
+    devTab==="labyrinth"&&React.createElement(React.Fragment,null,
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("span",{className:"dev-label"},"Current: Floor "+(labyrinthDepth||1))
+      ),
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("span",{className:"dev-label"},"🌀 Jump to Floor"),
+        React.createElement("input",{className:"dev-input",type:"number",value:vals.labyrinthFloor,onChange:e=>sv("labyrinthFloor",e.target.value),style:{width:70}}),
+        React.createElement("button",{className:"dev-btn",onClick:()=>{const n=parseInt(vals.labyrinthFloor,10);if(!isNaN(n))jumpToFloor(n);}},"Jump")
+      ),
+      React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginTop:6}},
+        LABYRINTH_TIER_FLOORS.map(f=>React.createElement("button",{key:f,className:"dev-btn",onClick:()=>jumpToFloor(f)},"Floor "+f))
+      ),
+      React.createElement("div",{className:"dev-row",style:{marginTop:10}},
+        React.createElement("span",{className:"dev-label"},"🌾 Set Field Level (current "+(farmFieldLevel||1)+"/"+FARM_FIELD_MAX_LEVEL+")"),
+        React.createElement("input",{className:"dev-input",type:"number",value:vals.farmFieldLevel,onChange:e=>sv("farmFieldLevel",e.target.value),style:{width:60}}),
+        React.createElement("button",{className:"dev-btn",onClick:()=>{const n=parseInt(vals.farmFieldLevel,10);if(!isNaN(n))setFarmFieldLevel(Math.max(0,Math.min(FARM_FIELD_MAX_LEVEL,n)));}},"Set")
       )
     ),
     devTab==="daily"&&React.createElement(React.Fragment,null,

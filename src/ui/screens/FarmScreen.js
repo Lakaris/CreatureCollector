@@ -3,13 +3,13 @@
 import React, { useState, useMemo, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { MELON_TYPES } from "../../data/types.js";
-import { FARM_PLOT_COSTS, PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_MONEY_RATES, FIELD_SHARD_RATES, FIELD_UPGRADE_COSTS, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
+import { FARM_PLOT_COSTS, PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_MONEY_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
 import { seededRand } from "../../core/random.js";
 import { formatDuration } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
-  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests } = useGame();
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests } = useGame();
   const MAX_PLOTS=6;
   const MAX_MONEY_PLOTS=4;
   const [confirm,setConfirm]=useState(false);
@@ -20,7 +20,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   const [showFieldInfo,setShowFieldInfo]=useState(false);
   const [showFieldUpgrade,setShowFieldUpgrade]=useState(false);
   const [speedUpConfirm,setSpeedUpConfirm]=useState(null);
-  const [upgradingPlot,setUpgradingPlot]=useState(null); // index of plot being upgraded
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(t);},[]);
   function showNotify(msg){setNotify(msg);setTimeout(()=>setNotify(null),2000);}
@@ -74,12 +73,12 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   const fmtTime=(ms)=>formatDuration(ms);
 
   const maxLevel=FIELD_RATES.length-1;
-  const upgradeCost=farmFieldLevel<maxLevel?FIELD_UPGRADE_COSTS[farmFieldLevel]:null;
-  const canUpgrade=upgradeCost!==null&&(currencies.money||0)>=upgradeCost;
+  const upgradeFertilizerCost=1;
+  const canUpgrade=farmFieldLevel<maxLevel&&(currencies.ancientFertilizer||0)>=upgradeFertilizerCost;
 
   function upgrade(){
     if(!canUpgrade)return;
-    setCurrencies(c=>({...c,money:c.money-upgradeCost}));
+    setCurrencies(c=>({...c,ancientFertilizer:(c.ancientFertilizer||0)-upgradeFertilizerCost}));
     setFarmFieldLevel(l=>l+1);
     showNotify("Field upgraded to Level "+(farmFieldLevel+1)+"!");
   }
@@ -99,8 +98,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       onBack&&React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
-      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🌾 Farm"),
-      React.createElement("div",{style:{marginLeft:"auto",fontSize:13,fontWeight:600,background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💰 "+(currencies.money||0).toLocaleString())
+      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🌾 Farm")
     ),
     React.createElement("div",{style:{display:"flex",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
       [{id:"field",label:"Main Field"},{id:"plots",label:"Plots"}].map(t=>
@@ -293,11 +291,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();setPicking(i);},
                 style:{padding:"10px 28px",background:"#4caf50",color:"#fff",border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",fontSize:15}
-              },"Grow"),
-              React.createElement("button",{
-                onClick:e=>{e.stopPropagation();setUpgradingPlot(i);},
-                style:{padding:"4px 12px",background:"#1976d2",color:"#fff",border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:11}
-              },"Upgrade")
+              },"Grow")
             ),
             unlocked&&crop&&!ready&&React.createElement(React.Fragment,null,
               React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600,marginBottom:4}},cropDef.label+" × "+effectiveYield),
@@ -400,7 +394,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},shardRate+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]||"?")+"/hr")
           )
         ),
-        React.createElement("div",{style:{fontSize:13,color:canUpgrade?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 💰 "+upgradeCost?.toLocaleString()),
+        React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 🪴 "+upgradeFertilizerCost+" Ancient Fertilizer"),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
           React.createElement("button",{onClick:()=>setShowFieldUpgrade(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Close"),
           React.createElement("button",{
@@ -411,45 +405,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         )
       )
     ),
-    upgradingPlot!==null&&(()=>{
-      const ui=upgradingPlot;
-      const uLevel=plotUpgrades[ui]||0;
-      const uBonus=Math.floor(uLevel/5);
-      const uProgress=uLevel%5;
-      const uCost=100*(uLevel+1);
-      const uCanAfford=(currencies.money||0)>=uCost;
-      return React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
-        React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-          React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},"⬆️ Upgrade Plot "+(ui+1)),
-          React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:12}},"Level "+uLevel+" → "+(uLevel+1)),
-          React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
-            PLOT_CROPS.map(c=>{
-              const cur=c.yield+Math.floor(uLevel/c.upgradeEvery);
-              const nxt=c.yield+Math.floor((uLevel+1)/c.upgradeEvery);
-              const nextBoostLevel=(Math.floor(uLevel/c.upgradeEvery)+1)*c.upgradeEvery;
-              return React.createElement("div",{key:c.key,style:{fontSize:12,display:"flex",alignItems:"center",gap:4,flexWrap:"wrap"}},
-                React.createElement("span",null,c.emoji+" "+c.label+": "),
-                React.createElement("span",{style:{fontWeight:700,color:nxt>cur?"#2e7d32":"#555"}},cur+" → "+nxt),
-                nxt===cur&&React.createElement("span",{style:{color:"#aaa",fontSize:11}},"(+1 at level "+nextBoostLevel+")")
-              );
-            })
-          ),
-          React.createElement("div",{style:{fontSize:13,color:uCanAfford?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 💰 "+uCost.toLocaleString()),
-          !uCanAfford&&React.createElement("div",{style:{fontSize:11,color:"#e53935",marginBottom:8}},"Need 💰 "+(uCost-(currencies.money||0)).toLocaleString()+" more"),
-          React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
-            React.createElement("button",{onClick:()=>setUpgradingPlot(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Close"),
-            React.createElement("button",{
-              disabled:!uCanAfford,
-              onClick:()=>{
-                setCurrencies(c=>({...c,money:(c.money||0)-uCost}));
-                setPlotUpgrades(pu=>{const a=[...pu];a[ui]=a[ui]+1;return a;});
-              },
-              style:{flex:1,padding:"10px 0",background:uCanAfford?"#1976d2":"#ccc",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:uCanAfford?"pointer":"default",fontSize:13}
-            },"Upgrade")
-          )
-        )
-      );
-    })(),
     cancelling!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:36,marginBottom:8}},"⚠️"),

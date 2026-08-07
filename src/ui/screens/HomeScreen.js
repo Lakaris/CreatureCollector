@@ -64,19 +64,16 @@ function HomeScreen(){
     React.createElement(ScreenHeader,{title:React.createElement("button",{
       onClick:()=>setSettingsOpen(true),
       style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
-    },"⚙️"),right:React.createElement(React.Fragment,null,
-      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems}),
-      React.createElement(CurrencyChip,{emoji:"💰",value:currencies.money})
-    )}),
+    },"⚙️"),right:React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})}),
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
     bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
     aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
     React.createElement("button",{
       onClick:()=>setShowQuests(true),
-      style:{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid #c4b5fd",background:"#f0effe",fontSize:28,fontWeight:700,color:"#534AB7",cursor:"pointer",boxShadow:"0 2px 12px rgba(83,74,183,0.15)"}
+      style:{position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
       "📋",
-      React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#534AB7"}},"Quests"),
+      React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Quests"),
       hasReadyQuest&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
     React.createElement("div",{style:{fontSize:120,lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))",position:"relative"}},emoji),
@@ -89,17 +86,17 @@ function HomeScreen(){
     },"Change"),
     React.createElement("button",{
       onClick:()=>setShowBattlepass(true),
-      style:{position:"absolute",right:16,top:"calc(50% - 88px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid #fbbf24",background:"#fffbeb",fontSize:28,fontWeight:700,color:"#d97706",cursor:"pointer",boxShadow:"0 2px 12px rgba(251,191,36,0.3)"}
+      style:{position:"absolute",right:0,top:"calc(50% - 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
       "🎫",
-      React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Battle Pass")
+      React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Battle Pass")
     ),
     React.createElement("button",{
       onClick:()=>setShowDaily(true),
-      style:{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:64,height:80,borderRadius:20,border:"2px solid "+(new Date().toDateString()!==dailyLastClaimed?"#fbbf24":"#e0e0e0"),background:new Date().toDateString()!==dailyLastClaimed?"#fffbeb":"#f5f5f5",fontSize:28,fontWeight:700,color:"#d97706",cursor:"pointer",boxShadow:new Date().toDateString()!==dailyLastClaimed?"0 2px 12px rgba(251,191,36,0.3)":"none"}
+      style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
       "📅",
-      React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#d97706"}},"Daily"),
+      React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Daily"),
       new Date().toDateString()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
     (()=>{
@@ -109,8 +106,11 @@ function HomeScreen(){
       const next=onCurrent?null:nextRewardDepth(depth);
       const rewardEmoji=onCurrent?formatLabyrinthReward(reward):(next?formatLabyrinthReward(next.reward):null);
       if(!rewardEmoji)return null;
-      const label=onCurrent?"Victory reward:":"Floor "+next.depth+" Victory reward:";
-      return React.createElement("div",{style:{position:"fixed",left:"calc(75vw - 8px)",transform:"translateX(-50%)",bottom:222,whiteSpace:"nowrap",fontSize:14,fontWeight:700,color:"#4f46e5",background:"#eef2ff",border:"2px solid #c7d2fe",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(99,102,241,0.15)",zIndex:5}},label+" "+rewardEmoji);
+      const label=onCurrent?"Victory Reward:":"Floor "+next.depth+" Victory Reward:";
+      return React.createElement("div",{style:{position:"fixed",left:"calc(75vw - 8px)",transform:"translateX(-50%)",bottom:222,textAlign:"center",fontSize:13,fontWeight:700,color:"#d97706",background:"#fffbeb",border:"2px solid #fbbf24",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(217,119,6,0.15)",zIndex:5,lineHeight:1.35}},
+        React.createElement("div",{style:{whiteSpace:"nowrap"}},label),
+        React.createElement("div",{style:{whiteSpace:"nowrap"}},rewardEmoji)
+      );
     })(),
     React.createElement("button",{
       onClick:()=>{setGameMode("labyrinth");setTab("play");},

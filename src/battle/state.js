@@ -2,6 +2,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
+import { calcStats } from "../core/creatures.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
@@ -38,6 +39,10 @@ function cooldownFor(spd) {
  * @param {Object} [equipmentLevels]     itemId -> level (global)
  * @param {Object} [equipmentAscensions] itemId -> ascension (global)
  * @param {{hpMult:number,atkMult:number,defMult:number}} [difficultyOverride]
+ * @param {number} [enemyLevel] Arena-only: when set, enemies use the same
+ *   level/rarity stat curve as owned creatures (calcStats) instead of the
+ *   bossLevel-scaled base stats, so a level-500 enemy roughly matches a
+ *   maxed-out player creature of the same rarity.
  */
 export function makeArenaBattle(
   playerGrid,
@@ -47,7 +52,8 @@ export function makeArenaBattle(
   animMs,
   equipmentLevels,
   equipmentAscensions,
-  difficultyOverride
+  difficultyOverride,
+  enemyLevel
 ) {
   const now = Date.now();
 
@@ -94,8 +100,19 @@ export function makeArenaBattle(
   };
   const enemyUnits = Object.entries(enemyGrid).map(([key, edef], i) => {
     const [row, col] = key.split(",").map(Number);
-    const spd = edef?.stats?.spd || 1;
-    const hp = Math.round((edef?.stats?.hp || 60) * HP_SCALE * (1 + hpMult));
+    const lvlStats = enemyLevel
+      ? calcStats(edef, { level: enemyLevel, ascensions: 0 })
+      : null;
+    const spd = (lvlStats || edef?.stats)?.spd || 1;
+    const hp = Math.round(
+      ((lvlStats?.hp ?? edef?.stats?.hp ?? 60) * HP_SCALE) * (lvlStats ? 1 : 1 + hpMult)
+    );
+    const atk = Math.round(
+      (lvlStats?.atk ?? edef?.stats?.atk ?? 30) * (lvlStats ? 1 : 1 + atkMult)
+    );
+    const def = Math.round(
+      (lvlStats?.def ?? edef?.stats?.def ?? 20) * (lvlStats ? 1 : 1 + defMult)
+    );
     return {
       uid: "e" + i,
       creatureId: edef.id,
@@ -106,8 +123,8 @@ export function makeArenaBattle(
       lastMoveTime: now - animMs,
       hp,
       maxHp: hp,
-      atk: Math.round((edef?.stats?.atk || 30) * (1 + atkMult)),
-      def: Math.round((edef?.stats?.def || 20) * (1 + defMult)),
+      atk,
+      def,
       spd,
       isRanged: edef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),

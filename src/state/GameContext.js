@@ -25,7 +25,7 @@ const GameContext = createContext(null);
 
 /** Starting currency balances for a new save. */
 const INITIAL_CURRENCIES = {
-  gems: 1500, food: 100, candy: 50, money: 0, equipShards: 0, dungeonPass: 10,
+  gems: 1500, food: 100, candy: 50, equipShards: 0, dungeonPass: 10,
   eggs: 0, legendaryEggs: 0,
   melonFire: 5, melonWater: 5, melonNature: 5, melonEarth: 5,
   melonWind: 5, melonElectric: 5, melonLight: 5, melonDark: 5, melonRainbow: 2,

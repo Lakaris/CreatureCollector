@@ -113,8 +113,7 @@ function GachaScreen({onHatch}){
     React.createElement(ScreenHeader,{title:"Hatch",right:React.createElement(React.Fragment,null,
       React.createElement(CurrencyChip,{emoji:"🥚",value:currencies.eggs}),
       (currencies.legendaryEggs||0)>0&&React.createElement(CurrencyChip,{emoji:"🥚✨",value:currencies.legendaryEggs}),
-      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems}),
-      React.createElement(CurrencyChip,{emoji:"💰",value:currencies.money})
+      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
     )}),
     React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
       React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i-1+BANNERS.length)%BANNERS.length);setShowRates(false);},

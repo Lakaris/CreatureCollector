@@ -27,16 +27,21 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
     const t = e.touches[0]; if (!t) return;
     const dx = t.clientX - ts.startX, dy = t.clientY - ts.startY;
     if (!ts.active) {
+      // Natural hand tremor while holding a phone still for the ~1s
+      // press-and-hold gesture easily produces several px of drift -- these
+      // thresholds must clear that noise floor, or a genuine "hold still"
+      // gets misread as the start of a drag and the hold gets cancelled out
+      // from under the player before the progress ring finishes filling.
       if (ts.fromCell) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
       } else {
         // Tray items also scroll horizontally. Real fingers rarely move in a
         // straight line, so only concede the gesture to a scroll once it's
         // decisively horizontal -- otherwise a natural, slightly-diagonal lift
         // toward the grid above would misfire as a scroll and the drag would
         // never start. Vertical intent (picking the creature up) wins ties.
-        if (Math.abs(dy) >= 10) { /* fall through to claim as drag */ }
-        else if (Math.abs(dx) > 16 && Math.abs(dx) > Math.abs(dy) * 1.5) { end(null); return; }
+        if (Math.abs(dy) >= 16) { /* fall through to claim as drag */ }
+        else if (Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 1.5) { end(null); return; }
         else return;
       }
       ts.active = true;

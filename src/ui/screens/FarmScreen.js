@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { MELON_TYPES } from "../../data/types.js";
-import { FARM_PLOT_COSTS, PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_MONEY_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
+import { PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
 import { seededRand } from "../../core/random.js";
 import { formatDuration } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
@@ -25,12 +25,10 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   function showNotify(msg){setNotify(msg);setTimeout(()=>setNotify(null),2000);}
 
   const rate=FIELD_RATES[farmFieldLevel]||2;
-  const moneyRate=FIELD_MONEY_RATES[farmFieldLevel]||5;
   const shardRate=FIELD_SHARD_RATES[farmFieldLevel]||1;
   const elapsedMs=now-farmFieldLastHarvest;
   const elapsedHours=elapsedMs/3600000;
   const accumulated=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*rate);
-  const accumulatedMoney=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*moneyRate);
   const accumulatedShards=Math.floor(Math.min(elapsedHours,FIELD_CAP_HOURS)*shardRate);
   const canHarvest=elapsedHours>=FIELD_MIN_HOURS&&accumulated>=1;
   const atCap=elapsedHours>=FIELD_CAP_HOURS;
@@ -49,7 +47,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   function harvest(){
     if(!canHarvest)return;
     setCurrencies(c=>{
-      const n={...c,food:(c.food||0)+accumulated,money:(c.money||0)+accumulatedMoney,equipShards:(c.equipShards||0)+accumulatedShards};
+      const n={...c,food:(c.food||0)+accumulated,equipShards:(c.equipShards||0)+accumulatedShards};
       Object.entries(fieldBonuses).forEach(([k,v])=>n[k]=(n[k]||0)+v);
       return n;
     });
@@ -59,7 +57,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     setNow(Date.now());
     const items=[
       {emoji:"🍖",label:"Food",amount:accumulated},
-      {emoji:"💰",label:"Money",amount:accumulatedMoney},
       {emoji:"🔧",label:"Gear Shards",amount:accumulatedShards},
       ...Object.entries(fieldBonuses).map(([k,v])=>{
         const m=MELON_TYPES.find(m=>m.key===k);
@@ -83,12 +80,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     showNotify("Field upgraded to Level "+(farmFieldLevel+1)+"!");
   }
 
-  const nextCost=farmPlots<MAX_MONEY_PLOTS?FARM_PLOT_COSTS[farmPlots]:null;
-  const canAfford=(currencies.money||0)>=nextCost;
-
   function unlockPlot(){
-    if(!canAfford)return;
-    setCurrencies(c=>({...c,money:c.money-nextCost}));
     setFarmPlots(p=>p+1);
     setConfirm(false);
   }
@@ -137,7 +129,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         React.createElement("div",{style:{position:"absolute",top:10,left:0,right:0,textAlign:"center",fontSize:14,fontWeight:700,color:"#555",pointerEvents:"none"}},"Lv."+farmFieldLevel),
         React.createElement("div",{style:{fontSize:56,marginBottom:6}},"🌾"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:2}},accumulated>0?"Ready to harvest":"Growing..."),
-        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+rate+"/hr  •  💰 "+moneyRate+"/hr")
+        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+rate+"/hr")
       ),
       React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px"}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
@@ -161,13 +153,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
                 React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Food")
               ),
               React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulated)
-            ),
-            accumulatedMoney>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                React.createElement("span",{style:{fontSize:20}},"💰"),
-                React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Money")
-              ),
-              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulatedMoney)
             ),
             accumulatedShards>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
@@ -251,7 +236,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           const isStorePlot=i>=MAX_MONEY_PLOTS;
           const unlocked=isStorePlot?specialPurchased:i<farmPlots;
           const isNext=!isStorePlot&&i===farmPlots&&farmPlots<MAX_MONEY_PLOTS;
-          const cost=FARM_PLOT_COSTS[i];
           const crop=farmCrops[i];
           const cropDef=crop?PLOT_CROPS.find(c=>c.key===crop.cropKey):null;
           const elapsed=crop?(now-crop.plantedAt):0;
@@ -268,7 +252,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           }
           return React.createElement("div",{
             key:i,
-            onClick:isStorePlot&&!unlocked?()=>onGoToStore():isNext?(canAfford?()=>setConfirm(true):()=>showNotify("Not enough 💰 Money!")):undefined,
+            onClick:isStorePlot&&!unlocked?()=>onGoToStore():isNext?()=>setConfirm(true):undefined,
             style:{
               position:"relative",
               background:unlocked?(ready?"#fff9c4":crop?"#e3f2fd":"#e8f5e9"):isNext?"#fff":isStorePlot?"#f3e8ff":"#f0f0f0",
@@ -323,7 +307,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             ),
             isNext&&React.createElement(React.Fragment,null,
               React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#555",marginBottom:4}},"Plot "+(i+1)),
-              React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#888"}},"💰 "+cost.toLocaleString())
+              React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#888"}},"Tap to unlock")
             ),
             !unlocked&&!isNext&&React.createElement(React.Fragment,null,
               React.createElement("div",{style:{fontSize:13,fontWeight:700,color:isStorePlot?"#7b1fa2":"#aaa",marginBottom:4}},"Plot "+(i+1)),
@@ -363,10 +347,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
         ),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,moneyRate)," 💰 Money"),
-          React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
-        ),
-        React.createElement("div",{className:"rates-row"},
           React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,"2")," 🍬 Candy"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"0.5%")
         ),
@@ -384,10 +364,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           React.createElement("div",{className:"rates-row"},
             React.createElement("span",{style:{fontSize:13}},"🍖 Food rate"),
             React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},rate+" → "+(FIELD_RATES[farmFieldLevel+1]||"?")+"/hr")
-          ),
-          React.createElement("div",{className:"rates-row"},
-            React.createElement("span",{style:{fontSize:13}},"💰 Money rate"),
-            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},moneyRate+" → "+(FIELD_MONEY_RATES[farmFieldLevel+1]||"?")+"/hr")
           ),
           React.createElement("div",{className:"rates-row"},
             React.createElement("span",{style:{fontSize:13}},"🔧 Gear Shards rate"),
@@ -442,14 +418,10 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     confirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:36,marginBottom:8}},"🔓"),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:6}},"Unlock Plot "+(farmPlots+1)+"?"),
-        React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:4}},"This will cost"),
-        React.createElement("div",{style:{fontSize:22,fontWeight:800,marginBottom:4}},"💰 "+nextCost?.toLocaleString()),
-        !canAfford&&React.createElement("div",{style:{fontSize:12,color:"#e53935",fontWeight:600,marginBottom:8}},"Not enough Money!"),
-        canAfford&&React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:16}},"You have: 💰 "+(currencies.money||0).toLocaleString()),
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:16}},"Unlock Plot "+(farmPlots+1)+"?"),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
           React.createElement("button",{onClick:()=>setConfirm(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),
-          React.createElement("button",{onClick:unlockPlot,disabled:!canAfford,style:{flex:1,padding:"10px 0",background:canAfford?"#4caf50":"#ccc",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:canAfford?"pointer":"default",fontSize:13}},"Unlock")
+          React.createElement("button",{onClick:unlockPlot,style:{flex:1,padding:"10px 0",background:"#4caf50",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Unlock")
         )
       )
     )

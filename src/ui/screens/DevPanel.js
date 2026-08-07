@@ -17,7 +17,7 @@ const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
 
 function DevPanel(){
   const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave } = useGame();
-  const [vals,setVals]=useState({gems:"1000",money:"500",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20"});
+  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
   function sv(k,v){setVals(p=>({...p,[k]:v}));}
@@ -45,7 +45,7 @@ function DevPanel(){
     CREATURES.filter(c=>!c.evolutionOf).forEach(c=>{all[c.id]=makeOwnedCreature(c);});
     setOwned(all);
   }
-  function resetAll(){setOwned({});setCurrencies({gems:1500,food:100,candy:50,money:0,eggs:0,legendaryEggs:0,melonFire:5,melonWater:5,melonNature:5,melonEarth:5,melonWind:5,melonElectric:5,melonLight:5,melonDark:5,melonRainbow:2,flairBanana:500,mythicalFlairBanana:500,ancientFlairBanana:500,flairShard:0});setSkinShards(0);clearSave();}
+  function resetAll(){setOwned({});setCurrencies({gems:1500,food:100,candy:50,eggs:0,legendaryEggs:0,melonFire:5,melonWater:5,melonNature:5,melonEarth:5,melonWind:5,melonElectric:5,melonLight:5,melonDark:5,melonRainbow:2,flairBanana:500,mythicalFlairBanana:500,ancientFlairBanana:500,flairShard:0});setSkinShards(0);clearSave();}
 
   function giveMaxInvestedCreatures(){
     const all={};
@@ -106,7 +106,6 @@ function DevPanel(){
     ),
     devTab==="general"&&React.createElement(React.Fragment,null,
       devRow("gems","💎 Gems"),
-      devRow("money","💰 Money"),
       devRow("equipShards","🔧 Gear Shards"),
       devRow("dungeonPass","🎟️ Dungeon Pass"),
       devRow("food","🍖 Food"),

@@ -110,6 +110,7 @@ function QuestsScreen({onBack}){
           );
         })
       ),
+      React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}},
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflowY:"auto"}},
         questTab==="daily"?React.createElement(DailyTabContent,{setCurrencies,questState,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions,setRewardPopup}):
         batch?React.createElement(React.Fragment,null,
@@ -178,10 +179,11 @@ function QuestsScreen({onBack}){
           React.createElement("div",{style:{fontSize:40}},"🏆"),
           React.createElement("div",{style:{fontSize:14,fontWeight:600}},"All quests complete!"),
         )
+      ),
+      React.createElement("div",{style:{display:"flex",justifyContent:"center",padding:"16px 0 28px",flexShrink:0}},
+        React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},"✕")
       )
-    ),
-    React.createElement("div",{style:{display:"flex",justifyContent:"center",padding:"16px 0 28px",flexShrink:0}},
-      React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},"✕")
+      )
     )
   );
 }

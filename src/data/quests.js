@@ -134,7 +134,7 @@ export const REWARD_DESC={
   mysteriousOre:"Used to unlock cosmetic skins for your Creatures.",
   deluxeOre:"Used to unlock rare and epic skins for your Creatures.",
   candy:"Used to unlock Skins.",
-  ancientFertilizer:"Used to upgrade your Main Field, boosting its Food/Money/Gear Shard rates.",
+  ancientFertilizer:"Used to upgrade your Main Field, boosting its Food/Gear Shard rates.",
 };
 
 export const DAILY_REWARDS=[

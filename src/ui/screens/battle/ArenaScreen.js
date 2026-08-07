@@ -15,10 +15,20 @@ import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import { DEV_MODE } from "../../../config.js";
 
 // Arena tab id -> creature type it restricts deployment to. "ice" is the arena tab id
 // for the Water-type arena (ARENA_TABS labels it "Water" but keeps the legacy id).
 const ARENA_TAB_TYPE={fire:"Fire",nature:"Nature",earth:"Earth",electric:"Electric",ice:"Water",light:"Light",dark:"Dark"};
+const ARENA_MAX_LEVEL=50;
+const ARENA_STAGES_PER_LEVEL=10;
+// Arena has ARENA_MAX_LEVEL(50) x ARENA_STAGES_PER_LEVEL(10) = 500 stages total,
+// matching MAX_LEVEL in core/creatures.js -- stage 1 of level 1 is enemy level 1,
+// stage 10 of level 50 is enemy level 500.
+function arenaEnemyLevel(arenaLevel,stageNum){
+  return Math.min(500,Math.max(1,(arenaLevel-1)*ARENA_STAGES_PER_LEVEL+(stageNum||1)));
+}
+const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{candy:5},5:{eggs:5},6:{mythicalFlairBanana:1},7:{deluxeOre:1},8:{candy:5},9:{ancientFlairBanana:1},10:{legendaryEggs:1}};
 
 function ArenaScreen({onBack,onFight,onViewCreature}){
   const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards } = useGame();
@@ -184,7 +194,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     if(arenaRafRef.current){cancelAnimationFrame(arenaRafRef.current);arenaRafRef.current=null;}
   }
   function initArenaBattle(playerGrid,enemyGrid){
-    return makeArenaBattle(playerGrid,enemyGrid,owned,level,aMoveAnimRef.current,equipmentLevels,equipmentAscensions);
+    return makeArenaBattle(playerGrid,enemyGrid,owned,level,aMoveAnimRef.current,equipmentLevels,equipmentAscensions,null,arenaEnemyLevel(level,stage));
   }
   function startArenaRenderLoop(){
     if(arenaRafRef.current)cancelAnimationFrame(arenaRafRef.current);
@@ -256,20 +266,24 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     const anyP=s.playerUnits.some(u=>u.hp>0);
     const anyE=s.enemyUnits.some(u=>u.hp>0);
     if(!anyE){
-      stopArenaLoops();
-      if(isBoss){setArenaLevels(p=>({...p,[arenaTab]:(p[arenaTab]||1)+1}));setArenaProgress(p=>({...p,[arenaTab]:1}));}
-      else setArenaProgress(p=>({...p,[arenaTab]:(p[arenaTab]||1)+1}));
-      const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{candy:5},5:{eggs:5},6:{mythicalFlairBanana:1},7:{deluxeOre:1},8:{candy:5},9:{ancientFlairBanana:1},10:{legendaryEggs:1}};
-      wonStageRef.current=stage;
-      const stageReward=ARENA_STAGE_REWARDS[stage]||{eggs:1};
-      applyRewards(setCurrencies,stageReward);
-      onFight&&onFight();
-      setTimeout(()=>setBattleOutcome("won"),600);
+      winStage();
     } else if(!anyP){
       stopArenaLoops();
       onFight&&onFight();
       setTimeout(()=>setBattleOutcome("lost"),600);
     }
+  }
+  /** Wins the current stage: advances progress/level and grants the stage reward.
+   * Shared by the normal "all enemies dead" tick outcome and the dev cheat button. */
+  function winStage(){
+    stopArenaLoops();
+    if(isBoss){setArenaLevels(p=>({...p,[arenaTab]:Math.min(ARENA_MAX_LEVEL,(p[arenaTab]||1)+1)}));setArenaProgress(p=>({...p,[arenaTab]:1}));}
+    else setArenaProgress(p=>({...p,[arenaTab]:(p[arenaTab]||1)+1}));
+    wonStageRef.current=stage;
+    const stageReward=ARENA_STAGE_REWARDS[stage]||{eggs:1};
+    applyRewards(setCurrencies,stageReward);
+    onFight&&onFight();
+    setTimeout(()=>setBattleOutcome("won"),600);
   }
   function restartFight(){
     stopArenaLoops();
@@ -343,7 +357,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?(isBoss?"Boss Defeated!":"Stage Clear!"):"Defeat!"),
       React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?(isBoss?"Boss stage "+stage+" complete!":"Stage "+stage+" complete!"):""),
-      won&&(()=>{const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{candy:5},5:{eggs:5},6:{mythicalFlairBanana:1},7:{deluxeOre:1},8:{candy:5},9:{ancientFlairBanana:1},10:{legendaryEggs:1}};const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
+      won&&(()=>{const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
       React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setPlanGrid({});setBattleSelectedUid(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
   }
@@ -354,8 +368,9 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+tabDef.label+" Arena — Stage "+stage+(isBoss?" (Boss)":""))
+          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+tabDef.label+" Arena — Stage "+stage+" · Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
         ),
+        DEV_MODE&&React.createElement("button",{onClick:winStage,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏆 Win (Dev)"),
         React.createElement("button",{onClick:restartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
         React.createElement("button",{onClick:cycleArenaSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},arenaBattleSpeed+"x ⚡")
       ),
@@ -452,6 +467,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         React.createElement("div",{style:{flex:1,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
         ),
+        DEV_MODE&&React.createElement("button",{onClick:winStage,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0,marginRight:8}},"🏆 Win (Dev)"),
         React.createElement("button",{
           onClick:deployedCount>0?fight:undefined,
           style:{background:deployedCount>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:deployedCount>0?"pointer":"default"}
@@ -516,7 +532,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 React.createElement(CreatureIcon,{def,size:28}),
                 React.createElement("div",null,
                   React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
-                  React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+" · Lv."+level+" · Enemy")
+                  React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+" · Lv."+arenaEnemyLevel(level,stage)+" · Enemy")
                 )
               ),
               !arenaEnemyMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
@@ -698,7 +714,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
             },
               React.createElement("div",{style:{flex:1,minWidth:0}},
                 React.createElement("div",{style:{fontSize:11,fontWeight:700,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#aaa",marginBottom:3}},
-                  isPast?"COMPLETE":"Stage "+stageNum
+                  (isPast?"COMPLETE":"Stage "+stageNum)+" · Lv."+arenaEnemyLevel(level,stageNum)
                 ),
                 React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center",opacity:isPast?0.3:1,overflow:"hidden"}},
                   enemies.map((e,ei)=>React.createElement("span",{key:ei,style:{fontSize:22,lineHeight:1,flexShrink:0}},e))

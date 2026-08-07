@@ -17,7 +17,8 @@ function ScreenHeader({ title, onBack, right, edgeToEdge = true }) {
       display: "flex", alignItems: "center", gap: 12,
       background: "#fff", borderBottom: "1px solid #e0e0e0",
       margin: edgeToEdge ? "0 -16px 12px" : "0 0 12px",
-      padding: "16px 16px 12px", flexShrink: 0
+      padding: "16px 16px 12px", flexShrink: 0,
+      position: "sticky", top: 0, zIndex: 5
     }
   },
     onBack && React.createElement("button", {

@@ -30,7 +30,7 @@ const TABS = [
   { id: "play", icon: "ti-sword", label: "Play" },
   { id: "farm", icon: "ti-plant", label: "Farm" },
   { id: "equipment", icon: "ti-tool", label: "Equipment" },
-  { id: "store", icon: "ti-shopping-cart", label: "Store" },
+  // { id: "store", icon: "ti-shopping-cart", label: "Store" }, // hidden for now, re-add later
 ];
 
 const CARD_BASE = {

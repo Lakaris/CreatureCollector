@@ -1,7 +1,6 @@
 // Farm tuning: plot costs, crop definitions, and per-level idle field rates.
 // Rate arrays are indexed by field level.
 
-export const FARM_PLOT_COSTS=[0,100,250,500,1000,2000]; // index = plot number (0-based), cost to unlock that plot
 export const PLOT_GROW_MS=12*3600000; // 12 hours
 export const PLOT_CROPS=[
   {key:"food",        label:"Food",            emoji:"🍖", yield:10, upgradeEvery:1},
@@ -31,9 +30,6 @@ const FIELD_MAX_LEVEL = 100;
 export const FIELD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
   l === 0 ? 0 : Math.round(8.2 * Math.pow(l, 1.72))
 ); // food per hour at each level (index=level)
-export const FIELD_MONEY_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
-  l === 0 ? 0 : Math.round(2.5 * FIELD_RATES[l])
-); // money per hour at each level (index=level)
 export const FIELD_SHARD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
   l === 0 ? 0 : Math.round(20 + FIELD_RATES[l] * 0.5)
 ); // equipment shards per hour at each level (index=level)

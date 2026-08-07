@@ -77,8 +77,13 @@ function QuestsScreen({onBack}){
     );
   }
 
+  const questTabDef=QUEST_TABS.find(t=>t.id===questTab);
+  const headerTitle=questTab==="daily"?"📅 Daily Missions":(questTabDef?.emoji+" "+questTabDef?.label+" Quests");
   return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
     questRewardPopupEl,
+    React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid #e0e0e0",flexShrink:0,background:"#fff"}},
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111"}},headerTitle)
+    ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
       React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,alignSelf:"stretch",overflowY:"auto"}},
         QUEST_TABS.map(t=>{
@@ -108,9 +113,6 @@ function QuestsScreen({onBack}){
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflowY:"auto"}},
         questTab==="daily"?React.createElement(DailyTabContent,{setCurrencies,questState,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions,setRewardPopup}):
         batch?React.createElement(React.Fragment,null,
-          React.createElement("div",{style:{padding:"14px 14px 8px",borderBottom:"1px solid #f0f0f0",flexShrink:0}},
-            React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111"}},QUEST_TABS.find(t=>t.id===questTab)?.emoji+" "+QUEST_TABS.find(t=>t.id===questTab)?.label+" Quests")
-          ),
           React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10}},
             React.createElement("div",{style:{padding:"4px 0 0"}},
               React.createElement("div",{style:{fontSize:11,color:"#7c3aed",fontWeight:600,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}},"Completion Reward"),

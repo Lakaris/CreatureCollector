@@ -658,7 +658,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
-      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🏟️ Arena")
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,flex:1}},tabDef.emoji+" "+tabDef.label+" Arena"),
+      React.createElement("div",{style:{background:"#534AB7",color:"#fff",borderRadius:20,padding:"3px 14px",fontSize:13,fontWeight:700,flexShrink:0}},"Level "+level)
     ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
       React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,justifyContent:"space-evenly"}},
@@ -672,11 +673,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         }},React.createElement("span",{style:{fontSize:20}},t.emoji),t.label))
       ),
       React.createElement("div",{style:{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:12}},
-        React.createElement("div",{style:{textAlign:"center",paddingTop:4,marginBottom:4}},
-          React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111"}},tabDef.emoji+" "+tabDef.label+" Arena"),
-          React.createElement("div",{style:{display:"inline-block",background:"#534AB7",color:"#fff",borderRadius:20,padding:"3px 14px",fontSize:13,fontWeight:700,marginTop:4}},"Level "+level)
-        ),
-        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:5}},
           Array.from({length:10},(_,i)=>{
             const stageNum=i+1;
             const isPast=stageNum<stage;
@@ -690,8 +687,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
               key:i,
               onClick:isCurrent?()=>setPlanning(true):undefined,
               style:{
-                display:"flex",alignItems:"center",gap:12,
-                padding:"12px 14px",borderRadius:14,
+                display:"flex",alignItems:"center",gap:12,flex:1,
+                padding:"0 14px",borderRadius:12,
                 background:bg,border:"2px solid "+border,
                 opacity:isFutureStage?0.45:1,
                 cursor:isCurrent?"pointer":"default",
@@ -699,12 +696,12 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 boxShadow:isCurrent?"0 2px 12px rgba(83,74,183,0.15)":"none",
               }
             },
-              React.createElement("div",{style:{flex:1}},
+              React.createElement("div",{style:{flex:1,minWidth:0}},
                 React.createElement("div",{style:{fontSize:11,fontWeight:700,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#aaa",marginBottom:3}},
                   isPast?"COMPLETE":"Stage "+stageNum
                 ),
-                React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center",opacity:isPast?0.3:1}},
-                  enemies.map((e,ei)=>React.createElement("span",{key:ei,style:{fontSize:22,lineHeight:1}},e))
+                React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center",opacity:isPast?0.3:1,overflow:"hidden"}},
+                  enemies.map((e,ei)=>React.createElement("span",{key:ei,style:{fontSize:22,lineHeight:1,flexShrink:0}},e))
                 )
               ),
               (()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[i];return React.createElement("div",{onClick:!isPast?(e=>{e.stopPropagation();setRewardPopup(i);}):undefined,style:{flexShrink:0,textAlign:"center",cursor:isPast?"default":"pointer",opacity:isPast?0.35:1}},

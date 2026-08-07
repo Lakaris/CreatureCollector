@@ -90,9 +90,6 @@ function DailyTabContent({setRewardPopup}){
     );
   }
   return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflowY:"auto"}},
-    React.createElement("div",{style:{padding:"14px 14px 8px",borderBottom:"1px solid #f0f0f0",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111"}},"📅 Daily Missions")
-    ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10}},
       React.createElement("div",{style:{padding:"4px 0 0"}},
         React.createElement("div",{style:{fontSize:11,color:"#7c3aed",fontWeight:600,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}},"Completion Reward"),

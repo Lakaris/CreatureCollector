@@ -16,9 +16,7 @@
 // GameProvider for the full list of what's persisted.
 
 import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "../react.js";
-import { CREATURES } from "../data/creatures.js";
 import { DUNGEON_BOSSES, ARENA_TABS } from "../data/bosses.js";
-import { makeOwnedCreature } from "../core/creatures.js";
 import { isPastDailyHour } from "../core/dates.js";
 
 const GameContext = createContext(null);
@@ -74,6 +72,17 @@ export function GameProvider({ children }) {
   const [dexOverlay, setDexOverlay] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
+  // True for the stretch right after the tutorial's intro battle, once the player
+  // lands back on Home but before they've "graduated" -- hides a handful of Home
+  // features and locks Hatch/Equipment so there's less to get lost in. Cleared by
+  // Skip (which fast-forwards past the whole tutorial) alongside tutorialSeen.
+  const [tutorialRestricted, setTutorialRestricted] = useState(() => initialSave?.tutorialRestricted ?? false);
+  // Which step of the post-battle guided walkthrough the player's on, while
+  // tutorialRestricted is true: "collection" (arrow at the starter's card) ->
+  // "slot" (arrow at Slot 1) -> "item" (arrow at the Iron Band) -> null (done,
+  // clears alongside tutorialRestricted).
+  const [tutorialStep, setTutorialStep] = useState(() => initialSave?.tutorialStep ?? null);
   const [harvestPopup, setHarvestPopup] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [devTimeOffset, setDevTimeOffset] = useState(0);
@@ -88,11 +97,7 @@ export function GameProvider({ children }) {
 
   // ── Currencies + collection ──────────────────────────────────────────────
   const [currencies, setCurrencies] = useState(() => ({ ...INITIAL_CURRENCIES, ...(initialSave?.currencies || {}) }));
-  const [owned, setOwned] = useState(() =>
-    initialSave?.owned ?? Object.fromEntries(
-      CREATURES.filter((c) => !c.evolutionOf).map((c) => [c.id, makeOwnedCreature(c)])
-    )
-  );
+  const [owned, setOwned] = useState(() => initialSave?.owned ?? {});
   const [unlockedSkins, setUnlockedSkins] = useState(() => initialSave?.unlockedSkins ?? []);
   const [skinShards, setSkinShards] = useState(() => initialSave?.skinShards ?? 0);
   // Every creature id ever owned, including pre-evolution forms that `owned`
@@ -234,6 +239,7 @@ export function GameProvider({ children }) {
   const persistedRef = useRef(null);
   persistedRef.current = {
     v: SAVE_VERSION,
+    tutorialSeen, tutorialRestricted, tutorialStep,
     username, profileEmoji, profileAvatarId, profileFrame, profileTitle,
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
@@ -300,6 +306,9 @@ export function GameProvider({ children }) {
     profileAvatarId, setProfileAvatarId,
     profileFrame, setProfileFrame, profileTitle, setProfileTitle,
     settingsOpen, setSettingsOpen,
+    tutorialSeen, setTutorialSeen,
+    tutorialRestricted, setTutorialRestricted,
+    tutorialStep, setTutorialStep,
     harvestPopup, setHarvestPopup, revealedCount, setRevealedCount,
     // currencies + collection
     currencies, setCurrencies, owned, setOwned,

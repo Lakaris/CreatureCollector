@@ -10,9 +10,10 @@ import AscStars from "../../ui/components/AscStars.js";
 import CreatureDetail from "../../ui/screens/CreatureDetail/index.js";
 import DexScreen from "../../ui/screens/DexScreen.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
+import NavBar from "../../ui/components/NavBar.js";
 
 function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites } = useGame();
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, tutorialStep, setTutorialStep, tutorialRestricted, tab, setTab } = useGame();
   const [selected,setSelected]=useState(null);
   useEffect(()=>{if(deepLinkId){setSelected(deepLinkId);onDeepLinkConsumed&&onDeepLinkConsumed();}},[deepLinkId]);
   const [showDex,setShowDex]=useState(false);
@@ -80,7 +81,8 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
       equipmentLevels,setEquipmentLevels,
       equipmentAscensions,setEquipmentAscensions,equipmentCopies,setEquipmentCopies,
       equipFavorites,setEquipFavorites
-    })
+    }),
+    React.createElement(NavBar,{tab,setTab,style:{position:"fixed",bottom:0,left:0,right:0,background:"rgba(245,245,245,0.95)",backdropFilter:"blur(8px)"}})
   );
 
   return React.createElement("div",null,
@@ -95,7 +97,7 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
         style:{width:"100%",padding:"8px 10px 8px 32px",border:"0.5px solid rgba(0,0,0,0.15)",borderRadius:8,fontSize:13,outline:"none",background:"#fff"}
       })
     ),
-    React.createElement("div",{style:{marginBottom:10}},
+    !tutorialRestricted&&React.createElement("div",{style:{marginBottom:10}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Rarity"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
@@ -134,10 +136,12 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
           React.createElement("i",{className:"ti ti-egg",style:{fontSize:40,display:"block",marginBottom:8,opacity:.3}}),
           React.createElement("p",{style:{fontSize:13}},(activeRarities.size===0&&activeTypes.size===0&&!search.trim())?"No creatures yet — hatch some eggs!":"No creatures match your filters")
         )
-      :React.createElement("div",{className:"creature-grid"},
-          filtered.map(({owned:o,def:d})=>{
+      :React.createElement("div",{className:"creature-grid",style:tutorialStep==="collection"?{marginTop:34}:undefined},
+          filtered.map(({owned:o,def:d},idx)=>{
             const displayEmoji=getDisplayEmoji(d,o,unlockedSkins);
-            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);},style:{position:"relative",paddingTop:30}},
+            const showPointer=tutorialStep==="collection"&&idx===0;
+            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");},style:{position:"relative",paddingTop:30}},
+              showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
               d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),
               d.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[d.role].emoji),

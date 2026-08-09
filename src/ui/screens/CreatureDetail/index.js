@@ -20,6 +20,15 @@ import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 
+// Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
+// guided walkthrough points the player at equipping.
+const TUTORIAL_ITEM_ID="com_hp_atk";
+
+/** Equipped-slot stat bonuses, one stat per line (unlike equipBonusStr's "·"-joined string). */
+function equipBonusLines(bonuses){
+  return Object.entries(bonuses).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]);
+}
+
 /** Percent-of-base gain for a stat bonus (equip effect / flair / ability). Speed and Haste are
  * allowed to be fractional (e.g. 20% of a base-1 stat is 0.2, not rounded up to 1); every other
  * stat stays a whole number since they're discrete counts in the UI. */
@@ -39,7 +48,12 @@ function flairStatGain(stat,base,buffs){
 }
 
 function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay } = useGame();
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep } = useGame();
+  // "slot"/"item" cover the whole guided equip flow (creature page -> slot
+  // picker); "item" narrows further to the picker itself, where only the
+  // Iron Band tile should respond so the pointer arrow isn't a red herring.
+  const equipTutorialLock = tutorialRestricted && (tutorialStep === "slot" || tutorialStep === "item");
+  const pickerTutorialLock = tutorialRestricted && tutorialStep === "item";
   const [notify,setNotify]=useState(null);
   const [lastLeveledStat,setLastLeveledStat]=useState(null);
   const [ascPopup,setAscPopup]=useState(null);
@@ -400,7 +414,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           )
         )
       ),
-      React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+      React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},backDisabled:pickerTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
         onClick:()=>setDexOverlay(def.id),
         style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
       },"Evolutions")}),
@@ -433,13 +447,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             const rarCfg=item?EQUIP_RARITY_CONFIG[item.rarity]:null;
             const isPickingThis=equipSlotPicker===slotIdx;
             const slotKey="slot-"+slotIdx;
-            const slotPressStart=e=>{e.preventDefault();if(item)setHoldEquip(slotKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);if(item)setEquipDetailPage(itemId);},500);};
+            const slotPressStart=e=>{if(pickerTutorialLock)return;e.preventDefault();if(item)setHoldEquip(slotKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);if(item)setEquipDetailPage(itemId);},500);};
             const slotPressEnd=()=>{clearTimeout(longPressTimer.current);setHoldEquip(null);};
             return React.createElement("div",{key:slotIdx,
-              onClick:()=>{if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);},
+              onClick:()=>{if(pickerTutorialLock)return;if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);},
               onMouseDown:slotPressStart,onMouseUp:slotPressEnd,onMouseLeave:slotPressEnd,
               onTouchStart:slotPressStart,onTouchEnd:slotPressEnd,onTouchCancel:slotPressEnd,
-              style:{flex:1,height:128,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:isPickingThis?"#e0f7fa":rarCfg?rarCfg.bg:"#f5f5f5",border:"2px solid "+(isPickingThis?"#00acc1":rarCfg?rarCfg.color:"#e0e0e0"),borderRadius:10,padding:"8px 6px",cursor:"pointer",textAlign:"center",userSelect:"none",boxSizing:"border-box"}},
+              style:{flex:1,height:128,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:isPickingThis?"#e0f7fa":rarCfg?rarCfg.bg:"#f5f5f5",border:"2px solid "+(isPickingThis?"#00acc1":rarCfg?rarCfg.color:"#e0e0e0"),borderRadius:10,padding:"8px 6px",cursor:pickerTutorialLock?"not-allowed":"pointer",textAlign:"center",userSelect:"none",boxSizing:"border-box",opacity:pickerTutorialLock&&!isPickingThis?0.5:1}},
               item
                 ? React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}},
                     React.createElement("div",{style:{position:"absolute",top:0,left:2,fontSize:12,fontWeight:700,color:lvl>=EQUIP_MAX_LEVEL?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=EQUIP_MAX_LEVEL?"MAX":"Lv "+lvl),
@@ -451,7 +465,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
                       )
                     ),
                     React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#000",marginTop:2}},item.name),
-                    React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:600}},equipBonusStr(bonuses))
+                    React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:600}},equipBonusLines(bonuses).map((line,i)=>React.createElement("div",{key:i},line)))
                   )
                 : React.createElement("div",{style:{fontSize:11,color:"#aaa"}},
                     React.createElement("div",{style:{fontSize:22,marginBottom:4}},"＋"),
@@ -464,9 +478,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
       React.createElement("div",{className:"card"},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}},
           React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#666"}},equipSlotPicker!==null?"Slot "+(equipSlotPicker+1)+" — choose gear:":"All Gear"),
-          React.createElement("button",{onClick:()=>setEquipFiltersOpen(p=>!p),style:{fontSize:11,color:"#534AB7",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}},equipFiltersOpen?"Hide Filters ▲":"Filter ▼")
+          React.createElement("button",{disabled:pickerTutorialLock,onClick:()=>{if(pickerTutorialLock)return;setEquipFiltersOpen(p=>!p);},style:{fontSize:11,color:pickerTutorialLock?"#bbb":"#534AB7",fontWeight:600,background:"none",border:"none",cursor:pickerTutorialLock?"not-allowed":"pointer",padding:"2px 4px"}},equipFiltersOpen?"Hide Filters ▲":"Filter ▼")
         ),
-        (()=>{
+        !pickerTutorialLock&&(()=>{
           const anyReady=EQUIPMENT_DEFS.some(item=>{
             const asc=equipmentAscensions[item.id]||0;
             const copies=equipmentCopies[item.id]||0;
@@ -533,7 +547,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             React.createElement("button",{className:"filter-chip"+(equipFilterHideIncompatible?" active":""),onClick:()=>setEquipFilterHideIncompatible(p=>!p)},"Hide Incompatible")
           )
         ),
-        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:12}},
+        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:tutorialStep==="item"?42:12}},
           (()=>{
             const RARITY_RANK={legendary:3,epic:2,rare:1,common:0};
             return[...EQUIPMENT_DEFS]
@@ -575,8 +589,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             const equippedByPet=owned&&Object.values(owned).find(p=>p.id!==ownedData.id&&(p.equipped||[]).includes(item.id));
             const equippedByDef=equippedByPet?CREATURE_MAP[equippedByPet.id]:null;
             const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role);
+            // During the guided "choose gear" step, only the Iron Band tile
+            // the pointer arrow highlights should respond to a tap.
+            const tutorialBlocked=pickerTutorialLock&&item.id!==TUTORIAL_ITEM_ID;
             const onTapClick=equipSlotPicker!==null
               ? ()=>{if(didLongPress.current){didLongPress.current=false;return;}
+                  if(tutorialBlocked)return;
                   if(disabled&&!isEquippedHere)return;
                   if(isEquippedHere){setSlot(equipSlotPicker,null);}
                   else if(isEquippedOtherSlot){
@@ -585,25 +603,28 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
                     setOwned(prev=>{const pets={...prev};const pet={...pets[ownedData.id]};const s=[...(pet.equipped||[null,null,null,null])];const tmp=s[equipSlotPicker];s[equipSlotPicker]=s[otherSlot];s[otherSlot]=tmp;pet.equipped=s;pets[ownedData.id]=pet;return pets;});
                   }
                   else{setSlot(equipSlotPicker,item.id);}
+                  if(tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID){setTutorialStep("farm");}
                 }
               : ()=>{if(didLongPress.current){didLongPress.current=false;}};
             const cardKey="card-"+item.id;
-            const onPressStart=e=>{e.preventDefault();setHoldEquip(cardKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);setEquipDetailPage(item.id);},500);};
+            const onPressStart=e=>{if(tutorialBlocked)return;e.preventDefault();setHoldEquip(cardKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);setEquipDetailPage(item.id);},500);};
             const onPressEnd=()=>{clearTimeout(longPressTimer.current);setHoldEquip(null);};
             const highlight=isEquippedSlot0||isEquippedSlot1;
             const canAscendItem=asc<EQUIP_MAX_ASCENSION&&copies>=EQUIP_ASC_COSTS[asc];
+            const showItemPointer=tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID;
             return React.createElement("div",{key:item.id,
               onClick:onTapClick,
               onMouseDown:onPressStart,onMouseUp:onPressEnd,onMouseLeave:onPressEnd,
               onTouchStart:onPressStart,onTouchEnd:onPressEnd,onTouchCancel:onPressEnd,
-              style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled)?"pointer":"default",width:"calc(50% - 4px)",boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
+              style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:tutorialBlocked?0.35:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled&&!tutorialBlocked)?"pointer":"default",width:"calc(50% - 4px)",boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
+              showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=EQUIP_MAX_LEVEL?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=EQUIP_MAX_LEVEL?"MAX":"Lv "+lvl),
                 (item.element||item.role)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
                   [item.element,item.role].filter(Boolean).join(" · ")+" exclusive"
                 )
               ),
-              React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
+              !tutorialBlocked&&React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
               asc>0&&React.createElement("div",{style:{position:"absolute",top:4,left:0,right:0,textAlign:"center",fontSize:10,fontWeight:700,color:"#f59e0b",lineHeight:"14px",pointerEvents:"none"}},asc>=EQUIP_MAX_ASCENSION?"✦".repeat(10):(asc<=5?"★".repeat(asc):"★".repeat(5)+"★".repeat(asc-5))),
               React.createElement("div",{style:{position:"relative",display:"inline-block",marginTop:4}},
                 React.createElement("span",{style:{fontSize:22}},item.emoji),
@@ -637,7 +658,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     statInfoPopupEl,
     abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
-    React.createElement(ScreenHeader,{title:def.name,onBack,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+    React.createElement(ScreenHeader,{title:def.name,onBack,backDisabled:equipTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
       onClick:()=>setDexOverlay(def.id),
       style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
     },"Evolutions")}),
@@ -740,11 +761,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           const cSlotKey="cslot-"+slotIdx;
           const cSlotPressStart=e=>{e.preventDefault();if(item)setHoldEquip(cSlotKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);if(item){setEquipDetailPage(itemId);setShowEquipPage(true);}},500);};
           const cSlotPressEnd=()=>{clearTimeout(longPressTimer.current);setHoldEquip(null);};
+          const showSlotPointer=tutorialStep==="slot"&&slotIdx===0;
           return React.createElement("div",{key:slotIdx,
-            onClick:e=>{e.stopPropagation();if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);setShowEquipPage(true);},
+            onClick:e=>{e.stopPropagation();if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);setShowEquipPage(true);if(tutorialStep==="slot"&&slotIdx===0)setTutorialStep("item");},
             onMouseDown:cSlotPressStart,onMouseUp:cSlotPressEnd,onMouseLeave:cSlotPressEnd,
             onTouchStart:cSlotPressStart,onTouchEnd:cSlotPressEnd,onTouchCancel:cSlotPressEnd,
-            style:{flex:1,background:item?"#f7f7ff":"#f5f5f5",border:"1.5px solid "+(item?"#d0ccf7":"#e0e0e0"),borderRadius:10,padding:"8px 10px",textAlign:"center",cursor:"pointer",userSelect:"none"}},
+            style:{position:"relative",flex:1,background:item?"#f7f7ff":"#f5f5f5",border:"1.5px solid "+(item?"#d0ccf7":"#e0e0e0"),borderRadius:10,padding:"8px 10px",textAlign:"center",cursor:"pointer",userSelect:"none"}},
+            showSlotPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
             item
               ? React.createElement("div",null,
                   React.createElement("div",{style:{position:"relative",display:"inline-block"}},
@@ -756,7 +779,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
                   ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#000",marginTop:2}},item.name),
                   rarCfg&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:rarCfg.bg,borderRadius:4,padding:"1px 5px",display:"inline-block",marginBottom:1}},rarCfg.label),
-                  React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:600}},equipBonusStr(bonuses)),
+                  React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:600}},equipBonusLines(bonuses).map((line,i)=>React.createElement("div",{key:i},line))),
                   lvl>0&&React.createElement("div",{style:{fontSize:10,color:"#888"}},"Lv "+lvl)
                 )
               : React.createElement("div",{style:{fontSize:11,color:"#aaa",padding:"8px 0"}},
@@ -768,15 +791,20 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
       )
     ),
     React.createElement("div",{style:{display:"flex",gap:4,marginBottom:12,background:"#ebebeb",borderRadius:10,padding:4}},
-      tabs.map(t=>React.createElement("button",{
-        key:t.id,
-        onClick:()=>setTab(t.id),
-        style:{flex:1,padding:"7px 0",fontSize:13,fontWeight:600,border:"none",borderRadius:7,cursor:"pointer",
-          background:tab===t.id?"#fff":"transparent",
-          color:tab===t.id?"#534AB7":"#666",
-          boxShadow:tab===t.id?"0 1px 3px rgba(0,0,0,.12)":"none",
-          transition:"all .15s"}
-      },t.label))
+      tabs.map(t=>{
+        const tabLocked=equipTutorialLock&&t.id!=="levelup";
+        return React.createElement("button",{
+          key:t.id,
+          disabled:tabLocked,
+          onClick:()=>{if(tabLocked)return;setTab(t.id);},
+          style:{flex:1,padding:"7px 0",fontSize:13,fontWeight:600,border:"none",borderRadius:7,cursor:tabLocked?"not-allowed":"pointer",
+            background:tab===t.id?"#fff":"transparent",
+            color:tabLocked?"#bbb":(tab===t.id?"#534AB7":"#666"),
+            boxShadow:tab===t.id?"0 1px 3px rgba(0,0,0,.12)":"none",
+            opacity:tabLocked?0.6:1,
+            transition:"all .15s"}
+        },t.label);
+      })
     ),
     tab==="levelup"&&React.createElement(React.Fragment,null,
       React.createElement("div",{className:"card",style:{marginBottom:10}},

@@ -1,7 +1,10 @@
 /* Keyframes. The atk*/melee/boss/element ones drive battle FX. */
 @keyframes revealPop{from{opacity:0;transform:scale(.8) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes eggShake{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(7deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
 @keyframes fadeIn{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fadeInCentered{from{opacity:0;transform:translate(-50%,-50%) scale(.88) translateY(8px)}to{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}}
 @keyframes dupeFade{0%{opacity:0;transform:scale(.88)}25%{opacity:1;transform:scale(1)}100%{opacity:0.3;transform:scale(1)}}
+@keyframes pointerBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-10px)}}
 @keyframes holdRing{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 @keyframes statLevelUp{0%{background:#e8f5e9;outline-color:#2e7d32;color:#2e7d32}80%{background:#e8f5e9;outline-color:#2e7d32;color:#2e7d32}100%{background:transparent;outline-color:transparent;color:inherit}}
 @keyframes atkImpact{0%{opacity:1;transform:translate(-50%,-50%) scale(0.3)}40%{opacity:0.9;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}

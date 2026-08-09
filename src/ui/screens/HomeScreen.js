@@ -12,7 +12,7 @@ import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js"
 import { getDepthReward, nextRewardDepth, formatLabyrinthReward } from "../../core/labyrinth.js";
 
 function HomeScreen(){
-  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth } = useGame();
+  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, tutorialStep } = useGame();
   const [picking,setPicking]=React.useState(false);
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
@@ -62,15 +62,15 @@ function HomeScreen(){
 
   return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column"}},
     React.createElement(ScreenHeader,{title:React.createElement("button",{
-      onClick:()=>setSettingsOpen(true),
-      style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
+      onClick:()=>{if(!tutorialRestricted)setSettingsOpen(true);},
+      style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1,display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
     },"⚙️"),right:React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})}),
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
     bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
     aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
     React.createElement("button",{
-      onClick:()=>setShowQuests(true),
-      style:{position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+      onClick:()=>{if(!tutorialRestricted)setShowQuests(true);},
+      style:{position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },
       "📋",
       React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Quests"),
@@ -80,18 +80,18 @@ function HomeScreen(){
     title&&React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",marginTop:2}},title),
     def&&React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginTop:title?0:4}},def.name),
     def&&React.createElement("div",{style:{fontSize:13,color:"#888"}},def.type),
-    React.createElement("button",{
+    !tutorialRestricted&&React.createElement("button",{
       onClick:()=>setPicking(true),
       style:{marginTop:16,padding:"6px 18px",borderRadius:20,border:"1.5px solid #d0d0d0",background:"#f5f5f5",fontSize:13,fontWeight:600,color:"#555",cursor:"pointer"}
     },"Change"),
-    React.createElement("button",{
+    !tutorialRestricted&&React.createElement("button",{
       onClick:()=>setShowBattlepass(true),
       style:{position:"absolute",right:0,top:"calc(50% - 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
       "🎫",
       React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Battle Pass")
     ),
-    React.createElement("button",{
+    !tutorialRestricted&&React.createElement("button",{
       onClick:()=>setShowDaily(true),
       style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
@@ -99,7 +99,7 @@ function HomeScreen(){
       React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Daily"),
       new Date().toDateString()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
-    (()=>{
+    !tutorialRestricted&&(()=>{
       const depth=labyrinthDepth||1;
       const reward=getDepthReward(depth);
       const onCurrent=Object.keys(reward).length>0;
@@ -112,14 +112,18 @@ function HomeScreen(){
         React.createElement("div",{style:{whiteSpace:"nowrap"}},rewardEmoji)
       );
     })(),
-    React.createElement("button",{
+    !tutorialRestricted&&React.createElement("button",{
       onClick:()=>{setGameMode("labyrinth");setTab("play");},
       style:{position:"fixed",left:"calc(75vw - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}
     },
       "🌀",
       React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#4f46e5"}},"Descend"),
       React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#6366f1"}},"Floor "+(labyrinthDepth||1))
-    )
+    ),
+    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:150,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6}},
+      "Let's equip "+(def?def.name:"your creature")+" with the Iron Band you just got."
+    ),
+    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:"41.667vw",bottom:80,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
     )
   );
 }

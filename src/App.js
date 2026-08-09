@@ -9,6 +9,8 @@ import { DEV_MODE } from "./config.js";
 import { useGame } from "./state/GameContext.js";
 
 import CreatureOverlayHost from "./ui/components/CreatureOverlayHost.js";
+import TutorialOverlay from "./ui/components/TutorialOverlay.js";
+import NavBar from "./ui/components/NavBar.js";
 import CollectionScreen from "./ui/screens/CollectionScreen.js";
 import GachaScreen from "./ui/screens/GachaScreen.js";
 import DevPanel from "./ui/screens/DevPanel.js";
@@ -22,16 +24,6 @@ import DungeonScreen from "./ui/screens/battle/DungeonScreen.js";
 import DailyBossScreen from "./ui/screens/battle/DailyBossScreen.js";
 import ArenaScreen from "./ui/screens/battle/ArenaScreen.js";
 import LabyrinthScreen from "./ui/screens/battle/LabyrinthScreen.js";
-
-const TABS = [
-  { id: "home", icon: "ti-home", label: "Home" },
-  { id: "hatch", icon: "ti-egg", label: "Hatch" },
-  { id: "collection", icon: "ti-layout-grid", label: "Collection" },
-  { id: "play", icon: "ti-sword", label: "Play" },
-  { id: "farm", icon: "ti-plant", label: "Farm" },
-  { id: "equipment", icon: "ti-tool", label: "Equipment" },
-  // { id: "store", icon: "ti-shopping-cart", label: "Store" }, // hidden for now, re-add later
-];
 
 const CARD_BASE = {
   background: "#fff",
@@ -61,28 +53,6 @@ function nextNoon(now) {
   d.setDate(d.getDate() + 1);
   d.setHours(12, 0, 0, 0);
   return d;
-}
-
-function NavBar({ tab, setTab, onNavigate, style }) {
-  return React.createElement(
-    "div",
-    { className: "nav", style },
-    TABS.map((t) =>
-      React.createElement(
-        "button",
-        {
-          key: t.id,
-          className: "nav-btn" + (tab === t.id ? " active" : ""),
-          onClick: () => {
-            setTab(t.id);
-            if (onNavigate) onNavigate();
-          },
-        },
-        React.createElement("i", { className: "ti " + t.icon, "aria-hidden": "true" }),
-        t.label
-      )
-    )
-  );
 }
 
 /** The Daily Boss entry card, including its reward-availability state machine. */
@@ -208,10 +178,72 @@ function App() {
     setCreatureOverlay,
     setDungeonsCleared, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setPlotsGrown,
     settingsOpen, setSettingsOpen, labyrinthDepth,
+    tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep,
   } = useGame();
 
   const contentRef = React.useRef(null);
   const viewCreature = (id) => setCreatureOverlay(id);
+
+  // Home and Farm are the only tabs reachable while tutorialRestricted (every
+  // other nav button is locked, see NavBar), so this only needs wiring into
+  // those two branches below.
+  const restrictedSkipButton =
+    tutorialRestricted &&
+    React.createElement(
+      "button",
+      {
+        onClick: () => setTutorialRestricted(false),
+        style: {
+          position: "fixed",
+          top: 16,
+          right: 16,
+          zIndex: 50,
+          background: "rgba(255,255,255,0.9)",
+          border: "none",
+          borderRadius: 8,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+          color: "#888",
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: "pointer",
+          padding: "6px 10px",
+        },
+      },
+      "Skip tutorial"
+    );
+
+  // Shown once the Iron Band is equipped: the tutorial hands the player off
+  // to the Farm tab next, so this points at it regardless of which unlocked
+  // screen (Collection or its creature-detail overlay) they're currently on.
+  const farmPointer =
+    tutorialStep === "farm" &&
+    React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(
+        "div",
+        {
+          style: {
+            position: "fixed", left: 16, right: 16, bottom: 150,
+            background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
+            padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 60,
+          },
+        },
+        "Your new friend seems to have found something and is beckoning you to follow."
+      ),
+      React.createElement(
+        "div",
+        {
+          style: {
+            position: "fixed", left: "75vw", bottom: 80, transform: "translate(-50%,0)",
+            fontSize: 32, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite",
+            zIndex: 60, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+          },
+        },
+        "⬇️"
+      )
+    );
 
   // ── Settings: its own full-screen page, no bottom nav ─────────────────────
   if (settingsOpen)
@@ -295,7 +327,8 @@ function App() {
           { style: { position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,245,245,0.95)", backdropFilter: "blur(8px)" } },
           React.createElement(NavBar, { tab, setTab })
         ),
-      React.createElement(HarvestPopup)
+      React.createElement(HarvestPopup),
+      restrictedSkipButton
     );
 
   // ── Play menu ────────────────────────────────────────────────────────────
@@ -389,7 +422,10 @@ function App() {
         if (contentRef.current) contentRef.current.scrollTop = 0;
       },
     }),
-    React.createElement(CreatureOverlayHost)
+    React.createElement(CreatureOverlayHost),
+    !tutorialSeen && React.createElement(TutorialOverlay),
+    tutorialSeen && restrictedSkipButton,
+    tutorialSeen && farmPointer
   );
 }
 

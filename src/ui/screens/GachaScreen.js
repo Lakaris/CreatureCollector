@@ -5,9 +5,11 @@ import { useGame } from "../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
 import { BANNERS } from "../../data/banners.js";
+import { TYPE_EMOJI } from "../../data/types.js";
 import { makeOwnedCreature } from "../../core/creatures.js";
 import { rollGacha } from "../../core/gacha.js";
 import ScreenHeader, { CurrencyChip } from "../components/ScreenHeader.js";
+import CreatureAbilitySummary from "../components/CreatureAbilitySummary.js";
 
 function GachaScreen({onHatch}){
   const { owned, setOwned, currencies, setCurrencies, pity, setPity } = useGame();
@@ -17,6 +19,7 @@ function GachaScreen({onHatch}){
   const [showRates,setShowRates]=useState(false);
   const [bannerIdx,setBannerIdx]=useState(0);
   const [pendingHatch,setPendingHatch]=useState(null);
+  const [detailItem,setDetailItem]=useState(null);
   const banner=BANNERS[bannerIdx];
   const SINGLE=100,MULTI=900;
 
@@ -106,6 +109,7 @@ function GachaScreen({onHatch}){
       rs.forEach(({def})=>addCreature(def));
       setMultiResults(rs);
       setVisibleCount(0);
+      setDetailItem(null);
     }
   }
 
@@ -203,18 +207,19 @@ function GachaScreen({onHatch}){
           React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+(currencies[eggKey]||0).toLocaleString()),
           !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+currencies.gems.toLocaleString())
         ),
-        React.createElement("div",{style:{textAlign:"center",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}},
+        React.createElement("div",{style:{textAlign:"center",flex:1,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",overflowY:"auto"}},
           React.createElement("span",{style:{fontSize:96,display:"block",marginBottom:12,animation:"revealPop .4s cubic-bezier(.34,1.56,.64,1)"}},c.emoji),
           isNew&&React.createElement("span",{style:{display:"inline-block",fontSize:11,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"2px 10px",marginBottom:8,letterSpacing:".04em"}},"NEW"),
           React.createElement("span",{className:"badge "+RARITY_CONFIG[c.rarity].color,style:{display:"inline-block",marginBottom:10}},RARITY_CONFIG[c.rarity].label),
           React.createElement("div",{style:{fontSize:26,fontWeight:600,marginBottom:4,color:"#000"}},c.name),
-          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:isNew?0:20}},c.type),
-          !isNew&&React.createElement("div",{style:{width:220,marginTop:16}},
+          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:isNew?16:20}},(TYPE_EMOJI[c.type]||"")+" "+c.type),
+          !isNew&&React.createElement("div",{style:{width:220,marginBottom:16}},
             React.createElement("div",{style:{height:6,background:"#e0e0e0",borderRadius:3,overflow:"hidden",marginBottom:5}},
               React.createElement("div",{style:{height:"100%",width:shardPct+"%",background:shards>=c.shardsToAscend?"#378ADD":"#EF9F27",borderRadius:3,transition:"width .3s"}})
             ),
             React.createElement("div",{style:{fontSize:12,color:shards>=c.shardsToAscend?"#378ADD":"#555",fontWeight:shards>=c.shardsToAscend?700:400}},shards>=c.shardsToAscend?"Ready to ascend! ("+shards+" / "+c.shardsToAscend+")":shards+" / "+c.shardsToAscend+" shards to next ascension")
-          )
+          ),
+          React.createElement(CreatureAbilitySummary,{def:c})
         ),
         React.createElement("div",{style:{width:"100%",paddingBottom:8,display:"flex",flexDirection:"column",gap:10}},
           (()=>{
@@ -254,14 +259,17 @@ function GachaScreen({onHatch}){
       ),
       React.createElement("div",{className:"reveal-summary-grid"},
       React.createElement("div",{className:"multi-grid",style:{maxHeight:"none"}},
-        multiResults.map(({def:c,isNew,shards},i)=>{
+        multiResults.map((item,i)=>{
+          const {def:c,isNew,shards}=item;
           const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
           const visible=i<visibleCount;
-          return React.createElement("div",{key:i,className:"multi-item",style:{
+          const allRevealed=visibleCount>=multiResults.length;
+          return React.createElement("div",{key:i,className:"multi-item",onClick:()=>allRevealed&&visible&&setDetailItem(item),style:{
             position:"relative",
             opacity:visible?(isNew?1:0.45):0,
             animation:visible?"fadeIn .35s ease-out forwards":undefined,
-            transition:"opacity .1s"
+            transition:"opacity .1s",
+            cursor:allRevealed&&visible?"pointer":"default"
           }},
             visible&&isNew&&React.createElement("span",{style:{position:"absolute",top:4,right:4,fontSize:9,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"1px 5px",letterSpacing:".04em"}},"NEW"),
             React.createElement("span",{className:"me"},visible?c.emoji:""),
@@ -287,10 +295,31 @@ function GachaScreen({onHatch}){
               disabled:!canAfford(10),
               onClick:()=>{if(canAfford(10))doHatch(10);}
             },"Hatch Again x10 — "+costLabel(10)),
-            React.createElement("button",{className:"btn",style:{marginBottom:0,fontSize:15,padding:12,background:"#e0e0e0",color:"#333"},onClick:()=>setMultiResults(null)},"Collect All")
+            React.createElement("button",{className:"btn",style:{marginBottom:0,fontSize:15,padding:12,background:"#e0e0e0",color:"#333"},onClick:()=>{setMultiResults(null);setDetailItem(null);}},"Collect All")
           )
       )
-    )
+    ),
+    detailItem&&(()=>{
+      const c=detailItem.def;const isNew=detailItem.isNew;const shards=detailItem.shards;
+      const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
+      return React.createElement("div",{className:"modal-overlay",style:{zIndex:400},onClick:()=>setDetailItem(null)},
+        React.createElement("div",{className:"modal-box",style:{maxWidth:460,maxHeight:"85vh",overflowY:"auto"},onClick:e=>e.stopPropagation()},
+          React.createElement("span",{style:{fontSize:72,display:"block",marginBottom:8}},c.emoji),
+          isNew&&React.createElement("span",{style:{display:"inline-block",fontSize:11,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"2px 10px",marginBottom:8,letterSpacing:".04em"}},"NEW"),
+          React.createElement("span",{className:"badge "+RARITY_CONFIG[c.rarity].color,style:{display:"inline-block",marginBottom:10}},RARITY_CONFIG[c.rarity].label),
+          React.createElement("div",{style:{fontSize:22,fontWeight:600,marginBottom:4,color:"#000"}},c.name),
+          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:16}},(TYPE_EMOJI[c.type]||"")+" "+c.type),
+          !isNew&&React.createElement("div",{style:{width:"100%",marginBottom:16}},
+            React.createElement("div",{style:{height:6,background:"#e0e0e0",borderRadius:3,overflow:"hidden",marginBottom:5}},
+              React.createElement("div",{style:{height:"100%",width:shardPct+"%",background:shards>=c.shardsToAscend?"#378ADD":"#EF9F27",borderRadius:3,transition:"width .3s"}})
+            ),
+            React.createElement("div",{style:{fontSize:12,color:shards>=c.shardsToAscend?"#378ADD":"#555",fontWeight:shards>=c.shardsToAscend?700:400}},shards>=c.shardsToAscend?"Ready to ascend! ("+shards+" / "+c.shardsToAscend+")":shards+" / "+c.shardsToAscend+" shards to next ascension")
+          ),
+          React.createElement(CreatureAbilitySummary,{def:c,maxWidth:420}),
+          React.createElement("button",{className:"btn",style:{marginTop:16,marginBottom:0,fontSize:15,padding:12,background:"#e0e0e0",color:"#333",width:"100%"},onClick:()=>setDetailItem(null)},"Close")
+        )
+      );
+    })()
   );
 }
 

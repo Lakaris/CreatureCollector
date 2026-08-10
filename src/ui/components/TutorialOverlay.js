@@ -470,7 +470,7 @@ function TutorialOverlay() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             gap: 16,
             padding: "24px 24px 140px",
             overflowY: "auto",
@@ -487,7 +487,7 @@ function TutorialOverlay() {
         React.createElement(
           "div",
           { style: { marginTop: 12 } },
-          React.createElement(CreatureAbilitySummary, { def: pickedDef })
+          React.createElement(CreatureAbilitySummary, { def: pickedDef, flat: true })
         )
       ),
     phase === "reveal" &&
@@ -561,7 +561,7 @@ function TutorialOverlay() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-end",
+              justifyContent: "center",
               gap: 16,
               padding: "24px 24px 140px",
               overflowY: "auto",

@@ -9,15 +9,13 @@ import { formatDuration } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
-  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, tutorialRestricted, tutorialStep, setTutorialStep, labyrinthBestDepth } = useGame();
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, tutorialRestricted, tutorialStep, setTutorialStep, plotsUnlocked } = useGame();
   // The tutorial's field visit is scripted: storage always reads as full and
   // only Food/Gear Shards drop, so the guided harvest is guaranteed and
   // doesn't hand out melons/candy the player hasn't been introduced to yet.
   const harvestTutorialLock = tutorialRestricted && tutorialStep === "harvest";
-  // Plots stay locked until Floor 10's been cleared (bestDepth advances to
-  // 11 the moment Floor 10 is won).
-  const PLOTS_UNLOCK_BEST_DEPTH=11;
-  const plotsLocked=(labyrinthBestDepth||1)<PLOTS_UNLOCK_BEST_DEPTH;
+  // Plots stay locked until the "Plots" Progression-quest reward (Set 1) is claimed.
+  const plotsLocked=!plotsUnlocked;
   const MAX_PLOTS=6;
   const MAX_MONEY_PLOTS=4;
   const [confirm,setConfirm]=useState(false);
@@ -110,7 +108,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         // that's how its "not yet" toast gets a chance to fire.
         return React.createElement("button",{key:t.id,disabled:harvestTutorialLock,onClick:()=>{
           if(harvestTutorialLock)return;
-          if(t.id==="plots"&&plotsLocked){showNotify("Unlocks once you beat Floor 10 of the Labyrinth");return;}
+          if(t.id==="plots"&&plotsLocked){showNotify("Unlocks via progression quest");return;}
           setFarmTab(t.id);
         },style:{
           flex:1,padding:"10px 0",border:"none",background:"none",cursor:tabLocked?"not-allowed":"pointer",

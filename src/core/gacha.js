@@ -144,6 +144,7 @@ export function pickDailyMissions(unlocked = {}) {
     if (m.id === "dm_dung1" && !unlocked.dungeon) return false;
     if (m.id === "dm_farm" && !unlocked.plots) return false;
     if (m.id === "dm_boss" && !unlocked.boss) return false;
+    if (m.id === "dm_arena" && !unlocked.arena) return false;
     return true;
   });
   return ["dm_login", ...shuffle(pool).slice(0, 4).map((m) => m.id)];

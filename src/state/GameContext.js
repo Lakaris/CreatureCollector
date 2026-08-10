@@ -150,6 +150,9 @@ export function GameProvider({ children }) {
   const [farmCrops, setFarmCrops] = useState(() => initialSave?.farmCrops ?? Array(6).fill(null));
   const [plotUpgrades, setPlotUpgrades] = useState(() => initialSave?.plotUpgrades ?? Array(6).fill(0));
   const [specialPurchased, setSpecialPurchased] = useState(() => initialSave?.specialPurchased ?? false);
+  // True once the "Plots" progression-quest reward has been claimed --
+  // replaces the old labyrinth-depth gate for unlocking extra Farm plots.
+  const [plotsUnlocked, setPlotsUnlocked] = useState(() => initialSave?.plotsUnlocked ?? false);
 
   // ── Dungeon / daily boss ─────────────────────────────────────────────────
   const [dungeonBossLevels, setDungeonBossLevels] = useState(() =>
@@ -160,6 +163,10 @@ export function GameProvider({ children }) {
   const [lastPassRechargeReset, setLastPassRechargeReset] = useState(() => initialSave?.lastPassRechargeReset ?? "");
   const [dailyBossData, setDailyBossData] = useState(() => initialSave?.dailyBossData ?? { date: "", fights: 0, wins: 0 });
   const [dailyBossLevel, setDailyBossLevel] = useState(() => initialSave?.dailyBossLevel ?? 1);
+  // True once the "Dungeons" / "Daily Boss" progression-quest rewards have
+  // been claimed -- replaces the old labyrinth-depth gates for these.
+  const [dungeonsUnlocked, setDungeonsUnlocked] = useState(() => initialSave?.dungeonsUnlocked ?? false);
+  const [dailyBossUnlocked, setDailyBossUnlocked] = useState(() => initialSave?.dailyBossUnlocked ?? false);
 
   // ── Progression counters (feed quest predicates) ──────────────────────────
   const [eggsHatched, setEggsHatched] = useState(() => initialSave?.eggsHatched ?? 0);
@@ -269,8 +276,8 @@ export function GameProvider({ children }) {
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,
     labyrinthDepth, labyrinthBestDepth,
-    farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased,
-    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel,
+    farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked,
+    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked,
     eggsHatched, dungeonsCleared, arenaFights, labyrinthFights, bananasUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, everCompletedDailyQuests,
     questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
@@ -360,10 +367,12 @@ export function GameProvider({ children }) {
     farmFieldSeed, setFarmFieldSeed,
     farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades,
     specialPurchased, setSpecialPurchased,
+    plotsUnlocked, setPlotsUnlocked,
     // dungeon / daily boss
     dungeonBossLevels, setDungeonBossLevels,
     passRechargeCount, setPassRechargeCount,
     dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel,
+    dungeonsUnlocked, setDungeonsUnlocked, dailyBossUnlocked, setDailyBossUnlocked,
     devTimeOffset, setDevTimeOffset, nowMs,
     // counters
     eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared,

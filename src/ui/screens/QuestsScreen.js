@@ -3,6 +3,7 @@
 import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { QUEST_TABS, DAILY_MISSIONS, QUEST_DEFS, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
+import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { applyRewards } from "../../core/rewards.js";
 import DailyTabContent from "../../ui/screens/DailyTabContent.js";
 
@@ -10,9 +11,25 @@ import DailyTabContent from "../../ui/screens/DailyTabContent.js";
 // until then, so their quest tabs stay locked until the same threshold.
 const DUNGEON_ARENA_UNLOCK_BEST_DEPTH=21;
 const QUEST_TAB_LOCK_MSG={dungeon:"Unlocks once you beat Floor 20 of the Labyrinth",arena:"Unlocks once you beat Floor 20 of the Labyrinth"};
+// These reward keys don't add to currencies -- claiming them flips a
+// feature-unlock flag instead (see claimBatchReward).
+const UNLOCK_REWARD_KEYS=["plots","dungeons","dailyBoss"];
+
+// A reward with more than one distinct equipment piece displays as a single
+// generic "Common Equipment" tile instead of one icon per item -- the
+// underlying grant (in showReward) still hands out every individual piece.
+function collapseGearEntries(entries){
+  const equip=entries.filter(([k])=>EQUIPMENT_MAP[k]);
+  const other=entries.filter(([k])=>!EQUIPMENT_MAP[k]);
+  if(equip.length>1){
+    const total=equip.reduce((sum,[,v])=>sum+v,0);
+    return [...other,["gearBundle",total]];
+  }
+  return entries;
+}
 
 function QuestsScreen({onBack}){
-  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode } = useGame();
+  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked } = useGame();
   const [questTab,setQuestTab]=React.useState("general");
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
@@ -37,16 +54,30 @@ function QuestsScreen({onBack}){
     return()=>clearTimeout(t);
   },[rewardItems,visibleCount]);
 
-  function showReward(reward,items){
+  // Splits a reward object into currencies, specific gear pieces (keys that
+  // match an EQUIPMENT_MAP id), and feature-unlock flags -- each routed to
+  // the state that actually tracks it, rather than every key being treated
+  // as a stackable currency.
+  function showReward(reward){
     const entries=Object.entries(reward);
-    applyRewards(setCurrencies,Object.fromEntries(entries));
-    setRewardItems(entries);
+    const currencyEntries=entries.filter(([k])=>!UNLOCK_REWARD_KEYS.includes(k)&&!EQUIPMENT_MAP[k]);
+    const equipEntries=entries.filter(([k])=>EQUIPMENT_MAP[k]);
+    if(currencyEntries.length)applyRewards(setCurrencies,Object.fromEntries(currencyEntries));
+    if(equipEntries.length)setEquipmentCopies(prev=>{
+      const next={...prev};
+      for(const [k,v] of equipEntries)next[k]=(next[k]||0)+v;
+      return next;
+    });
+    setRewardItems(collapseGearEntries(entries));
     setVisibleCount(0);
   }
 
   function claimBatchReward(){
     if(!canClaimBatch)return;
     setQuestBatchIdx(prev=>({...prev,[questTab]:batchIdx+1}));
+    if(batch.reward.plots)setPlotsUnlocked(true);
+    if(batch.reward.dungeons)setDungeonsUnlocked(true);
+    if(batch.reward.dailyBoss)setDailyBossUnlocked(true);
     showReward(batch.reward);
   }
 
@@ -175,7 +206,7 @@ function QuestsScreen({onBack}){
               const claimed=claimedQuests.has(q.id);
               const prog=q.progress(questState);
               const pct=prog.max>0?Math.min(1,prog.cur/prog.max):0;
-              const rewardEntries=q.reward?Object.entries(q.reward):[];
+              const rewardEntries=q.reward?collapseGearEntries(Object.entries(q.reward)):[];
               const clickAction=done&&!claimed?()=>claimQuestReward(q):(!done&&q.nav?()=>goToQuest(q):undefined);
               return React.createElement("div",{key:q.id,onClick:clickAction,style:{background:done&&!claimed?"#f0fff4":"#fafafa",border:"1.5px solid "+(done&&!claimed?"#86efac":"#e8e8e8"),borderRadius:12,padding:"10px",display:"flex",gap:10,alignItems:"stretch",cursor:clickAction?"pointer":"default",opacity:claimed?0.45:1,transition:"opacity 0.2s"}},
                 rewardEntries.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,flexShrink:0}},

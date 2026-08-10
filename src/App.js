@@ -50,8 +50,21 @@ function countdownParts(from, to) {
 }
 
 /** The Daily Boss entry card, including its reward-availability state machine. */
-function DailyBossCard() {
+function DailyBossCard({ locked, onLockedTap }) {
   const { nowMs, devTimeOffset, dailyBossData, dailyBossLevel, setGameMode } = useGame();
+
+  if (locked)
+    return React.createElement(
+      "div",
+      { onClick: onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", border: "2px solid #e0e0e0", cursor: "pointer" } },
+      React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: 0.5 } }, "🔒"),
+      React.createElement(
+        "div",
+        { style: { flex: 1 } },
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 6, color: "#999" } }, "Daily Boss"),
+        React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+      )
+    );
 
   const nowTs = nowMs + devTimeOffset;
   const isToday = !isPastEasternNoon(dailyBossData.date, nowTs);
@@ -173,9 +186,16 @@ function App() {
     settingsOpen, setSettingsOpen, labyrinthDepth,
     tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep,
     owned,
+    dungeonsUnlocked, dailyBossUnlocked,
   } = useGame();
 
   const contentRef = React.useRef(null);
+  const [playLockedMsg, setPlayLockedMsg] = React.useState(null);
+  React.useEffect(() => {
+    if (!playLockedMsg) return;
+    const t = setTimeout(() => setPlayLockedMsg(null), 2200);
+    return () => clearTimeout(t);
+  }, [playLockedMsg]);
   const viewCreature = (id) => setCreatureOverlay(id);
   const starterName = (() => {
     const first = Object.values(owned || {})[0];
@@ -365,6 +385,12 @@ function App() {
     return React.createElement(
       "div",
       { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
+      playLockedMsg &&
+        React.createElement(
+          "div",
+          { style: { position: "fixed", top: 70, left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.8)", color: "#fff", borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", zIndex: 300, pointerEvents: "none", animation: "toastFade 2.2s ease-in-out" } },
+          playLockedMsg
+        ),
       React.createElement(
         "div",
         { style: { display: "flex", alignItems: "center", gap: 12, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "16px 16px 12px", flexShrink: 0 } },
@@ -384,9 +410,20 @@ function App() {
           ),
           React.createElement(
             "div",
-            { onClick: () => setGameMode("dungeon"), style: CARD_BASE },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🏰"),
-            React.createElement("div", null, React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Dungeon"))
+            {
+              onClick: () => {
+                if (!dungeonsUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                setGameMode("dungeon");
+              },
+              style: dungeonsUnlocked ? CARD_BASE : { ...CARD_BASE, background: "#f5f5f5" },
+            },
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: dungeonsUnlocked ? 1 : 0.5 } }, dungeonsUnlocked ? "🏰" : "🔒"),
+            React.createElement(
+              "div",
+              null,
+              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: dungeonsUnlocked ? "#111" : "#999" } }, "Dungeon"),
+              !dungeonsUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+            )
           ),
           React.createElement(
             "div",
@@ -399,7 +436,7 @@ function App() {
               React.createElement("div", { style: { fontSize: 12, color: "#888" } }, "Floor " + (labyrinthDepth || 1))
             )
           ),
-          React.createElement(DailyBossCard),
+          React.createElement(DailyBossCard, { locked: !dailyBossUnlocked, onLockedTap: () => setPlayLockedMsg("Unlocks via progression quest") }),
           React.createElement(
             "div",
             {

@@ -104,7 +104,10 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
       // would be safe.
       React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>{if(tutorialRestricted)return;setShowDex(true);},disabled:tutorialRestricted,style:{marginBottom:0,padding:"4px 12px",border:"none",lineHeight:1.2,opacity:tutorialRestricted?0.5:1,cursor:tutorialRestricted?"not-allowed":"pointer"}},"Dex")
     }),
-    React.createElement("div",{style:{position:"relative",marginBottom:8}},
+    // Hidden for the whole tutorial -- there's nothing to search yet, and it
+    // would otherwise sit right above the card the tutorial points the
+    // player at.
+    !tutorialRestricted&&React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
       React.createElement("input",{
         type:"text",value:search,onChange:e=>setSearch(e.target.value),

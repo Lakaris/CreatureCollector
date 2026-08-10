@@ -13,7 +13,7 @@ const ABILITY_META = {
 };
 const ABILITY_KEYS = ["basic", "special", "unique"];
 
-function CreatureAbilitySummary({ def, maxWidth = 360 }) {
+function CreatureAbilitySummary({ def, maxWidth = 360, flat = false }) {
   return React.createElement(
     "div",
     { style: { display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth } },
@@ -25,7 +25,13 @@ function CreatureAbilitySummary({ def, maxWidth = 360 }) {
         "div",
         {
           key,
-          style: {
+          style: flat ? {
+            padding: "6px 0",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+            textAlign: "left",
+          } : {
             background: "#f7f6ff",
             border: "1px solid #e0ddf7",
             borderRadius: 12,
@@ -43,7 +49,7 @@ function CreatureAbilitySummary({ def, maxWidth = 360 }) {
               width: 36,
               height: 36,
               borderRadius: 8,
-              background: meta.bg,
+              background: flat ? "transparent" : meta.bg,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -53,7 +59,7 @@ function CreatureAbilitySummary({ def, maxWidth = 360 }) {
           },
           ability.icon
             ? React.createElement("img", { src: ability.icon, style: { width: "100%", height: "100%", objectFit: "cover" } })
-            : React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: meta.color, opacity: 0.5, userSelect: "none" } }, "No img")
+            : React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: flat ? "#000" : meta.color, opacity: 0.5, userSelect: "none" } }, "No img")
         ),
         React.createElement(
           "div",
@@ -77,13 +83,22 @@ function CreatureAbilitySummary({ def, maxWidth = 360 }) {
               },
               meta.label
             ),
-            React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: "#534AB7" } }, ability.name),
+            React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: flat ? "#000" : "#534AB7" } }, ability.name),
             ...tags.map((tag) =>
               React.createElement(
                 "span",
                 {
                   key: tag,
-                  style: {
+                  style: flat ? {
+                    fontSize: 9,
+                    fontWeight: 800,
+                    color: "#000",
+                    background: "transparent",
+                    border: "1px solid #ccc",
+                    borderRadius: 10,
+                    padding: "1px 8px",
+                    lineHeight: 1.5,
+                  } : {
                     fontSize: 9,
                     fontWeight: 800,
                     color: "#534AB7",
@@ -98,7 +113,7 @@ function CreatureAbilitySummary({ def, maxWidth = 360 }) {
               )
             )
           ),
-          React.createElement("div", { style: { fontSize: 12, color: "#555", marginTop: 3 } }, ability.upgrades[0])
+          React.createElement("div", { style: { fontSize: 12, color: flat ? "#000" : "#555", marginTop: 3 } }, ability.upgrades[0])
         )
       );
     })

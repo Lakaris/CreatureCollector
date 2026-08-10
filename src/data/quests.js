@@ -29,12 +29,12 @@ export const DAILY_MISSIONS=[
 
 export const QUEST_DEFS={
   general:[
-    {reward:{gems:100,food:50},quests:[
+    {reward:{gems:100,food:50,plots:1,dungeons:1,dailyBoss:1},quests:[
       {id:"g0a",reward:{eggs:1},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10}),nav:"hatch"},
       {id:"g0b",reward:{flairBanana:1},label:"Use 1 Flair Banana",check:s=>s.bananasUsed>=1,progress:s=>({cur:Math.min(s.bananasUsed,1),max:1}),nav:"collection"},
-      {id:"g0c",reward:{eggs:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
+      {id:"g0c",reward:{com_hp_atk2:1,com_hp_def2:1,com_hp_def:1,com_atk_def2:1,com_atk_def:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
       {id:"g0d",reward:{food:1000},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
-      {id:"g0e",reward:{equipShards:1000},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
+      {id:"g0e",reward:{equipShards:500},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
       {id:"g0f",reward:{eggs:1},label:"Complete Floor 10 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=11,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,10),max:10}),nav:"labyrinth"},
     ]},
     {reward:{gems:250,candy:25},quests:[
@@ -118,7 +118,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -139,6 +139,15 @@ export const REWARD_DESC={
   deluxeOre:"Used to unlock rare and epic skins for your Creatures.",
   candy:"Used to unlock Skins.",
   ancientFertilizer:"Used to upgrade your Field, boosting its Food/Gear Shard rates.",
+  plots:"Unlocks the Farm's extra Plots.",
+  dungeons:"Unlocks the Dungeon.",
+  dailyBoss:"Unlocks the Daily Boss.",
+  com_hp_atk2:"Common gear. +5 Health, +5 Attack.",
+  com_hp_def2:"Common gear. +5 Health, +5 Defense.",
+  com_hp_def:"Common gear. +5 Health, +5 Defense.",
+  com_atk_def2:"Common gear. +5 Attack, +5 Defense.",
+  com_atk_def:"Common gear. +5 Attack, +5 Defense.",
+  gearBundle:"Equipment for creatures",
 };
 
 // "FIELD_12H" is a sentinel, not a literal amount -- resolveDailyReward()

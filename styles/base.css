@@ -1,7 +1,8 @@
 /* Reset, document shell, and top-level app layout. */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body,#root{height:100%;overflow:hidden;overscroll-behavior:none}
-body{font-family:system-ui,sans-serif;background:#f5f5f5;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+html{touch-action:pan-x pan-y}
+body{font-family:system-ui,sans-serif;background:#f5f5f5;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-x pan-y}
 input,textarea{-webkit-user-select:text;user-select:text}
 .app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:0}
 .app-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px;min-height:0}

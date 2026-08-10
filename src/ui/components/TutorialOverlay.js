@@ -54,13 +54,18 @@ const TUTORIAL_ENEMY_ID = "murkwing";
 const TUTORIAL_ENEMY_LEVEL = 1;
 
 function TutorialOverlay() {
-  const { setTutorialSeen, setTutorialRestricted, setTutorialStep, setOwned, owned, equipmentLevels, equipmentAscensions, setEquipmentCopies } = useGame();
-  const [phase, setPhase] = useState("text"); // "text" | "eggs" | "reveal" | "postText" | "battlePlan" | "battle" | "finalText"
-  const [line, setLine] = useState(0);
-  const [postLine, setPostLine] = useState(0);
+  const {
+    setTutorialSeen, setTutorialRestricted, setTutorialStep, setOwned, owned, equipmentLevels, equipmentAscensions, setEquipmentCopies,
+    // Persisted (see GameContext) so quitting mid-tutorial resumes on the same
+    // beat instead of restarting from the shore -- "phase" included: it's
+    // normalized battle -> battlePlan at load time, never resumes as "battle".
+    tutorialPhase: phase, setTutorialPhase: setPhase,
+    tutorialLine: line, setTutorialLine: setLine,
+    tutorialPostLine: postLine, setTutorialPostLine: setPostLine,
+    tutorialPickedCreatureId: pickedCreatureId, setTutorialPickedCreatureId: setPickedCreatureId,
+    tutorialPlayerCell: playerCell, setTutorialPlayerCell: setPlayerCell,
+  } = useGame();
   const [selectedEgg, setSelectedEgg] = useState(null);
-  const [pickedCreatureId, setPickedCreatureId] = useState(null);
-  const [playerCell, setPlayerCell] = useState(null);
   // Which side-panel is showing: null | { type: "enemy" | "player", minimized }
   const [sidePanel, setSidePanel] = useState(null);
   // Some browsers still fire a trailing click on the drag source right after

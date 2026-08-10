@@ -17,7 +17,7 @@ import { TABS } from "../../ui/components/NavBar.js";
 const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TABS.length)*100+"vw";
 
 function HomeScreen(){
-  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow } = useGame();
+  const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow, pendingDungeonReveal, setPendingDungeonReveal } = useGame();
   const [picking,setPicking]=React.useState(false);
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
@@ -49,7 +49,13 @@ function HomeScreen(){
     if(!batch)return false;
     return batch.quests.some(q=>q.check(questState)&&q.reward&&!claimedQuests.has(q.id));
   });
-  if(showQuests) return React.createElement(QuestsScreen,{onBack:()=>setShowQuests(false),questState,questBatchIdx,setQuestBatchIdx,setCurrencies,claimedQuests,setClaimedQuests,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions});
+  if(showQuests) return React.createElement(QuestsScreen,{onBack:()=>{
+    setShowQuests(false);
+    // The Dungeon reveal hand-off waits for the player to actually land back
+    // on Home (rather than firing the instant the Set 1 reward is claimed,
+    // which would interrupt the reward-popup animation still on screen).
+    if(pendingDungeonReveal){setPendingDungeonReveal(false);setTutorialRestricted(true);setTutorialStep("dungeonReveal");}
+  },questState,questBatchIdx,setQuestBatchIdx,setCurrencies,claimedQuests,setClaimedQuests,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions});
   if(showDaily) return React.createElement(DailyScreen,{onBack:()=>{setShowDaily(false);setShowQuestsArrow(true);},setCurrencies,dailyDay,setDailyDay,dailyLastClaimed,setDailyLastClaimed});
   if(showNewPlayerGift) return React.createElement(NewPlayerGiftScreen,{onBack:()=>{
     setShowNewPlayerGift(false);

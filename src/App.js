@@ -50,13 +50,13 @@ function countdownParts(from, to) {
 }
 
 /** The Daily Boss entry card, including its reward-availability state machine. */
-function DailyBossCard({ locked, onLockedTap }) {
+function DailyBossCard({ locked, onLockedTap, disabled }) {
   const { nowMs, devTimeOffset, dailyBossData, dailyBossLevel, setGameMode } = useGame();
 
   if (locked)
     return React.createElement(
       "div",
-      { onClick: onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", border: "2px solid #e0e0e0", cursor: "pointer" } },
+      { onClick: disabled ? undefined : onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", border: "2px solid #e0e0e0", cursor: disabled ? "default" : "pointer" } },
       React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: 0.5 } }, "🔒"),
       React.createElement(
         "div",
@@ -78,12 +78,14 @@ function DailyBossCard({ locked, onLockedTap }) {
   return React.createElement(
     "div",
     {
-      onClick: () => setGameMode("dailyboss"),
+      onClick: disabled ? undefined : () => setGameMode("dailyboss"),
       style: {
         ...CARD_BASE,
         padding: "16px 18px",
         background: delivered ? "#f5f5f5" : "linear-gradient(135deg,#f0effe,#e8e4ff)",
         border: "2px solid " + (delivered ? "#e0e0e0" : "#a89cf7"),
+        opacity: disabled ? 0.4 : 1,
+        cursor: disabled ? "default" : "pointer",
       },
     },
     React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, TYPE_EMOJI[boss.type] || "👾"),
@@ -183,10 +185,11 @@ function App() {
     collectionDeepLink, setCollectionDeepLink,
     setCreatureOverlay,
     setDungeonsCleared, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setPlotsGrown,
-    settingsOpen, setSettingsOpen, labyrinthDepth,
-    tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep,
+    settingsOpen, setSettingsOpen,
+    tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep,
     owned,
-    dungeonsUnlocked, dailyBossUnlocked,
+    dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked,
+    flairGuideStep, setFlairGuideStep,
   } = useGame();
 
   const contentRef = React.useRef(null);
@@ -196,6 +199,21 @@ function App() {
     const t = setTimeout(() => setPlayLockedMsg(null), 2200);
     return () => clearTimeout(t);
   }, [playLockedMsg]);
+
+  // The "Use 1 Flair Banana" quest's guided arrows aren't a lockdown -- the
+  // player can tap anything else at any point, it just cancels the guide.
+  // A single capture-phase listener (fires before any button's own onClick)
+  // checks the click against whatever the current step's target is tagged
+  // with (data-guide-target); anything else clears flairGuideStep. The
+  // matching element's own onClick is what advances to the next step.
+  React.useEffect(() => {
+    if (!flairGuideStep) return;
+    function onClick(e) {
+      if (!e.target.closest('[data-guide-target="' + flairGuideStep + '"]')) setFlairGuideStep(null);
+    }
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [flairGuideStep]);
   const viewCreature = (id) => setCreatureOverlay(id);
   const starterName = (() => {
     const first = Object.values(owned || {})[0];
@@ -293,6 +311,14 @@ function App() {
   const toHomeFinalPointer =
     tutorialStep === "toHome" && navHandoff(null, "home");
 
+  // Shown right after the Set 1 Progression reward (Dungeon + Daily Boss)
+  // is claimed and the player backs out to Home: hands off to the Play tab,
+  // where the second half of this reveal (an arrow at the Dungeon card
+  // itself) picks up -- see the tab === "play" branch below.
+  const dungeonRevealPointer =
+    tutorialRestricted && tutorialStep === "dungeonReveal" &&
+    navHandoff("The ground begins to shake and a new structure rises up from the ground.", "play");
+
   // ── Settings: its own full-screen page, no bottom nav ─────────────────────
   if (settingsOpen)
     return React.createElement(
@@ -381,7 +407,10 @@ function App() {
     );
 
   // ── Play menu ────────────────────────────────────────────────────────────
-  if (tab === "play")
+  if (tab === "play") {
+    // Second half of the post-Set-1 Dungeon reveal (see dungeonRevealPointer
+    // above): every other card is inert and dimmed, only Dungeon responds.
+    const dungeonPointActive = tutorialRestricted && tutorialStep === "dungeonPoint";
     return React.createElement(
       "div",
       { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
@@ -404,51 +433,94 @@ function App() {
           { style: { display: "flex", flexDirection: "column", gap: 12 } },
           React.createElement(
             "div",
-            { onClick: () => setGameMode("arena"), style: CARD_BASE },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🏟️"),
-            React.createElement("div", null, React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Arena"))
+            {
+              onClick: () => {
+                if (dungeonPointActive) return;
+                if (!arenaUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                setGameMode("arena");
+              },
+              style: arenaUnlocked
+                ? { ...CARD_BASE, opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
+                : { ...CARD_BASE, background: "#f5f5f5" },
+            },
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "🏟️" : "🔒"),
+            React.createElement(
+              "div",
+              null,
+              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: arenaUnlocked ? "#111" : "#999" } }, "Arena"),
+              !arenaUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+            )
           ),
+          React.createElement(
+            "div",
+            { style: { position: "relative" } },
+            React.createElement(
+              "div",
+              {
+                onClick: () => {
+                  if (!dungeonsUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                  setGameMode("dungeon");
+                  if (dungeonPointActive) { setTutorialRestricted(false); setTutorialStep(null); }
+                },
+                style: dungeonsUnlocked ? CARD_BASE : { ...CARD_BASE, background: "#f5f5f5" },
+              },
+              React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: dungeonsUnlocked ? 1 : 0.5 } }, dungeonsUnlocked ? "🏰" : "🔒"),
+              React.createElement(
+                "div",
+                null,
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: dungeonsUnlocked ? "#111" : "#999" } }, "Dungeon"),
+                !dungeonsUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+              )
+            ),
+            // Second half of the post-Set-1 reveal: arrow above the Dungeon
+            // card itself (rather than a nav-bar tab), text bubble above that.
+            dungeonPointActive &&
+              React.createElement(
+                "div",
+                {
+                  style: {
+                    position: "absolute", bottom: "100%", left: 0, right: 0, marginBottom: 40,
+                    background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
+                    padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 6,
+                  },
+                },
+                "Prove your worth and earn legendary rewards."
+              ),
+            dungeonPointActive &&
+              React.createElement(
+                "div",
+                {
+                  style: {
+                    position: "absolute", bottom: "100%", left: "50%", marginBottom: 4, transform: "translate(-50%,0)",
+                    fontSize: 32, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite",
+                    zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+                  },
+                },
+                "⬇️"
+              )
+          ),
+          React.createElement(DailyBossCard, { locked: !dailyBossUnlocked, onLockedTap: () => setPlayLockedMsg("Unlocks via progression quest"), disabled: dungeonPointActive }),
           React.createElement(
             "div",
             {
               onClick: () => {
-                if (!dungeonsUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
-                setGameMode("dungeon");
+                if (dungeonPointActive) return;
+                if (!treasureUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                setGameMode("treasure");
               },
-              style: dungeonsUnlocked ? CARD_BASE : { ...CARD_BASE, background: "#f5f5f5" },
+              style: treasureUnlocked
+                ? { ...CARD_BASE, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", border: "2px solid #fbbf24", opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
+                : { ...CARD_BASE, background: "#f5f5f5" },
             },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: dungeonsUnlocked ? 1 : 0.5 } }, dungeonsUnlocked ? "🏰" : "🔒"),
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: treasureUnlocked ? 1 : 0.5 } }, treasureUnlocked ? "💰" : "🔒"),
             React.createElement(
               "div",
               null,
-              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: dungeonsUnlocked ? "#111" : "#999" } }, "Dungeon"),
-              !dungeonsUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
-            )
-          ),
-          React.createElement(
-            "div",
-            { onClick: () => setGameMode("labyrinth"), style: CARD_BASE },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🌀"),
-            React.createElement(
-              "div",
-              null,
-              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Labyrinth"),
-              React.createElement("div", { style: { fontSize: 12, color: "#888" } }, "Floor " + (labyrinthDepth || 1))
-            )
-          ),
-          React.createElement(DailyBossCard, { locked: !dailyBossUnlocked, onLockedTap: () => setPlayLockedMsg("Unlocks via progression quest") }),
-          React.createElement(
-            "div",
-            {
-              onClick: () => setGameMode("treasure"),
-              style: { ...CARD_BASE, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", border: "2px solid #fbbf24" },
-            },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "💰"),
-            React.createElement(
-              "div",
-              null,
-              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2 } }, "Treasure"),
-              React.createElement("div", { style: { fontSize: 12, color: "#d97706" } }, "Open Mysterious Ore for treasures")
+              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: treasureUnlocked ? "#111" : "#999" } }, "Treasure"),
+              treasureUnlocked
+                ? React.createElement("div", { style: { fontSize: 12, color: "#d97706" } }, "Open Mysterious Ore for treasures")
+                : React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
             )
           )
         )
@@ -457,8 +529,10 @@ function App() {
         "div",
         { style: { background: "#f5f5f5" } },
         React.createElement(NavBar, { tab, setTab, onNavigate: () => window.scrollTo(0, 0) })
-      )
+      ),
+      restrictedSkipButton
     );
+  }
 
   // ── Default shell ────────────────────────────────────────────────────────
   return React.createElement(
@@ -493,7 +567,8 @@ function App() {
     tutorialSeen && restrictedSkipButton,
     tutorialSeen && farmPointer,
     tutorialSeen && toEquipmentPointer,
-    tutorialSeen && toHomeFinalPointer
+    tutorialSeen && toHomeFinalPointer,
+    tutorialSeen && dungeonRevealPointer
   );
 }
 

@@ -7,15 +7,10 @@ import { applyRewards } from "../../core/rewards.js";
 import { pickDailyMissions } from "../../core/gacha.js";
 import { easternNoonDayKey } from "../../core/dates.js";
 
-// Mirrors NavBar's Play-tab gate: an Arena daily mission for a feature the
-// player hasn't reached yet must never be drawn. Plots/Dungeon/Daily Boss
-// are instead gated by their own progression-quest unlock flags below.
-const ARENA_UNLOCK_BEST_DEPTH=21;
-
-function DailyTabContent({setRewardPopup}){
-  const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, plotsUnlocked, dungeonsUnlocked, dailyBossUnlocked, setEverCompletedDailyQuests } = useGame();
+function DailyTabContent({setRewardPopup,onNavigate}){
+  const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, plotsUnlocked, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, setEverCompletedDailyQuests } = useGame();
   const today=easternNoonDayKey();
-  const unlockedFeatures={dungeon:dungeonsUnlocked,plots:plotsUnlocked,boss:dailyBossUnlocked,arena:(labyrinthBestDepth||1)>=ARENA_UNLOCK_BEST_DEPTH};
+  const unlockedFeatures={dungeon:dungeonsUnlocked,plots:plotsUnlocked,boss:dailyBossUnlocked,arena:arenaUnlocked};
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
   const [localRewardPopup,setLocalRewardPopup]=React.useState(null);
@@ -27,7 +22,7 @@ function DailyTabContent({setRewardPopup}){
   React.useEffect(()=>{
     if(dailyMissionsDate!==today){
       setDailyMissionsDate(today);
-      setDailyMissionsSnapshot({eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,labyrinthFights:questState.labyrinthFights||0,fieldHarvests:questState.fieldHarvests||0,currencies:{...questState.currencies}});
+      setDailyMissionsSnapshot({eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,labyrinthFights:questState.labyrinthFights||0,fieldHarvests:questState.fieldHarvests||0,petLevelUps:questState.petLevelUps||0,equipLevelUps:questState.equipLevelUps||0,currencies:{...questState.currencies}});
       setDailyMissionsDone(new Set());
       setDailyCompletionClaimed(false);
       setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
@@ -42,7 +37,7 @@ function DailyTabContent({setRewardPopup}){
     const hasLocked=dailySelectedMissions.some(id=>(id==="dm_dung1"&&!unlockedFeatures.dungeon)||(id==="dm_farm"&&!unlockedFeatures.plots)||(id==="dm_boss"&&!unlockedFeatures.boss)||(id==="dm_arena"&&!unlockedFeatures.arena));
     if(hasLocked)setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
   },[dailySelectedMissions,unlockedFeatures.dungeon,unlockedFeatures.plots,unlockedFeatures.boss,unlockedFeatures.arena]);
-  const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}};
+  const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,petLevelUps:0,equipLevelUps:0,currencies:{}};
   const qs=questState||{};
   function showReward(reward){
     const entries=Object.entries(reward);
@@ -143,9 +138,10 @@ function DailyTabContent({setRewardPopup}){
         try{ready=m.check(qs,snap);prog=m.progress(qs,snap);}catch{}
         const pct=prog.max>0?Math.min(1,prog.cur/prog.max):0;
         const rewardEntries=Object.entries(m.reward);
+        const clickAction=ready&&!claimed?()=>claimMission(m):(!ready&&!claimed&&m.nav&&onNavigate?()=>onNavigate(m.nav):undefined);
         return React.createElement("div",{key:m.id,
-          onClick:ready&&!claimed?()=>claimMission(m):undefined,
-          style:{background:ready&&!claimed?"#f0fff4":"#fafafa",border:"1.5px solid "+(ready&&!claimed?"#86efac":"#e8e8e8"),borderRadius:12,padding:"10px",display:"flex",gap:10,alignItems:"stretch",cursor:ready&&!claimed?"pointer":"default",opacity:claimed?0.45:1,transition:"opacity 0.2s"}
+          onClick:clickAction,
+          style:{background:ready&&!claimed?"#f0fff4":"#fafafa",border:"1.5px solid "+(ready&&!claimed?"#86efac":"#e8e8e8"),borderRadius:12,padding:"10px",display:"flex",gap:10,alignItems:"stretch",cursor:clickAction?"pointer":"default",opacity:claimed?0.45:1,transition:"opacity 0.2s"}
         },
           rewardEntries.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,flexShrink:0}},
             rewardEntries.map(([k,v])=>React.createElement("div",{key:k,onClick:e=>{e.stopPropagation();setRewardPopup?.(k);},style:{

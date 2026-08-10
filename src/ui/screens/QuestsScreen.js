@@ -13,7 +13,7 @@ const DUNGEON_ARENA_UNLOCK_BEST_DEPTH=21;
 const QUEST_TAB_LOCK_MSG={dungeon:"Unlocks once you beat Floor 20 of the Labyrinth",arena:"Unlocks once you beat Floor 20 of the Labyrinth"};
 // These reward keys don't add to currencies -- claiming them flips a
 // feature-unlock flag instead (see claimBatchReward).
-const UNLOCK_REWARD_KEYS=["plots","dungeons","dailyBoss"];
+const UNLOCK_REWARD_KEYS=["plots","dungeons","dailyBoss","arena","treasure"];
 
 // A reward with more than one distinct equipment piece displays as a single
 // generic "Common Equipment" tile instead of one icon per item -- the
@@ -29,7 +29,7 @@ function collapseGearEntries(entries){
 }
 
 function QuestsScreen({onBack}){
-  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked } = useGame();
+  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, setFlairGuideStep, setFarmDeepLink, setPendingDungeonReveal } = useGame();
   const [questTab,setQuestTab]=React.useState("general");
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
@@ -76,8 +76,13 @@ function QuestsScreen({onBack}){
     if(!canClaimBatch)return;
     setQuestBatchIdx(prev=>({...prev,[questTab]:batchIdx+1}));
     if(batch.reward.plots)setPlotsUnlocked(true);
-    if(batch.reward.dungeons)setDungeonsUnlocked(true);
+    // The Dungeon reveal hand-off (arrow at Play, then at the Dungeon card)
+    // fires the next time the player backs out to Home, not immediately --
+    // claiming this reward can't interrupt the reward-popup animation.
+    if(batch.reward.dungeons){setDungeonsUnlocked(true);setPendingDungeonReveal(true);}
     if(batch.reward.dailyBoss)setDailyBossUnlocked(true);
+    if(batch.reward.arena)setArenaUnlocked(true);
+    if(batch.reward.treasure)setTreasureUnlocked(true);
     showReward(batch.reward);
   }
 
@@ -92,7 +97,24 @@ function QuestsScreen({onBack}){
     if(!q.nav)return;
     if(q.nav==="dailyTab"){setQuestTab("daily");return;}
     if(q.nav==="labyrinth"){setGameMode("labyrinth");setTab("play");return;}
+    // "Use 1 Flair Banana" gets a guided hand-off: arrows walk the player to
+    // the first creature, its Flair tab, then the Feed button. Re-tapping
+    // this quest always restarts the guide from step one.
+    if(q.id==="g0b"){setFlairGuideStep("collection");setTab("collection");return;}
     setTab(q.nav);
+  }
+
+  // Same idea for Daily missions: tapping one that isn't done yet jumps to
+  // wherever it's actually completed, instead of sitting there inert.
+  function goToDailyMission(nav){
+    if(nav==="dungeon"){setGameMode("dungeon");setTab("play");return;}
+    if(nav==="dailyboss"){setGameMode("dailyboss");setTab("play");return;}
+    if(nav==="arena"){setGameMode("arena");setTab("play");return;}
+    if(nav==="labyrinth"){setGameMode("labyrinth");setTab("play");return;}
+    if(nav==="farm"){setGameMode(null);setTab("farm");return;}
+    if(nav==="plots"){setFarmDeepLink("plots");setGameMode(null);setTab("farm");return;}
+    setGameMode(null);
+    setTab(nav);
   }
 
   const questRewardPopupEl=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
@@ -168,7 +190,7 @@ function QuestsScreen({onBack}){
       ),
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}},
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",overflowY:"auto"}},
-        questTab==="daily"?React.createElement(DailyTabContent,{setCurrencies,questState,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions,setRewardPopup}):
+        questTab==="daily"?React.createElement(DailyTabContent,{setCurrencies,questState,dailyMissionsDate,setDailyMissionsDate,dailyMissionsSnapshot,setDailyMissionsSnapshot,dailyMissionsDone,setDailyMissionsDone,setBattlepassPoints,dailyCompletionClaimed,setDailyCompletionClaimed,dailySelectedMissions,setDailySelectedMissions,setRewardPopup,onNavigate:goToDailyMission}):
         batch?React.createElement(React.Fragment,null,
           React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10}},
             React.createElement("div",{style:{padding:"4px 0 0"}},

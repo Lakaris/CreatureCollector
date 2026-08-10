@@ -31,6 +31,9 @@ const TAB_TUTORIAL_STEPS = {
   farm: { farm: "harvest" },
   equipment: { toEquipment: "equipItem" },
   home: { toHome: "descend" },
+  // Post-Set-1 Dungeon reveal: arrow at Play ("dungeonReveal") hands off to
+  // an arrow at the Dungeon card once tapped ("dungeonPoint"), see App.js.
+  play: { dungeonReveal: "dungeonPoint" },
 };
 
 // Permanent (non-tutorial) progress gates: a tab stays locked until the

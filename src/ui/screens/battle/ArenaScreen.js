@@ -20,6 +20,7 @@ import { DEV_MODE } from "../../../config.js";
 // Arena tab id -> creature type it restricts deployment to. "ice" is the arena tab id
 // for the Water-type arena (ARENA_TABS labels it "Water" but keeps the legacy id).
 const ARENA_TAB_TYPE={fire:"Fire",nature:"Nature",earth:"Earth",electric:"Electric",ice:"Water",light:"Light",dark:"Dark"};
+const ARENA_UNLOCK_COUNT=6;
 const ARENA_MAX_LEVEL=50;
 const ARENA_STAGES_PER_LEVEL=10;
 // Arena has ARENA_MAX_LEVEL(50) x ARENA_STAGES_PER_LEVEL(10) = 500 stages total,
@@ -34,6 +35,13 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards } = useGame();
   const [arenaTab,setArenaTab]=useState("all");
   const [rewardPopup,setRewardPopup]=useState(null);
+  const [arenaLockMsg,setArenaLockMsg]=useState(null);
+  function showArenaLockToast(t){
+    const reqType=ARENA_TAB_TYPE[t.id];
+    const count=arenaTypeCounts[reqType]||0;
+    setArenaLockMsg("Collect "+ARENA_UNLOCK_COUNT+" "+t.label+"-type creatures to unlock ("+count+"/"+ARENA_UNLOCK_COUNT+")");
+    setTimeout(()=>setArenaLockMsg(null),2200);
+  }
   const [arenaAbilityTagPopup,setArenaAbilityTagPopup]=useState(null);
   const ARENA_STAGE_REWARDS_DISPLAY=[
     {emoji:"🥚",label:"5 Eggs",key:"eggs",qty:5},
@@ -107,6 +115,14 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const isBoss=stage===10;
   const arenaRequiredType=ARENA_TAB_TYPE[arenaTab]||null;
   const ownedList=Object.values(owned||{}).sort((a,b)=>(b.level||1)-(a.level||1)).filter(o=>o&&CREATURE_MAP[o.id]&&(!arenaRequiredType||CREATURE_MAP[o.id].type===arenaRequiredType));
+  const arenaTypeCounts=React.useMemo(()=>{
+    const counts={};
+    Object.values(owned||{}).forEach(o=>{
+      const def=o&&CREATURE_MAP[o.id];
+      if(def)counts[def.type]=(counts[def.type]||0)+1;
+    });
+    return counts;
+  },[owned]);
   const placedIds=new Set(Object.values(planGrid));
 
   function onListMouseDown(e){dragScroll.current={armed:true,on:false,x:e.pageX,y:e.pageY,sl:creatureListRef.current.scrollLeft,intentScroll:false};}
@@ -670,6 +686,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
       )
     );})(),
+    arenaLockMsg&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:300,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},arenaLockMsg),
     React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
@@ -679,14 +696,19 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
       React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,justifyContent:"space-evenly"}},
-        ARENA_TABS.map(t=>React.createElement("button",{key:t.id,onClick:()=>setArenaTab(t.id),style:{
-          display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,
-          flex:1,padding:"4px",border:"none",
-          borderRight:arenaTab===t.id?"3px solid #534AB7":"3px solid transparent",
-          background:arenaTab===t.id?"#f0effe":"none",
-          color:arenaTab===t.id?"#534AB7":"#555",
-          fontSize:10,fontWeight:arenaTab===t.id?700:400,cursor:"pointer",transition:"background 0.15s",
-        }},React.createElement("span",{style:{fontSize:20}},t.emoji),t.label))
+        ARENA_TABS.map(t=>{
+          const reqType=ARENA_TAB_TYPE[t.id];
+          const isLocked=reqType&&(arenaTypeCounts[reqType]||0)<ARENA_UNLOCK_COUNT;
+          return React.createElement("button",{key:t.id,onClick:()=>{if(isLocked){showArenaLockToast(t);return;}setArenaTab(t.id);},style:{
+            display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,
+            flex:1,padding:"4px",border:"none",
+            borderRight:arenaTab===t.id?"3px solid #534AB7":"3px solid transparent",
+            background:arenaTab===t.id?"#f0effe":"none",
+            color:isLocked?"#bbb":(arenaTab===t.id?"#534AB7":"#555"),
+            fontSize:10,fontWeight:arenaTab===t.id?700:400,cursor:"pointer",transition:"background 0.15s",
+            opacity:isLocked?0.6:1,
+          }},React.createElement("span",{style:{fontSize:20}},isLocked?"🔒":t.emoji),t.label);
+        })
       ),
       React.createElement("div",{style:{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:12}},
         React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:5}},

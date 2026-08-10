@@ -18,31 +18,34 @@ export const DAILY_COMPLETION_REWARD={eggs:1};
 export const DAILY_COMPLETION_BP=100;
 export const DAILY_MISSIONS=[
   {id:"dm_login",  label:"Daily Login",           emoji:"🌅", reward:{gems:20}, points:10, check:(c,s)=>true,                                                         progress:(c,s)=>({cur:1,max:1})},
-  {id:"dm_dung1",  label:"Use a Dungeon Pass",    emoji:"🏰", reward:{gems:20}, points:25, check:(c,s)=>(c.dungeonsCleared-s.dungeonsCleared)>=1,                    progress:(c,s)=>({cur:Math.min(c.dungeonsCleared-s.dungeonsCleared,1),max:1})},
-  {id:"dm_boss",   label:"Fight the Daily Boss",  emoji:"👹", reward:{gems:20}, points:25, check:(c,s)=>(c.dailyBossFights-s.dailyBossFights)>=1,                    progress:(c,s)=>({cur:Math.min(c.dailyBossFights-s.dailyBossFights,1),max:1})},
-  {id:"dm_farm",   label:"Grow a Plot",           emoji:"🌱", reward:{gems:20}, points:20, check:(c,s)=>(c.plotsGrown-s.plotsGrown)>=1,                              progress:(c,s)=>({cur:Math.min(c.plotsGrown-s.plotsGrown,1),max:1})},
-  {id:"dm_arena",  label:"Attempt an Arena Fight",emoji:"🏟️",reward:{gems:20}, points:25, check:(c,s)=>(c.arenaFights-s.arenaFights)>=1,                            progress:(c,s)=>({cur:Math.min(c.arenaFights-s.arenaFights,1),max:1})},
-  {id:"dm_banana", label:"Use a Flair Banana",    emoji:"🍌", reward:{gems:20}, points:20, check:(c,s)=>(c.bananasUsed-s.bananasUsed)>=1,                            progress:(c,s)=>({cur:Math.min(c.bananasUsed-s.bananasUsed,1),max:1})},
-  {id:"dm_labyrinth",label:"Attempt a Labyrinth Fight",emoji:"🌀",reward:{gems:20},points:25, check:(c,s)=>(c.labyrinthFights-s.labyrinthFights)>=1,                  progress:(c,s)=>({cur:Math.min(c.labyrinthFights-s.labyrinthFights,1),max:1})},
-  {id:"dm_harvest",label:"Harvest Field",         emoji:"🌾", reward:{gems:20}, points:20, check:(c,s)=>(c.fieldHarvests-s.fieldHarvests)>=1,                        progress:(c,s)=>({cur:Math.min(c.fieldHarvests-s.fieldHarvests,1),max:1})},
+  {id:"dm_dung1",  label:"Use a Dungeon Pass",    emoji:"🏰", reward:{gems:20}, points:25, check:(c,s)=>(c.dungeonsCleared-s.dungeonsCleared)>=1,                    progress:(c,s)=>({cur:Math.min(c.dungeonsCleared-s.dungeonsCleared,1),max:1}), nav:"dungeon"},
+  {id:"dm_boss",   label:"Fight the Daily Boss",  emoji:"👹", reward:{gems:20}, points:25, check:(c,s)=>(c.dailyBossFights-s.dailyBossFights)>=1,                    progress:(c,s)=>({cur:Math.min(c.dailyBossFights-s.dailyBossFights,1),max:1}), nav:"dailyboss"},
+  {id:"dm_farm",   label:"Grow a Plot",           emoji:"🌱", reward:{gems:20}, points:20, check:(c,s)=>(c.plotsGrown-s.plotsGrown)>=1,                              progress:(c,s)=>({cur:Math.min(c.plotsGrown-s.plotsGrown,1),max:1}), nav:"plots"},
+  {id:"dm_arena",  label:"Attempt an Arena Fight",emoji:"🏟️",reward:{gems:20}, points:25, check:(c,s)=>(c.arenaFights-s.arenaFights)>=1,                            progress:(c,s)=>({cur:Math.min(c.arenaFights-s.arenaFights,1),max:1}), nav:"arena"},
+  {id:"dm_banana", label:"Use a Flair Banana",    emoji:"🍌", reward:{gems:20}, points:20, check:(c,s)=>(c.bananasUsed-s.bananasUsed)>=1,                            progress:(c,s)=>({cur:Math.min(c.bananasUsed-s.bananasUsed,1),max:1}), nav:"collection"},
+  {id:"dm_labyrinth",label:"Attempt a Labyrinth Fight",emoji:"🌀",reward:{gems:20},points:25, check:(c,s)=>(c.labyrinthFights-s.labyrinthFights)>=1,                  progress:(c,s)=>({cur:Math.min(c.labyrinthFights-s.labyrinthFights,1),max:1}), nav:"labyrinth"},
+  {id:"dm_harvest",label:"Harvest Field",         emoji:"🌾", reward:{gems:20}, points:20, check:(c,s)=>(c.fieldHarvests-s.fieldHarvests)>=1,                        progress:(c,s)=>({cur:Math.min(c.fieldHarvests-s.fieldHarvests,1),max:1}), nav:"farm"},
+  {id:"dm_hatch",  label:"Hatch an Egg",          emoji:"🥚", reward:{gems:20}, points:20, check:(c,s)=>(c.eggsHatched-s.eggsHatched)>=1,                            progress:(c,s)=>({cur:Math.min(c.eggsHatched-s.eggsHatched,1),max:1}), nav:"hatch"},
+  {id:"dm_petlvl", label:"Level Up a Creature",   emoji:"⬆️", reward:{gems:20}, points:20, check:(c,s)=>(c.petLevelUps-s.petLevelUps)>=1,                            progress:(c,s)=>({cur:Math.min(c.petLevelUps-s.petLevelUps,1),max:1}), nav:"collection"},
+  {id:"dm_equiplvl",label:"Upgrade a Piece of Gear",emoji:"🔧",reward:{gems:20}, points:20, check:(c,s)=>(c.equipLevelUps-s.equipLevelUps)>=1,                        progress:(c,s)=>({cur:Math.min(c.equipLevelUps-s.equipLevelUps,1),max:1}), nav:"equipment"},
 ];
 
 export const QUEST_DEFS={
   general:[
-    {reward:{gems:100,food:50,plots:1,dungeons:1,dailyBoss:1},quests:[
+    {reward:{legendaryEggs:1,dungeons:1,dailyBoss:1},quests:[
       {id:"g0a",reward:{eggs:1},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10}),nav:"hatch"},
       {id:"g0b",reward:{flairBanana:1},label:"Use 1 Flair Banana",check:s=>s.bananasUsed>=1,progress:s=>({cur:Math.min(s.bananasUsed,1),max:1}),nav:"collection"},
       {id:"g0c",reward:{com_hp_atk2:1,com_hp_def2:1,com_hp_def:1,com_atk_def2:1,com_atk_def:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
-      {id:"g0d",reward:{food:1000},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
+      {id:"g0d",reward:{food:500},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
       {id:"g0e",reward:{equipShards:500},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
-      {id:"g0f",reward:{eggs:1},label:"Complete Floor 10 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=11,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,10),max:10}),nav:"labyrinth"},
+      {id:"g0f",reward:{eggs:1},label:"Complete Floor 30 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=31,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,30),max:30}),nav:"labyrinth"},
     ]},
-    {reward:{gems:250,candy:25},quests:[
+    {reward:{gems:250,candy:25,plots:1,arena:1},quests:[
       {id:"g1a",reward:{food:40},label:"Own 10 creatures",check:s=>Object.keys(s.owned).length>=10,progress:s=>({cur:Math.min(Object.keys(s.owned).length,10),max:10})},
       {id:"g1b",reward:{gems:50},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10})},
       {id:"g1c",reward:{candy:10},label:"Have 1,000 gems",check:s=>s.currencies.gems>=1000,progress:s=>({cur:Math.min(s.currencies.gems,1000),max:1000})},
     ]},
-    {reward:{gems:500,food:200},quests:[
+    {reward:{gems:500,food:200,treasure:1},quests:[
       {id:"g2a",reward:{food:80},label:"Own 20 creatures",check:s=>Object.keys(s.owned).length>=20,progress:s=>({cur:Math.min(Object.keys(s.owned).length,20),max:20})},
       {id:"g2b",reward:{gems:100},label:"Hatch 30 eggs",check:s=>s.eggsHatched>=30,progress:s=>({cur:Math.min(s.eggsHatched,30),max:30})},
       {id:"g2c",reward:{candy:20},label:"Unlock a skin",check:s=>s.unlockedSkins.length>=1,progress:s=>({cur:Math.min(s.unlockedSkins.length,1),max:1})},
@@ -118,7 +121,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -142,6 +145,8 @@ export const REWARD_DESC={
   plots:"Unlocks the Farm's extra Plots.",
   dungeons:"Unlocks the Dungeon.",
   dailyBoss:"Unlocks the Daily Boss.",
+  arena:"Unlocks the Arena.",
+  treasure:"Unlocks the Treasure.",
   com_hp_atk2:"Common gear. +5 Health, +5 Attack.",
   com_hp_def2:"Common gear. +5 Health, +5 Defense.",
   com_hp_def:"Common gear. +5 Health, +5 Defense.",

@@ -720,7 +720,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
         },"⚡ Auto Fight")
       )
     ),
-    React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",flexShrink:0}},
+    React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",flexShrink:0,paddingBottom:"env(safe-area-inset-bottom)"}},
       React.createElement("div",{style:{display:"flex",borderTop:"1px solid #e0e0e0"}},
         DUNGEON_BOSSES.map(b=>React.createElement("button",{
           key:b.key,onClick:()=>setSelected(b.key),

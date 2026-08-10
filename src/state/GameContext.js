@@ -72,8 +72,19 @@ export function GameProvider({ children }) {
   const [tab, setTab] = useState(() => (initialSave?.tutorialRestricted && initialSave?.tab) || "home");
   const [gameMode, setGameMode] = useState(() => (initialSave?.tutorialRestricted ? (initialSave?.gameMode ?? null) : null));
   const [collectionDeepLink, setCollectionDeepLink] = useState(null);
+  // Which Farm sub-tab to jump to next time FarmScreen mounts/updates (e.g.
+  // "plots" when the "Grow a Plot" daily mission is tapped incomplete) --
+  // consumed once by FarmScreen then cleared, same pattern as collectionDeepLink.
+  const [farmDeepLink, setFarmDeepLink] = useState(null);
   const [creatureOverlay, setCreatureOverlay] = useState(null);
   const [dexOverlay, setDexOverlay] = useState(null);
+  // Ephemeral, never persisted: which step of the "Use 1 Flair Banana" quest's
+  // guided arrows is showing (null | "collection" | "flair" | "feed"), or null
+  // when no guide is active. Set by QuestsScreen when that quest is tapped
+  // incomplete; cleared the moment the player clicks anything the current
+  // arrow *isn't* pointing at (see App.js's global click watcher) or once the
+  // banana's actually fed.
+  const [flairGuideStep, setFlairGuideStep] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
@@ -87,6 +98,19 @@ export function GameProvider({ children }) {
   // "slot" (arrow at Slot 1) -> "item" (arrow at the Iron Band) -> null (done,
   // clears alongside tutorialRestricted).
   const [tutorialStep, setTutorialStep] = useState(() => initialSave?.tutorialStep ?? null);
+  // Progress through TutorialOverlay's own intro narrative (island/eggs/battle),
+  // persisted so quitting mid-tutorial resumes on the same beat instead of
+  // restarting from the shore. "battle" never resumes as itself -- the live
+  // simulation isn't worth serializing -- it lands back on "battlePlan"
+  // (playerCell is kept, so the creature's still placed; they just re-tap Fight).
+  const [tutorialPhase, setTutorialPhase] = useState(() => {
+    const p = initialSave?.tutorialPhase;
+    return p === "battle" ? "battlePlan" : (p ?? "text");
+  });
+  const [tutorialLine, setTutorialLine] = useState(() => initialSave?.tutorialLine ?? 0);
+  const [tutorialPostLine, setTutorialPostLine] = useState(() => initialSave?.tutorialPostLine ?? 0);
+  const [tutorialPickedCreatureId, setTutorialPickedCreatureId] = useState(() => initialSave?.tutorialPickedCreatureId ?? null);
+  const [tutorialPlayerCell, setTutorialPlayerCell] = useState(() => initialSave?.tutorialPlayerCell ?? null);
   // Set the instant the tutorial's guided walkthrough finishes (see
   // LabyrinthScreen's Floor 1 win handling); HomeScreen consumes this once
   // to auto-open the New Player Gift, then the Daily screen behind it, and
@@ -96,6 +120,12 @@ export function GameProvider({ children }) {
   // shows an arrow at Quests until it's tapped (no other button is blocked
   // meanwhile; it just doesn't go away on its own).
   const [showQuestsArrow, setShowQuestsArrow] = useState(() => initialSave?.showQuestsArrow ?? false);
+  // Set when the Progression quests' Set 1 completion reward (which unlocks
+  // Dungeon + Daily Boss) is claimed; consumed the next time the player backs
+  // out of the Quests screen to Home, which kicks off the short "a new
+  // structure rises up" guided hand-off to the Dungeon. One-shot, like
+  // postTutorialPopupPending above.
+  const [pendingDungeonReveal, setPendingDungeonReveal] = useState(() => initialSave?.pendingDungeonReveal ?? false);
   const [harvestPopup, setHarvestPopup] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [devTimeOffset, setDevTimeOffset] = useState(0);
@@ -167,6 +197,10 @@ export function GameProvider({ children }) {
   // been claimed -- replaces the old labyrinth-depth gates for these.
   const [dungeonsUnlocked, setDungeonsUnlocked] = useState(() => initialSave?.dungeonsUnlocked ?? false);
   const [dailyBossUnlocked, setDailyBossUnlocked] = useState(() => initialSave?.dailyBossUnlocked ?? false);
+  // Same idea for "Arena" and "Treasure" -- both stay greyed out on the Play
+  // page even after Play itself unlocks, until their own quest reward lands.
+  const [arenaUnlocked, setArenaUnlocked] = useState(() => initialSave?.arenaUnlocked ?? false);
+  const [treasureUnlocked, setTreasureUnlocked] = useState(() => initialSave?.treasureUnlocked ?? false);
 
   // ── Progression counters (feed quest predicates) ──────────────────────────
   const [eggsHatched, setEggsHatched] = useState(() => initialSave?.eggsHatched ?? 0);
@@ -197,7 +231,7 @@ export function GameProvider({ children }) {
   const [dailyMissionsSnapshot, setDailyMissionsSnapshot] = useState(() => initialSave?.dailyMissionsSnapshot ?? {
     eggsHatched: 0, dungeonsCleared: 0, arenaFights: 0,
     bananasUsed: 0, dailyBossFights: 0, plotsGrown: 0,
-    labyrinthFights: 0, fieldHarvests: 0, currencies: {},
+    labyrinthFights: 0, fieldHarvests: 0, petLevelUps: 0, equipLevelUps: 0, currencies: {},
   });
   const [dailyMissionsDone, setDailyMissionsDone] = useState(() => initialSave?.dailyMissionsDone ?? new Set());
   const [dailyCompletionClaimed, setDailyCompletionClaimed] = useState(() => initialSave?.dailyCompletionClaimed ?? false);
@@ -270,14 +304,15 @@ export function GameProvider({ children }) {
   persistedRef.current = {
     v: SAVE_VERSION,
     tab, gameMode,
-    tutorialSeen, tutorialRestricted, tutorialStep, postTutorialPopupPending, showQuestsArrow,
+    tutorialSeen, tutorialRestricted, tutorialStep, postTutorialPopupPending, showQuestsArrow, pendingDungeonReveal,
+    tutorialPhase, tutorialLine, tutorialPostLine, tutorialPickedCreatureId, tutorialPlayerCell,
     username, profileEmoji, profileAvatarId, profileFrame, profileTitle,
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,
     labyrinthDepth, labyrinthBestDepth,
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked,
-    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked,
+    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked,
     eggsHatched, dungeonsCleared, arenaFights, labyrinthFights, bananasUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, everCompletedDailyQuests,
     questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
@@ -333,8 +368,10 @@ export function GameProvider({ children }) {
     // ui
     tab, setTab, gameMode, setGameMode,
     collectionDeepLink, setCollectionDeepLink,
+    farmDeepLink, setFarmDeepLink,
     creatureOverlay, setCreatureOverlay,
     dexOverlay, setDexOverlay,
+    flairGuideStep, setFlairGuideStep,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,
     profileAvatarId, setProfileAvatarId,
@@ -345,6 +382,9 @@ export function GameProvider({ children }) {
     tutorialStep, setTutorialStep,
     postTutorialPopupPending, setPostTutorialPopupPending,
     showQuestsArrow, setShowQuestsArrow,
+    pendingDungeonReveal, setPendingDungeonReveal,
+    tutorialPhase, setTutorialPhase, tutorialLine, setTutorialLine, tutorialPostLine, setTutorialPostLine,
+    tutorialPickedCreatureId, setTutorialPickedCreatureId, tutorialPlayerCell, setTutorialPlayerCell,
     harvestPopup, setHarvestPopup, revealedCount, setRevealedCount,
     // currencies + collection
     currencies, setCurrencies, owned, setOwned,
@@ -373,6 +413,7 @@ export function GameProvider({ children }) {
     passRechargeCount, setPassRechargeCount,
     dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel,
     dungeonsUnlocked, setDungeonsUnlocked, dailyBossUnlocked, setDailyBossUnlocked,
+    arenaUnlocked, setArenaUnlocked, treasureUnlocked, setTreasureUnlocked,
     devTimeOffset, setDevTimeOffset, nowMs,
     // counters
     eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared,

@@ -8,7 +8,7 @@ import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 
-function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
+function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep}){
   const { setOwned, currencies, setCurrencies, lastFreeBananaDate, setLastFreeBananaDate } = useGame();
   const freeBananaAvailable = lastFreeBananaDate !== easternNoonDayKey();
   const [flairTab,setFlairTab]=useState("feed");
@@ -200,7 +200,6 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
             );
           })
         ),
-        freeBananaAvailable&&React.createElement("div",{style:{textAlign:"center",fontSize:11,fontWeight:700,color:"#1b5e20",marginBottom:6}},"🎁 First banana free today!"),
         // Feed buttons
         React.createElement("div",{style:{display:"flex",gap:8}},
           (()=>{
@@ -209,11 +208,20 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
             const need9=freeBananaAvailable?8:9;
             const dis1=selCount<need1||revealing;
             const dis10=selCount<need9||revealing;
+            const showFeedGuideArrow=flairGuideStep==="feed";
             return React.createElement(React.Fragment,null,
-              React.createElement("button",{onClick:()=>doFeed(1),disabled:dis1,style:{
+              React.createElement("button",{
+                "data-guide-target":"feed",
+                onClick:()=>{doFeed(1);if(flairGuideStep==="feed")setFlairGuideStep(null);},
+                disabled:dis1,
+                style:{
                 flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis1?"default":"pointer",
+                position:"relative",
                 background:dis1?"#e0e0e0":selectedBanana.color,color:dis1?"#aaa":"#fff"}
-              },"Feed ×1"),
+              },
+                showFeedGuideArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+                freeBananaAvailable?"Feed ×1 (Free!)":"Feed ×1"
+              ),
               React.createElement("button",{onClick:()=>doFeed(9),disabled:dis10,style:{
                 flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis10?"default":"pointer",
                 background:dis10?"#e0e0e0":selectedBanana.color,color:dis10?"#aaa":"#fff"}

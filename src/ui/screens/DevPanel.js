@@ -17,7 +17,7 @@ const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
 const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTab, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked } = useGame();
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked } = useGame();
   const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",questSet:"1"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
@@ -46,15 +46,34 @@ function DevPanel(){
     CREATURES.filter(c=>!c.evolutionOf).forEach(c=>{all[c.id]=makeOwnedCreature(c);});
     setOwned(all);
   }
-  function skipTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(true);setTab("home");setLabyrinthBestDepth(d=>Math.max(d||1,21));setPlotsUnlocked(true);setDungeonsUnlocked(true);setDailyBossUnlocked(true);}
-  function triggerTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(false);setTab("home");}
-  function resetAll(){setOwned({});setCurrencies({gems:0,food:0,candy:0,eggs:0,legendaryEggs:0,melonFire:0,melonWater:0,melonNature:0,melonEarth:0,melonWind:0,melonElectric:0,melonLight:0,melonDark:0,melonRainbow:0,flairBanana:0,mythicalFlairBanana:0,ancientFlairBanana:0,flairShard:0});setSkinShards(0);setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);setTab("home");setLabyrinthDepth(1);setLabyrinthBestDepth(1);setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());setFarmFieldLevel(1);setFarmPlots(1);setFarmFieldLastHarvest(Date.now());setFarmFieldSeed((Math.random()*1e9)|0);setFarmCrops(Array(6).fill(null));setPlotUpgrades(Array(6).fill(0));setSpecialPurchased(false);
+  function skipTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(true);setTab("home");setLabyrinthBestDepth(d=>Math.max(d||1,21));setPlotsUnlocked(true);setDungeonsUnlocked(true);setDailyBossUnlocked(true);setArenaUnlocked(true);setTreasureUnlocked(true);}
+  function triggerTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(false);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);setTab("home");}
+  // Jumps straight to the post-Set-1 "Dungeon reveal" hand-off (arrow at
+  // Play, then at the Dungeon card) without replaying the intro narrative or
+  // Progression Set 1 itself -- assumes Set 1 just completed, so it also
+  // marks that set claimed and unlocks Dungeon + Daily Boss to match.
+  function triggerTutorial2(){
+    // Reaching Progression Set 1 in a real playthrough requires Play (and so
+    // Dungeon/Arena) to already be unlocked, which is its own permanent gate
+    // on Labyrinth depth, separate from the tutorial lock -- clear it too or
+    // the "arrow at Play" hand-off dead-ends on that tab's own lock toast.
+    setLabyrinthBestDepth(d=>Math.max(d||1,21));
+    setQuestBatchIdx(prev=>({...prev,general:Math.max(prev.general||0,1)}));
+    setDungeonsUnlocked(true);
+    setDailyBossUnlocked(true);
+    setTutorialSeen(true);
+    setTutorialRestricted(true);
+    setTutorialStep("dungeonReveal");
+    setGameMode(null);
+    setTab("home");
+  }
+  function resetAll(){setOwned({});setCurrencies({gems:0,food:0,candy:0,eggs:0,legendaryEggs:0,melonFire:0,melonWater:0,melonNature:0,melonEarth:0,melonWind:0,melonElectric:0,melonLight:0,melonDark:0,melonRainbow:0,flairBanana:0,mythicalFlairBanana:0,ancientFlairBanana:0,flairShard:0});setSkinShards(0);setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);setTab("home");setLabyrinthDepth(1);setLabyrinthBestDepth(1);setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());setFarmFieldLevel(1);setFarmPlots(1);setFarmFieldLastHarvest(Date.now());setFarmFieldSeed((Math.random()*1e9)|0);setFarmCrops(Array(6).fill(null));setPlotUpgrades(Array(6).fill(0));setSpecialPurchased(false);
     // Quest batchIdx/claimed alone aren't enough -- every check()/progress()
     // in data/quests.js reads these live counters, so they have to reset too
     // or a "completed" quest stays completed even after its set rewinds.
     setUnlockedSkins([]);setArenaLevels(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));setArenaProgress(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));
     setEggsHatched(0);setDungeonsCleared(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setEverCompletedDailyQuests(false);
-    setPlotsUnlocked(false);setDungeonsUnlocked(false);setDailyBossUnlocked(false);
+    setPlotsUnlocked(false);setDungeonsUnlocked(false);setDailyBossUnlocked(false);setArenaUnlocked(false);setTreasureUnlocked(false);
     clearSave();}
 
   function giveMaxInvestedCreatures(){
@@ -70,6 +89,34 @@ function DevPanel(){
       all[finalDef.id]=e;
     });
     setOwned(all);
+  }
+  // Satisfies every quest check() across every QUEST_DEFS category's current
+  // batch (general/creature/gear/dungeon/arena) -- generous creatures,
+  // currencies, and counters -- WITHOUT touching claimedQuests or granting
+  // any reward, so quests show as ready-to-claim but stay unclaimed.
+  function completeCurrentQuests(){
+    giveMaxInvestedCreatures();
+    const legendaryDef=CREATURES.find(c=>c.rarity==="legendary");
+    setOwned(prev=>{
+      const next={...prev};
+      if(legendaryDef&&!next[legendaryDef.id]){
+        next[legendaryDef.id]=makeOwnedCreature(legendaryDef);
+        next[legendaryDef.id].level=MAX_LEVEL;
+      }
+      Object.keys(next).slice(0,5).forEach(id=>{next[id]={...next[id],equipped:["com_hp_atk",null,null,null]};});
+      return next;
+    });
+    setEquipmentCopies(prev=>({...prev,com_hp_atk:Math.max(prev.com_hp_atk||0,5)}));
+    setCurrencies(c=>({...c,gems:Math.max(c.gems||0,999999),equipShards:Math.max(c.equipShards||0,999999),dungeonPass:Math.max(c.dungeonPass||0,999)}));
+    setEggsHatched(c=>Math.max(c,999));
+    setBananasUsed(c=>Math.max(c,999));
+    setEquipLevelUps(c=>Math.max(c,999));
+    setDungeonsCleared(c=>Math.max(c,999));
+    setLabyrinthBestDepth(c=>Math.max(c||1,999));
+    setEverCompletedDailyQuests(true);
+    setUnlockedSkins(prev=>prev&&prev.length?prev:["dev_dummy_skin"]);
+    setArenaProgress(Object.fromEntries(ARENA_TABS.map(t=>[t.id,999])));
+    setArenaLevels(Object.fromEntries(ARENA_TABS.map(t=>[t.id,999])));
   }
   function giveMaxGear(){
     const lvl={},asc={};
@@ -253,10 +300,17 @@ function DevPanel(){
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxFlair},"Unlock all flair (max flair)")
       ),
       React.createElement("div",{className:"dev-row"},
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:completeCurrentQuests},
+          "Complete current quests in every tab (doesn't claim rewards)")
+      ),
+      React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:skipTutorial},"Skip tutorial")
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:triggerTutorial},"Trigger tutorial")
+      ),
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:triggerTutorial2},"Trigger tutorial 2 (Dungeon reveal)")
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8,background:"#A32D2D"},onClick:resetAll},"Reset everything")

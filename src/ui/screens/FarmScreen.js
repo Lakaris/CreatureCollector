@@ -9,7 +9,7 @@ import { formatDuration } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
-  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, tutorialRestricted, tutorialStep, setTutorialStep, plotsUnlocked } = useGame();
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, tutorialRestricted, tutorialStep, setTutorialStep, plotsUnlocked, farmDeepLink, setFarmDeepLink } = useGame();
   // The tutorial's field visit is scripted: storage always reads as full and
   // only Food/Gear Shards drop, so the guided harvest is guaranteed and
   // doesn't hand out melons/candy the player hasn't been introduced to yet.
@@ -28,6 +28,12 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   const [speedUpConfirm,setSpeedUpConfirm]=useState(null);
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(t);},[]);
+  // Jumps straight to a sub-tab when navigated here from e.g. the "Grow a
+  // Plot" daily mission; consumed once then cleared, same pattern as
+  // CollectionScreen's deepLinkId.
+  useEffect(()=>{
+    if(farmDeepLink){setFarmTab(farmDeepLink);setFarmDeepLink(null);}
+  },[farmDeepLink]);
   function showNotify(msg){setNotify(msg);setTimeout(()=>setNotify(null),2000);}
 
   const rate=FIELD_RATES[farmFieldLevel]||2;

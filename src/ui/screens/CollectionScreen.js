@@ -13,7 +13,7 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import NavBar from "../../ui/components/NavBar.js";
 
 function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, tutorialStep, setTutorialStep, tutorialRestricted, tab, setTab } = useGame();
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, tutorialStep, setTutorialStep, tutorialRestricted, tab, setTab, flairGuideStep, setFlairGuideStep } = useGame();
   const [selected,setSelected]=useState(null);
   useEffect(()=>{if(deepLinkId){setSelected(deepLinkId);onDeepLinkConsumed&&onDeepLinkConsumed();}},[deepLinkId]);
   // Resuming mid-tutorial after a reload: these steps expect a creature's
@@ -157,11 +157,11 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
           React.createElement("i",{className:"ti ti-egg",style:{fontSize:40,display:"block",marginBottom:8,opacity:.3}}),
           React.createElement("p",{style:{fontSize:13}},(activeRarities.size===0&&activeTypes.size===0&&!search.trim())?"No creatures yet — hatch some eggs!":"No creatures match your filters")
         )
-      :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick")?{marginTop:34}:undefined},
+      :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection")?{marginTop:34}:undefined},
           filtered.map(({owned:o,def:d},idx)=>{
             const displayEmoji=getDisplayEmoji(d,o,unlockedSkins);
-            const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick")&&idx===0;
-            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");},style:{position:"relative",paddingTop:30}},
+            const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection")&&idx===0;
+            return React.createElement("div",{key:o.id,className:"creature-card","data-guide-target":(flairGuideStep==="collection"&&idx===0)?"collection":undefined,onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");if(flairGuideStep==="collection"&&idx===0)setFlairGuideStep("flair");},style:{position:"relative",paddingTop:30}},
               showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
               d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),

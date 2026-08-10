@@ -16,7 +16,19 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, tutorialStep, setTutorialStep, tutorialRestricted, tab, setTab } = useGame();
   const [selected,setSelected]=useState(null);
   useEffect(()=>{if(deepLinkId){setSelected(deepLinkId);onDeepLinkConsumed&&onDeepLinkConsumed();}},[deepLinkId]);
+  // Resuming mid-tutorial after a reload: these steps expect a creature's
+  // detail page already open, but `selected` is local state that doesn't
+  // survive a reload. There's only ever the one starter creature owned at
+  // this point in the tutorial, so it's safe to just re-open it.
+  useEffect(()=>{
+    if(selected||!tutorialRestricted)return;
+    if(tutorialStep==="slot"||tutorialStep==="item"||tutorialStep==="levelupCreature"){
+      const ids=Object.keys(owned);
+      if(ids.length)setSelected(ids[0]);
+    }
+  },[]);
   const [showDex,setShowDex]=useState(false);
+  const [filtersOpen,setFiltersOpen]=useState(false);
   const [pendingEvo,setPendingEvo]=useState(null);
   const [search,setSearch]=useState("");
   const [activeRarities,setActiveRarities]=useState(new Set());
@@ -87,7 +99,10 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
 
   return React.createElement("div",null,
     React.createElement(ScreenHeader,{title:"Collection",right:
-      React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>setShowDex(true),style:{marginBottom:0,padding:"4px 12px",border:"none",lineHeight:1.2}},"Dex")
+      // Locked for the whole tutorial regardless of step -- the Dex isn't
+      // part of any guided flow, so there's no step where tapping into it
+      // would be safe.
+      React.createElement("button",{className:"btn btn-primary btn-sm",onClick:()=>{if(tutorialRestricted)return;setShowDex(true);},disabled:tutorialRestricted,style:{marginBottom:0,padding:"4px 12px",border:"none",lineHeight:1.2,opacity:tutorialRestricted?0.5:1,cursor:tutorialRestricted?"not-allowed":"pointer"}},"Dex")
     }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
@@ -97,7 +112,10 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
         style:{width:"100%",padding:"8px 10px 8px 32px",border:"0.5px solid rgba(0,0,0,0.15)",borderRadius:8,fontSize:13,outline:"none",background:"#fff"}
       })
     ),
-    !tutorialRestricted&&React.createElement("div",{style:{marginBottom:10}},
+    !tutorialRestricted&&React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginBottom:6}},
+      React.createElement("button",{onClick:()=>setFiltersOpen(p=>!p),style:{fontSize:11,color:"#534AB7",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}},filtersOpen?"Hide Filters ▲":"Filter ▼")
+    ),
+    !tutorialRestricted&&filtersOpen&&React.createElement("div",{style:{marginBottom:10}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Rarity"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
@@ -136,11 +154,11 @@ function CollectionScreen({onBananaUsed,deepLinkId,onDeepLinkConsumed}){
           React.createElement("i",{className:"ti ti-egg",style:{fontSize:40,display:"block",marginBottom:8,opacity:.3}}),
           React.createElement("p",{style:{fontSize:13}},(activeRarities.size===0&&activeTypes.size===0&&!search.trim())?"No creatures yet — hatch some eggs!":"No creatures match your filters")
         )
-      :React.createElement("div",{className:"creature-grid",style:tutorialStep==="collection"?{marginTop:34}:undefined},
+      :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick")?{marginTop:34}:undefined},
           filtered.map(({owned:o,def:d},idx)=>{
             const displayEmoji=getDisplayEmoji(d,o,unlockedSkins);
-            const showPointer=tutorialStep==="collection"&&idx===0;
-            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");},style:{position:"relative",paddingTop:30}},
+            const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick")&&idx===0;
+            return React.createElement("div",{key:o.id,className:"creature-card",onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");},style:{position:"relative",paddingTop:30}},
               showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
               d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),

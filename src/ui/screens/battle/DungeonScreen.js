@@ -18,6 +18,7 @@ import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
+import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
 function DungeonScreen({onBack,onClear,onViewCreature}){
@@ -240,10 +241,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(t);},[]);
   function getTimeToNoon(){
-    const d=new Date();
-    const noon=new Date();noon.setHours(12,0,0,0);
-    if(d>=noon)noon.setDate(noon.getDate()+1);
-    const diff=noon-d;
+    const diff=nextEasternNoon(now)-now;
     const h=Math.floor(diff/3600000);
     const m=Math.floor((diff%3600000)/60000);
     const s=Math.floor((diff%60000)/1000);

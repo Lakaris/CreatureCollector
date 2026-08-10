@@ -18,11 +18,12 @@ import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import { easternNoonDayKey } from "../../../core/dates.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
   const GRID_ROWS=10,GRID_COLS=6,PLAYER_START_ROW=6,TILE=44,GAP=0;
-  const today=new Date().toDateString();
+  const today=easternNoonDayKey();
   const boss=DUNGEON_BOSSES[((dailyBossLevel||1)-1)%DUNGEON_BOSSES.length];
   const emoji=TYPE_EMOJI[boss.type]||"👾";
   const [nowMs,setNowMs]=useState(Date.now());

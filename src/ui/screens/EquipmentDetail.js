@@ -14,7 +14,7 @@ import EquipmentPicker from "../../ui/screens/EquipmentPicker.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 
 function EquipmentDetail({ itemId, onBack }) {
-  const { owned, currencies, setCurrencies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies } = useGame();
+  const { owned, currencies, setCurrencies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, tutorialStep, setTutorialStep, setEquipLevelUps } = useGame();
   const [notify, setNotify] = React.useState(null);
   const [pickerOpen, setPickerOpen] = React.useState(false);
   function notify_(msg) { setNotify(msg); setTimeout(() => setNotify(null), 2200); }
@@ -43,7 +43,11 @@ function EquipmentDetail({ itemId, onBack }) {
     const cost = equipUpgradeCost(lvl);
     if ((currencies.equipShards || 0) < cost) { notify_("Not enough 🔧 Gear Shards!"); return; }
     setCurrencies((c) => ({ ...c, equipShards: (c.equipShards || 0) - cost }));
-    setEquipmentLevels((prev) => ({ ...prev, [pi.id]: (prev[pi.id] || 0) + 1 }));
+    setEquipmentLevels((prev) => ({ ...prev, [pi.id]: (prev[pi.id] || 1) + 1 }));
+    setEquipLevelUps((c) => c + 1);
+    // Advances once, the first time -- further upgrades after this stay
+    // fully available, they just no longer move the tutorial forward.
+    if (tutorialStep === "upgradeItem") setTutorialStep("toHome");
   }
 
   function doAscendEquip() {
@@ -56,7 +60,10 @@ function EquipmentDetail({ itemId, onBack }) {
 
   return React.createElement("div", null,
     notify && React.createElement(Notify, { msg: notify }),
-    React.createElement(ScreenHeader, { title: "", onBack }),
+    // "toHome" is the hand-off right after that single upgrade -- Back stays
+    // locked the same as during "upgradeItem" so the only way forward is the
+    // NavBar arrow to Home.
+    React.createElement(ScreenHeader, { title: "", onBack, backDisabled: tutorialStep === "upgradeItem" || tutorialStep === "toHome" }),
     React.createElement("div", { className: "card", style: { position: "relative" } },
       rarCfg && React.createElement("div", { style: { position: "absolute", top: 10, left: 12, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
       (pi.element || pi.role) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
@@ -89,12 +96,16 @@ function EquipmentDetail({ itemId, onBack }) {
         pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + pi.effect)
       ),
       React.createElement("div", { style: { borderTop: "1px solid #eee", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10 } },
-        React.createElement("div", null,
+        React.createElement("div", { style: { position: "relative" } },
+          tutorialStep === "upgradeItem" && React.createElement("div", { style: { position: "absolute", left: "50%", top: -6, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "UPGRADE"),
           lvl < EQUIP_MAX_LEVEL
             ? React.createElement("div", null,
                 React.createElement("div", { style: { fontSize: 12, color: "#534AB7", marginBottom: 8 } }, "Lv " + (lvl + 1) + ": " + equipBonusStr(nextUpgradeBonuses)),
-                React.createElement("button", { onClick: doUpgrade, disabled: !canAffordUpgrade, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: canAffordUpgrade ? "pointer" : "default", background: canAffordUpgrade ? "#534AB7" : "#e0e0e0", color: canAffordUpgrade ? "#fff" : "#aaa" } }, "🔧 Upgrade " + (currencies.equipShards || 0) + "/" + upgradeCost)
+                (() => {
+                  const enabled = canAffordUpgrade && tutorialStep !== "toHome";
+                  return React.createElement("button", { onClick: doUpgrade, disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa" } }, "🔧 Upgrade " + (currencies.equipShards || 0) + "/" + upgradeCost);
+                })()
               )
             : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Level")
         ),

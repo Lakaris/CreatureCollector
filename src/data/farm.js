@@ -17,7 +17,7 @@ export const PLOT_CROPS=[
   {key:"ascensionMelon",label:"Ascension Melon",emoji:"🍈", yield:1, upgradeEvery:5},
 ];
 
-// Main Field: 100 levels, one Ancient Fertilizer each (see FarmScreen.js) --
+// Field: 100 levels, one Ancient Fertilizer each (see FarmScreen.js) --
 // deliberately 1:1 with the 100 total Ancient Fertilizer a full 5000-floor
 // Labyrinth clear pays out (1 every 50 floors). A player who spends
 // fertilizer as they climb keeps field level roughly in step with floor/50,

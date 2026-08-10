@@ -5,9 +5,9 @@
 // only for bosses, melons, and arena tabs. That is intentional, not a gap.
 
 export const TYPE_EMOJI={Fire:"🔥",Water:"💧",Nature:"🌿",Earth:"🪨",Wind:"💨",Electric:"⚡",Light:"✨",Dark:"🌑"};
-export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,emoji,key:"melon"+type,label:emoji+" "+type+" Melon"}));
-MELON_TYPES.push({type:null,emoji:"🌈",key:"melonRainbow",label:"🌈 Rainbow Melon"});
-MELON_TYPES.push({type:null,emoji:"🍈",key:"ascensionMelon",label:"🍈 Ascension Melon"});
+export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,emoji,key:"melon"+type,label:type+" Melon"}));
+MELON_TYPES.push({type:null,emoji:"🌈",key:"melonRainbow",label:"Rainbow Melon"});
+MELON_TYPES.push({type:null,emoji:"🍈",key:"ascensionMelon",label:"Ascension Melon"});
 
 export const ROLE_CONFIG={
   Attacker:{emoji:"⚔️",color:"#9B2020",bg:"#FDEAEA"},

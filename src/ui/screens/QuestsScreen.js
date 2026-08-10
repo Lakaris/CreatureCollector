@@ -6,12 +6,24 @@ import { QUEST_TABS, DAILY_MISSIONS, QUEST_DEFS, REWARD_LABELS, REWARD_DESC } fr
 import { applyRewards } from "../../core/rewards.js";
 import DailyTabContent from "../../ui/screens/DailyTabContent.js";
 
+// Mirrors NavBar's Play-tab gate: Dungeon and Arena quests aren't reachable
+// until then, so their quest tabs stay locked until the same threshold.
+const DUNGEON_ARENA_UNLOCK_BEST_DEPTH=21;
+const QUEST_TAB_LOCK_MSG={dungeon:"Unlocks once you beat Floor 20 of the Labyrinth",arena:"Unlocks once you beat Floor 20 of the Labyrinth"};
+
 function QuestsScreen({onBack}){
-  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions } = useGame();
-  const [questTab,setQuestTab]=React.useState("daily");
+  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode } = useGame();
+  const [questTab,setQuestTab]=React.useState("general");
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
   const [rewardPopup,setRewardPopup]=React.useState(null);
+  const [lockedMsg,setLockedMsg]=React.useState(null);
+  React.useEffect(()=>{
+    if(!lockedMsg)return;
+    const t=setTimeout(()=>setLockedMsg(null),2200);
+    return()=>clearTimeout(t);
+  },[lockedMsg]);
+  const featureLocked=t=>(t.id==="dungeon"||t.id==="arena")&&(labyrinthBestDepth||1)<DUNGEON_ARENA_UNLOCK_BEST_DEPTH;
   const batchIdx=questBatchIdx[questTab]||0;
   const batches=QUEST_DEFS[questTab]||[];
   const batch=batches[batchIdx];
@@ -41,6 +53,15 @@ function QuestsScreen({onBack}){
   function claimQuestReward(q){
     setClaimedQuests(prev=>new Set([...prev,q.id]));
     showReward(q.reward);
+  }
+
+  // Tapping an incomplete quest jumps to wherever it can actually be
+  // worked on, instead of just sitting there doing nothing.
+  function goToQuest(q){
+    if(!q.nav)return;
+    if(q.nav==="dailyTab"){setQuestTab("daily");return;}
+    if(q.nav==="labyrinth"){setGameMode("labyrinth");setTab("play");return;}
+    setTab(q.nav);
   }
 
   const questRewardPopupEl=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
@@ -78,11 +99,13 @@ function QuestsScreen({onBack}){
   }
 
   const questTabDef=QUEST_TABS.find(t=>t.id===questTab);
-  const headerTitle=questTab==="daily"?"📅 Daily Missions":(questTabDef?.emoji+" "+questTabDef?.label+" Quests");
+  const headerTitle=questTab==="daily"?"📅 Daily Quests":(questTabDef?.emoji+" "+questTabDef?.label+" Quests");
   return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
     questRewardPopupEl,
-    React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid #e0e0e0",flexShrink:0,background:"#fff"}},
-      React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111"}},headerTitle)
+    lockedMsg&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:300,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},lockedMsg),
+    React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid #e0e0e0",flexShrink:0,background:"#fff",display:"flex",alignItems:"center",gap:8}},
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111"}},headerTitle),
+      questTab==="general"&&React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#534AB7",background:"#f0effe",border:"1px solid #d8d4fb",borderRadius:20,padding:"2px 10px"}},"Set "+(batchIdx+1))
     ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
       React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,alignSelf:"stretch",overflowY:"auto"}},
@@ -92,8 +115,9 @@ function QuestsScreen({onBack}){
           const tBatch=tBatches[tBatchIdx];
           const activeDailyMissions=dailySelectedMissions&&dailySelectedMissions.length>0?DAILY_MISSIONS.filter(m=>dailySelectedMissions.includes(m.id)):DAILY_MISSIONS;
           const tDone=t.id==="daily"?activeDailyMissions.some(m=>!dailyMissionsDone.has(m.id)&&(()=>{try{return m.check(questState,dailyMissionsSnapshot);}catch{return false;}})()):(tBatch&&tBatch.quests.some(q=>q.check(questState)&&q.reward&&!claimedQuests.has(q.id)));
+          const locked=featureLocked(t);
           return React.createElement("button",{key:t.id,
-            onClick:()=>setQuestTab(t.id),
+            onClick:()=>{ if(locked){setLockedMsg(QUEST_TAB_LOCK_MSG[t.id]);return;} setQuestTab(t.id); },
             style:{
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
               flex:1,gap:3,padding:"4px",border:"none",position:"relative",
@@ -101,12 +125,13 @@ function QuestsScreen({onBack}){
               background:questTab===t.id?"#f0effe":"none",
               color:questTab===t.id?"#534AB7":"#555",
               fontSize:10,fontWeight:questTab===t.id?700:400,cursor:"pointer",
+              opacity:locked?0.4:1,
               transition:"background 0.15s",
             }
           },
-            React.createElement("span",{style:{fontSize:20}},t.emoji),
+            React.createElement("span",{style:{fontSize:20}},locked?"🔒":t.emoji),
             t.label,
-            tDone&&(t.id==="daily"||tBatchIdx<tBatches.length)&&React.createElement("span",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
+            !locked&&tDone&&(t.id==="daily"||tBatchIdx<tBatches.length)&&React.createElement("span",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
           );
         })
       ),
@@ -151,7 +176,8 @@ function QuestsScreen({onBack}){
               const prog=q.progress(questState);
               const pct=prog.max>0?Math.min(1,prog.cur/prog.max):0;
               const rewardEntries=q.reward?Object.entries(q.reward):[];
-              return React.createElement("div",{key:q.id,onClick:done&&!claimed?()=>claimQuestReward(q):undefined,style:{background:done&&!claimed?"#f0fff4":"#fafafa",border:"1.5px solid "+(done&&!claimed?"#86efac":"#e8e8e8"),borderRadius:12,padding:"10px",display:"flex",gap:10,alignItems:"stretch",cursor:done&&!claimed?"pointer":"default",opacity:claimed?0.45:1,transition:"opacity 0.2s"}},
+              const clickAction=done&&!claimed?()=>claimQuestReward(q):(!done&&q.nav?()=>goToQuest(q):undefined);
+              return React.createElement("div",{key:q.id,onClick:clickAction,style:{background:done&&!claimed?"#f0fff4":"#fafafa",border:"1.5px solid "+(done&&!claimed?"#86efac":"#e8e8e8"),borderRadius:12,padding:"10px",display:"flex",gap:10,alignItems:"stretch",cursor:clickAction?"pointer":"default",opacity:claimed?0.45:1,transition:"opacity 0.2s"}},
                 rewardEntries.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,flexShrink:0}},
                   rewardEntries.map(([k,v])=>React.createElement("div",{key:k,onClick:e=>{e.stopPropagation();setRewardPopup(k);},style:{
                     width:60,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,

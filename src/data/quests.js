@@ -3,10 +3,11 @@
 // Some of those closures look creatures up by id, hence the CREATURE_MAP import.
 
 import { CREATURE_MAP } from "./creatures.js";
+import { FIELD_RATES, FIELD_SHARD_RATES } from "./farm.js";
 
 export const QUEST_TABS=[
-  {id:"daily",label:"Daily",emoji:"📅"},
   {id:"general",label:"Progression",emoji:"📋"},
+  {id:"daily",label:"Daily",emoji:"📅"},
   {id:"creature",label:"Creature",emoji:"🐾"},
   {id:"gear",label:"Gear",emoji:"⚔️"},
   {id:"dungeon",label:"Dungeon",emoji:"🏰"},
@@ -29,9 +30,12 @@ export const DAILY_MISSIONS=[
 export const QUEST_DEFS={
   general:[
     {reward:{gems:100,food:50},quests:[
-      {id:"g0a",reward:{food:20},label:"Own 5 creatures",check:s=>Object.keys(s.owned).length>=5,progress:s=>({cur:Math.min(Object.keys(s.owned).length,5),max:5})},
-      {id:"g0b",reward:{gems:25},label:"Hatch 3 eggs",check:s=>s.eggsHatched>=3,progress:s=>({cur:Math.min(s.eggsHatched,3),max:3})},
-      {id:"g0c",reward:{candy:5},label:"Collect 100 food",check:s=>s.currencies.food>=100,progress:s=>({cur:Math.min(s.currencies.food,100),max:100})},
+      {id:"g0a",reward:{eggs:1},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10}),nav:"hatch"},
+      {id:"g0b",reward:{flairBanana:1},label:"Use 1 Flair Banana",check:s=>s.bananasUsed>=1,progress:s=>({cur:Math.min(s.bananasUsed,1),max:1}),nav:"collection"},
+      {id:"g0c",reward:{eggs:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
+      {id:"g0d",reward:{food:1000},label:"Level up pets 5 times",check:s=>s.petLevelUps>=5,progress:s=>({cur:Math.min(s.petLevelUps,5),max:5}),nav:"collection"},
+      {id:"g0e",reward:{equipShards:1000},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
+      {id:"g0f",reward:{eggs:1},label:"Complete Floor 10 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=11,progress:s=>({cur:Math.min(s.labyrinthBestDepth||1,11),max:11}),nav:"labyrinth"},
     ]},
     {reward:{gems:250,candy:25},quests:[
       {id:"g1a",reward:{food:40},label:"Own 10 creatures",check:s=>Object.keys(s.owned).length>=10,progress:s=>({cur:Math.min(Object.keys(s.owned).length,10),max:10})},
@@ -114,7 +118,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -134,40 +138,76 @@ export const REWARD_DESC={
   mysteriousOre:"Used to unlock cosmetic skins for your Creatures.",
   deluxeOre:"Used to unlock rare and epic skins for your Creatures.",
   candy:"Used to unlock Skins.",
-  ancientFertilizer:"Used to upgrade your Main Field, boosting its Food/Gear Shard rates.",
+  ancientFertilizer:"Used to upgrade your Field, boosting its Food/Gear Shard rates.",
 };
 
+// "FIELD_12H" is a sentinel, not a literal amount -- resolveDailyReward()
+// below swaps it for 12 hours' worth of the Field's current Food/Gear Shard
+// rate, so these days keep pace as the player upgrades the Field with
+// Ancient Fertilizer instead of paying out a fixed number forever.
 export const DAILY_REWARDS=[
   {day:1,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:2,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:2,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:3,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
-  {day:4,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:4,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:5,label:"5 Flair Banana",emoji:"🍌",reward:{flairBanana:5}},
   {day:6,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:7,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:7,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:8,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
-  {day:9,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:9,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:10,label:"1 Rainbow Melon",emoji:"🍈",reward:{rainbowMelon:1}},
   {day:11,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:12,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:12,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:13,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
-  {day:14,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:14,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:15,label:"1 Mythical Flair Banana",emoji:"🍌✨",reward:{mythicalFlairBanana:1}},
   {day:16,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:17,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:17,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:18,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
-  {day:19,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:19,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:20,label:"3 Ascension Melon",emoji:"🍈",reward:{ascensionMelon:3}},
   {day:21,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:22,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:22,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:23,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
-  {day:24,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:24,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:25,label:"1 Ancient Flair Banana",emoji:"🍌⭐",reward:{ancientFlairBanana:1}},
   {day:26,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
-  {day:27,label:"50 Food",emoji:"🍖",reward:{food:50}},
+  {day:27,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:28,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
-  {day:29,label:"10 Gear Shards",emoji:"⚔️",reward:{equipShards:10}},
+  {day:29,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
   {day:30,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+];
+
+/** Resolves a DAILY_REWARDS entry's "FIELD_12H" sentinels into an actual
+ * amount (12h of the Field's current per-hour rate at the given level) and
+ * a matching label. Entries without a sentinel pass through unchanged. */
+export function resolveDailyReward(entry,farmFieldLevel){
+  const reward={...entry.reward};
+  let label=entry.label;
+  if(reward.food==="FIELD_12H"){
+    const amt=(FIELD_RATES[farmFieldLevel]||FIELD_RATES[1])*12;
+    reward.food=amt;
+    label=amt+" Food";
+  }
+  if(reward.equipShards==="FIELD_12H"){
+    const amt=(FIELD_SHARD_RATES[farmFieldLevel]||FIELD_SHARD_RATES[1])*12;
+    reward.equipShards=amt;
+    label=amt+" Gear Shards";
+  }
+  return {...entry,reward,label};
+}
+
+export const NEW_PLAYER_GIFT_REWARDS=[
+  {day:1,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
+  {day:2,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+  {day:3,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
+  {day:4,label:"1 Ascension Melon",emoji:"🍈",reward:{ascensionMelon:1}},
+  {day:5,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
+  {day:6,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+  {day:7,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
+  {day:8,label:"1 Rainbow Melon",emoji:"🍈",reward:{rainbowMelon:1}},
+  {day:9,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
+  {day:10,label:"3 Legendary Eggs",emoji:"🌟",reward:{legendaryEggs:3}},
 ];
 
 export const BATTLEPASS_MISSIONS=[

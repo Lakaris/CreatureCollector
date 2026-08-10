@@ -5,7 +5,7 @@
 // CreatureDetail's own Gear tab, since assigning gear to a slot only makes
 // sense in the context of one creature).
 
-import React, { useState } from "../../react.js";
+import React, { useState, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
@@ -16,9 +16,19 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 
+// Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the
+// tutorial's guided walkthrough points at equipping/upgrading.
+const TUTORIAL_ITEM_ID="com_hp_atk";
+
 function EquipmentScreen() {
-  const { owned, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, setEquipmentAscensions, equipFavorites, setEquipFavorites } = useGame();
+  const { owned, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, setEquipmentAscensions, equipFavorites, setEquipFavorites, tutorialRestricted, tutorialStep, setTutorialStep } = useGame();
   const [selected, setSelected] = useState(null);
+  // Resuming mid-tutorial after a reload: "upgradeItem" expects the Iron
+  // Band's detail page already open, but `selected` is local state that
+  // doesn't survive a reload.
+  useEffect(() => {
+    if (tutorialRestricted && tutorialStep === "upgradeItem") setSelected(TUTORIAL_ITEM_ID);
+  }, []);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterRarities, setFilterRarities] = useState(new Set());
   const [filterStats, setFilterStats] = useState(new Set());
@@ -94,9 +104,9 @@ function EquipmentScreen() {
     }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 } },
       React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#666" } }, "All Gear"),
-      React.createElement("button", { onClick: () => setFiltersOpen((p) => !p), style: { fontSize: 11, color: "#534AB7", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" } }, filtersOpen ? "Hide Filters ▲" : "Filter ▼")
+      !tutorialRestricted && React.createElement("button", { onClick: () => setFiltersOpen((p) => !p), style: { fontSize: 11, color: "#534AB7", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" } }, filtersOpen ? "Hide Filters ▲" : "Filter ▼")
     ),
-    filtersOpen && React.createElement("div", { style: { marginBottom: 4 } },
+    !tutorialRestricted && filtersOpen && React.createElement("div", { style: { marginBottom: 4 } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Rarity"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
@@ -141,11 +151,13 @@ function EquipmentScreen() {
             const rarCfg = EQUIP_RARITY_CONFIG[item.rarity];
             const isEquipped = equippedAnywhere.has(item.id);
             const canAscendItem = asc < EQUIP_MAX_ASCENSION && copies >= EQUIP_ASC_COSTS[asc];
+            const showItemPointer = tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID;
             return React.createElement("div", {
               key: item.id,
-              onClick: () => setSelected(item.id),
+              onClick: () => { setSelected(item.id); if (tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID) setTutorialStep("upgradeItem"); },
               style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
             },
+              showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8 } },
                 React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl)
               ),

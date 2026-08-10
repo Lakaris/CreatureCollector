@@ -23,6 +23,10 @@ import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
 // guided walkthrough points the player at equipping.
 const TUTORIAL_ITEM_ID="com_hp_atk";
+// The level-up detour only requires a single level-up before advancing --
+// the guided harvest's fixed food amount isn't guaranteed to afford more
+// than that (it doesn't scale with the food-cost curve in core/creatures.js),
+// so requiring more than one risks softlocking the tutorial.
 
 /** Equipped-slot stat bonuses, one stat per line (unlike equipBonusStr's "·"-joined string). */
 function equipBonusLines(bonuses){
@@ -48,12 +52,36 @@ function flairStatGain(stat,base,buffs){
 }
 
 function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep } = useGame();
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep, setPetLevelUps, setEquipLevelUps } = useGame();
   // "slot"/"item" cover the whole guided equip flow (creature page -> slot
   // picker); "item" narrows further to the picker itself, where only the
   // Iron Band tile should respond so the pointer arrow isn't a red herring.
-  const equipTutorialLock = tutorialRestricted && (tutorialStep === "slot" || tutorialStep === "item");
-  const pickerTutorialLock = tutorialRestricted && tutorialStep === "item";
+  // "farm" is the hand-off step after equipping -- the player's meant to
+  // follow the arrow to the Farm tab, so everything here stays locked down
+  // (the Iron Band tile included, since it's already equipped by then).
+  // "levelupCreature" is the later level-up detour -- Back/tabs lock down
+  // the same way, and (see levelupLock below) so does Gear entirely.
+  // "toEquipment" is the hand-off step right after that single level-up --
+  // same full lockdown as "farm", so Level Up can't be tapped again and the
+  // only way forward is the NavBar arrow to Equipment.
+  const equipTutorialLock = tutorialRestricted && (tutorialStep === "slot" || tutorialStep === "item" || tutorialStep === "farm" || tutorialStep === "levelupCreature" || tutorialStep === "toEquipment");
+  const pickerTutorialLock = tutorialRestricted && (tutorialStep === "item" || tutorialStep === "farm");
+  // Stricter than equipTutorialLock: also blocks the forward-path controls
+  // (Gear card, Level Up, Ascend) that stay open during "slot"/"item".
+  const postEquipLock = tutorialRestricted && (tutorialStep === "farm" || tutorialStep === "toEquipment");
+  // During the level-up detour, Gear is fully off-limits (all 4 slots, not
+  // just 2-4 like slotStepLock below) -- the only thing tappable is Level Up.
+  const levelupLock = tutorialRestricted && tutorialStep === "levelupCreature";
+  // During "slot" specifically, only Slot 1 itself should be tappable --
+  // the Gear card header and Slots 2-4 are blocked (see slotBlocked below).
+  const slotStepLock = tutorialRestricted && tutorialStep === "slot";
+  // Level Up and Ascend must also stay greyed out during "slot" -- the
+  // player hasn't been asked to touch either yet, so leaving them live is
+  // just a distraction from Slot 1. Ascend additionally stays locked all the
+  // way through "levelupCreature" (only Level Up itself should be tappable
+  // during that detour).
+  const levelUpButtonLock = postEquipLock || slotStepLock;
+  const ascendButtonLock = postEquipLock || slotStepLock || levelupLock;
   const [notify,setNotify]=useState(null);
   const [lastLeveledStat,setLastLeveledStat]=useState(null);
   const [ascPopup,setAscPopup]=useState(null);
@@ -136,6 +164,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     });
     setLastLeveledStat(gainedStat);
     setTimeout(()=>setLastLeveledStat(null),1500);
+    setPetLevelUps(c=>c+1);
+    // Advances once the player's leveled up as far as a single harvest's
+    // food allows -- with the fixed food/shard drops from the tutorial's
+    // guided harvest, that's level 6. Further level-ups after this stay
+    // fully available, they just no longer move the tutorial forward.
+    if(tutorialStep==="levelupCreature")setTutorialStep("toEquipment");
   }
 
   function doFeed(){
@@ -196,6 +230,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
   const [previewPip,setPreviewPip]=useState({});
   const [holdEquip,setHoldEquip]=useState(null);
   const [equipSlotPicker,setEquipSlotPicker]=useState(null); // slot index being picked
+  // Resuming mid-tutorial after a reload: "item" step expects the Slot 1
+  // picker already open (see the Gear-slot onClick below for the normal path
+  // there), but that's local state that doesn't survive a reload.
+  useEffect(()=>{
+    if(tutorialStep==="item"){setShowEquipPage(true);setEquipSlotPicker(0);}
+  },[]);
   const [equipConflict,setEquipConflict]=useState(null); // {itemId,slotIdx,otherPetId,otherPetName}
   const abilityKeys=["basic","special","unique"];
   const allMaxed=abilityKeys.every(k=>ownedData.abilityLevels[k]>=5);
@@ -289,7 +329,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     const cost=equipUpgradeCost(lvl);
     if((currencies.equipShards||0)<cost){notify_("Not enough 🔧 Gear Shards!");return;}
     setCurrencies(c=>({...c,equipShards:(c.equipShards||0)-cost}));
-    setEquipmentLevels(prev=>({...prev,[itemId]:(prev[itemId]||0)+1}));
+    setEquipmentLevels(prev=>({...prev,[itemId]:(prev[itemId]||1)+1}));
+    setEquipLevelUps(c=>c+1);
   }
 
   function doAscendEquip(itemId){
@@ -415,8 +456,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         )
       ),
       React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},backDisabled:pickerTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
-        onClick:()=>setDexOverlay(def.id),
-        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+        disabled:pickerTutorialLock,
+        onClick:()=>{if(pickerTutorialLock)return;setDexOverlay(def.id);},
+        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(pickerTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:pickerTutorialLock?"#f5f5f5":"#f0effe",color:pickerTutorialLock?"#bbb":"#534AB7",cursor:pickerTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
       },"Evolutions")}),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
@@ -591,7 +633,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role);
             // During the guided "choose gear" step, only the Iron Band tile
             // the pointer arrow highlights should respond to a tap.
-            const tutorialBlocked=pickerTutorialLock&&item.id!==TUTORIAL_ITEM_ID;
+            const tutorialBlocked=pickerTutorialLock&&!(tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID);
             const onTapClick=equipSlotPicker!==null
               ? ()=>{if(didLongPress.current){didLongPress.current=false;return;}
                   if(tutorialBlocked)return;
@@ -659,8 +701,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
     React.createElement(ScreenHeader,{title:def.name,onBack,backDisabled:equipTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
-      onClick:()=>setDexOverlay(def.id),
-      style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+      disabled:equipTutorialLock,
+      onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
+      style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(equipTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:equipTutorialLock?"#f5f5f5":"#f0effe",color:equipTutorialLock?"#bbb":"#534AB7",cursor:equipTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
     },"Evolutions")}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
@@ -745,7 +788,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
         )
       );
     })(),
-    React.createElement("div",{className:"card",style:{marginBottom:12,cursor:"pointer"},onClick:()=>setShowEquipPage(true)},
+    React.createElement("div",{className:"card",style:{marginBottom:12,cursor:(postEquipLock||slotStepLock||levelupLock)?"not-allowed":"pointer",opacity:(postEquipLock||levelupLock)?0.5:1},onClick:()=>{if(postEquipLock||slotStepLock||levelupLock)return;setShowEquipPage(true);}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#666"}},"Gear"),
         React.createElement("span",{style:{fontSize:13,color:"#aaa"}},"›")
@@ -759,14 +802,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           const bonuses=item?equipBonus(itemId,lvl,asc):{};
           const rarCfg=item?EQUIP_RARITY_CONFIG[item.rarity]:null;
           const cSlotKey="cslot-"+slotIdx;
-          const cSlotPressStart=e=>{e.preventDefault();if(item)setHoldEquip(cSlotKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);if(item){setEquipDetailPage(itemId);setShowEquipPage(true);}},500);};
+          // During the guided "slot" step, only Slot 1 (index 0) -- the one
+          // the pointer arrow highlights -- should respond to taps.
+          const slotBlocked=postEquipLock||levelupLock||(slotStepLock&&slotIdx!==0);
+          const cSlotPressStart=e=>{if(slotBlocked)return;e.preventDefault();if(item)setHoldEquip(cSlotKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);if(item){setEquipDetailPage(itemId);setShowEquipPage(true);}},500);};
           const cSlotPressEnd=()=>{clearTimeout(longPressTimer.current);setHoldEquip(null);};
           const showSlotPointer=tutorialStep==="slot"&&slotIdx===0;
           return React.createElement("div",{key:slotIdx,
-            onClick:e=>{e.stopPropagation();if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);setShowEquipPage(true);if(tutorialStep==="slot"&&slotIdx===0)setTutorialStep("item");},
+            onClick:e=>{e.stopPropagation();if(slotBlocked)return;if(didLongPress.current){didLongPress.current=false;return;}setEquipSlotPicker(slotIdx);setShowEquipPage(true);if(tutorialStep==="slot"&&slotIdx===0)setTutorialStep("item");},
             onMouseDown:cSlotPressStart,onMouseUp:cSlotPressEnd,onMouseLeave:cSlotPressEnd,
             onTouchStart:cSlotPressStart,onTouchEnd:cSlotPressEnd,onTouchCancel:cSlotPressEnd,
-            style:{position:"relative",flex:1,background:item?"#f7f7ff":"#f5f5f5",border:"1.5px solid "+(item?"#d0ccf7":"#e0e0e0"),borderRadius:10,padding:"8px 10px",textAlign:"center",cursor:"pointer",userSelect:"none"}},
+            style:{position:"relative",flex:1,background:item?"#f7f7ff":"#f5f5f5",border:"1.5px solid "+(item?"#d0ccf7":"#e0e0e0"),borderRadius:10,padding:"8px 10px",textAlign:"center",cursor:slotBlocked?"not-allowed":"pointer",userSelect:"none",opacity:(slotBlocked&&!levelupLock&&!(tutorialStep==="slot"&&slotIdx===0))?0.5:1}},
             showSlotPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
             item
               ? React.createElement("div",null,
@@ -807,18 +853,19 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
       })
     ),
     tab==="levelup"&&React.createElement(React.Fragment,null,
-      React.createElement("div",{className:"card",style:{marginBottom:10}},
+      React.createElement("div",{className:"card",style:{marginBottom:10,position:"relative"}},
+        tutorialStep==="levelupCreature"&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:74,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
         React.createElement("div",{className:"section-label"},"Level Up"),
         isMaxLevel
           ? React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:8}},"Lv "+ownedData.level+" — Max level reached")
           : React.createElement(React.Fragment,null,
               React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#666",marginBottom:6}},
                 React.createElement("span",null,"Lv "+ownedData.level+" → "+(ownedData.level+1)),
-                React.createElement("span",null,"🍖 "+cost+" Food")
+                React.createElement("span",{style:{color:hasFood?"#666":"#e53935"}},"🍖 "+(currencies.food||0)+" available")
               ),
               React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length]])
             ),
-        React.createElement("button",{className:"btn btn-primary",onClick:doLevelUp,disabled:!hasFood,style:{marginBottom:0}},
+        React.createElement("button",{className:"btn btn-primary",onClick:doLevelUp,disabled:!hasFood||levelUpButtonLock,style:{marginBottom:0,opacity:levelUpButtonLock?0.5:1}},
           isMaxLevel?"Lv "+ownedData.level:"Level Up — 🍖 "+cost
         )
       ),
@@ -851,7 +898,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
           const label=melonsUsed>0
             ?action+" — 🔶 "+shardsUsed+(melonsUsed>0?" + 🍈 "+melonsUsed:"")
             :action+" — 🔶 "+needed+" Shards";
-          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend,style:{marginBottom:0}},label);
+          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend||ascendButtonLock,style:{marginBottom:0,opacity:ascendButtonLock?0.5:1}},label);
         })()
       )
     ),

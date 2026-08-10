@@ -17,18 +17,18 @@
 
 import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "../react.js";
 import { DUNGEON_BOSSES, ARENA_TABS } from "../data/bosses.js";
-import { isPastDailyHour } from "../core/dates.js";
+import { isPastEasternNoon, easternNoonDayKey } from "../core/dates.js";
 
 const GameContext = createContext(null);
 
-/** Starting currency balances for a new save. */
+/** Starting currency balances for a new save -- everyone starts at zero. */
 const INITIAL_CURRENCIES = {
-  gems: 1500, food: 100, candy: 50, equipShards: 0, dungeonPass: 10,
+  gems: 0, food: 0, candy: 0, equipShards: 0, dungeonPass: 0,
   eggs: 0, legendaryEggs: 0,
-  melonFire: 5, melonWater: 5, melonNature: 5, melonEarth: 5,
-  melonWind: 5, melonElectric: 5, melonLight: 5, melonDark: 5, melonRainbow: 2,
-  flairBanana: 500, mythicalFlairBanana: 500, ancientFlairBanana: 500, flairShard: 0,
-  mysteriousOre: 5, deluxeOre: 0, rainbowOre: 0, treasureShards: 0,
+  melonFire: 0, melonWater: 0, melonNature: 0, melonEarth: 0,
+  melonWind: 0, melonElectric: 0, melonLight: 0, melonDark: 0, melonRainbow: 0,
+  flairBanana: 0, mythicalFlairBanana: 0, ancientFlairBanana: 0, flairShard: 0,
+  mysteriousOre: 0, deluxeOre: 0, rainbowOre: 0, treasureShards: 0,
   ancientFertilizer: 0,
 };
 
@@ -64,9 +64,13 @@ function loadSave() {
 const initialSave = loadSave();
 
 export function GameProvider({ children }) {
-  // ── UI / navigation (never persisted) ────────────────────────────────────
-  const [tab, setTab] = useState("home");
-  const [gameMode, setGameMode] = useState(null);
+  // ── UI / navigation (never persisted, EXCEPT tab/gameMode while the
+  // tutorial is active -- see the autosave block below. Quitting mid-tutorial
+  // needs to drop the player back on the exact screen they left, since most
+  // tutorial steps aren't reachable through NavBar's normal tab locks; outside
+  // the tutorial this stays "always starts fresh" as before) ────────────────
+  const [tab, setTab] = useState(() => (initialSave?.tutorialRestricted && initialSave?.tab) || "home");
+  const [gameMode, setGameMode] = useState(() => (initialSave?.tutorialRestricted ? (initialSave?.gameMode ?? null) : null));
   const [collectionDeepLink, setCollectionDeepLink] = useState(null);
   const [creatureOverlay, setCreatureOverlay] = useState(null);
   const [dexOverlay, setDexOverlay] = useState(null);
@@ -83,6 +87,15 @@ export function GameProvider({ children }) {
   // "slot" (arrow at Slot 1) -> "item" (arrow at the Iron Band) -> null (done,
   // clears alongside tutorialRestricted).
   const [tutorialStep, setTutorialStep] = useState(() => initialSave?.tutorialStep ?? null);
+  // Set the instant the tutorial's guided walkthrough finishes (see
+  // LabyrinthScreen's Floor 1 win handling); HomeScreen consumes this once
+  // to auto-open the New Player Gift, then the Daily screen behind it, and
+  // clears it so it never fires again on a later visit.
+  const [postTutorialPopupPending, setPostTutorialPopupPending] = useState(() => initialSave?.postTutorialPopupPending ?? false);
+  // True right after closing the Daily or New Player Gift screen -- HomeScreen
+  // shows an arrow at Quests until it's tapped (no other button is blocked
+  // meanwhile; it just doesn't go away on its own).
+  const [showQuestsArrow, setShowQuestsArrow] = useState(() => initialSave?.showQuestsArrow ?? false);
   const [harvestPopup, setHarvestPopup] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [devTimeOffset, setDevTimeOffset] = useState(0);
@@ -157,6 +170,11 @@ export function GameProvider({ children }) {
   const [dailyBossFights, setDailyBossFights] = useState(() => initialSave?.dailyBossFights ?? 0);
   const [plotsGrown, setPlotsGrown] = useState(() => initialSave?.plotsGrown ?? 0);
   const [fieldHarvests, setFieldHarvests] = useState(() => initialSave?.fieldHarvests ?? 0);
+  const [petLevelUps, setPetLevelUps] = useState(() => initialSave?.petLevelUps ?? 0);
+  const [equipLevelUps, setEquipLevelUps] = useState(() => initialSave?.equipLevelUps ?? 0);
+  // True forever once the player has fully cleared a day's Daily Quests at
+  // least once -- unlike dailyCompletionClaimed, this never resets.
+  const [everCompletedDailyQuests, setEverCompletedDailyQuests] = useState(() => initialSave?.everCompletedDailyQuests ?? false);
 
   // ── Quests / daily missions ──────────────────────────────────────────────
   const [questBatchIdx, setQuestBatchIdx] = useState(() => initialSave?.questBatchIdx ?? {
@@ -165,6 +183,9 @@ export function GameProvider({ children }) {
   const [claimedQuests, setClaimedQuests] = useState(() => initialSave?.claimedQuests ?? new Set());
   const [dailyDay, setDailyDay] = useState(() => initialSave?.dailyDay ?? 0);
   const [dailyLastClaimed, setDailyLastClaimed] = useState(() => initialSave?.dailyLastClaimed ?? null);
+  const [newPlayerGiftDay, setNewPlayerGiftDay] = useState(() => initialSave?.newPlayerGiftDay ?? 0);
+  const [newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed] = useState(() => initialSave?.newPlayerGiftLastClaimed ?? null);
+  const [newPlayerGiftDoubled, setNewPlayerGiftDoubled] = useState(() => initialSave?.newPlayerGiftDoubled ?? false);
   const [dailyMissionsDate, setDailyMissionsDate] = useState(() => initialSave?.dailyMissionsDate ?? null);
   const [dailyMissionsSnapshot, setDailyMissionsSnapshot] = useState(() => initialSave?.dailyMissionsSnapshot ?? {
     eggsHatched: 0, dungeonsCleared: 0, arenaFights: 0,
@@ -174,6 +195,9 @@ export function GameProvider({ children }) {
   const [dailyMissionsDone, setDailyMissionsDone] = useState(() => initialSave?.dailyMissionsDone ?? new Set());
   const [dailyCompletionClaimed, setDailyCompletionClaimed] = useState(() => initialSave?.dailyCompletionClaimed ?? false);
   const [dailySelectedMissions, setDailySelectedMissions] = useState(() => initialSave?.dailySelectedMissions ?? []);
+  // Eastern-noon day key of the last free Flair Banana feed -- the first
+  // banana fed each day (any type) doesn't consume inventory.
+  const [lastFreeBananaDate, setLastFreeBananaDate] = useState(() => initialSave?.lastFreeBananaDate ?? null);
 
   // ── Battle pass ──────────────────────────────────────────────────────────
   const [battlepassLastReset, setBattlepassLastReset] = useState(() => initialSave?.battlepassLastReset ?? null);
@@ -198,20 +222,19 @@ export function GameProvider({ children }) {
     });
   }, [owned]);
 
-  // Dungeon passes regenerate, and recharge counts reset, at noon local time.
-  // This is deliberately a NOON reset, unlike the midnight resets used by daily
-  // missions and login rewards.
+  // Dungeon passes regenerate, and recharge counts reset, at noon Eastern
+  // Time -- the same boundary every daily system in the game now uses.
   useEffect(() => {
     const check = () => {
-      if (isPastDailyHour(lastDungeonPassGain, 12)) {
+      if (isPastEasternNoon(lastDungeonPassGain)) {
         setCurrencies((c) =>
           (c.dungeonPass || 0) >= 30 ? c : { ...c, dungeonPass: (c.dungeonPass || 0) + 10 }
         );
-        setLastDungeonPassGain(new Date().toDateString());
+        setLastDungeonPassGain(easternNoonDayKey());
       }
-      if (isPastDailyHour(lastPassRechargeReset, 12)) {
+      if (isPastEasternNoon(lastPassRechargeReset)) {
         setPassRechargeCount(0);
-        setLastPassRechargeReset(new Date().toDateString());
+        setLastPassRechargeReset(easternNoonDayKey());
       }
     };
     check();
@@ -239,7 +262,8 @@ export function GameProvider({ children }) {
   const persistedRef = useRef(null);
   persistedRef.current = {
     v: SAVE_VERSION,
-    tutorialSeen, tutorialRestricted, tutorialStep,
+    tab, gameMode,
+    tutorialSeen, tutorialRestricted, tutorialStep, postTutorialPopupPending, showQuestsArrow,
     username, profileEmoji, profileAvatarId, profileFrame, profileTitle,
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
@@ -248,8 +272,9 @@ export function GameProvider({ children }) {
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased,
     dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel,
     eggsHatched, dungeonsCleared, arenaFights, labyrinthFights, bananasUsed, dailyBossFights, plotsGrown, fieldHarvests,
-    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, dailyMissionsDate, dailyMissionsSnapshot,
-    dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions,
+    petLevelUps, equipLevelUps, everCompletedDailyQuests,
+    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
+    dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions, lastFreeBananaDate,
     battlepassLastReset, battlepassClaimed, battlepassPaidClaimed, battlepassPremium, battlepassPoints,
     collectedTreasures, completedTreasureSets,
   };
@@ -289,10 +314,12 @@ export function GameProvider({ children }) {
       owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
       eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
       labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
+      petLevelUps, equipLevelUps, everCompletedDailyQuests,
     }),
     [owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
      eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
-     labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests]
+     labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
+     petLevelUps, equipLevelUps, everCompletedDailyQuests]
   );
 
   const value = {
@@ -309,6 +336,8 @@ export function GameProvider({ children }) {
     tutorialSeen, setTutorialSeen,
     tutorialRestricted, setTutorialRestricted,
     tutorialStep, setTutorialStep,
+    postTutorialPopupPending, setPostTutorialPopupPending,
+    showQuestsArrow, setShowQuestsArrow,
     harvestPopup, setHarvestPopup, revealedCount, setRevealedCount,
     // currencies + collection
     currencies, setCurrencies, owned, setOwned,
@@ -341,14 +370,19 @@ export function GameProvider({ children }) {
     arenaFights, setArenaFights, labyrinthFights, setLabyrinthFights, bananasUsed, setBananasUsed,
     dailyBossFights, setDailyBossFights, plotsGrown, setPlotsGrown,
     fieldHarvests, setFieldHarvests,
+    petLevelUps, setPetLevelUps, equipLevelUps, setEquipLevelUps,
+    everCompletedDailyQuests, setEverCompletedDailyQuests,
     // quests
     questBatchIdx, setQuestBatchIdx, claimedQuests, setClaimedQuests,
     dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed,
+    newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed,
+    newPlayerGiftDoubled, setNewPlayerGiftDoubled,
     dailyMissionsDate, setDailyMissionsDate,
     dailyMissionsSnapshot, setDailyMissionsSnapshot,
     dailyMissionsDone, setDailyMissionsDone,
     dailyCompletionClaimed, setDailyCompletionClaimed,
     dailySelectedMissions, setDailySelectedMissions,
+    lastFreeBananaDate, setLastFreeBananaDate,
     // battle pass
     battlepassLastReset, setBattlepassLastReset,
     battlepassClaimed, setBattlepassClaimed,

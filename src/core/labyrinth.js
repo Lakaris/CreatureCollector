@@ -29,7 +29,18 @@ export const DIFFICULTY_BREAKPOINTS = [
   { depth: 5000, hpMult: 115, atkMult: 900, defMult: 1300 },
 ];
 
+// Floor 1 is most players' first real fight, right out of the tutorial --
+// hand-tuned (rather than read off the generic curve, which is calibrated
+// for a 6-enemy roster at all depths and would make a fixed 2-enemy floor
+// either a 1-hit throwaway or, worse, a real threat) so a level-1 starter
+// with just the tutorial's Iron Band needs a few hits per enemy but is
+// never at real risk. See getEnemyLayoutForDepth's depth===1 case for the
+// matching 2-enemy layout (Duskling + Sparkit) these multipliers are
+// calibrated against.
+const FLOOR_1_DIFFICULTY = { hpMult: -0.25, atkMult: -0.83, defMult: -0.32 };
+
 export function getDifficultyMultipliers(depth) {
+  if (depth === 1) return FLOOR_1_DIFFICULTY;
   const d = Math.min(MAX_LABYRINTH_DEPTH, Math.max(0, depth));
   const pts = DIFFICULTY_BREAKPOINTS;
   let lo = pts[0], hi = pts[pts.length - 1];
@@ -89,6 +100,7 @@ export const LABYRINTH_REWARD_DISPLAY = {
 
 /** Reward for clearing a given depth -- repeats on a 50-floor cycle. */
 export function getDepthReward(depth) {
+  if (depth === 1) return { eggs: 5 };
   const m = depth % 50;
   if (m === 0) return { legendaryEggs: 1, ancientFertilizer: 1 };
   if (m === 10 || m === 20 || m === 30 || m === 40) return { eggs: 1 };

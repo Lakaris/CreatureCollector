@@ -6,18 +6,19 @@ import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION } from "../../data/equipment.js";
 import { FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS } from "../../data/flair.js";
 import { MELON_TYPES } from "../../data/types.js";
-import { DAILY_MISSIONS } from "../../data/quests.js";
+import { DAILY_MISSIONS, QUEST_DEFS } from "../../data/quests.js";
 import { makeOwnedCreature, getChain, MAX_LEVEL, MAX_ASCENSION } from "../../core/creatures.js";
 import { MAX_LABYRINTH_DEPTH } from "../../core/labyrinth.js";
 import { FIELD_RATES } from "../../data/farm.js";
+import { ARENA_TABS } from "../../data/bosses.js";
 import { DEV_MODE } from "../../config.js";
 
 const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
 const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTab } = useGame();
-  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20"});
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTab, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests } = useGame();
+  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",questSet:"1"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
   function sv(k,v){setVals(p=>({...p,[k]:v}));}
@@ -47,7 +48,13 @@ function DevPanel(){
   }
   function skipTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(true);setTab("home");}
   function triggerTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(false);setTab("home");}
-  function resetAll(){setOwned({});setCurrencies({gems:1500,food:100,candy:50,eggs:0,legendaryEggs:0,melonFire:5,melonWater:5,melonNature:5,melonEarth:5,melonWind:5,melonElectric:5,melonLight:5,melonDark:5,melonRainbow:2,flairBanana:500,mythicalFlairBanana:500,ancientFlairBanana:500,flairShard:0});setSkinShards(0);setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);clearSave();}
+  function resetAll(){setOwned({});setCurrencies({gems:0,food:0,candy:0,eggs:0,legendaryEggs:0,melonFire:0,melonWater:0,melonNature:0,melonEarth:0,melonWind:0,melonElectric:0,melonLight:0,melonDark:0,melonRainbow:0,flairBanana:0,mythicalFlairBanana:0,ancientFlairBanana:0,flairShard:0});setSkinShards(0);setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);setTab("home");setLabyrinthDepth(1);setLabyrinthBestDepth(1);setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());setFarmFieldLevel(1);setFarmPlots(1);setFarmFieldLastHarvest(Date.now());setFarmFieldSeed((Math.random()*1e9)|0);setFarmCrops(Array(6).fill(null));setPlotUpgrades(Array(6).fill(0));setSpecialPurchased(false);
+    // Quest batchIdx/claimed alone aren't enough -- every check()/progress()
+    // in data/quests.js reads these live counters, so they have to reset too
+    // or a "completed" quest stays completed even after its set rewinds.
+    setUnlockedSkins([]);setArenaLevels(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));setArenaProgress(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));
+    setEggsHatched(0);setDungeonsCleared(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setEverCompletedDailyQuests(false);
+    clearSave();}
 
   function giveMaxInvestedCreatures(){
     const all={};
@@ -74,6 +81,20 @@ function DevPanel(){
     const d=Math.max(1,Math.min(MAX_LABYRINTH_DEPTH,n));
     setLabyrinthDepth(d);
     setLabyrinthBestDepth(b=>Math.max(b||1,d));
+  }
+  function jumpToQuestSet(n){
+    const target=Math.max(1,Math.min(QUEST_DEFS.general.length,n))-1;
+    const current=questBatchIdx.general||0;
+    if(target<current){
+      // Going back to an earlier set resets progress: unclaim every quest
+      // from that set onward so it plays through fresh again.
+      const idsToClear=new Set();
+      for(let i=target;i<QUEST_DEFS.general.length;i++){
+        QUEST_DEFS.general[i].quests.forEach(q=>idsToClear.add(q.id));
+      }
+      setClaimedQuests(prev=>new Set([...prev].filter(id=>!idsToClear.has(id))));
+    }
+    setQuestBatchIdx(prev=>({...prev,general:target}));
   }
   function giveMaxFlair(){
     const allFlairIds=[
@@ -126,7 +147,7 @@ function DevPanel(){
       devRow("legendaryEggs","🥚✨ Leg. Eggs")
     ),
     devTab==="melons"&&React.createElement(React.Fragment,null,
-      ...MELON_TYPES.map(m=>devRow(m.key,m.label))
+      ...MELON_TYPES.map(m=>devRow(m.key,m.emoji+" "+m.label))
     ),
     devTab==="bananas"&&React.createElement(React.Fragment,null,
       devRow("flairBanana","🍌 Flair Banana"),
@@ -185,6 +206,11 @@ function DevPanel(){
           const missions=DAILY_MISSIONS.filter(m=>ids.includes(m.id));
           setDailyMissionsDone(new Set(missions.map(m=>m.id)));
         }},"Complete all daily missions")
+      ),
+      React.createElement("div",{className:"dev-row",style:{marginTop:10}},
+        React.createElement("span",{className:"dev-label"},"📋 Progression Set (current "+((questBatchIdx.general||0)+1)+"/"+QUEST_DEFS.general.length+")"),
+        React.createElement("input",{className:"dev-input",type:"number",value:vals.questSet,onChange:e=>sv("questSet",e.target.value),style:{width:60}}),
+        React.createElement("button",{className:"dev-btn",onClick:()=>{const n=parseInt(vals.questSet,10);if(!isNaN(n))jumpToQuestSet(n);}},"Jump")
       )
     ),
     devTab==="treasure"&&React.createElement(React.Fragment,null,

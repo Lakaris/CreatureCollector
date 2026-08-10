@@ -311,6 +311,14 @@ function TutorialOverlay() {
 
   useEffect(() => () => stopBattleLoops(), []);
 
+  // Skips just this scripted fight (not the whole tutorial) -- grants the
+  // same reward the real win does and jumps straight to the hand-off text.
+  function skipBattle() {
+    stopBattleLoops();
+    setEquipmentCopies((prev) => ({ ...prev, [TUTORIAL_ITEM_ID]: (prev[TUTORIAL_ITEM_ID] || 0) + 1 }));
+    setPhase("finalText");
+  }
+
   function advance() {
     if (phase === "eggs" || phase === "battlePlan") return;
     if (phase === "battle") {
@@ -867,8 +875,21 @@ function TutorialOverlay() {
           { style: { position: "absolute", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
           React.createElement(
             "div",
-            { style: { display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 16px 12px", flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
-            React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, "Battle!")
+            { style: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 16px 12px", flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
+            React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, "Battle!"),
+            !battleOutcome &&
+              React.createElement(
+                "button",
+                {
+                  onClick: (e) => { e.stopPropagation(); skipBattle(); },
+                  style: {
+                    position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)",
+                    background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 8,
+                    color: "#888", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "6px 10px",
+                  },
+                },
+                "Skip"
+              )
           ),
           React.createElement(
             "div",

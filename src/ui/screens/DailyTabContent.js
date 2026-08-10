@@ -5,10 +5,17 @@ import { useGame } from "../../state/GameContext.js";
 import { DAILY_COMPLETION_REWARD, DAILY_COMPLETION_BP, DAILY_MISSIONS, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
 import { pickDailyMissions } from "../../core/gacha.js";
+import { easternNoonDayKey } from "../../core/dates.js";
+
+// Mirrors NavBar's Play-tab gate and FarmScreen's Plots-tab gate: a daily
+// mission for a feature the player hasn't reached yet must never be drawn.
+const DUNGEON_UNLOCK_BEST_DEPTH=21;
+const PLOTS_UNLOCK_BEST_DEPTH=11;
 
 function DailyTabContent({setRewardPopup}){
-  const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions } = useGame();
-  const today=new Date().toDateString();
+  const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setEverCompletedDailyQuests } = useGame();
+  const today=easternNoonDayKey();
+  const unlockedFeatures={dungeon:(labyrinthBestDepth||1)>=DUNGEON_UNLOCK_BEST_DEPTH,plots:(labyrinthBestDepth||1)>=PLOTS_UNLOCK_BEST_DEPTH};
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
   const [localRewardPopup,setLocalRewardPopup]=React.useState(null);
@@ -23,11 +30,18 @@ function DailyTabContent({setRewardPopup}){
       setDailyMissionsSnapshot({eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,labyrinthFights:questState.labyrinthFights||0,fieldHarvests:questState.fieldHarvests||0,currencies:{...questState.currencies}});
       setDailyMissionsDone(new Set());
       setDailyCompletionClaimed(false);
-      setDailySelectedMissions(pickDailyMissions());
+      setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
     } else if(!dailySelectedMissions||dailySelectedMissions.length===0){
-      setDailySelectedMissions(pickDailyMissions());
+      setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
     }
   },[today]);
+  // Prunes missions that were drawn before their feature unlocked -- or
+  // before this gating existed at all -- so a locked one never lingers.
+  React.useEffect(()=>{
+    if(!dailySelectedMissions||dailySelectedMissions.length===0)return;
+    const hasLocked=dailySelectedMissions.some(id=>(id==="dm_dung1"&&!unlockedFeatures.dungeon)||(id==="dm_farm"&&!unlockedFeatures.plots));
+    if(hasLocked)setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
+  },[dailySelectedMissions,unlockedFeatures.dungeon,unlockedFeatures.plots]);
   const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}};
   const qs=questState||{};
   function showReward(reward){
@@ -50,6 +64,7 @@ function DailyTabContent({setRewardPopup}){
     applyRewards(setCurrencies,Object.fromEntries(entries));
     if(setBattlepassPoints) setBattlepassPoints(p=>p+DAILY_COMPLETION_BP);
     setDailyCompletionClaimed(true);
+    setEverCompletedDailyQuests(true);
     showReward(allReward);
   }
   const todaysMissions=dailySelectedMissions&&dailySelectedMissions.length>0

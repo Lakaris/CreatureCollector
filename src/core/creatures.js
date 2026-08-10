@@ -89,9 +89,13 @@ export function getDisplayEmoji(def, ownedData, unlockedSkins) {
   return (skinSet.appearances[vid] && skinSet.appearances[vid].emoji) || def.emoji;
 }
 
-/** Food cost to level a creature up from `lvl`. Paired with the Main Field's
+/** Food cost to level a creature up from `lvl`. Paired with the Field's
  * food-rate curve in data/farm.js -- see that file's header comment for how
- * the two are calibrated together against Labyrinth's level breakpoints. */
+ * the two are calibrated together against Labyrinth's level breakpoints.
+ * The ^1.6 exponent (steeper than the old ^1.35) grows faster than a fresh
+ * creature's early levels, which stay cheap regardless -- so pushing one
+ * already-high creature further costs noticeably more than spreading the
+ * same food across several lower-level ones. */
 export function energyCost(lvl) {
-  return Math.floor(8 * Math.pow(lvl, 1.35));
+  return Math.floor(8 * Math.pow(lvl, 1.6));
 }

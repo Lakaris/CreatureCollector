@@ -5,12 +5,14 @@ import React from "./react.js";
 
 import { TYPE_EMOJI } from "./data/types.js";
 import { DUNGEON_BOSSES } from "./data/bosses.js";
+import { CREATURE_MAP } from "./data/creatures.js";
 import { DEV_MODE } from "./config.js";
 import { useGame } from "./state/GameContext.js";
+import { easternNoonDayKey, isPastEasternNoon, nextEasternNoon } from "./core/dates.js";
 
 import CreatureOverlayHost from "./ui/components/CreatureOverlayHost.js";
 import TutorialOverlay from "./ui/components/TutorialOverlay.js";
-import NavBar from "./ui/components/NavBar.js";
+import NavBar, { TABS } from "./ui/components/NavBar.js";
 import CollectionScreen from "./ui/screens/CollectionScreen.js";
 import GachaScreen from "./ui/screens/GachaScreen.js";
 import DevPanel from "./ui/screens/DevPanel.js";
@@ -47,26 +49,17 @@ function countdownParts(from, to) {
   ].join(":");
 }
 
-/** Next noon strictly after `now`. Daily boss rewards unlock on this boundary. */
-function nextNoon(now) {
-  const d = new Date(now);
-  d.setDate(d.getDate() + 1);
-  d.setHours(12, 0, 0, 0);
-  return d;
-}
-
 /** The Daily Boss entry card, including its reward-availability state machine. */
 function DailyBossCard() {
   const { nowMs, devTimeOffset, dailyBossData, dailyBossLevel, setGameMode } = useGame();
 
-  const now = new Date(nowMs + devTimeOffset);
-  const isToday = dailyBossData.date === now.toDateString();
+  const nowTs = nowMs + devTimeOffset;
+  const isToday = !isPastEasternNoon(dailyBossData.date, nowTs);
   const delivered = dailyBossData.delivered;
   const qualified = dailyBossData.qualified;
   const attemptsLeft = Math.max(0, 3 - (isToday ? dailyBossData.fights || 0 : 0));
-  const fightDate = qualified && dailyBossData.date ? new Date(dailyBossData.date) : null;
-  const rewardAt = fightDate ? nextNoon(fightDate) : null;
-  const canCollect = !!(qualified && !delivered && rewardAt && now >= rewardAt);
+  const rewardAt = qualified && dailyBossData.date ? nextEasternNoon(nowTs) : null;
+  const canCollect = !!(qualified && !delivered && rewardAt && nowTs >= rewardAt);
   const boss = DUNGEON_BOSSES[((dailyBossLevel || 1) - 1) % DUNGEON_BOSSES.length];
 
   return React.createElement(
@@ -119,7 +112,7 @@ function DailyBossCard() {
         React.createElement(
           "div",
           { style: { fontSize: 12, fontWeight: 700, color: "#888", fontVariantNumeric: "tabular-nums" } },
-          countdownParts(now, nextNoon(now))
+          countdownParts(nowTs, nextEasternNoon(nowTs))
         )
       )
   );
@@ -143,12 +136,12 @@ function HarvestPopup() {
       harvestPopup.slice(0, revealedCount).map((item, i) =>
         React.createElement(
           "div",
-          { key: i, style: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "#fff", borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", animation: "fadeIn .25s ease" } },
-          React.createElement("span", { style: { fontSize: 24 } }, item.emoji),
+          { key: i, style: { display: "flex", alignItems: "center", gap: 8, width: 160, padding: "8px 12px", background: "#fff", borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", animation: "fadeIn .25s ease" } },
+          React.createElement("span", { style: { fontSize: 24, flexShrink: 0 } }, item.emoji),
           React.createElement(
             "div",
-            null,
-            React.createElement("div", { style: { fontSize: 11, color: "#888", lineHeight: 1 } }, item.label),
+            { style: { minWidth: 0 } },
+            React.createElement("div", { style: { fontSize: 11, color: "#888", lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, item.label),
             React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#2e7d32" } }, "+" + item.amount)
           )
         )
@@ -164,7 +157,7 @@ function HarvestPopup() {
             onClick: () => setHarvestPopup(null),
             style: { width: "100%", padding: "14px 0", background: "#4caf50", color: "#fff", border: "none", borderRadius: 14, fontWeight: 700, fontSize: 16, cursor: "pointer" },
           },
-          "Collect!"
+          "Collect"
         )
     )
   );
@@ -179,10 +172,15 @@ function App() {
     setDungeonsCleared, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setPlotsGrown,
     settingsOpen, setSettingsOpen, labyrinthDepth,
     tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep,
+    owned,
   } = useGame();
 
   const contentRef = React.useRef(null);
   const viewCreature = (id) => setCreatureOverlay(id);
+  const starterName = (() => {
+    const first = Object.values(owned || {})[0];
+    return first ? (CREATURE_MAP[first.id]?.name || "your creature") : "your creature";
+  })();
 
   // Home and Farm are the only tabs reachable while tutorialRestricted (every
   // other nav button is locked, see NavBar), so this only needs wiring into
@@ -212,31 +210,36 @@ function App() {
       "Skip tutorial"
     );
 
-  // Shown once the Iron Band is equipped: the tutorial hands the player off
-  // to the Farm tab next, so this points at it regardless of which unlocked
-  // screen (Collection or its creature-detail overlay) they're currently on.
-  const farmPointer =
-    tutorialStep === "farm" &&
-    React.createElement(
+  // Banner + arrow pointing at a bottom-nav tab, used whenever the tutorial
+  // hands the player off from wherever they are to a specific tab next.
+  // Horizontal position is derived from the tab's index so it always lines
+  // up with NavBar's own layout (evenly split across TABS.length columns).
+  // `text` is optional -- pass null/undefined for an arrow-only nudge when
+  // the destination doesn't need re-explaining.
+  function navHandoff(text, tabId) {
+    const idx = TABS.findIndex((t) => t.id === tabId);
+    const leftPct = ((idx + 0.5) / TABS.length) * 100 + "vw";
+    return React.createElement(
       React.Fragment,
       null,
-      React.createElement(
-        "div",
-        {
-          style: {
-            position: "fixed", left: 16, right: 16, bottom: 150,
-            background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
-            padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 60,
+      text &&
+        React.createElement(
+          "div",
+          {
+            style: {
+              position: "fixed", left: 16, right: 16, bottom: 150,
+              background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
+              padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 60,
+            },
           },
-        },
-        "Your new friend seems to have found something and is beckoning you to follow."
-      ),
+          text
+        ),
       React.createElement(
         "div",
         {
           style: {
-            position: "fixed", left: "75vw", bottom: 80, transform: "translate(-50%,0)",
+            position: "fixed", left: leftPct, bottom: 80, transform: "translate(-50%,0)",
             fontSize: 32, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite",
             zIndex: 60, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
           },
@@ -244,6 +247,31 @@ function App() {
         "⬇️"
       )
     );
+  }
+
+  // Shown once the Iron Band is equipped: the tutorial hands the player off
+  // to the Farm tab next, so this points at it regardless of which unlocked
+  // screen (Collection or its creature-detail overlay) they're currently on.
+  const farmPointer =
+    tutorialStep === "farm" && navHandoff("Your new friend seems to have found something and is beckoning you to follow.", "farm");
+
+  // Shown right after harvesting: hands the player off to Collection for a
+  // level-up detour before they're allowed back to Home/Descend.
+  const levelupNavPointer =
+    tutorialStep === "levelupNav" && navHandoff("Let's level up " + starterName + ".", "collection");
+
+  // Shown as soon as the player's leveled their creature up once (see
+  // CreatureDetail's doLevelUp): hands off to the Equipment tab so they can
+  // upgrade the Iron Band too. Only requiring one level-up here (rather than
+  // a fixed target level) means it can never be softlocked by the food-cost
+  // curve outpacing the guided harvest's fixed food amount.
+  const toEquipmentPointer =
+    tutorialStep === "toEquipment" && navHandoff("Now let's level up the Iron Band.", "equipment");
+
+  // Shown once the Iron Band's been upgraded once: hands off back to Home,
+  // where the tutorial resumes at the Descend step.
+  const toHomeFinalPointer =
+    tutorialStep === "toHome" && navHandoff(null, "home");
 
   // ── Settings: its own full-screen page, no bottom nav ─────────────────────
   if (settingsOpen)
@@ -328,7 +356,8 @@ function App() {
           React.createElement(NavBar, { tab, setTab })
         ),
       React.createElement(HarvestPopup),
-      restrictedSkipButton
+      restrictedSkipButton,
+      levelupNavPointer
     );
 
   // ── Play menu ────────────────────────────────────────────────────────────
@@ -425,7 +454,9 @@ function App() {
     React.createElement(CreatureOverlayHost),
     !tutorialSeen && React.createElement(TutorialOverlay),
     tutorialSeen && restrictedSkipButton,
-    tutorialSeen && farmPointer
+    tutorialSeen && farmPointer,
+    tutorialSeen && toEquipmentPointer,
+    tutorialSeen && toHomeFinalPointer
   );
 }
 

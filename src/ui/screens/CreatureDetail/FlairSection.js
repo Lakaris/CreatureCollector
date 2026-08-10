@@ -4,11 +4,13 @@ import React, { useState, useEffect } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
+import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 
 function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
-  const { setOwned, currencies, setCurrencies } = useGame();
+  const { setOwned, currencies, setCurrencies, lastFreeBananaDate, setLastFreeBananaDate } = useGame();
+  const freeBananaAvailable = lastFreeBananaDate !== easternNoonDayKey();
   const [flairTab,setFlairTab]=useState("feed");
   const [feedResult,setFeedResult]=useState(null);
   const [selectedBanana,setSelectedBanana]=useState(FLAIR_BANANAS[0]);
@@ -22,10 +24,13 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
   const flairTabs=[{id:"feed",label:"Feed"},{id:"titles",label:"Titles"},{id:"aura",label:"Aura"},{id:"background",label:"Background"},{id:"item",label:"Item"}];
   function doFeed(times){
     const banana=selectedBanana;
+    const useFree=freeBananaAvailable;
+    const cost=useFree?times-1:times;
     const count=currencies[banana.id]||0;
-    if(count<times)return;
+    if(count<cost)return;
+    if(useFree)setLastFreeBananaDate(easternNoonDayKey());
     if(times===1){
-      const result=feedFlair(banana,ownedData,setOwned,setCurrencies);
+      const result=feedFlair(banana,ownedData,setOwned,setCurrencies,useFree);
       setFeedResult({type:"single",results:[result]});
       onBananaUsed?.(1);
     } else {
@@ -54,7 +59,7 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
         unlocked.add(key);newKeys.push(key);
         results.push({rarity,cat:usedCat,won,emoji:usedCat==="titles"?"📛":usedCat==="aura"?"✨":usedCat==="background"?"🖼️":"🌿"});
       }
-      setCurrencies(c=>({...c,[banana.id]:Math.max(0,(c[banana.id]||0)-times),flairShard:(c.flairShard||0)+totalShards}));
+      setCurrencies(c=>({...c,[banana.id]:Math.max(0,(c[banana.id]||0)-cost),flairShard:(c.flairShard||0)+totalShards}));
       setOwned(prev=>{const e={...prev[ownedData.id]};e.unlockedFlair=[...(e.unlockedFlair||[]),...newKeys];return{...prev,[e.id]:e};});
       onBananaUsed?.(times);
       setVisibleCount(0);
@@ -195,12 +200,15 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData}){
             );
           })
         ),
+        freeBananaAvailable&&React.createElement("div",{style:{textAlign:"center",fontSize:11,fontWeight:700,color:"#1b5e20",marginBottom:6}},"🎁 First banana free today!"),
         // Feed buttons
         React.createElement("div",{style:{display:"flex",gap:8}},
           (()=>{
             const revealing=feedResult&&feedResult.type==="multi"&&visibleCount<feedResult.results.length;
-            const dis1=selCount<1||revealing;
-            const dis10=selCount<9||revealing;
+            const need1=freeBananaAvailable?0:1;
+            const need9=freeBananaAvailable?8:9;
+            const dis1=selCount<need1||revealing;
+            const dis10=selCount<need9||revealing;
             return React.createElement(React.Fragment,null,
               React.createElement("button",{onClick:()=>doFeed(1),disabled:dis1,style:{
                 flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis1?"default":"pointer",

@@ -40,6 +40,18 @@ function getEnemiesForDepth(depth) {
 }
 
 function getEnemyLayoutForDepth(depth) {
+  // Floor 1 is hand-placed: 2 fixed enemies (Duskling + Sparkit) instead of
+  // the usual seeded 6-enemy roster (see FLOOR_1_DIFFICULTY in
+  // core/labyrinth.js for the matching stat tuning -- both were calibrated
+  // together).
+  if (depth === 1) {
+    const duskling = CREATURE_MAP["shadowpup"];
+    const sparkit = CREATURE_MAP["sparkpup"];
+    const layout = {};
+    if (duskling) layout["1,1"] = duskling;
+    if (sparkit) layout["1,3"] = sparkit;
+    return layout;
+  }
   const enemies = getEnemiesForDepth(depth);
   if (!enemies.length) return {};
   const baseSeed = seedFor(depth);
@@ -58,7 +70,7 @@ function getEnemyLayoutForDepth(depth) {
 }
 
 function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
-  const { equipmentLevels, equipmentAscensions, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, setCurrencies, owned } = useGame();
+  const { equipmentLevels, equipmentAscensions, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, setCurrencies, owned, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, setPostTutorialPopupPending, setTab } = useGame();
   const depth = Math.min(labyrinthDepth || 1, MAX_LABYRINTH_DEPTH);
   const level = getEnemyLevelForDepth(depth);
   const enemyAbilityLevel = getEnemyAbilityLevelForDepth(depth);
@@ -276,6 +288,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       const reward = getDepthReward(depth);
       applyRewards(setCurrencies, reward);
       onFight && onFight();
+      // The tutorial's last scripted beat -- winning is the actual finish
+      // line (not just attempting the fight), so the restriction lifts here.
+      if (tutorialStep === "labyrinth") { setTutorialRestricted(false); setTutorialStep(null); setPostTutorialPopupPending(true); }
       setTimeout(() => {
         setLabyrinthDepth((d) => Math.min(MAX_LABYRINTH_DEPTH, (d || 1) + 1));
         setLabyrinthBestDepth((b) => Math.min(MAX_LABYRINTH_DEPTH, Math.max(b || 1, (depth || 1) + 1)));
@@ -320,7 +335,10 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     setBattling(false); setBattleOutcome(null); setBSnap(null); setAtkEffects([]); setPlanGrid({}); setBattleSelectedUid(null);
   }
   React.useEffect(() => {
-    if (battleOutcome !== "won") return;
+    // Floor 1's victory screen is exit-only (see the render below) -- no
+    // point running the auto-continue countdown toward a button that isn't
+    // there.
+    if (battleOutcome !== "won" || wonDepthRef.current === 1) return;
     setContinueSeconds(3);
     continueTimerRef.current = setInterval(() => {
       setContinueSeconds((s) => {
@@ -354,10 +372,12 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         )
       ),
       won
-        ? React.createElement("div", { style: { display: "flex", gap: 10 } },
-            React.createElement("button", { onClick: exitToPlanning, style: { padding: "12px 28px", background: "#eee", color: "#444", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit"),
-            React.createElement("button", { onClick: continueToNextFight, style: { padding: "12px 28px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Continue (" + continueSeconds + ")")
-          )
+        ? (wonDepthRef.current === 1
+            ? React.createElement("button", { onClick: () => { exitToPlanning(); onBack && onBack(); setTab("home"); }, style: { padding: "12px 36px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit")
+            : React.createElement("div", { style: { display: "flex", gap: 10 } },
+                React.createElement("button", { onClick: exitToPlanning, style: { padding: "12px 28px", background: "#eee", color: "#444", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit"),
+                React.createElement("button", { onClick: continueToNextFight, style: { padding: "12px 28px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Continue (" + continueSeconds + ")")
+              ))
         : React.createElement("button", { onClick: exitToPlanning, style: { padding: "12px 36px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Continue")
     );
   }
@@ -370,7 +390,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         React.createElement("div", { style: { flex: 1 } },
           React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111" } }, "🌀 Labyrinth — Floor " + depth)
         ),
-        React.createElement("button", { onClick: exitToPlanning, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#eee", color: "#555", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, "↺ Restart"),
+        // Floor 1's fight is the guaranteed-safe tutorial encounter -- no
+        // need for a bail-out button there.
+        depth !== 1 && React.createElement("button", { onClick: exitToPlanning, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#eee", color: "#555", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, "↺ Restart"),
         React.createElement("button", { onClick: cycleSpeed, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, battleSpeed + "x ⚡")
       ),
       React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", padding: "12px", overflow: "hidden", gap: 6 } },
@@ -458,7 +480,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
-        React.createElement("button", { onClick: () => { setPlanGrid({}); setGridInfoCreature(null); endHold(); onBack && onBack(); }, style: { background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#555", padding: 0, lineHeight: 1 } },
+        // Locked during the first-ever Descend (tutorialStep "labyrinth") --
+        // the player's meant to fight the floor, not back out of it.
+        React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; setPlanGrid({}); setGridInfoCreature(null); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },
           React.createElement("i", { className: "ti ti-arrow-left" })
         ),
         React.createElement("div", { style: { flex: 1, textAlign: "center", minWidth: 0 } },
@@ -584,6 +608,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             );
           })()
         )
+      ),
+      tutorialRestricted && tutorialStep === "labyrinth" && React.createElement("div", { style: { margin: "0 16px 12px", background: "#fff", border: "2px solid #534AB7", borderRadius: 16, padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4, boxShadow: "0 4px 16px rgba(0,0,0,0.14)", flexShrink: 0 } },
+        "You see a dusty plaque with the words \"Make your way to the bottom of this cursed labyrinth and all your questions will be answered.\""
       ),
       React.createElement("div", {
         style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },

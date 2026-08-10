@@ -134,9 +134,18 @@ export function rollDungeonRewards(count, bossType, bossLevel = 10) {
   return results;
 }
 
-/** The login mission plus four random others. */
-export function pickDailyMissions() {
-  return ["dm_login", ...shuffle(DAILY_POOL).slice(0, 4).map((m) => m.id)];
+/**
+ * The login mission plus four random others. `unlocked` excludes missions
+ * for features the player hasn't reached yet (e.g. dungeon pass / plot
+ * missions before those systems unlock), so they can never be drawn.
+ */
+export function pickDailyMissions(unlocked = {}) {
+  const pool = DAILY_POOL.filter((m) => {
+    if (m.id === "dm_dung1" && !unlocked.dungeon) return false;
+    if (m.id === "dm_farm" && !unlocked.plots) return false;
+    return true;
+  });
+  return ["dm_login", ...shuffle(pool).slice(0, 4).map((m) => m.id)];
 }
 
 /**
@@ -144,9 +153,10 @@ export function pickDailyMissions() {
  * not yet unlocked; falls back to other categories, then to shards on a full dupe.
  *
  * Stateful by design -- it drives setOwned/setCurrencies directly, matching how
- * the flair UI consumes it.
+ * the flair UI consumes it. Pass `free: true` for the day's first feed, which
+ * skips the inventory deduction (the roll and rewards are unaffected).
  */
-export function feedFlair(banana, ownedData, setOwned, setCurrencies) {
+export function feedFlair(banana, ownedData, setOwned, setCurrencies, free = false) {
   const categories = ["titles", "aura", "background", "item"];
   const pools = {
     titles: FLAIR_TITLES,
@@ -168,7 +178,7 @@ export function feedFlair(banana, ownedData, setOwned, setCurrencies) {
   const spendBanana = (extra) =>
     setCurrencies((c) => ({
       ...c,
-      [banana.id]: Math.max(0, (c[banana.id] || 0) - 1),
+      [banana.id]: free ? (c[banana.id] || 0) : Math.max(0, (c[banana.id] || 0) - 1),
       ...(extra ? extra(c) : {}),
     }));
   const grant = (category, won) => {

@@ -1,33 +1,66 @@
 // Daily-reset helpers.
 //
-// The game uses TWO different reset conventions, both intentional and both live:
-//   - Midnight (date-string) resets: daily missions, login rewards, daily boss.
-//   - Noon resets: dungeon-pass regeneration and pass-recharge counts.
-// Keep them distinct; collapsing them would silently change reset timing.
+// Every daily system in the game (login rewards, daily missions, daily
+// boss, dungeon-pass regen) resets at the SAME moment: noon Eastern Time
+// (America/New_York), which auto-adjusts across EST/EDT. There is only
+// one convention now -- do not reintroduce a local-midnight or
+// local-noon variant.
 
-/** Local date string used as the "which day is it" key. */
-export function todayStr(now = Date.now()) {
-  return new Date(now).toDateString();
-}
+const ET_TZ = "America/New_York";
 
-/** True when `lastDateStr` is from an earlier day than `now` (midnight reset). */
-export function isNewDay(lastDateStr, now = Date.now()) {
-  return lastDateStr !== todayStr(now);
+const etDateFmt = new Intl.DateTimeFormat("en-CA", {
+  timeZone: ET_TZ,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+const etOffsetFmt = new Intl.DateTimeFormat("en-US", {
+  timeZone: ET_TZ,
+  timeZoneName: "shortOffset",
+  hour: "2-digit",
+});
+
+/** Eastern-time calendar date, as "YYYY-MM-DD". */
+export function easternDateKey(ts = Date.now()) {
+  return etDateFmt.format(ts);
 }
 
 /**
- * True when it is past `hour` local time and the stored marker is not today.
- * Used by the noon-reset systems.
+ * Offset of Eastern Time from UTC, in minutes (e.g. -300 for EST, -240 for
+ * EDT), for the moment `ts`. Detected live so DST transitions "just work".
  */
-export function isPastDailyHour(lastDateStr, hour = 12, now = Date.now()) {
-  const d = new Date(now);
-  return d.getHours() >= hour && lastDateStr !== d.toDateString();
+function easternOffsetMinutes(ts) {
+  const part = etOffsetFmt.formatToParts(ts).find((p) => p.type === "timeZoneName");
+  const m = part && part.value.match(/GMT([+-]\d+)(?::(\d+))?/);
+  if (!m) return -300;
+  const h = parseInt(m[1], 10);
+  const min = m[2] ? parseInt(m[2], 10) : 0;
+  return h * 60 + (h < 0 ? -min : min);
 }
 
-/** Timestamp of the next occurrence of `hour` local time, strictly in the future. */
-export function nextResetAt(hour = 12, now = Date.now()) {
-  const d = new Date(now);
-  d.setHours(hour, 0, 0, 0);
-  if (d.getTime() <= now) d.setDate(d.getDate() + 1);
-  return d.getTime();
+/**
+ * The "game day" key, which flips at noon Eastern rather than midnight.
+ * Shifting the timestamp back 12h before reading the Eastern calendar date
+ * puts anything before noon ET into the previous game-day's bucket.
+ */
+export function easternNoonDayKey(ts = Date.now()) {
+  return easternDateKey(ts - 12 * 3600 * 1000);
+}
+
+/** True when `lastKey` (an `easternNoonDayKey` string) is not the current game day. */
+export function isPastEasternNoon(lastKey, ts = Date.now()) {
+  return lastKey !== easternNoonDayKey(ts);
+}
+
+/** Timestamp (ms) of the next noon-Eastern boundary strictly after `ts`. */
+export function nextEasternNoon(ts = Date.now()) {
+  const key = easternDateKey(ts);
+  const [y, mo, d] = key.split("-").map(Number);
+  const offsetMin = easternOffsetMinutes(ts);
+  let candidate = Date.UTC(y, mo - 1, d, 12, 0, 0) - offsetMin * 60000;
+  if (candidate <= ts) {
+    candidate = Date.UTC(y, mo - 1, d + 1, 12, 0, 0) - offsetMin * 60000;
+  }
+  return candidate;
 }

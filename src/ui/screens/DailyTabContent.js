@@ -11,11 +11,14 @@ import { easternNoonDayKey } from "../../core/dates.js";
 // mission for a feature the player hasn't reached yet must never be drawn.
 const DUNGEON_UNLOCK_BEST_DEPTH=21;
 const PLOTS_UNLOCK_BEST_DEPTH=11;
+// Daily Boss lives inside the Play tab, so it unlocks at the same threshold
+// NavBar uses to unlock Play itself.
+const BOSS_UNLOCK_BEST_DEPTH=21;
 
 function DailyTabContent({setRewardPopup}){
   const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setEverCompletedDailyQuests } = useGame();
   const today=easternNoonDayKey();
-  const unlockedFeatures={dungeon:(labyrinthBestDepth||1)>=DUNGEON_UNLOCK_BEST_DEPTH,plots:(labyrinthBestDepth||1)>=PLOTS_UNLOCK_BEST_DEPTH};
+  const unlockedFeatures={dungeon:(labyrinthBestDepth||1)>=DUNGEON_UNLOCK_BEST_DEPTH,plots:(labyrinthBestDepth||1)>=PLOTS_UNLOCK_BEST_DEPTH,boss:(labyrinthBestDepth||1)>=BOSS_UNLOCK_BEST_DEPTH};
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
   const [localRewardPopup,setLocalRewardPopup]=React.useState(null);
@@ -39,9 +42,9 @@ function DailyTabContent({setRewardPopup}){
   // before this gating existed at all -- so a locked one never lingers.
   React.useEffect(()=>{
     if(!dailySelectedMissions||dailySelectedMissions.length===0)return;
-    const hasLocked=dailySelectedMissions.some(id=>(id==="dm_dung1"&&!unlockedFeatures.dungeon)||(id==="dm_farm"&&!unlockedFeatures.plots));
+    const hasLocked=dailySelectedMissions.some(id=>(id==="dm_dung1"&&!unlockedFeatures.dungeon)||(id==="dm_farm"&&!unlockedFeatures.plots)||(id==="dm_boss"&&!unlockedFeatures.boss));
     if(hasLocked)setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
-  },[dailySelectedMissions,unlockedFeatures.dungeon,unlockedFeatures.plots]);
+  },[dailySelectedMissions,unlockedFeatures.dungeon,unlockedFeatures.plots,unlockedFeatures.boss]);
   const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}};
   const qs=questState||{};
   function showReward(reward){

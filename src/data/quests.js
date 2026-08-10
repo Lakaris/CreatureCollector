@@ -13,7 +13,7 @@ export const QUEST_TABS=[
   {id:"dungeon",label:"Dungeon",emoji:"🏰"},
   {id:"arena",label:"Arena",emoji:"🏟️"},
 ];
-export const BP_PTS_PER_NODE=150;
+export const BP_PTS_PER_NODE=100;
 export const DAILY_COMPLETION_REWARD={eggs:1};
 export const DAILY_COMPLETION_BP=100;
 export const DAILY_MISSIONS=[
@@ -33,9 +33,9 @@ export const QUEST_DEFS={
       {id:"g0a",reward:{eggs:1},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10}),nav:"hatch"},
       {id:"g0b",reward:{flairBanana:1},label:"Use 1 Flair Banana",check:s=>s.bananasUsed>=1,progress:s=>({cur:Math.min(s.bananasUsed,1),max:1}),nav:"collection"},
       {id:"g0c",reward:{eggs:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
-      {id:"g0d",reward:{food:1000},label:"Level up pets 5 times",check:s=>s.petLevelUps>=5,progress:s=>({cur:Math.min(s.petLevelUps,5),max:5}),nav:"collection"},
+      {id:"g0d",reward:{food:1000},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
       {id:"g0e",reward:{equipShards:1000},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
-      {id:"g0f",reward:{eggs:1},label:"Complete Floor 10 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=11,progress:s=>({cur:Math.min(s.labyrinthBestDepth||1,11),max:11}),nav:"labyrinth"},
+      {id:"g0f",reward:{eggs:1},label:"Complete Floor 10 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=11,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,10),max:10}),nav:"labyrinth"},
     ]},
     {reward:{gems:250,candy:25},quests:[
       {id:"g1a",reward:{food:40},label:"Own 10 creatures",check:s=>Object.keys(s.owned).length>=10,progress:s=>({cur:Math.min(Object.keys(s.owned).length,10),max:10})},

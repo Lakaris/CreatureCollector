@@ -143,6 +143,7 @@ export function pickDailyMissions(unlocked = {}) {
   const pool = DAILY_POOL.filter((m) => {
     if (m.id === "dm_dung1" && !unlocked.dungeon) return false;
     if (m.id === "dm_farm" && !unlocked.plots) return false;
+    if (m.id === "dm_boss" && !unlocked.boss) return false;
     return true;
   });
   return ["dm_login", ...shuffle(pool).slice(0, 4).map((m) => m.id)];

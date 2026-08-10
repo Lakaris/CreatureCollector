@@ -12,6 +12,9 @@ import NewPlayerGiftScreen from "../../ui/screens/NewPlayerGiftScreen.js";
 import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
 import { getDepthReward, nextRewardDepth, formatLabyrinthReward } from "../../core/labyrinth.js";
 import { easternNoonDayKey } from "../../core/dates.js";
+import { TABS } from "../../ui/components/NavBar.js";
+
+const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TABS.length)*100+"vw";
 
 function HomeScreen(){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow } = useGame();
@@ -84,13 +87,17 @@ function HomeScreen(){
     React.createElement(ScreenHeader,{title:React.createElement("button",{
       onClick:()=>{if(!tutorialRestricted)setSettingsOpen(true);},
       style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1,display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
-    },"⚙️"),right:React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})}),
+    },"⚙️"),right:React.createElement(React.Fragment,null,
+      React.createElement(CurrencyChip,{emoji:"⚔️",value:currencies.equipShards}),
+      React.createElement(CurrencyChip,{emoji:"🍖",value:currencies.food}),
+      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
+    )}),
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
     bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
     aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
     !tutorialRestricted&&React.createElement("button",{
       onClick:()=>{setShowQuests(true);setShowQuestsArrow(false);},
-      style:{position:"absolute",left:0,top:"calc(50% - 82px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:66,height:82,border:"none",background:"none",fontSize:32,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+      style:{position:"absolute",left:0,top:"calc(50% - 60px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:66,height:82,border:"none",background:"none",fontSize:32,fontWeight:700,color:"#534AB7",cursor:"pointer"}
     },
       "📋",
       React.createElement("span",{style:{fontSize:12,fontWeight:700,color:"#534AB7"}},"Quests"),
@@ -155,7 +162,7 @@ function HomeScreen(){
     tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:150,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6}},
       "Let's equip "+(def?def.name:"your creature")+" with the Iron Band you just got."
     ),
-    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:"41.667vw",bottom:80,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:COLLECTION_TAB_LEFT_PCT,bottom:80,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
     tutorialRestricted&&tutorialStep==="descend"&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:300,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6}},
       "You see a mysterious cave entrance that you didn't see before."
     ),

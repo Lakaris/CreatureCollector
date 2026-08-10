@@ -6,6 +6,8 @@ import { REWARD_LABELS, REWARD_DESC, NEW_PLAYER_GIFT_REWARDS } from "../../data/
 import { applyRewards } from "../../core/rewards.js";
 import { easternNoonDayKey } from "../../core/dates.js";
 
+const PURPLE="#534AB7";const GOLD="#d97706";const NODE_COL_W=56;const BOX_MAX=200;
+
 function NewPlayerGiftScreen({onBack}){
   const { setCurrencies, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, newPlayerGiftDoubled, setNewPlayerGiftDoubled } = useGame();
   const [rewardItems,setRewardItems]=React.useState(null);
@@ -83,28 +85,71 @@ function NewPlayerGiftScreen({onBack}){
       )
     ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}},
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}},
+      // Column headers -- normal reward on the left, doubled reward on the right.
+      // Lives inside the same scrolling box as the rows below (sticky, not a
+      // separate element) so it shares the scrollbar's width and stays aligned.
+      React.createElement("div",{style:{position:"sticky",top:0,zIndex:2,background:"#f8f8ff",display:"flex",justifyContent:"center",alignItems:"center",gap:14,padding:"8px 0"}},
+        React.createElement("div",{style:{flex:1,maxWidth:BOX_MAX,textAlign:"center",fontSize:16,fontWeight:800,color:PURPLE,letterSpacing:1}},"🎁 NORMAL"),
+        React.createElement("div",{style:{width:NODE_COL_W}}),
+        React.createElement("div",{style:{flex:1,maxWidth:BOX_MAX,textAlign:"center",fontSize:16,fontWeight:800,color:GOLD,letterSpacing:1}},"✨ DOUBLED")
+      ),
+      React.createElement("div",{style:{position:"relative",display:"flex",flexDirection:"column",gap:12,padding:"4px 0"}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"center",position:"relative",zIndex:1,marginBottom:4}},
+          React.createElement("div",{style:{width:NODE_COL_W,textAlign:"center",fontSize:11,fontWeight:800,color:"#888",letterSpacing:1}},"DAY")
+        ),
+        React.createElement("div",{style:{position:"absolute",top:38,bottom:22,left:"50%",width:4,background:"#e0d9ff",transform:"translateX(-50%)",borderRadius:3,zIndex:0}}),
         NEW_PLAYER_GIFT_REWARDS.map((r,i)=>{
           const isPast=i<newPlayerGiftDay;
           const isCurrent=i===newPlayerGiftDay;
           const rewardKey=Object.keys(r.reward)[0];
-          const rewardQty=newPlayerGiftDoubled?r.reward[rewardKey]*2:r.reward[rewardKey];
-          return React.createElement("div",{key:i,
-            onClick:isCurrent&&canClaim?claimDay:()=>setRewardPopup({key:rewardKey,qty:rewardQty,label:r.label,emoji:r.emoji}),
-            style:{
-              borderRadius:14,padding:"6px 4px 4px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"space-between",height:94,
-              background:isPast?"#f0f0f0":isCurrent?"#f0effe":"#fafafa",
-              border:"2px solid "+(isPast?"#ddd":isCurrent?"#7c4dff":"#e8e8e8"),
-              cursor:"pointer",
-              boxShadow:isCurrent?"0 2px 12px rgba(124,77,255,0.2)":"none",
-              transition:"transform 0.1s",
-            }
-          },
-            React.createElement("div",{style:{fontSize:9,fontWeight:700,color:isPast?"#bbb":isCurrent?"#7c4dff":"#aaa",letterSpacing:0.3}},"DAY "+(i+1)),
-            React.createElement("div",{style:{fontSize:26,lineHeight:1}},r.emoji),
-            React.createElement("div",{style:{fontSize:10,fontWeight:800,color:isPast?"#bbb":"#534AB7"}},"x"+rewardQty),
-            React.createElement("div",{style:{height:16,display:"flex",alignItems:"center",justifyContent:"center"}},
-              isCurrent&&canClaim&&React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#7c4dff",borderRadius:6,padding:"2px 6px"}},"CLAIM")
+          const baseQty=r.reward[rewardKey];
+          const claimable=isCurrent&&canClaim;
+          const badgeBase={fontSize:10,fontWeight:800,borderRadius:8,padding:"3px 10px",marginTop:2};
+          const leftBadgeVisible=claimable&&!newPlayerGiftDoubled;
+          const rightLocked=!newPlayerGiftDoubled;
+          const rightBadgeVisible=!isPast&&(rightLocked||(newPlayerGiftDoubled&&claimable));
+          return React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",justifyContent:"center",gap:14,position:"relative",zIndex:1}},
+            // Normal reward (left)
+            React.createElement("div",{
+              onClick:(!newPlayerGiftDoubled&&claimable)?claimDay:()=>setRewardPopup({key:rewardKey,qty:baseQty,label:r.label,emoji:r.emoji}),
+              style:{
+                flex:1,maxWidth:BOX_MAX,borderRadius:16,padding:"10px 12px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
+                background:isPast?"#f0f0f0":(isCurrent&&!newPlayerGiftDoubled)?"#f0effe":"#fafafa",
+                border:"2px solid "+(isPast?"#ddd":(isCurrent&&!newPlayerGiftDoubled)?"#7c4dff":"#e8e8e8"),
+                cursor:"pointer",
+                boxShadow:(isCurrent&&!newPlayerGiftDoubled)?"0 2px 12px rgba(124,77,255,0.2)":"none",
+              }
+            },
+              React.createElement("div",{style:{fontSize:28,lineHeight:1}},r.emoji),
+              React.createElement("div",{style:{fontSize:14,fontWeight:800,color:isPast?"#bbb":PURPLE}},"x"+baseQty),
+              React.createElement("div",{style:{...badgeBase,color:"#fff",background:PURPLE,visibility:leftBadgeVisible?"visible":"hidden"}},"CLAIM")
+            ),
+            // Center: day node
+            React.createElement("div",{style:{width:NODE_COL_W,flexShrink:0,display:"flex",justifyContent:"center"}},
+              React.createElement("div",{style:{
+                width:44,height:44,borderRadius:"50%",
+                background:isPast?"#e0e0e0":isCurrent?"#7c4dff":"#f0effe",
+                border:"2px solid "+(isPast?"#ccc":isCurrent?"#3730a3":"#c4b5fd"),
+                display:"flex",alignItems:"center",justifyContent:"center",
+                fontSize:14,fontWeight:800,color:isPast?"#aaa":isCurrent?"#fff":"#c4b5fd",
+                boxShadow:isCurrent?"0 2px 8px rgba(83,74,183,0.3)":"none"
+              }},isPast?"✓":(i+1))
+            ),
+            // Doubled reward (right) -- locked until purchased
+            React.createElement("div",{
+              onClick:(newPlayerGiftDoubled&&claimable)?claimDay:()=>setRewardPopup({key:rewardKey,qty:baseQty,label:r.label,emoji:r.emoji}),
+              style:{
+                flex:1,maxWidth:BOX_MAX,borderRadius:16,padding:"10px 12px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
+                background:isPast?"#f0f0f0":!newPlayerGiftDoubled?"#f7f7f7":isCurrent?"#fffbeb":"#fafafa",
+                border:"2px solid "+(isPast?"#ddd":!newPlayerGiftDoubled?"#ddd":isCurrent?"#fbbf24":"#e8e8e8"),
+                cursor:"pointer",
+                boxShadow:(isCurrent&&newPlayerGiftDoubled)?"0 2px 12px rgba(251,191,36,0.25)":"none",
+                opacity:isPast?1:!newPlayerGiftDoubled?0.65:1,
+              }
+            },
+              React.createElement("div",{style:{fontSize:28,lineHeight:1,filter:!isPast&&!newPlayerGiftDoubled?"grayscale(70%)":"none"}},r.emoji),
+              React.createElement("div",{style:{fontSize:14,fontWeight:800,color:isPast?"#bbb":!newPlayerGiftDoubled?"#aaa":GOLD}},"x"+baseQty),
+              React.createElement("div",{style:{...badgeBase,color:rightLocked?"#999":"#fff",background:rightLocked?"#eaeaea":GOLD,visibility:rightBadgeVisible?"visible":"hidden"}},rightLocked?"🔒 Locked":"CLAIM")
             )
           );
         })

@@ -12,12 +12,21 @@ export const EQUIPMENT_DEFS=[
   // Common (base 5 per stat -- two-stat items nerfed to ~0.6x so their combined
   // total stays in line with same-rarity single-stat items)
   {id:"com_hp_atk",  name:"Iron Band",        emoji:"⚔️",  rarity:"common",    stats:{hp:5,  atk:5}},
+  {id:"com_hp_atk2", name:"Leather Vambrace", emoji:"🧤",  rarity:"common",    stats:{hp:5,  atk:5}},
+  {id:"com_hp_atk3", name:"Boarhide Wrap",    emoji:"🐗",  rarity:"common",    stats:{hp:5,  atk:5}},
   {id:"com_hp_def",  name:"Stone Brace",      emoji:"🪨",  rarity:"common",    stats:{hp:5,  def:5}},
+  {id:"com_hp_def2", name:"Wooden Buckler",   emoji:"🪵",  rarity:"common",    stats:{hp:5,  def:5}},
+  {id:"com_hp_def3", name:"Bone Guard",       emoji:"🦴",  rarity:"common",    stats:{hp:5,  def:5}},
   {id:"com_atk_def", name:"Iron Knuckles",    emoji:"🥊",  rarity:"common",    stats:{atk:5, def:5}},
+  {id:"com_atk_def2",name:"Bronze Spikes",    emoji:"📌",  rarity:"common",    stats:{atk:5, def:5}},
+  {id:"com_atk_def3",name:"Rawhide Wraps",    emoji:"🥋",  rarity:"common",    stats:{atk:5, def:5}},
   // Rare (base 7 per stat)
   {id:"rar_hp_atk",  name:"Silver Armlet",    emoji:"⚔️",  rarity:"rare",      stats:{hp:7,  atk:7}},
+  {id:"rar_hp_atk2", name:"Falcon Bracer",    emoji:"🦅",  rarity:"rare",      stats:{hp:7,  atk:7}},
   {id:"rar_hp_def",  name:"Guardian Crest",   emoji:"🛡️",  rarity:"rare",      stats:{hp:7,  def:7}},
+  {id:"rar_hp_def2", name:"Tortoise Shell",   emoji:"🐢",  rarity:"rare",      stats:{hp:7,  def:7}},
   {id:"rar_atk_def", name:"War Gauntlet",     emoji:"🥊",  rarity:"rare",      stats:{atk:7, def:7}},
+  {id:"rar_atk_def2",name:"Wolf Fang Claw",   emoji:"🐺",  rarity:"rare",      stats:{atk:7, def:7}},
   // Stat Sigils — Rare single-stat (base 18), +10% that stat
   {id:"sig_hp",  name:"Life Sigil",   emoji:"❤️", rarity:"rare", stats:{hp:18},           effect:"Gain 10% more HP",    statBonus:{stat:"hp",  pct:10}},
   {id:"sig_atk", name:"Fury Sigil",   emoji:"⚔️", rarity:"rare", stats:{atk:18},          effect:"Gain 10% more ATK",   statBonus:{stat:"atk", pct:10}},

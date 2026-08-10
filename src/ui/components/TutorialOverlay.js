@@ -561,7 +561,7 @@ function TutorialOverlay() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-start",
+              justifyContent: "flex-end",
               gap: 16,
               padding: "24px 24px 140px",
               overflowY: "auto",

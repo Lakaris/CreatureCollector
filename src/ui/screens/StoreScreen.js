@@ -4,6 +4,7 @@ import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { STORE_GEM_PACKS, STORE_BUNDLES } from "../../data/store.js";
 import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
+import { formatNum } from "../../core/format.js";
 
 function StoreScreen(){
   const { currencies } = useGame();
@@ -43,7 +44,7 @@ function StoreScreen(){
         STORE_GEM_PACKS.map(p=>React.createElement("div",{key:p.id,onClick:()=>buy(p),style:{background:"#fff",borderRadius:16,padding:"14px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,boxShadow:"0 1px 6px rgba(0,0,0,0.07)",cursor:"pointer",position:"relative",border:"1.5px solid #e8e8e8"}},
           p.badge&&React.createElement("div",{style:{position:"absolute",top:-8,right:8,background:p.badge==="Best Value"?"#f59e0b":"#534AB7",color:"#fff",fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:8}},p.badge),
           React.createElement("div",{style:{fontSize:32,lineHeight:1}},"💎"),
-          React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111"}},p.gems.toLocaleString()),
+          React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111"}},formatNum(p.gems)),
           p.bonus>0&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#22c55e"}},"+"+p.bonus+" bonus"),
           React.createElement("div",{style:{marginTop:4,padding:"5px 14px",background:"linear-gradient(135deg,#534AB7,#7c4dff)",color:"#fff",borderRadius:10,fontSize:12,fontWeight:700}},p.price)
         ))

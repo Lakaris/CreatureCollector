@@ -35,3 +35,13 @@ export const FIELD_SHARD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_,
 ); // equipment shards per hour at each level (index=level)
 export const FIELD_CAP_HOURS=24;
 export const FIELD_MIN_HOURS=1;
+
+// Food/Gear Shard plots don't use the flat yield/upgradeEvery progression
+// below -- they instead pay out 12h (== PLOT_GROW_MS) of whatever the Field
+// currently produces per hour at farmFieldLevel, so upgrading the Field also
+// raises what these plots pay out.
+export function getPlotYield(cropDef,upgradeLevel,farmFieldLevel){
+  if(cropDef.key==="food")return 12*(FIELD_RATES[farmFieldLevel]||FIELD_RATES[1]);
+  if(cropDef.key==="equipShards")return 12*(FIELD_SHARD_RATES[farmFieldLevel]||FIELD_SHARD_RATES[1]);
+  return cropDef.yield+Math.floor(upgradeLevel/cropDef.upgradeEvery);
+}

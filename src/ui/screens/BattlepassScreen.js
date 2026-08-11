@@ -5,7 +5,7 @@ import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { BP_PTS_PER_NODE, BATTLEPASS_REWARDS_FREE, BATTLEPASS_REWARDS_PAID, resolveReward, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
-import { formatDuration } from "../../core/format.js";
+import { formatDuration, formatNum } from "../../core/format.js";
 
 function BattlepassScreen({onBack}){
   const { setCurrencies, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, farmFieldLevel } = useGame();
@@ -67,7 +67,7 @@ function BattlepassScreen({onBack}){
                 React.createElement("span",{key:"emoji",style:{fontSize:30,filter:locked?"grayscale(70%)":"none"}},rewardEmoji)
               ]
             :[
-                React.createElement("span",{key:"amt",style:{fontSize:22,fontWeight:800,color:locked?"#aaa":(isPaid?GOLD:PURPLE)}},rewardAmt),
+                React.createElement("span",{key:"amt",style:{fontSize:22,fontWeight:800,color:locked?"#aaa":(isPaid?GOLD:PURPLE)}},formatNum(rewardAmt)),
                 React.createElement("span",{key:"emoji",style:{fontSize:30,filter:locked?"grayscale(70%)":"none"}},rewardEmoji)
               ]
         ),
@@ -102,7 +102,7 @@ function BattlepassScreen({onBack}){
         React.createElement("div",{style:{flex:1,height:6,borderRadius:6,background:"#e8e8e8",overflow:"hidden"}},
           React.createElement("div",{style:{height:"100%",width:Math.min(100,ptsIntoLevel/BP_PTS_PER_NODE*100)+"%",background:"linear-gradient(90deg,#534AB7,#7c4dff)",borderRadius:6,transition:"width 0.4s"}})
         ),
-        React.createElement("div",{style:{fontSize:11,fontWeight:700,color:PURPLE,whiteSpace:"nowrap"}},ptsIntoLevel+"/"+BP_PTS_PER_NODE+" pts")
+        React.createElement("div",{style:{fontSize:11,fontWeight:700,color:PURPLE,whiteSpace:"nowrap"}},ptsIntoLevel+" / "+BP_PTS_PER_NODE+" pts")
       ),
       React.createElement("div",{style:{padding:"0 20px 14px"}},
         React.createElement("button",{onClick:claimAll,disabled:!anyClaimable,style:{width:"100%",padding:"10px 0",borderRadius:12,border:"none",cursor:anyClaimable?"pointer":"default",background:anyClaimable?PURPLE:"#e8e8e8",color:anyClaimable?"#fff":"#aaa",fontWeight:700,fontSize:13}},"🎁 Collect All")

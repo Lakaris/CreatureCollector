@@ -619,7 +619,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 } },
           React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 4 } },
             React.createElement("span", { style: { fontSize: 22, fontWeight: 800, color: deployedCount >= ARENA_MAX_DEPLOYED ? "#ef4444" : "#111" } }, deployedCount),
-            React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: "#aaa" } }, "/" + ARENA_MAX_DEPLOYED + " deployed")
+            React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: "#aaa" } }, " / " + ARENA_MAX_DEPLOYED + " deployed")
           ),
           React.createElement("div", { style: { display: "flex", gap: 8 } },
             React.createElement("button", { onClick: () => deployedCount > 0 && setPlanGrid({}), disabled: deployedCount === 0, style: { padding: "8px 14px", fontSize: 14, fontWeight: 700, background: "#fff", color: deployedCount > 0 ? "#534AB7" : "#ccc", border: "1.5px solid " + (deployedCount > 0 ? "#534AB7" : "#ccc"), borderRadius: 12, cursor: deployedCount > 0 ? "pointer" : "default" } }, "🗑 Clear All"),

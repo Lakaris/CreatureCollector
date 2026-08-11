@@ -1,6 +1,19 @@
 // Display formatting helpers.
 
 /**
+ * Format a count for display, abbreviating once it gets long: 100,000+ as
+ * "k" (e.g. 320000 -> "320k"), 1,000,000+ as "m" (e.g. 1320000 -> "1.32m").
+ * Anything smaller keeps its full comma-grouped form (e.g. "12,500").
+ */
+export function formatNum(n) {
+  const v = n || 0;
+  const abs = Math.abs(v);
+  if (abs >= 1000000) return Number((v / 1000000).toFixed(2)) + "m";
+  if (abs >= 100000) return Number((v / 1000).toFixed(2)) + "k";
+  return v.toLocaleString();
+}
+
+/**
  * Format a duration as its two largest meaningful units.
  *
  * @param {number} ms

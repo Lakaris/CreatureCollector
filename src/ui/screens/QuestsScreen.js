@@ -6,6 +6,7 @@ import { QUEST_TABS, DAILY_MISSIONS, QUEST_DEFS, REWARD_LABELS, REWARD_DESC } fr
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { applyRewards } from "../../core/rewards.js";
 import DailyTabContent from "../../ui/screens/DailyTabContent.js";
+import { formatNum } from "../../core/format.js";
 
 // Mirrors NavBar's Play-tab gate: Dungeon and Arena quests aren't reachable
 // until then, so their quest tabs stay locked until the same threshold.
@@ -149,7 +150,7 @@ function QuestsScreen({onBack}){
             transition:"opacity 0.3s, transform 0.3s",
           }},
             React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},v)
+            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},formatNum(v))
           );
         })
       ),
@@ -209,7 +210,7 @@ function QuestsScreen({onBack}){
                   background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,cursor:"pointer",
                 }},
                   React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-                  React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},v)
+                  React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},formatNum(v))
                 ))
               ),
               React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
@@ -247,13 +248,13 @@ function QuestsScreen({onBack}){
                     borderRadius:10,cursor:"pointer",
                   }},
                     React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-                    React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":done?"#534AB7":"#7c3aed"}},v)
+                    React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":done?"#534AB7":"#7c3aed"}},formatNum(v))
                   ))
                 ),
                 React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:6}},
                   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
                     React.createElement("div",{style:{fontSize:13,fontWeight:600,color:done?"#166534":"#222",flex:1}},q.label),
-                    React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+"/"+prog.max)
+                    React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+" / "+prog.max)
                   ),
                   React.createElement("div",{style:{height:6,borderRadius:6,background:"#e8e8e8",overflow:"hidden"}},
                     React.createElement("div",{style:{height:"100%",width:(pct*100)+"%",background:done?"#22c55e":"#534AB7",borderRadius:6,transition:"width 0.3s"}})

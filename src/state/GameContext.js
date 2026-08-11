@@ -394,12 +394,12 @@ export function GameProvider({ children }) {
       owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
       eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
       labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
-      petLevelUps, equipLevelUps, everCompletedDailyQuests,
+      petLevelUps, equipLevelUps, everCompletedDailyQuests, equipmentLevels, equipmentCopies,
     }),
     [owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
      eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
      labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
-     petLevelUps, equipLevelUps, everCompletedDailyQuests]
+     petLevelUps, equipLevelUps, everCompletedDailyQuests, equipmentLevels, equipmentCopies]
   );
 
   const value = {

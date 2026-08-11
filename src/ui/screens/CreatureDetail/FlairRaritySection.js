@@ -3,6 +3,7 @@
 import React, { useState } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { FLAIR_RARITIES, BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_COSTS, RARITY_COLORS_FLAIR } from "../../../data/flair.js";
+import { formatNum } from "../../../core/format.js";
 
 function FlairRaritySection({flairTab,ownedData}){
   const { setOwned, currencies, setCurrencies } = useGame();
@@ -90,10 +91,10 @@ function FlairRaritySection({flairTab,ownedData}){
         React.createElement("div",{style:{fontSize:11,fontWeight:600,color:RARITY_COLORS_FLAIR[purchaseModal.rarity],textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}},purchaseModal.rarity),
         purchaseModal.buff&&React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#555",marginBottom:16}},"+"+purchaseModal.buff.pct+"% "+BUFF_STAT_LABEL[purchaseModal.buff.stat]),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontSize:15,fontWeight:700,color:"#534AB7",marginBottom:20}},
-          React.createElement("span",null,"🔷 "+FLAIR_SHARD_COSTS[purchaseModal.rarity].toLocaleString()+" Flair Shards")
+          React.createElement("span",null,"🔷 "+formatNum(FLAIR_SHARD_COSTS[purchaseModal.rarity])+" Flair Shards")
         ),
         React.createElement("div",{style:{fontSize:11,color:(currencies.flairShard||0)>=FLAIR_SHARD_COSTS[purchaseModal.rarity]?"#1b5e20":"#c62828",marginBottom:16,fontWeight:600}},
-          "You have "+(currencies.flairShard||0)+" 🔷"
+          "You have "+formatNum(currencies.flairShard||0)+" 🔷"
         ),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{onClick:()=>setPurchaseModal(null),style:{flex:1,padding:"10px 0",border:"1px solid #e0e0e0",borderRadius:8,background:"#f5f5f5",fontWeight:600,fontSize:13,cursor:"pointer",color:"#555"}},"Cancel"),

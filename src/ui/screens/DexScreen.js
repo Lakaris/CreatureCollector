@@ -42,7 +42,7 @@ function DexScreen({onBack}){
 
   return React.createElement("div",null,
     React.createElement(ScreenHeader,{title:"Creature Dex",onBack,right:
-      React.createElement("span",{style:{fontSize:12,color:"#666"}},collectedCount+"/"+FINAL_FORMS.length+" collected")
+      React.createElement("span",{style:{fontSize:12,color:"#666"}},collectedCount+" / "+FINAL_FORMS.length+" collected")
     }),
     React.createElement("div",{style:{position:"relative",marginBottom:8}},
       React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),

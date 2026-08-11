@@ -9,6 +9,7 @@ import { CREATURE_MAP } from "./data/creatures.js";
 import { DEV_MODE } from "./config.js";
 import { useGame } from "./state/GameContext.js";
 import { easternNoonDayKey, isPastEasternNoon, nextEasternNoon } from "./core/dates.js";
+import { formatNum } from "./core/format.js";
 
 import CreatureOverlayHost from "./ui/components/CreatureOverlayHost.js";
 import TutorialOverlay from "./ui/components/TutorialOverlay.js";
@@ -122,7 +123,7 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
             React.createElement(
               "span",
               { style: { color: "#534AB7", fontSize: 12, fontWeight: 700 } },
-              attemptsLeft + "/3 Attempts Left"
+              attemptsLeft + " / 3 Attempts Left"
             )
           )
     ),
@@ -167,7 +168,7 @@ function HarvestPopup() {
             "div",
             { style: { minWidth: 0 } },
             React.createElement("div", { style: { fontSize: 11, color: "#888", lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, item.label),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#2e7d32" } }, "+" + item.amount)
+            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#2e7d32" } }, "+" + formatNum(item.amount))
           )
         )
       )

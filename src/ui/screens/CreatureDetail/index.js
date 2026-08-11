@@ -19,6 +19,7 @@ import SkinSection from "../../../ui/screens/CreatureDetail/SkinSection.js";
 import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js";
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
+import { formatNum } from "../../../core/format.js";
 
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
 // guided walkthrough points the player at equipping.
@@ -423,14 +424,14 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
               lvl<EQUIP_MAX_LEVEL
                 ? React.createElement("div",null,
                     React.createElement("div",{style:{fontSize:12,color:"#534AB7",marginBottom:8}},"Lv "+(lvl+1)+": "+equipBonusStr(nextUpgradeBonuses)),
-                    React.createElement("button",{onClick:()=>doUpgrade(pi.id),disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa"}},"🔧 Upgrade "+(currencies.equipShards||0)+"/"+upgradeCost)
+                    React.createElement("button",{onClick:()=>doUpgrade(pi.id),disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa"}},"🔧 Upgrade "+formatNum(currencies.equipShards||0)+" / "+formatNum(upgradeCost))
                   )
                 : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},"✦ Max Level")
             ),
             React.createElement("div",null,
               React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#666",marginBottom:6}},"ASCENSION"),
               asc<EQUIP_MAX_ASCENSION
-                ? React.createElement("button",{onClick:()=>doAscendEquip(pi.id),disabled:!canAffordAsc,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordAsc?"pointer":"default",background:canAffordAsc?"#f59e0b":"#e0e0e0",color:canAffordAsc?"#fff":"#aaa"}},"✦ Ascend "+copies+"/"+ascCost)
+                ? React.createElement("button",{onClick:()=>doAscendEquip(pi.id),disabled:!canAffordAsc,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordAsc?"pointer":"default",background:canAffordAsc?"#f59e0b":"#e0e0e0",color:canAffordAsc?"#fff":"#aaa"}},"✦ Ascend "+copies+" / "+ascCost)
                 : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},"✦ Max Ascension")
             )
           )
@@ -882,10 +883,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
           React.createElement("span",{style:{fontSize:12,color:"#2e7d32",fontWeight:600}},"🍈 "+(currencies.ascensionMelon||0))
         ),
         def.evolutionId&&React.createElement("div",{style:{fontSize:11,color:"#666",marginBottom:6}},
-          "Evolves to "+CREATURE_MAP[def.evolutionId].name+" after "+def.ascensionsToEvolve+" ascensions ("+ownedData.ascensions+"/"+def.ascensionsToEvolve+")"
+          "Evolves to "+CREATURE_MAP[def.evolutionId].name+" after "+def.ascensionsToEvolve+" ascensions ("+ownedData.ascensions+" / "+def.ascensionsToEvolve+")"
         ),
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
-          React.createElement("span",{style:{fontSize:12,color:ownedData.shards>=rootDef.shardsToAscend?"#378ADD":"#666",fontWeight:ownedData.shards>=rootDef.shardsToAscend?700:400}},"Shards: "+ownedData.shards+"/"+rootDef.shardsToAscend),
+          React.createElement("span",{style:{fontSize:12,color:ownedData.shards>=rootDef.shardsToAscend?"#378ADD":"#666",fontWeight:ownedData.shards>=rootDef.shardsToAscend?700:400}},"Shards: "+ownedData.shards+" / "+rootDef.shardsToAscend),
           React.createElement("div",{className:"shard-bar-bg"},
             React.createElement("div",{className:"shard-bar-fill",style:{width:Math.round(shardsProgress*100)+"%",background:ownedData.shards>=rootDef.shardsToAscend?"#378ADD":"#EF9F27"}})
           ),

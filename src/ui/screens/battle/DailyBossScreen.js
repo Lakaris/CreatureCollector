@@ -721,7 +721,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:4}},
           React.createElement("span",{style:{fontSize:22,fontWeight:800,color:Object.keys(planGrid).length>=MAX_DEPLOYED?"#ef4444":"#111"}},Object.keys(planGrid).length),
-          React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+MAX_DEPLOYED+" deployed")
+          React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}}," / "+MAX_DEPLOYED+" deployed")
         ),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{onClick:()=>Object.keys(planGrid).length>0&&setPlanGrid({}),disabled:Object.keys(planGrid).length===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"1.5px solid "+(Object.keys(planGrid).length>0?"#534AB7":"#ccc"),borderRadius:12,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},"🗑 Clear All"),
@@ -854,7 +854,7 @@ function DailyBossScreen({onBack,onViewCreature}){
               attemptsLeft>0
                 &&React.createElement("button",{onClick:()=>setPhase("planning"),style:{width:"100%",padding:"15px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}},
                     React.createElement("span",null,"⚔️ Fight"),
-                    React.createElement("span",{style:{fontSize:12,fontWeight:600,opacity:0.8}},attemptsLeft+"/"+MAX_ATTEMPTS+" Attempts Left")
+                    React.createElement("span",{style:{fontSize:12,fontWeight:600,opacity:0.8}},attemptsLeft+" / "+MAX_ATTEMPTS+" Attempts Left")
                   )
             );
           })()

@@ -12,6 +12,7 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import Notify from "../../ui/components/Notify.js";
 import EquipmentPicker from "../../ui/screens/EquipmentPicker.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
+import { formatNum } from "../../core/format.js";
 
 function EquipmentDetail({ itemId, onBack }) {
   const { owned, currencies, setCurrencies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, tutorialStep, setTutorialStep, setEquipLevelUps } = useGame();
@@ -104,7 +105,7 @@ function EquipmentDetail({ itemId, onBack }) {
                 React.createElement("div", { style: { fontSize: 12, color: "#534AB7", marginBottom: 8 } }, "Lv " + (lvl + 1) + ": " + equipBonusStr(nextUpgradeBonuses)),
                 (() => {
                   const enabled = canAffordUpgrade && tutorialStep !== "toHome";
-                  return React.createElement("button", { onClick: doUpgrade, disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa" } }, "🔧 Upgrade " + (currencies.equipShards || 0) + "/" + upgradeCost);
+                  return React.createElement("button", { onClick: doUpgrade, disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa" } }, "🔧 Upgrade " + formatNum(currencies.equipShards || 0) + " / " + formatNum(upgradeCost));
                 })()
               )
             : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Level")
@@ -112,7 +113,7 @@ function EquipmentDetail({ itemId, onBack }) {
         React.createElement("div", null,
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "ASCENSION"),
           asc < EQUIP_MAX_ASCENSION
-            ? React.createElement("button", { onClick: doAscendEquip, disabled: !canAffordAsc, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: canAffordAsc ? "pointer" : "default", background: canAffordAsc ? "#f59e0b" : "#e0e0e0", color: canAffordAsc ? "#fff" : "#aaa" } }, "✦ Ascend " + copies + "/" + ascCost)
+            ? React.createElement("button", { onClick: doAscendEquip, disabled: !canAffordAsc, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: canAffordAsc ? "pointer" : "default", background: canAffordAsc ? "#f59e0b" : "#e0e0e0", color: canAffordAsc ? "#fff" : "#aaa" } }, "✦ Ascend " + copies + " / " + ascCost)
             : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Ascension")
         )
       )

@@ -3,9 +3,9 @@
 import React, { useState, useMemo, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { MELON_TYPES } from "../../data/types.js";
-import { PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS } from "../../data/farm.js";
+import { PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS, getPlotYield } from "../../data/farm.js";
 import { seededRand } from "../../core/random.js";
-import { formatDuration } from "../../core/format.js";
+import { formatDuration, formatNum } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
@@ -156,7 +156,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         React.createElement("div",{style:{position:"absolute",top:10,left:0,right:0,textAlign:"center",fontSize:14,fontWeight:700,color:"#555",pointerEvents:"none"}},"Lv."+farmFieldLevel),
         React.createElement("div",{style:{fontSize:56,marginBottom:6}},"🌾"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:2}},accumulated>0?"Ready to harvest":"Growing..."),
-        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+rate+"/hr")
+        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+formatNum(rate)+"/hr")
       ),
       React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px"}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
@@ -179,14 +179,14 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
                 React.createElement("span",{style:{fontSize:20}},"🍖"),
                 React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Food")
               ),
-              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulated)
+              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+formatNum(accumulated))
             ),
             accumulatedShards>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
                 React.createElement("span",{style:{fontSize:20}},"🔧"),
                 React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Gear Shards")
               ),
-              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+accumulatedShards)
+              React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+formatNum(accumulatedShards))
             ),
             ...Object.entries(fieldBonuses).map(([k,v])=>{
               const m=MELON_TYPES.find(m=>m.key===k);
@@ -275,7 +275,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           const hLeft=Math.floor(msLeft/3600000);
           const mLeft=Math.floor((msLeft%3600000)/60000);
           const upgradeLevel=plotUpgrades[i]||0;
-          const effectiveYield=crop?(cropDef.yield+Math.floor(upgradeLevel/cropDef.upgradeEvery)):0;
+          const effectiveYield=crop?getPlotYield(cropDef,upgradeLevel,farmFieldLevel):0;
           function harvestPlot(){
             setCurrencies(c=>({...c,[cropDef.key]:(c[cropDef.key]||0)+effectiveYield}));
             setFarmCrops(fc=>{const a=[...fc];a[i]=null;return a;});
@@ -308,7 +308,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               },"Grow")
             ),
             unlocked&&crop&&!ready&&React.createElement(React.Fragment,null,
-              React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600,marginBottom:4}},cropDef.label+" × "+effectiveYield),
+              React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600,marginBottom:4}},cropDef.label+" × "+formatNum(effectiveYield)),
               React.createElement("div",{style:{background:"#e0e0e0",borderRadius:4,height:6,margin:"0 4px 6px",overflow:"hidden",width:"100%"}},
                 React.createElement("div",{style:{width:(pct*100)+"%",height:"100%",background:"#534AB7",transition:"width .5s"}})
               ),
@@ -329,7 +329,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               },"⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎")
             ),
             unlocked&&crop&&ready&&React.createElement(React.Fragment,null,
-              React.createElement("div",{style:{fontSize:11,color:"#e65100",fontWeight:600,marginBottom:6}},cropDef.emoji+" "+effectiveYield+" "+cropDef.label+" ready!"),
+              React.createElement("div",{style:{fontSize:11,color:"#e65100",fontWeight:600,marginBottom:6}},cropDef.emoji+" "+formatNum(effectiveYield)+" "+cropDef.label+" ready!"),
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();harvestPlot();},
                 style:{padding:"6px 14px",background:"#ff9800",color:"#fff",border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:12}
@@ -373,11 +373,11 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       }},
         React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#555",marginBottom:6,paddingBottom:4,borderBottom:"0.5px solid rgba(0,0,0,0.08)"}},"Drops per hour"),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,rate)," 🍖 Food"),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(rate))," 🍖 Food"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
         ),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,shardRate)," 🔧 Gear Shards"),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(shardRate))," 🔧 Gear Shards"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
         ),
         React.createElement("div",{className:"rates-row"},
@@ -397,11 +397,11 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
           React.createElement("div",{className:"rates-row"},
             React.createElement("span",{style:{fontSize:13}},"🍖 Food rate"),
-            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},rate+" → "+(FIELD_RATES[farmFieldLevel+1]||"?")+"/hr")
+            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},formatNum(rate)+" → "+(FIELD_RATES[farmFieldLevel+1]?formatNum(FIELD_RATES[farmFieldLevel+1]):"?")+"/hr")
           ),
           React.createElement("div",{className:"rates-row"},
             React.createElement("span",{style:{fontSize:13}},"🔧 Gear Shards rate"),
-            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},shardRate+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]||"?")+"/hr")
+            React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},formatNum(shardRate)+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]?formatNum(FIELD_SHARD_RATES[farmFieldLevel+1]):"?")+"/hr")
           )
         ),
         React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 🪴 "+upgradeFertilizerCost+" Ancient Fertilizer"),
@@ -442,7 +442,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           },
             React.createElement("span",{style:{fontSize:20}},crop.emoji),
             React.createElement("span",{style:{fontSize:10,fontWeight:700,textAlign:"center",lineHeight:1.2}},crop.label),
-            React.createElement("span",{style:{fontSize:9,color:"#888"}},"x"+(crop.yield+Math.floor((plotUpgrades[picking]||0)/crop.upgradeEvery)))
+            React.createElement("span",{style:{fontSize:9,color:"#888"}},"x"+formatNum(getPlotYield(crop,plotUpgrades[picking]||0,farmFieldLevel)))
           ))
         ),
         React.createElement("button",{onClick:()=>setPicking(null),style:{width:"100%",marginTop:8,padding:"8px 0",background:"#eee",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:12}},"Cancel")

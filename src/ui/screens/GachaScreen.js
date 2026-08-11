@@ -8,6 +8,7 @@ import { BANNERS } from "../../data/banners.js";
 import { TYPE_EMOJI } from "../../data/types.js";
 import { makeOwnedCreature } from "../../core/creatures.js";
 import { rollGacha } from "../../core/gacha.js";
+import { formatNum } from "../../core/format.js";
 import ScreenHeader, { CurrencyChip } from "../components/ScreenHeader.js";
 import CreatureAbilitySummary from "../components/CreatureAbilitySummary.js";
 
@@ -204,8 +205,8 @@ function GachaScreen({onHatch}){
       const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
       return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}},
         React.createElement("div",{style:{alignSelf:"flex-end",marginBottom:8,display:"flex",gap:6}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+(currencies[eggKey]||0).toLocaleString()),
-          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+currencies.gems.toLocaleString())
+          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+formatNum(currencies[eggKey]||0)),
+          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+formatNum(currencies.gems))
         ),
         React.createElement("div",{style:{textAlign:"center",flex:1,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",overflowY:"auto"}},
           React.createElement("span",{style:{fontSize:96,display:"block",marginBottom:12,animation:"revealPop .4s cubic-bezier(.34,1.56,.64,1)"}},c.emoji),
@@ -253,8 +254,8 @@ function GachaScreen({onHatch}){
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}},
         React.createElement("div",{style:{fontSize:16,fontWeight:500,color:"#000"}},"Hatch Results"),
         React.createElement("div",{style:{display:"flex",gap:6}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+(currencies[eggKey]||0).toLocaleString()),
-          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+currencies.gems.toLocaleString())
+          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+formatNum(currencies[eggKey]||0)),
+          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+formatNum(currencies.gems))
         )
       ),
       React.createElement("div",{className:"reveal-summary-grid"},

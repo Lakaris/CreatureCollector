@@ -5,6 +5,7 @@ import { useGame } from "../../state/GameContext.js";
 import { TREASURE_RARITIES, TREASURE_SETS, TREASURES } from "../../data/treasures.js";
 import { applyRewards } from "../../core/rewards.js";
 import { rollTreasure } from "../../core/gacha.js";
+import { formatNum } from "../../core/format.js";
 
 function TreasureScreen({onBack}){
   const { currencies, setCurrencies, collectedTreasures, setCollectedTreasures, completedTreasureSets, setCompletedTreasureSets } = useGame();
@@ -170,7 +171,7 @@ function TreasureScreen({onBack}){
         React.createElement("div",{style:{fontSize:17,fontWeight:800,color:"#111"}},"Redeem Shards"),
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4,background:"#f5f3ff",border:"1.5px solid #ddd6fe",borderRadius:20,padding:"3px 10px"}},
           React.createElement("span",{style:{fontSize:13}},"✨"),
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#7c3aed"}},(shards).toLocaleString()),
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#7c3aed"}},formatNum(shards)),
           React.createElement("span",{style:{fontSize:11,color:"#a78bfa",fontWeight:500}},"Shards")
         )
       ),
@@ -227,7 +228,7 @@ function TreasureScreen({onBack}){
           React.createElement("div",{style:{flex:1,textAlign:"center"}},
             React.createElement("div",{style:{position:"relative",display:"inline-block",marginBottom:8}},
               React.createElement("div",{style:{fontSize:72,lineHeight:1}},ore.emoji),
-              React.createElement("div",{style:{position:"absolute",bottom:0,right:-6,background:"#333",color:"#fff",fontWeight:800,fontSize:13,minWidth:24,height:24,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 6px",border:"2px solid #fff"}},ore.count)
+              React.createElement("div",{style:{position:"absolute",bottom:0,right:-6,background:"#333",color:"#fff",fontWeight:800,fontSize:13,minWidth:24,height:24,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 6px",border:"2px solid #fff"}},formatNum(ore.count))
             ),
             React.createElement("div",{style:{fontSize:15,fontWeight:800,color:ore.color,marginBottom:2}},ore.label),
             React.createElement("div",{style:{fontSize:12,color:allRainbowCollected?"#10b981":"#aaa",marginBottom:14}},allRainbowCollected?"✅ All treasures collected!":ore.desc),

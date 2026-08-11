@@ -3,11 +3,12 @@
 // bled edge-to-edge via negative margins to offset app-content's own 16px padding.
 
 import React from "../../react.js";
+import { formatNum } from "../../core/format.js";
 
 export function CurrencyChip({ emoji, value }) {
   return React.createElement("div", { className: "chip" },
     emoji,
-    React.createElement("span", null, (value || 0).toLocaleString())
+    React.createElement("span", null, formatNum(value))
   );
 }
 

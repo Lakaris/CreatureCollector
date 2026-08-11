@@ -5,6 +5,7 @@ import { useGame } from "../../state/GameContext.js";
 import { REWARD_LABELS, REWARD_DESC, DAILY_REWARDS, resolveDailyReward } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
 import { easternNoonDayKey } from "../../core/dates.js";
+import { formatNum } from "../../core/format.js";
 
 function DailyScreen({onBack}){
   const { setCurrencies, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, farmFieldLevel } = useGame();
@@ -50,7 +51,7 @@ function DailyScreen({onBack}){
             opacity:visible?1:0,transform:visible?"scale(1)":"scale(0.7)",transition:"opacity 0.3s, transform 0.3s",
           }},
             React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},v)
+            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},formatNum(v))
           );
         })
       ),

@@ -518,7 +518,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
           React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:4}},
             React.createElement("span",{style:{fontSize:22,fontWeight:800,color:deployedCount>=DUNGEON_MAX_DEPLOYED?"#ef4444":"#111"}},deployedCount),
-            React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+DUNGEON_MAX_DEPLOYED+" deployed")
+            React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}}," / "+DUNGEON_MAX_DEPLOYED+" deployed")
           ),
           React.createElement("div",{style:{display:"flex",gap:8}},
             React.createElement("button",{onClick:()=>deployedCount>0&&setDPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},"🗑 Clear All"),
@@ -714,7 +714,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     ),
     React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"0 24px 40px",flexShrink:0}},
       React.createElement("div",{style:{position:"relative",display:"inline-block"}},
-        React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#111"}},"🎫 "+passes+"/10"),
+        React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#111"}},"🎫 "+passes+" / 10"),
         React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setBuyPassesOpen(true);},style:{position:"absolute",top:-6,right:-24,width:20,height:20,borderRadius:"50%",background:dungeonEnterActive?"#ccc":"#534AB7",color:"#fff",border:"none",fontSize:14,fontWeight:700,cursor:dungeonEnterActive?"not-allowed":"pointer",padding:0,lineHeight:"20px",textAlign:"center"}},"+")
       ),
       React.createElement("div",{style:{fontSize:11,color:"#bbb"}},"Refreshes in "+getTimeToNoon()),

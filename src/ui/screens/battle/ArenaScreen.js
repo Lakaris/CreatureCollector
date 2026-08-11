@@ -49,7 +49,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   function showArenaLockToast(t){
     const reqType=ARENA_TAB_TYPE[t.id];
     const count=arenaTypeCounts[reqType]||0;
-    setArenaLockMsg("Collect "+ARENA_UNLOCK_COUNT+" "+t.label+"-type creatures to unlock ("+count+"/"+ARENA_UNLOCK_COUNT+")");
+    setArenaLockMsg("Collect "+ARENA_UNLOCK_COUNT+" "+t.label+"-type creatures to unlock ("+count+" / "+ARENA_UNLOCK_COUNT+")");
     setTimeout(()=>setArenaLockMsg(null),2200);
   }
   const [arenaAbilityTagPopup,setArenaAbilityTagPopup]=useState(null);
@@ -381,7 +381,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?(isBoss?"Boss Defeated!":"Stage Clear!"):"Defeat!"),
-      React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?(isBoss?"Boss stage "+stage+" complete!":"Stage "+stage+" complete!"):""),
+      React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?(isBoss?"Boss stage "+wonStageRef.current+" complete!":"Stage "+wonStageRef.current+" complete!"):""),
       won&&(()=>{const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
       React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setPlanGrid({});setBattleSelectedUid(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
@@ -627,7 +627,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
           React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:4}},
             React.createElement("span",{style:{fontSize:22,fontWeight:800,color:deployedCount>=ARENA_MAX_DEPLOYED?"#ef4444":"#111"}},deployedCount),
-            React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+ARENA_MAX_DEPLOYED+" deployed")
+            React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}}," / "+ARENA_MAX_DEPLOYED+" deployed")
           ),
           React.createElement("div",{style:{display:"flex",gap:8}},
             React.createElement("button",{onClick:()=>deployedCount>0&&setPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},"🗑 Clear All"),

@@ -6,6 +6,7 @@ import { DAILY_COMPLETION_REWARD, DAILY_COMPLETION_BP, DAILY_MISSIONS, REWARD_LA
 import { applyRewards } from "../../core/rewards.js";
 import { pickDailyMissions } from "../../core/gacha.js";
 import { easternNoonDayKey } from "../../core/dates.js";
+import { formatNum } from "../../core/format.js";
 
 function DailyTabContent({setRewardPopup,onNavigate}){
   const { setCurrencies, questState, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, plotsUnlocked, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, setEverCompletedDailyQuests } = useGame();
@@ -105,7 +106,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
             transition:"opacity 0.3s, transform 0.3s",
           }},
             React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},typeof v==="number"&&k==="battlepassPoints"?v+" pts":v)
+            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},typeof v==="number"&&k==="battlepassPoints"?formatNum(v)+" pts":formatNum(v))
           );
         })
       ),
@@ -124,7 +125,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
             background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,cursor:"pointer",
           }},
             React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-            React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},v)
+            React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},formatNum(v))
           )),
           React.createElement("div",{onClick:()=>setRewardPopup?.("battlepassPoints"),style:{
             width:72,height:72,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
@@ -166,13 +167,13 @@ function DailyTabContent({setRewardPopup,onNavigate}){
               borderRadius:10,cursor:"pointer",
             }},
               React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
-              React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":ready?"#534AB7":"#7c3aed"}},v)
+              React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":ready?"#534AB7":"#7c3aed"}},formatNum(v))
             ))
           ),
           React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:6}},
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
               React.createElement("div",{style:{fontSize:13,fontWeight:600,color:ready&&!claimed?"#166534":"#222",flex:1}},m.label),
-              React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+"/"+prog.max)
+              React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+" / "+prog.max)
             ),
             React.createElement("div",{style:{height:6,borderRadius:6,background:"#e8e8e8",overflow:"hidden"}},
               React.createElement("div",{style:{height:"100%",width:(pct*100)+"%",background:ready?"#22c55e":"#534AB7",borderRadius:6,transition:"width 0.3s"}})

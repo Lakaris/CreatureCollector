@@ -4,6 +4,10 @@
 
 import { CREATURE_MAP } from "./creatures.js";
 import { FIELD_RATES, FIELD_SHARD_RATES } from "./farm.js";
+import { EQUIPMENT_DEFS } from "./equipment.js";
+
+const RARE_EQUIP_IDS=EQUIPMENT_DEFS.filter(e=>e.rarity==="rare").map(e=>e.id);
+const COMMON_EQUIP_IDS=EQUIPMENT_DEFS.filter(e=>e.rarity==="common").map(e=>e.id);
 
 export const QUEST_TABS=[
   {id:"general",label:"Progression",emoji:"📋"},
@@ -89,9 +93,10 @@ export const QUEST_DEFS={
   ],
   gear:[
     {reward:{gems:100,equipShards:10},quests:[
-      {id:"r0a",reward:{equipShards:5},label:"Collect 5 equip shards",check:s=>s.currencies.equipShards>=5,progress:s=>({cur:Math.min(s.currencies.equipShards,5),max:5})},
-      {id:"r0b",reward:{equipShards:8},label:"Clear a dungeon",check:s=>s.dungeonsCleared>=1,progress:s=>({cur:Math.min(s.dungeonsCleared,1),max:1})},
-      {id:"r0c",reward:{gems:20},label:"Equip an item on a creature",check:s=>Object.values(s.owned).some(o=>o.equipped&&o.equipped.some(Boolean)),progress:s=>({cur:Object.values(s.owned).some(o=>o.equipped&&o.equipped.some(Boolean))?1:0,max:1})},
+      {id:"r0d",reward:{equipShards:500},label:"Upgrade 5 equipment to level 3",check:s=>Object.keys(s.equipmentLevels||{}).filter(id=>(s.equipmentLevels[id]||1)>=3).length>=5,progress:s=>({cur:Math.min(Object.keys(s.equipmentLevels||{}).filter(id=>(s.equipmentLevels[id]||1)>=3).length,5),max:5}),nav:"equipment"},
+      {id:"r0e",reward:{eggs:5},label:"Obtain 5 Rare equipment",check:s=>RARE_EQUIP_IDS.filter(id=>(s.equipmentCopies?.[id]||0)>0).length>=5,progress:s=>({cur:Math.min(RARE_EQUIP_IDS.filter(id=>(s.equipmentCopies?.[id]||0)>0).length,5),max:5}),nav:"dungeon"},
+      {id:"r0f",reward:{eggs:5},label:"Obtain all common equipment",check:s=>COMMON_EQUIP_IDS.every(id=>(s.equipmentCopies?.[id]||0)>0),progress:s=>({cur:COMMON_EQUIP_IDS.filter(id=>(s.equipmentCopies?.[id]||0)>0).length,max:COMMON_EQUIP_IDS.length}),nav:"dungeon"},
+      {id:"r0g",reward:{equipShards:500},label:"Equip 5 pieces of equipment to creatures",check:s=>Object.values(s.owned).reduce((n,o)=>n+(o.equipped?o.equipped.filter(Boolean).length:0),0)>=5,progress:s=>({cur:Math.min(Object.values(s.owned).reduce((n,o)=>n+(o.equipped?o.equipped.filter(Boolean).length:0),0),5),max:5}),nav:"collection"},
     ]},
     {reward:{gems:200,equipShards:25},quests:[
       {id:"r1a",reward:{equipShards:15},label:"Collect 30 equip shards",check:s=>s.currencies.equipShards>=30,progress:s=>({cur:Math.min(s.currencies.equipShards,30),max:30})},

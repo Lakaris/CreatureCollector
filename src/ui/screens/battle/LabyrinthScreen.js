@@ -70,7 +70,7 @@ function getEnemyLayoutForDepth(depth) {
 }
 
 function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
-  const { equipmentLevels, equipmentAscensions, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, setCurrencies, owned, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, setPostTutorialPopupPending, setTab } = useGame();
+  const { equipmentLevels, equipmentAscensions, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, setCurrencies, owned, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, setPostTutorialPopupPending, setTab, labyrinthPlanGrid: planGrid, setLabyrinthPlanGrid: setPlanGrid } = useGame();
   const depth = Math.min(labyrinthDepth || 1, MAX_LABYRINTH_DEPTH);
   const level = getEnemyLevelForDepth(depth);
   const enemyAbilityLevel = getEnemyAbilityLevelForDepth(depth);
@@ -92,7 +92,6 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const wonDepthRef = React.useRef(1);
   const [continueSeconds, setContinueSeconds] = useState(3);
   const continueTimerRef = React.useRef(null);
-  const [planGrid, setPlanGrid] = useState({});
   const [dragId, setDragId] = useState(null);
   const [dragCell, setDragCell] = useState(null);
   const [enemyInfo, setEnemyInfo] = useState(null);
@@ -482,7 +481,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
         // Locked during the first-ever Descend (tutorialStep "labyrinth") --
         // the player's meant to fight the floor, not back out of it.
-        React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; setPlanGrid({}); setGridInfoCreature(null); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },
+        React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; setGridInfoCreature(null); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },
           React.createElement("i", { className: "ti ti-arrow-left" })
         ),
         React.createElement("div", { style: { flex: 1, textAlign: "center", minWidth: 0 } },
@@ -622,7 +621,10 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             React.createElement("span", { style: { fontSize: 22, fontWeight: 800, color: deployedCount >= ARENA_MAX_DEPLOYED ? "#ef4444" : "#111" } }, deployedCount),
             React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: "#aaa" } }, "/" + ARENA_MAX_DEPLOYED + " deployed")
           ),
-          React.createElement("button", { onClick: autoDeploy, style: { padding: "8px 16px", fontSize: 14, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer" } }, "⚡ Auto Deploy")
+          React.createElement("div", { style: { display: "flex", gap: 8 } },
+            React.createElement("button", { onClick: () => deployedCount > 0 && setPlanGrid({}), disabled: deployedCount === 0, style: { padding: "8px 14px", fontSize: 14, fontWeight: 700, background: "#fff", color: deployedCount > 0 ? "#534AB7" : "#ccc", border: "1.5px solid " + (deployedCount > 0 ? "#534AB7" : "#ccc"), borderRadius: 12, cursor: deployedCount > 0 ? "pointer" : "default" } }, "🗑 Clear All"),
+            React.createElement("button", { onClick: autoDeploy, style: { padding: "8px 16px", fontSize: 14, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer" } }, "⚡ Auto Deploy")
+          )
         ),
         React.createElement("div", {
           ref: creatureListRef,

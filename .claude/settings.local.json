@@ -59,7 +59,20 @@
       "Bash(curl -s -o /dev/null -w \"start_url\\(/index.html\\): %{http_code}\\\\n\" https://lakaris.github.io/index.html)",
       "Bash(curl -s -o /dev/null -w \"apple-touch-icon: %{http_code}\\\\n\" https://lakaris.github.io/CreatureCollector/images/icons/apple-touch-icon.png)",
       "Bash(curl -s https://lakaris.github.io/CreatureCollector/index.html)",
-      "PowerShell(node -v)"
+      "PowerShell(node -v)",
+      "Bash(node --check src/state/GameContext.js)",
+      "Bash(node --check src/ui/screens/battle/ArenaScreen.js)",
+      "Bash(node --check src/ui/screens/battle/DungeonScreen.js)",
+      "Bash(node --check src/ui/screens/battle/DailyBossScreen.js)",
+      "PowerShell(node --check src/state/GameContext.js)",
+      "PowerShell(node --check src/ui/screens/battle/ArenaScreen.js)",
+      "PowerShell(node --check src/ui/screens/battle/DungeonScreen.js)",
+      "PowerShell(node --check src/ui/screens/battle/LabyrinthScreen.js)",
+      "PowerShell(node --check src/ui/screens/battle/DailyBossScreen.js)",
+      "Bash(xargs grep -l \"currencies\")",
+      "Bash(sort -u -t: -k3)",
+      "Bash(awk -F: '{print $3}')",
+      "Bash(awk -F: '{print $2}')"
     ]
   }
 }

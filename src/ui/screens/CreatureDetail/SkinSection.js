@@ -6,7 +6,7 @@ import { SKIN_TIER_CONFIG, SKIN_FAIL_SHARDS } from "../../../data/rarity.js";
 import { getChain, getSkinsForCreature } from "../../../core/creatures.js";
 import { rollSkinForCreature } from "../../../core/gacha.js";
 
-function SkinSection({ownedData,def}){
+function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep}){
   const { currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards } = useGame();
   const [skinNotify,setSkinNotify]=useState(null);
   const [previewSkin,setPreviewSkin]=useState(null);
@@ -25,6 +25,9 @@ function SkinSection({ownedData,def}){
   }
 
   function doRollSkin(){
+    if(currencies.candy<1)return;
+    onCandyUsed?.();
+    if(candyGuideStep==="candyFeed")setCandyGuideStep(null);
     setCurrencies(c=>{
       if(c.candy<1) return c;
       const skin=rollSkinForCreature(def.id);
@@ -161,10 +164,12 @@ function SkinSection({ownedData,def}){
     React.createElement("button",{
       className:"btn btn-primary",
       disabled:currencies.candy<1,
-      style:{width:"100%",fontSize:15,padding:"12px 0",marginBottom:10,userSelect:"none"},
+      "data-guide-target":"candyFeed",
+      style:{width:"100%",fontSize:15,padding:"12px 0",marginBottom:10,userSelect:"none",position:"relative"},
       onMouseDown:startHold,onMouseUp:stopHold,onMouseLeave:stopHold,
       onTouchStart:e=>{e.preventDefault();startHold();},onTouchEnd:stopHold
     },
+      candyGuideStep==="candyFeed"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
       "Feed — 🍬 1  ("+currencies.candy+" left)"
     ),
     React.createElement("div",{className:"skin-grid"},

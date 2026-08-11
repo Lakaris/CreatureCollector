@@ -1,6 +1,6 @@
 // Arena: symmetric minion-vs-minion stages, no boss unit.
 
-import React, { useState } from "../../../react.js";
+import React, { useState, useEffect } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -30,10 +30,20 @@ function arenaEnemyLevel(arenaLevel,stageNum){
   return Math.min(500,Math.max(1,(arenaLevel-1)*ARENA_STAGES_PER_LEVEL+(stageNum||1)));
 }
 const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{candy:5},5:{eggs:5},6:{mythicalFlairBanana:1},7:{deluxeOre:1},8:{candy:5},9:{ancientFlairBanana:1},10:{legendaryEggs:1}};
+// The "all" tab's own label is already "Arena", so appending " Arena" again
+// would read "Arena Arena" -- every other tab's label is just the type name
+// (e.g. "Fire") and still needs the suffix.
+function arenaTitle(tabDef){return tabDef.id==="all"?tabDef.label:tabDef.label+" Arena";}
 
 function ArenaScreen({onBack,onFight,onViewCreature}){
-  const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards } = useGame();
+  const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards, arenaPlanGrid: planGrid, setArenaPlanGrid: setPlanGrid, arenaDeepLink, setArenaDeepLink } = useGame();
   const [arenaTab,setArenaTab]=useState("all");
+  // Jumps straight to a tab when navigated here from e.g. the "Complete
+  // Stage 10 Level 2 of the Wind Arena"-style quests; consumed once then
+  // cleared, same pattern as FarmScreen's farmDeepLink.
+  useEffect(()=>{
+    if(arenaDeepLink){setArenaTab(arenaDeepLink);setArenaDeepLink(null);}
+  },[arenaDeepLink]);
   const [rewardPopup,setRewardPopup]=useState(null);
   const [arenaLockMsg,setArenaLockMsg]=useState(null);
   function showArenaLockToast(t){
@@ -73,7 +83,6 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const savedPlanGridRef=React.useRef({});
   const wonStageRef=React.useRef(1);
   const [planning,setPlanning]=useState(false);
-  const [planGrid,setPlanGrid]=useState({});
   const [dragId,setDragId]=useState(null);
   const [dragCell,setDragCell]=useState(null);
   const [arenaEnemyInfo,setArenaEnemyInfo]=useState(null);
@@ -384,7 +393,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+tabDef.label+" Arena — Stage "+stage+" · Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
+          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+arenaTitle(tabDef)+" — Stage "+stage+" · Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
         ),
         DEV_MODE&&React.createElement("button",{onClick:winStage,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏆 Win (Dev)"),
         React.createElement("button",{onClick:restartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
@@ -477,7 +486,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       ),
       // header
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
-        React.createElement("button",{onClick:()=>{setPlanning(false);setPlanGrid({});setGridInfoCreature(null);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+        React.createElement("button",{onClick:()=>{setPlanning(false);setGridInfoCreature(null);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
           React.createElement("i",{className:"ti ti-arrow-left"})
         ),
         React.createElement("div",{style:{flex:1,textAlign:"center"}},
@@ -620,7 +629,10 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
             React.createElement("span",{style:{fontSize:22,fontWeight:800,color:deployedCount>=ARENA_MAX_DEPLOYED?"#ef4444":"#111"}},deployedCount),
             React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+ARENA_MAX_DEPLOYED+" deployed")
           ),
-          React.createElement("button",{onClick:arenaAutoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+          React.createElement("div",{style:{display:"flex",gap:8}},
+            React.createElement("button",{onClick:()=>deployedCount>0&&setPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},"🗑 Clear All"),
+            React.createElement("button",{onClick:arenaAutoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+          )
         ),
         ownedList.length===0
           ?React.createElement("div",{style:{fontSize:12,color:"#999",padding:"10px 2px"}},"No "+arenaRequiredType+"-type creatures to deploy.")
@@ -691,8 +703,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
-      React.createElement("div",{style:{fontSize:18,fontWeight:700,flex:1}},tabDef.emoji+" "+tabDef.label+" Arena"),
-      React.createElement("div",{style:{background:"#534AB7",color:"#fff",borderRadius:20,padding:"3px 14px",fontSize:13,fontWeight:700,flexShrink:0}},"Level "+level)
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,flex:1}},tabDef.emoji+" "+arenaTitle(tabDef)),
+      React.createElement("div",{style:{background:"#534AB7",color:"#fff",borderRadius:20,padding:"3px 14px",fontSize:13,fontWeight:700,flexShrink:0}},"Rank "+level)
     ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
       React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,justifyContent:"space-evenly"}},
@@ -734,9 +746,13 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 boxShadow:isCurrent?"0 2px 12px rgba(83,74,183,0.15)":"none",
               }
             },
+              React.createElement("div",{style:{flexShrink:0,minWidth:32,textAlign:"center",lineHeight:1.05,marginRight:8}},
+                React.createElement("div",{style:{fontSize:8,fontWeight:700,color:"#aaa",letterSpacing:0.3}},"LV"),
+                React.createElement("div",{style:{fontSize:17,fontWeight:800,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#999"}},arenaEnemyLevel(level,stageNum))
+              ),
               React.createElement("div",{style:{flex:1,minWidth:0}},
                 React.createElement("div",{style:{fontSize:11,fontWeight:700,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#aaa",marginBottom:3}},
-                  (isPast?"COMPLETE":"Stage "+stageNum)+" · Lv."+arenaEnemyLevel(level,stageNum)
+                  isPast?"COMPLETE":"Stage "+stageNum
                 ),
                 React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center",opacity:isPast?0.3:1,overflow:"hidden"}},
                   enemies.map((e,ei)=>React.createElement("span",{key:ei,style:{fontSize:22,lineHeight:1,flexShrink:0}},e))

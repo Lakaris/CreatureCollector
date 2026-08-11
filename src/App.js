@@ -39,6 +39,10 @@ const CARD_BASE = {
   boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
 };
 
+// Shown on a Play-page feature card from the moment it unlocks until the
+// player first taps it -- see newFeaturePillsSeen in GameContext.js.
+const NEW_PILL = { fontSize: 9, fontWeight: 800, color: "#fff", background: "#ef4444", borderRadius: 6, padding: "2px 6px", letterSpacing: 0.3, flexShrink: 0 };
+
 /** Two-digit clock parts for the "resets in" countdown. */
 function countdownParts(from, to) {
   const s = Math.max(0, Math.floor((to - from) / 1000));
@@ -51,7 +55,12 @@ function countdownParts(from, to) {
 
 /** The Daily Boss entry card, including its reward-availability state machine. */
 function DailyBossCard({ locked, onLockedTap, disabled }) {
-  const { nowMs, devTimeOffset, dailyBossData, dailyBossLevel, setGameMode } = useGame();
+  const { nowMs, devTimeOffset, dailyBossData, dailyBossLevel, setGameMode, newFeaturePillsSeen, setNewFeaturePillsSeen } = useGame();
+  const showNewPill = !locked && !newFeaturePillsSeen.dailyBoss;
+  function openDailyBoss() {
+    if (!newFeaturePillsSeen.dailyBoss) setNewFeaturePillsSeen((prev) => ({ ...prev, dailyBoss: true }));
+    setGameMode("dailyboss");
+  }
 
   if (locked)
     return React.createElement(
@@ -78,7 +87,7 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
   return React.createElement(
     "div",
     {
-      onClick: disabled ? undefined : () => setGameMode("dailyboss"),
+      onClick: disabled ? undefined : openDailyBoss,
       style: {
         ...CARD_BASE,
         padding: "16px 18px",
@@ -94,8 +103,9 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
       { style: { flex: 1 } },
       React.createElement(
         "div",
-        { style: { fontSize: 15, fontWeight: 700, marginBottom: 6, color: delivered ? "#999" : "#111" } },
-        "Daily Boss"
+        { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: delivered ? "#999" : "#111" } }, "Daily Boss"),
+        showNewPill && React.createElement("div", { style: NEW_PILL }, "NEW")
       ),
       delivered
         ? React.createElement("div", { style: { fontSize: 12, color: "#bbb" } }, "Completed · returns tomorrow")
@@ -184,12 +194,14 @@ function App() {
     harvestPopup,
     collectionDeepLink, setCollectionDeepLink,
     setCreatureOverlay,
-    setDungeonsCleared, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setPlotsGrown,
+    setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setEggsHatched, setBananasUsed, setCandyUsed, setPlotsGrown,
     settingsOpen, setSettingsOpen,
     tutorialSeen, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep,
     owned,
     dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked,
+    newFeaturePillsSeen, setNewFeaturePillsSeen,
     flairGuideStep, setFlairGuideStep,
+    candyGuideStep, setCandyGuideStep,
   } = useGame();
 
   const contentRef = React.useRef(null);
@@ -214,6 +226,16 @@ function App() {
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, [flairGuideStep]);
+  // Same idea as the flairGuideStep watcher above, for the "Use a Candy"
+  // quest's guide.
+  React.useEffect(() => {
+    if (!candyGuideStep) return;
+    function onClick(e) {
+      if (!e.target.closest('[data-guide-target="' + candyGuideStep + '"]')) setCandyGuideStep(null);
+    }
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [candyGuideStep]);
   const viewCreature = (id) => setCreatureOverlay(id);
   const starterName = (() => {
     const first = Object.values(owned || {})[0];
@@ -335,6 +357,7 @@ function App() {
       React.createElement(DungeonScreen, {
         onBack: () => setGameMode(null),
         onClear: (n) => setDungeonsCleared((c) => c + n),
+        onAutoFight: () => setDungeonAutoFights((c) => c + 1),
         onViewCreature: viewCreature,
       }),
       React.createElement(CreatureOverlayHost)
@@ -437,6 +460,7 @@ function App() {
               onClick: () => {
                 if (dungeonPointActive) return;
                 if (!arenaUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                if (!newFeaturePillsSeen.arena) setNewFeaturePillsSeen((prev) => ({ ...prev, arena: true }));
                 setGameMode("arena");
               },
               style: arenaUnlocked
@@ -447,7 +471,12 @@ function App() {
             React.createElement(
               "div",
               null,
-              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: arenaUnlocked ? "#111" : "#999" } }, "Arena"),
+              React.createElement(
+                "div",
+                { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 2 } },
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: arenaUnlocked ? "#111" : "#999" } }, "Arena"),
+                arenaUnlocked && !newFeaturePillsSeen.arena && React.createElement("div", { style: NEW_PILL }, "NEW")
+              ),
               !arenaUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
             )
           ),
@@ -459,8 +488,12 @@ function App() {
               {
                 onClick: () => {
                   if (!dungeonsUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                  if (!newFeaturePillsSeen.dungeon) setNewFeaturePillsSeen((prev) => ({ ...prev, dungeon: true }));
                   setGameMode("dungeon");
-                  if (dungeonPointActive) { setTutorialRestricted(false); setTutorialStep(null); }
+                  // Tutorial stays restricted -- the "Prove your worth" line now
+                  // shows once they're actually inside (see DungeonScreen), not
+                  // here on the card itself.
+                  if (dungeonPointActive) setTutorialStep("dungeonEnter");
                 },
                 style: dungeonsUnlocked ? CARD_BASE : { ...CARD_BASE, background: "#f5f5f5" },
               },
@@ -468,25 +501,19 @@ function App() {
               React.createElement(
                 "div",
                 null,
-                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: dungeonsUnlocked ? "#111" : "#999" } }, "Dungeon"),
+                React.createElement(
+                  "div",
+                  { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 2 } },
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: dungeonsUnlocked ? "#111" : "#999" } }, "Dungeon"),
+                  dungeonsUnlocked && !newFeaturePillsSeen.dungeon && React.createElement("div", { style: NEW_PILL }, "NEW")
+                ),
                 !dungeonsUnlocked && React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
               )
             ),
             // Second half of the post-Set-1 reveal: arrow above the Dungeon
-            // card itself (rather than a nav-bar tab), text bubble above that.
-            dungeonPointActive &&
-              React.createElement(
-                "div",
-                {
-                  style: {
-                    position: "absolute", bottom: "100%", left: 0, right: 0, marginBottom: 40,
-                    background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
-                    padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 6,
-                  },
-                },
-                "Prove your worth and earn legendary rewards."
-              ),
+            // card itself (rather than a nav-bar tab). The explanatory line
+            // now shows once they're actually inside (see DungeonScreen) --
+            // this is just a nudge toward what to tap.
             dungeonPointActive &&
               React.createElement(
                 "div",
@@ -507,6 +534,7 @@ function App() {
               onClick: () => {
                 if (dungeonPointActive) return;
                 if (!treasureUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                if (!newFeaturePillsSeen.treasure) setNewFeaturePillsSeen((prev) => ({ ...prev, treasure: true }));
                 setGameMode("treasure");
               },
               style: treasureUnlocked
@@ -517,7 +545,12 @@ function App() {
             React.createElement(
               "div",
               null,
-              React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 2, color: treasureUnlocked ? "#111" : "#999" } }, "Treasure"),
+              React.createElement(
+                "div",
+                { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 2 } },
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: treasureUnlocked ? "#111" : "#999" } }, "Treasure"),
+                treasureUnlocked && !newFeaturePillsSeen.treasure && React.createElement("div", { style: NEW_PILL }, "NEW")
+              ),
               treasureUnlocked
                 ? React.createElement("div", { style: { fontSize: 12, color: "#d97706" } }, "Open Mysterious Ore for treasures")
                 : React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
@@ -547,6 +580,7 @@ function App() {
       tab === "collection" &&
         React.createElement(CollectionScreen, {
           onBananaUsed: () => setBananasUsed((c) => c + 1),
+          onCandyUsed: () => setCandyUsed((c) => c + 1),
           deepLinkId: collectionDeepLink,
           onDeepLinkConsumed: () => setCollectionDeepLink(null),
         }),

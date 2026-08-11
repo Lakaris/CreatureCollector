@@ -64,7 +64,7 @@ export const DUNGEON_BOSSES=[
 ];
 
 export const ARENA_TABS=[
-  {id:"all",label:"All",emoji:"🏟️"},
+  {id:"all",label:"Arena",emoji:"🏟️"},
   {id:"fire",label:"Fire",emoji:"🔥"},
   {id:"nature",label:"Nature",emoji:"🌿"},
   {id:"earth",label:"Earth",emoji:"🪨"},

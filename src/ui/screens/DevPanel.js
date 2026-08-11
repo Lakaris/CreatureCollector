@@ -17,7 +17,7 @@ const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
 const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked } = useGame();
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked } = useGame();
   const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",questSet:"1"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
@@ -72,7 +72,7 @@ function DevPanel(){
     // in data/quests.js reads these live counters, so they have to reset too
     // or a "completed" quest stays completed even after its set rewinds.
     setUnlockedSkins([]);setArenaLevels(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));setArenaProgress(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));
-    setEggsHatched(0);setDungeonsCleared(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setEverCompletedDailyQuests(false);
+    setEggsHatched(0);setDungeonsCleared(0);setDungeonAutoFights(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setEverCompletedDailyQuests(false);
     setPlotsUnlocked(false);setDungeonsUnlocked(false);setDailyBossUnlocked(false);setArenaUnlocked(false);setTreasureUnlocked(false);
     clearSave();}
 
@@ -111,7 +111,9 @@ function DevPanel(){
     setEggsHatched(c=>Math.max(c,999));
     setBananasUsed(c=>Math.max(c,999));
     setEquipLevelUps(c=>Math.max(c,999));
+    setPetLevelUps(c=>Math.max(c,999));
     setDungeonsCleared(c=>Math.max(c,999));
+    setDungeonAutoFights(c=>Math.max(c,999));
     setLabyrinthBestDepth(c=>Math.max(c||1,999));
     setEverCompletedDailyQuests(true);
     setUnlockedSkins(prev=>prev&&prev.length?prev:["dev_dummy_skin"]);

@@ -76,6 +76,14 @@ export function GameProvider({ children }) {
   // "plots" when the "Grow a Plot" daily mission is tapped incomplete) --
   // consumed once by FarmScreen then cleared, same pattern as collectionDeepLink.
   const [farmDeepLink, setFarmDeepLink] = useState(null);
+  // Which Dungeon boss tab to jump to next time DungeonScreen mounts/updates
+  // (e.g. "wind" for the "Defeat the Level 1 Wind Boss" quest) -- consumed
+  // once by DungeonScreen then cleared, same pattern as farmDeepLink.
+  const [dungeonDeepLink, setDungeonDeepLink] = useState(null);
+  // Which Arena tab to jump to next time ArenaScreen mounts/updates (e.g.
+  // "ice" for the "Complete Stage 10 Level 2 of the Water Arena" quest) --
+  // consumed once by ArenaScreen then cleared, same pattern as farmDeepLink.
+  const [arenaDeepLink, setArenaDeepLink] = useState(null);
   const [creatureOverlay, setCreatureOverlay] = useState(null);
   const [dexOverlay, setDexOverlay] = useState(null);
   // Ephemeral, never persisted: which step of the "Use 1 Flair Banana" quest's
@@ -85,6 +93,11 @@ export function GameProvider({ children }) {
   // arrow *isn't* pointing at (see App.js's global click watcher) or once the
   // banana's actually fed.
   const [flairGuideStep, setFlairGuideStep] = useState(null);
+  // Same idea as flairGuideStep, for the "Use a Candy" quest: null |
+  // "candyCollection" | "candySkins" | "candyFeed". Kept as a separate piece
+  // of state (rather than reusing flairGuideStep's step names) so the two
+  // guided flows never interfere with each other if one is left mid-way.
+  const [candyGuideStep, setCandyGuideStep] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
@@ -172,6 +185,16 @@ export function GameProvider({ children }) {
   const [labyrinthDepth, setLabyrinthDepth] = useState(() => initialSave?.labyrinthDepth ?? 1);
   const [labyrinthBestDepth, setLabyrinthBestDepth] = useState(() => initialSave?.labyrinthBestDepth ?? 1);
 
+  // ── Battle planning grids ────────────────────────────────────────────────
+  // "r,c" -> creatureId, one per game mode. Lifted up here (instead of local
+  // screen state) so a deployment survives backing out of the planning phase
+  // or closing the app entirely -- previously each screen wiped its grid the
+  // moment the player tapped the back arrow.
+  const [arenaPlanGrid, setArenaPlanGrid] = useState(() => initialSave?.arenaPlanGrid ?? {});
+  const [dungeonPlanGrid, setDungeonPlanGrid] = useState(() => initialSave?.dungeonPlanGrid ?? {});
+  const [labyrinthPlanGrid, setLabyrinthPlanGrid] = useState(() => initialSave?.labyrinthPlanGrid ?? {});
+  const [dailyBossPlanGrid, setDailyBossPlanGrid] = useState(() => initialSave?.dailyBossPlanGrid ?? {});
+
   // ── Farm ─────────────────────────────────────────────────────────────────
   const [farmPlots, setFarmPlots] = useState(() => initialSave?.farmPlots ?? 1);
   const [farmFieldLevel, setFarmFieldLevel] = useState(() => initialSave?.farmFieldLevel ?? 1);
@@ -201,13 +224,27 @@ export function GameProvider({ children }) {
   // page even after Play itself unlocks, until their own quest reward lands.
   const [arenaUnlocked, setArenaUnlocked] = useState(() => initialSave?.arenaUnlocked ?? false);
   const [treasureUnlocked, setTreasureUnlocked] = useState(() => initialSave?.treasureUnlocked ?? false);
+  // Tracks which Play-page features the player has already opened at least
+  // once since unlocking, so the "NEW" pill only shows for a feature between
+  // the moment it unlocks and the moment it's first tapped. Defaults to
+  // "already seen" for anything that was already unlocked before this save
+  // was first loaded under this feature -- otherwise every existing player's
+  // save would suddenly show "NEW" on features they unlocked long ago.
+  const [newFeaturePillsSeen, setNewFeaturePillsSeen] = useState(() => initialSave?.newFeaturePillsSeen ?? {
+    arena: initialSave?.arenaUnlocked ?? false,
+    dungeon: initialSave?.dungeonsUnlocked ?? false,
+    dailyBoss: initialSave?.dailyBossUnlocked ?? false,
+    treasure: initialSave?.treasureUnlocked ?? false,
+  });
 
   // ── Progression counters (feed quest predicates) ──────────────────────────
   const [eggsHatched, setEggsHatched] = useState(() => initialSave?.eggsHatched ?? 0);
   const [dungeonsCleared, setDungeonsCleared] = useState(() => initialSave?.dungeonsCleared ?? 0);
+  const [dungeonAutoFights, setDungeonAutoFights] = useState(() => initialSave?.dungeonAutoFights ?? 0);
   const [arenaFights, setArenaFights] = useState(() => initialSave?.arenaFights ?? 0);
   const [labyrinthFights, setLabyrinthFights] = useState(() => initialSave?.labyrinthFights ?? 0);
   const [bananasUsed, setBananasUsed] = useState(() => initialSave?.bananasUsed ?? 0);
+  const [candyUsed, setCandyUsed] = useState(() => initialSave?.candyUsed ?? 0);
   const [dailyBossFights, setDailyBossFights] = useState(() => initialSave?.dailyBossFights ?? 0);
   const [plotsGrown, setPlotsGrown] = useState(() => initialSave?.plotsGrown ?? 0);
   const [fieldHarvests, setFieldHarvests] = useState(() => initialSave?.fieldHarvests ?? 0);
@@ -242,8 +279,8 @@ export function GameProvider({ children }) {
 
   // ── Battle pass ──────────────────────────────────────────────────────────
   const [battlepassLastReset, setBattlepassLastReset] = useState(() => initialSave?.battlepassLastReset ?? null);
-  const [battlepassClaimed, setBattlepassClaimed] = useState(() => initialSave?.battlepassClaimed ?? Array(50).fill(false));
-  const [battlepassPaidClaimed, setBattlepassPaidClaimed] = useState(() => initialSave?.battlepassPaidClaimed ?? Array(50).fill(false));
+  const [battlepassClaimed, setBattlepassClaimed] = useState(() => initialSave?.battlepassClaimed ?? Array(30).fill(false));
+  const [battlepassPaidClaimed, setBattlepassPaidClaimed] = useState(() => initialSave?.battlepassPaidClaimed ?? Array(30).fill(false));
   const [battlepassPremium, setBattlepassPremium] = useState(() => initialSave?.battlepassPremium ?? false);
   const [battlepassPoints, setBattlepassPoints] = useState(() => initialSave?.battlepassPoints ?? 0);
 
@@ -311,9 +348,10 @@ export function GameProvider({ children }) {
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,
     labyrinthDepth, labyrinthBestDepth,
+    arenaPlanGrid, dungeonPlanGrid, labyrinthPlanGrid, dailyBossPlanGrid,
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked,
-    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked,
-    eggsHatched, dungeonsCleared, arenaFights, labyrinthFights, bananasUsed, dailyBossFights, plotsGrown, fieldHarvests,
+    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, newFeaturePillsSeen,
+    eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, labyrinthFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, everCompletedDailyQuests,
     questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
     dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions, lastFreeBananaDate,
@@ -353,13 +391,13 @@ export function GameProvider({ children }) {
   /** The bag of state quest `check()`/`progress()` predicates read. */
   const questState = useMemo(
     () => ({
-      owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
-      eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
+      owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
+      eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
       labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
       petLevelUps, equipLevelUps, everCompletedDailyQuests,
     }),
-    [owned, currencies, unlockedSkins, arenaProgress, arenaLevels,
-     eggsHatched, dungeonsCleared, arenaFights, bananasUsed, dailyBossFights, plotsGrown,
+    [owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
+     eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
      labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
      petLevelUps, equipLevelUps, everCompletedDailyQuests]
   );
@@ -369,9 +407,12 @@ export function GameProvider({ children }) {
     tab, setTab, gameMode, setGameMode,
     collectionDeepLink, setCollectionDeepLink,
     farmDeepLink, setFarmDeepLink,
+    dungeonDeepLink, setDungeonDeepLink,
+    arenaDeepLink, setArenaDeepLink,
     creatureOverlay, setCreatureOverlay,
     dexOverlay, setDexOverlay,
     flairGuideStep, setFlairGuideStep,
+    candyGuideStep, setCandyGuideStep,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,
     profileAvatarId, setProfileAvatarId,
@@ -401,6 +442,11 @@ export function GameProvider({ children }) {
     arenaLevels, setArenaLevels, arenaProgress, setArenaProgress,
     // labyrinth
     labyrinthDepth, setLabyrinthDepth, labyrinthBestDepth, setLabyrinthBestDepth,
+    // battle planning grids
+    arenaPlanGrid, setArenaPlanGrid,
+    dungeonPlanGrid, setDungeonPlanGrid,
+    labyrinthPlanGrid, setLabyrinthPlanGrid,
+    dailyBossPlanGrid, setDailyBossPlanGrid,
     // farm
     farmPlots, setFarmPlots, farmFieldLevel, setFarmFieldLevel,
     farmFieldLastHarvest, setFarmFieldLastHarvest,
@@ -414,10 +460,12 @@ export function GameProvider({ children }) {
     dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel,
     dungeonsUnlocked, setDungeonsUnlocked, dailyBossUnlocked, setDailyBossUnlocked,
     arenaUnlocked, setArenaUnlocked, treasureUnlocked, setTreasureUnlocked,
+    newFeaturePillsSeen, setNewFeaturePillsSeen,
     devTimeOffset, setDevTimeOffset, nowMs,
     // counters
-    eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared,
+    eggsHatched, setEggsHatched, dungeonsCleared, setDungeonsCleared, dungeonAutoFights, setDungeonAutoFights,
     arenaFights, setArenaFights, labyrinthFights, setLabyrinthFights, bananasUsed, setBananasUsed,
+    candyUsed, setCandyUsed,
     dailyBossFights, setDailyBossFights, plotsGrown, setPlotsGrown,
     fieldHarvests, setFieldHarvests,
     petLevelUps, setPetLevelUps, equipLevelUps, setEquipLevelUps,

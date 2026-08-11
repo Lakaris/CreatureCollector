@@ -21,7 +21,7 @@ import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
-  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins } = useGame();
+  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins, dailyBossPlanGrid: planGrid, setDailyBossPlanGrid: setPlanGrid } = useGame();
   const GRID_ROWS=10,GRID_COLS=6,PLAYER_START_ROW=6,TILE=44,GAP=0;
   const today=easternNoonDayKey();
   const boss=DUNGEON_BOSSES[((dailyBossLevel||1)-1)%DUNGEON_BOSSES.length];
@@ -39,7 +39,6 @@ function DailyBossScreen({onBack,onViewCreature}){
   const completed=false; // completion is no longer a concept — resets daily anyway
   const level=dailyBossLevel||1;
   const [phase,setPhase]=useState("idle"); // idle | planning | battling | won | lost
-  const [planGrid,setPlanGrid]=useState({}); // "r,c" -> creatureId
   const [foughtBoss,setFoughtBoss]=useState(null); // boss snapshot at fight time
   const [dragId,setDragId]=useState(null); // creatureId being dragged from list
   const [dragCell,setDragCell]=useState(null); // "r,c" being dragged from grid
@@ -575,7 +574,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     // header
     React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
-      React.createElement("button",{onClick:()=>{setPhase("idle");setPlanGrid({});},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+      React.createElement("button",{onClick:()=>{setPhase("idle");},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
       React.createElement("div",{style:{flex:1,textAlign:"center"}},
@@ -724,7 +723,10 @@ function DailyBossScreen({onBack,onViewCreature}){
           React.createElement("span",{style:{fontSize:22,fontWeight:800,color:Object.keys(planGrid).length>=MAX_DEPLOYED?"#ef4444":"#111"}},Object.keys(planGrid).length),
           React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+MAX_DEPLOYED+" deployed")
         ),
-        React.createElement("button",{onClick:autoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+        React.createElement("div",{style:{display:"flex",gap:8}},
+          React.createElement("button",{onClick:()=>Object.keys(planGrid).length>0&&setPlanGrid({}),disabled:Object.keys(planGrid).length===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"1.5px solid "+(Object.keys(planGrid).length>0?"#534AB7":"#ccc"),borderRadius:12,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},"🗑 Clear All"),
+          React.createElement("button",{onClick:autoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+        )
       ),
       React.createElement("div",{
         ref:creatureListRef,

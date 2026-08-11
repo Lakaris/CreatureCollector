@@ -43,6 +43,11 @@ function HomeScreen(){
   const aura=ownedData&&ownedData.equippedAura?ownedData.equippedAura:null;
   const bg=ownedData&&ownedData.equippedBackground?ownedData.equippedBackground:null;
 
+  // Tutorial 2 (post-Set-1 Dungeon reveal): unlike the original tutorial's
+  // Home steps, which hide every other button to keep a brand-new player
+  // from getting lost, this step just needs the player unable to wander off
+  // -- everything stays visible (dimmed) so the screen doesn't look broken.
+  const dungeonRevealActive=tutorialRestricted&&tutorialStep==="dungeonReveal";
   const hasReadyQuest=Object.keys(QUEST_DEFS).some(tab=>{
     const batchIdx=questBatchIdx[tab]||0;
     const batch=(QUEST_DEFS[tab]||[])[batchIdx];
@@ -101,9 +106,9 @@ function HomeScreen(){
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
     bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
     aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
-    !tutorialRestricted&&React.createElement("button",{
-      onClick:()=>{setShowQuests(true);setShowQuestsArrow(false);},
-      style:{position:"absolute",left:0,top:"calc(50% - 60px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:66,height:82,border:"none",background:"none",fontSize:32,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
+      onClick:()=>{if(tutorialRestricted)return;setShowQuests(true);setShowQuestsArrow(false);},
+      style:{position:"absolute",left:0,top:"calc(50% - 60px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:66,height:82,border:"none",background:"none",fontSize:32,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },
       "📋",
       React.createElement("span",{style:{fontSize:12,fontWeight:700,color:"#534AB7"}},"Quests"),
@@ -117,34 +122,34 @@ function HomeScreen(){
     title&&React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",marginTop:2}},title),
     def&&React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginTop:title?0:4}},def.name),
     def&&React.createElement("div",{style:{fontSize:13,color:"#888"}},def.type),
-    !tutorialRestricted&&React.createElement("button",{
-      onClick:()=>setPicking(true),
-      style:{marginTop:16,padding:"6px 18px",borderRadius:20,border:"1.5px solid #d0d0d0",background:"#f5f5f5",fontSize:13,fontWeight:600,color:"#555",cursor:"pointer"}
+    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
+      onClick:()=>{if(tutorialRestricted)return;setPicking(true);},
+      style:{marginTop:16,padding:"6px 18px",borderRadius:20,border:"1.5px solid #d0d0d0",background:"#f5f5f5",fontSize:13,fontWeight:600,color:"#555",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },"Change"),
-    !tutorialRestricted&&React.createElement("button",{
-      onClick:()=>setShowBattlepass(true),
-      style:{position:"absolute",right:0,top:"calc(50% - 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
+      onClick:()=>{if(tutorialRestricted)return;setShowBattlepass(true);},
+      style:{position:"absolute",right:0,top:"calc(50% - 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },
       "🎫",
       React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Battle Pass")
     ),
-    !tutorialRestricted&&React.createElement("button",{
-      onClick:()=>setShowDaily(true),
-      style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
+      onClick:()=>{if(tutorialRestricted)return;setShowDaily(true);},
+      style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },
       "📅",
       React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Daily"),
       easternNoonDayKey()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
-    !tutorialRestricted&&newPlayerGiftDay<NEW_PLAYER_GIFT_REWARDS.length&&React.createElement("button",{
-      onClick:()=>setShowNewPlayerGift(true),
-      style:{position:"absolute",right:0,top:"calc(50% + 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:"pointer"}
+    (!tutorialRestricted||dungeonRevealActive)&&newPlayerGiftDay<NEW_PLAYER_GIFT_REWARDS.length&&React.createElement("button",{
+      onClick:()=>{if(tutorialRestricted)return;setShowNewPlayerGift(true);},
+      style:{position:"absolute",right:0,top:"calc(50% + 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
     },
       "🎁",
       React.createElement("span",{style:{fontSize:8,fontWeight:700,color:"#534AB7",textAlign:"center",lineHeight:1.1}},"New Player Welcome Gift"),
       easternNoonDayKey()!==newPlayerGiftLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
-    !tutorialRestricted&&(()=>{
+    (!tutorialRestricted||tutorialStep==="descend")&&(()=>{
       const depth=labyrinthDepth||1;
       const reward=getDepthReward(depth);
       const onCurrent=Object.keys(reward).length>0;

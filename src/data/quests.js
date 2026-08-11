@@ -40,27 +40,46 @@ export const QUEST_DEFS={
       {id:"g0e",reward:{equipShards:500},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
       {id:"g0f",reward:{eggs:1},label:"Complete Floor 30 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=31,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,30),max:30}),nav:"labyrinth"},
     ]},
-    {reward:{gems:250,candy:25,plots:1,arena:1},quests:[
-      {id:"g1a",reward:{food:40},label:"Own 10 creatures",check:s=>Object.keys(s.owned).length>=10,progress:s=>({cur:Math.min(Object.keys(s.owned).length,10),max:10})},
-      {id:"g1b",reward:{gems:50},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10})},
-      {id:"g1c",reward:{candy:10},label:"Have 1,000 gems",check:s=>s.currencies.gems>=1000,progress:s=>({cur:Math.min(s.currencies.gems,1000),max:1000})},
+    {reward:{plots:1},quests:[
+      {id:"g1_boss",reward:{eggs:1},label:"Fight the Daily Boss",check:s=>s.dailyBossFights>=1,progress:s=>({cur:Math.min(s.dailyBossFights,1),max:1}),nav:"dailyboss"},
+      {id:"g1_dungeon",reward:{dungeonPass:5},label:"Clear 1 dungeon",check:s=>s.dungeonsCleared>=1,progress:s=>({cur:Math.min(s.dungeonsCleared,1),max:1}),nav:"dungeon"},
+      {id:"g1_autofight",reward:{dungeonPass:10},label:"Auto Fight 10 times",check:s=>(s.dungeonAutoFights||0)>=10,progress:s=>({cur:Math.min(s.dungeonAutoFights||0,10),max:10}),nav:"dungeon"},
+      {id:"g1_petlvl",reward:{food:1000},label:"Level up creatures 10 times",check:s=>s.petLevelUps>=10,progress:s=>({cur:Math.min(s.petLevelUps,10),max:10}),nav:"collection"},
+      {id:"g1_equiplvl",reward:{equipShards:1000},label:"Level up equipment 10 times",check:s=>s.equipLevelUps>=10,progress:s=>({cur:Math.min(s.equipLevelUps,10),max:10}),nav:"equipment"},
     ]},
-    {reward:{gems:500,food:200,treasure:1},quests:[
-      {id:"g2a",reward:{food:80},label:"Own 20 creatures",check:s=>Object.keys(s.owned).length>=20,progress:s=>({cur:Math.min(Object.keys(s.owned).length,20),max:20})},
-      {id:"g2b",reward:{gems:100},label:"Hatch 30 eggs",check:s=>s.eggsHatched>=30,progress:s=>({cur:Math.min(s.eggsHatched,30),max:30})},
-      {id:"g2c",reward:{candy:20},label:"Unlock a skin",check:s=>s.unlockedSkins.length>=1,progress:s=>({cur:Math.min(s.unlockedSkins.length,1),max:1})},
+    {reward:{gems:500,food:200,treasure:1,arena:1},quests:[
+      {id:"g2_arena_all",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 3 of the Arena",check:s=>(s.arenaLevels?.all||1)>=4,progress:s=>({cur:(s.arenaLevels?.all||1)>=4?1:0,max:1}),nav:"arena",navArena:"all"},
+      {id:"g2_arena_fire",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Fire Arena",check:s=>(s.arenaLevels?.fire||1)>=3,progress:s=>({cur:(s.arenaLevels?.fire||1)>=3?1:0,max:1}),nav:"arena",navArena:"fire"},
+      {id:"g2_arena_nature",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Nature Arena",check:s=>(s.arenaLevels?.nature||1)>=3,progress:s=>({cur:(s.arenaLevels?.nature||1)>=3?1:0,max:1}),nav:"arena",navArena:"nature"},
+      {id:"g2_arena_earth",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Earth Arena",check:s=>(s.arenaLevels?.earth||1)>=3,progress:s=>({cur:(s.arenaLevels?.earth||1)>=3?1:0,max:1}),nav:"arena",navArena:"earth"},
+      {id:"g2_arena_electric",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Electric Arena",check:s=>(s.arenaLevels?.electric||1)>=3,progress:s=>({cur:(s.arenaLevels?.electric||1)>=3?1:0,max:1}),nav:"arena",navArena:"electric"},
+      {id:"g2_arena_water",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Water Arena",check:s=>(s.arenaLevels?.ice||1)>=3,progress:s=>({cur:(s.arenaLevels?.ice||1)>=3?1:0,max:1}),nav:"arena",navArena:"ice"},
+      {id:"g2_arena_light",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Light Arena",check:s=>(s.arenaLevels?.light||1)>=3,progress:s=>({cur:(s.arenaLevels?.light||1)>=3?1:0,max:1}),nav:"arena",navArena:"light"},
+      {id:"g2_arena_dark",reward:{ascensionMelon:1},label:"Complete Stage 10 Level 2 of the Dark Arena",check:s=>(s.arenaLevels?.dark||1)>=3,progress:s=>({cur:(s.arenaLevels?.dark||1)>=3?1:0,max:1}),nav:"arena",navArena:"dark"},
+      {id:"g2_candy",reward:{candy:10},label:"Use a Candy",check:s=>s.candyUsed>=1,progress:s=>({cur:Math.min(s.candyUsed,1),max:1}),nav:"candyGuide"},
     ]},
   ],
   creature:[
     {reward:{gems:100},quests:[
-      {id:"c0a",reward:{food:15},label:"Own a Water type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Water"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Water")?1:0,max:1})},
-      {id:"c0b",reward:{food:15},label:"Own a Wind type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Wind"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Wind")?1:0,max:1})},
-      {id:"c0c",reward:{gems:20},label:"Own creatures of 3 different types",check:s=>new Set(Object.values(s.owned).map(o=>CREATURE_MAP[o.id]?.type).filter(Boolean)).size>=3,progress:s=>({cur:Math.min(new Set(Object.values(s.owned).map(o=>CREATURE_MAP[o.id]?.type).filter(Boolean)).size,3),max:3})},
+      {id:"c0a",reward:{eggs:2},label:"Own a Fire type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Fire"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Fire")?1:0,max:1}),nav:"hatch"},
+      {id:"c0b",reward:{eggs:2},label:"Own a Water type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Water"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Water")?1:0,max:1}),nav:"hatch"},
+      {id:"c0c",reward:{eggs:2},label:"Own a Nature type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Nature"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Nature")?1:0,max:1}),nav:"hatch"},
+      {id:"c0d",reward:{eggs:2},label:"Own an Earth type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Earth"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Earth")?1:0,max:1}),nav:"hatch"},
+      {id:"c0e",reward:{eggs:2},label:"Own a Wind type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Wind"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Wind")?1:0,max:1}),nav:"hatch"},
+      {id:"c0f",reward:{eggs:2},label:"Own an Electric type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Electric"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Electric")?1:0,max:1}),nav:"hatch"},
+      {id:"c0g",reward:{eggs:2},label:"Own a Light type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Light"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Light")?1:0,max:1}),nav:"hatch"},
+      {id:"c0h",reward:{eggs:2},label:"Own a Dark type creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Dark"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.type==="Dark")?1:0,max:1}),nav:"hatch"},
     ]},
     {reward:{gems:200,candy:20},quests:[
-      {id:"c1a",reward:{candy:8},label:"Own an evolved creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.evolutionOf),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.evolutionOf)?1:0,max:1})},
-      {id:"c1b",reward:{gems:30},label:"Own creatures of 5 different types",check:s=>new Set(Object.values(s.owned).map(o=>CREATURE_MAP[o.id]?.type).filter(Boolean)).size>=5,progress:s=>({cur:Math.min(new Set(Object.values(s.owned).map(o=>CREATURE_MAP[o.id]?.type).filter(Boolean)).size,5),max:5})},
-      {id:"c1c",reward:{food:50},label:"Own 15 creatures",check:s=>Object.keys(s.owned).length>=15,progress:s=>({cur:Math.min(Object.keys(s.owned).length,15),max:15})},
+      {id:"c1_ascend",reward:{ascensionMelon:5},label:"Ascend a Creature",check:s=>Object.values(s.owned).some(o=>(o.ascensions||0)>=1),progress:s=>({cur:Object.values(s.owned).some(o=>(o.ascensions||0)>=1)?1:0,max:1}),nav:"collection"},
+      {id:"c1_fire",reward:{eggs:2},label:"Own 3 Fire type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Fire").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Fire").length,3),max:3}),nav:"hatch"},
+      {id:"c1_water",reward:{eggs:2},label:"Own 3 Water type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Water").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Water").length,3),max:3}),nav:"hatch"},
+      {id:"c1_nature",reward:{eggs:2},label:"Own 3 Nature type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Nature").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Nature").length,3),max:3}),nav:"hatch"},
+      {id:"c1_earth",reward:{eggs:2},label:"Own 3 Earth type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Earth").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Earth").length,3),max:3}),nav:"hatch"},
+      {id:"c1_wind",reward:{eggs:2},label:"Own 3 Wind type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Wind").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Wind").length,3),max:3}),nav:"hatch"},
+      {id:"c1_electric",reward:{eggs:2},label:"Own 3 Electric type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Electric").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Electric").length,3),max:3}),nav:"hatch"},
+      {id:"c1_light",reward:{eggs:2},label:"Own 3 Light type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Light").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Light").length,3),max:3}),nav:"hatch"},
+      {id:"c1_dark",reward:{eggs:2},label:"Own 3 Dark type creatures",check:s=>Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Dark").length>=3,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>CREATURE_MAP[o.id]?.type==="Dark").length,3),max:3}),nav:"hatch"},
     ]},
     {reward:{gems:500},quests:[
       {id:"c2a",reward:{gems:75},label:"Own a legendary creature",check:s=>Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.rarity==="legendary"),progress:s=>({cur:Object.values(s.owned).some(o=>CREATURE_MAP[o.id]?.rarity==="legendary")?1:0,max:1})},
@@ -87,9 +106,14 @@ export const QUEST_DEFS={
   ],
   dungeon:[
     {reward:{gems:100,dungeonPass:5},quests:[
-      {id:"d0a",reward:{dungeonPass:2},label:"Clear 1 dungeon",check:s=>s.dungeonsCleared>=1,progress:s=>({cur:Math.min(s.dungeonsCleared,1),max:1})},
-      {id:"d0b",reward:{gems:25},label:"Clear 5 dungeons",check:s=>s.dungeonsCleared>=5,progress:s=>({cur:Math.min(s.dungeonsCleared,5),max:5})},
-      {id:"d0c",reward:{dungeonPass:3},label:"Have 10 dungeon passes at once",check:s=>s.currencies.dungeonPass>=10,progress:s=>({cur:Math.min(s.currencies.dungeonPass,10),max:10})},
+      {id:"g1_fire",reward:{dungeonPass:5},label:"Defeat the Level 1 Fire Boss",check:s=>(s.dungeonBossLevels?.fire||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.fire||1)-1,1),max:1}),nav:"dungeon",navBoss:"fire"},
+      {id:"g1_nature",reward:{dungeonPass:5},label:"Defeat the Level 1 Nature Boss",check:s=>(s.dungeonBossLevels?.nature||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.nature||1)-1,1),max:1}),nav:"dungeon",navBoss:"nature"},
+      {id:"g1_earth",reward:{dungeonPass:5},label:"Defeat the Level 1 Earth Boss",check:s=>(s.dungeonBossLevels?.earth||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.earth||1)-1,1),max:1}),nav:"dungeon",navBoss:"earth"},
+      {id:"g1_electric",reward:{dungeonPass:5},label:"Defeat the Level 1 Electric Boss",check:s=>(s.dungeonBossLevels?.electric||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.electric||1)-1,1),max:1}),nav:"dungeon",navBoss:"electric"},
+      {id:"g1_water",reward:{dungeonPass:5},label:"Defeat the Level 1 Water Boss",check:s=>(s.dungeonBossLevels?.water||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.water||1)-1,1),max:1}),nav:"dungeon",navBoss:"water"},
+      {id:"g1_light",reward:{dungeonPass:5},label:"Defeat the Level 1 Light Boss",check:s=>(s.dungeonBossLevels?.light||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.light||1)-1,1),max:1}),nav:"dungeon",navBoss:"light"},
+      {id:"g1_dark",reward:{dungeonPass:5},label:"Defeat the Level 1 Dark Boss",check:s=>(s.dungeonBossLevels?.dark||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.dark||1)-1,1),max:1}),nav:"dungeon",navBoss:"dark"},
+      {id:"g1_wind",reward:{dungeonPass:5},label:"Defeat the Level 1 Wind Boss",check:s=>(s.dungeonBossLevels?.wind||1)>=2,progress:s=>({cur:Math.min((s.dungeonBossLevels?.wind||1)-1,1),max:1}),nav:"dungeon",navBoss:"wind"},
     ]},
     {reward:{gems:250,dungeonPass:10},quests:[
       {id:"d1a",reward:{gems:50},label:"Clear 20 dungeons",check:s=>s.dungeonsCleared>=20,progress:s=>({cur:Math.min(s.dungeonsCleared,20),max:20})},
@@ -121,7 +145,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",rainbowMelon:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",melonRainbow:"🍈 Rainbow Melon",ascensionMelon:"🍈 Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -134,7 +158,7 @@ export const REWARD_DESC={
   flairBanana:"Used to unlock Flairs.",
   mythicalFlairBanana:"Used to unlock Rare and higher rarity Flairs.",
   ancientFlairBanana:"Used to unlock Epic and higher rarity Flairs.",
-  rainbowMelon:"A colorful melon with special properties.",
+  melonRainbow:"A colorful melon with special properties.",
   ascensionMelon:"Used to ascend your Creatures to a higher form.",
   legendaryEgg:"Used to hatch powerful Creatures.",
   legendaryEggs:"Used to hatch powerful Legendary Creatures.",
@@ -169,7 +193,7 @@ export const DAILY_REWARDS=[
   {day:7,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:8,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:9,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
-  {day:10,label:"1 Rainbow Melon",emoji:"🍈",reward:{rainbowMelon:1}},
+  {day:10,label:"1 Rainbow Melon",emoji:"🍈",reward:{melonRainbow:1}},
   {day:11,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:12,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:13,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
@@ -192,24 +216,49 @@ export const DAILY_REWARDS=[
   {day:30,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
 ];
 
-/** Resolves a DAILY_REWARDS entry's "FIELD_12H" sentinels into an actual
- * amount (12h of the Field's current per-hour rate at the given level) and
- * a matching label. Entries without a sentinel pass through unchanged. */
+/** Resolves any "FIELD_<N>H" sentinel (food against FIELD_RATES, equipShards
+ * against FIELD_SHARD_RATES) into N hours of the Field's current per-hour
+ * rate at the given level. Keys without a sentinel pass through unchanged. */
+export function resolveReward(reward,farmFieldLevel){
+  const resolved={...reward};
+  const m=k=>typeof resolved[k]==="string"?/^FIELD_(\d+)H$/.exec(resolved[k]):null;
+  const foodMatch=m("food");
+  if(foodMatch) resolved.food=(FIELD_RATES[farmFieldLevel]||FIELD_RATES[1])*Number(foodMatch[1]);
+  const shardMatch=m("equipShards");
+  if(shardMatch) resolved.equipShards=(FIELD_SHARD_RATES[farmFieldLevel]||FIELD_SHARD_RATES[1])*Number(shardMatch[1]);
+  return resolved;
+}
+
+/** Resolves a DAILY_REWARDS entry's "FIELD_<N>H" sentinels into an actual
+ * amount and a matching label. Entries without a sentinel pass through
+ * unchanged. */
 export function resolveDailyReward(entry,farmFieldLevel){
-  const reward={...entry.reward};
+  const reward=resolveReward(entry.reward,farmFieldLevel);
   let label=entry.label;
-  if(reward.food==="FIELD_12H"){
-    const amt=(FIELD_RATES[farmFieldLevel]||FIELD_RATES[1])*12;
-    reward.food=amt;
-    label=amt+" Food";
-  }
-  if(reward.equipShards==="FIELD_12H"){
-    const amt=(FIELD_SHARD_RATES[farmFieldLevel]||FIELD_SHARD_RATES[1])*12;
-    reward.equipShards=amt;
-    label=amt+" Gear Shards";
-  }
+  if(reward.food!==entry.reward.food) label=reward.food+" Food";
+  if(reward.equipShards!==entry.reward.equipShards) label=reward.equipShards+" Gear Shards";
   return {...entry,reward,label};
 }
+
+// 30 tiers each. Free lane pays modest amounts; Premium pays roughly 3x plus
+// the two chase items (Mythical/Ancient Flair Banana, Legendary Eggs) get
+// their own dedicated tiers instead of scaling the free lane's item.
+export const BATTLEPASS_REWARDS_FREE=[
+  {eggs:1},{food:"FIELD_6H"},{ascensionMelon:1},{equipShards:"FIELD_6H"},{melonRainbow:1},
+  {eggs:1},{food:"FIELD_6H"},{candy:5},{equipShards:"FIELD_6H"},{flairBanana:5},
+  {eggs:1},{food:"FIELD_6H"},{ascensionMelon:1},{equipShards:"FIELD_6H"},{melonRainbow:1},
+  {eggs:1},{food:"FIELD_6H"},{candy:5},{equipShards:"FIELD_6H"},{flairBanana:5},
+  {eggs:1},{food:"FIELD_6H"},{ascensionMelon:1},{equipShards:"FIELD_6H"},{melonRainbow:1},
+  {eggs:1},{food:"FIELD_6H"},{candy:5},{equipShards:"FIELD_6H"},{legendaryEggs:1},
+];
+export const BATTLEPASS_REWARDS_PAID=[
+  {legendaryEggs:3},{food:"FIELD_18H"},{ascensionMelon:3},{equipShards:"FIELD_18H"},{melonRainbow:3},
+  {eggs:4},{food:"FIELD_18H"},{candy:15},{equipShards:"FIELD_18H"},{mythicalFlairBanana:5},
+  {eggs:4},{food:"FIELD_18H"},{ascensionMelon:3},{equipShards:"FIELD_18H"},{melonRainbow:3},
+  {eggs:4},{food:"FIELD_18H"},{candy:15},{equipShards:"FIELD_18H"},{ancientFlairBanana:1},
+  {eggs:4},{food:"FIELD_18H"},{ascensionMelon:3},{equipShards:"FIELD_18H"},{melonRainbow:3},
+  {eggs:4},{food:"FIELD_18H"},{candy:15},{equipShards:"FIELD_18H"},{legendaryEggs:3},
+];
 
 export const NEW_PLAYER_GIFT_REWARDS=[
   {day:1,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
@@ -219,7 +268,7 @@ export const NEW_PLAYER_GIFT_REWARDS=[
   {day:5,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
   {day:6,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
   {day:7,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
-  {day:8,label:"1 Rainbow Melon",emoji:"🍈",reward:{rainbowMelon:1}},
+  {day:8,label:"1 Rainbow Melon",emoji:"🍈",reward:{melonRainbow:1}},
   {day:9,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
   {day:10,label:"3 Legendary Eggs",emoji:"🌟",reward:{legendaryEggs:3}},
 ];

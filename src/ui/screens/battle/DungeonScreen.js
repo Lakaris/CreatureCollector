@@ -21,13 +21,16 @@ import { ABILITY_TAG_DEFS, getAbilityTags } from "../../../core/abilityText.js";
 import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
-function DungeonScreen({onBack,onClear,onViewCreature}){
-  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins } = useGame();
+function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
+  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrid, setDungeonPlanGrid: setDPlanGrid, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep } = useGame();
   const PASS_COST=1;
   const rechargeCost=100*Math.pow(2,passRechargeCount);
+  // Tail end of the post-Set-1 Dungeon reveal (see App.js's Play hub): while
+  // active, every button on the boss-select screen is inert except Fight --
+  // tapping it is what finally clears the tutorial (see the Fight button below).
+  const dungeonEnterActive=tutorialRestricted&&tutorialStep==="dungeonEnter";
   // battle state
   const [dPlanning,setDPlanning]=useState(false);
-  const [dPlanGrid,setDPlanGrid]=useState({});
   const [dPlanHighlight,setDPlanHighlight]=useState(null);
   const [dBossMinimized,setDBossMinimized]=useState(false);
   const [dCreatureMinimized,setDCreatureMinimized]=useState(false);
@@ -230,6 +233,12 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     document.removeEventListener('touchend',dEndHoldDoc);
   }
   const [selected,setSelected]=useState("fire");
+  // Jumps straight to a boss tab when navigated here from e.g. the "Defeat
+  // the Level 1 Wind Boss" quest; consumed once then cleared, same pattern
+  // as FarmScreen's farmDeepLink.
+  useEffect(()=>{
+    if(dungeonDeepLink){setSelected(dungeonDeepLink);setDungeonDeepLink(null);}
+  },[dungeonDeepLink]);
   const [rewards,setRewards]=useState(null);
   const [previewItem,setPreviewItem]=useState(null);
   const [notify,setNotify]=useState(null);
@@ -263,6 +272,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     const rolled=rollDungeonRewards(passCount,boss.type,bossLevel);
     setRewards(rolled);
     onClear&&onClear(1);
+    onAutoFight&&onAutoFight();
   }
   function recharge(){
     if((currencies.gems||0)<rechargeCost){showNotify("Not enough 💎 Gems!");return;}
@@ -406,7 +416,7 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
         )
       ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
-        React.createElement("button",{onClick:()=>{setDPlanning(false);setDPlanGrid({});},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
+        React.createElement("button",{onClick:()=>{setDPlanning(false);},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
         React.createElement("div",{style:{flex:1,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
         ),
@@ -510,7 +520,10 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
             React.createElement("span",{style:{fontSize:22,fontWeight:800,color:deployedCount>=DUNGEON_MAX_DEPLOYED?"#ef4444":"#111"}},deployedCount),
             React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}},"/"+DUNGEON_MAX_DEPLOYED+" deployed")
           ),
-          React.createElement("button",{onClick:dAutoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+          React.createElement("div",{style:{display:"flex",gap:8}},
+            React.createElement("button",{onClick:()=>deployedCount>0&&setDPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},"🗑 Clear All"),
+            React.createElement("button",{onClick:dAutoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
+          )
         ),
         React.createElement("div",{ref:dCreatureListRef,
           onMouseDown:e=>{dDragScroll.current={armed:true,on:false,x:e.pageX,y:e.pageY,sl:dCreatureListRef.current.scrollLeft,intentScroll:false};},
@@ -590,6 +603,13 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     )
   );
   return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    // Final beat of the post-Set-1 Dungeon reveal. Same box style/size as
+    // every other tutorial text box in the game (see HomeScreen's) -- full
+    // width, not sized to the Fight button. The arrow (near the Fight
+    // button below) is what actually points at the target.
+    dungeonEnterActive&&React.createElement("div",{
+      style:{position:"fixed",left:16,right:16,bottom:280,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6,pointerEvents:"none"}
+    },'You see a plaque that says "Prove your worth to earn legendary rewards."'),
     notify&&React.createElement("div",{style:{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",background:"#333",color:"#fff",borderRadius:10,padding:"8px 18px",fontSize:13,fontWeight:600,zIndex:200,whiteSpace:"nowrap"}},notify),
     buyPassesOpen&&React.createElement("div",{onClick:()=>setBuyPassesOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
@@ -629,11 +649,11 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
       )
     ),
     React.createElement("div",{style:{padding:"16px 16px 0",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",paddingBottom:12,background:"#fff",flexShrink:0}},
-      React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+      React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;onBack();},style:{background:"none",border:"none",cursor:dungeonEnterActive?"not-allowed":"pointer",fontSize:20,color:dungeonEnterActive?"#ccc":"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
       React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🏰 Dungeon"),
-      boss&&React.createElement("button",{onClick:()=>setShowDrops(true),style:{marginLeft:"auto",padding:"5px 12px",fontSize:12,fontWeight:600,background:"#f0f0f0",border:"none",borderRadius:20,cursor:"pointer",color:"#555"}},"Drops")
+      boss&&React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setShowDrops(true);},style:{marginLeft:"auto",padding:"5px 12px",fontSize:12,fontWeight:600,background:"#f0f0f0",border:"none",borderRadius:20,cursor:dungeonEnterActive?"not-allowed":"pointer",color:dungeonEnterActive?"#ccc":"#555"}},"Drops")
     ),
     showDrops&&boss&&React.createElement("div",{onClick:()=>setShowDrops(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:320,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:340}},
@@ -695,41 +715,54 @@ function DungeonScreen({onBack,onClear,onViewCreature}){
     React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"0 24px 40px",flexShrink:0}},
       React.createElement("div",{style:{position:"relative",display:"inline-block"}},
         React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#111"}},"🎫 "+passes+"/10"),
-        React.createElement("button",{onClick:()=>setBuyPassesOpen(true),style:{position:"absolute",top:-6,right:-24,width:20,height:20,borderRadius:"50%",background:"#534AB7",color:"#fff",border:"none",fontSize:14,fontWeight:700,cursor:"pointer",padding:0,lineHeight:"20px",textAlign:"center"}},"+")
+        React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setBuyPassesOpen(true);},style:{position:"absolute",top:-6,right:-24,width:20,height:20,borderRadius:"50%",background:dungeonEnterActive?"#ccc":"#534AB7",color:"#fff",border:"none",fontSize:14,fontWeight:700,cursor:dungeonEnterActive?"not-allowed":"pointer",padding:0,lineHeight:"20px",textAlign:"center"}},"+")
       ),
       React.createElement("div",{style:{fontSize:11,color:"#bbb"}},"Refreshes in "+getTimeToNoon()),
       React.createElement("div",{style:{display:"flex",gap:10,marginTop:4}},
+        React.createElement("div",{style:{position:"relative"}},
+          // Final beat of the post-Set-1 Dungeon reveal: anchored to Fight's
+          // own box (not the viewport center) so it's aligned with Fight
+          // regardless of screen width. Sits to the left of the button --
+          // the gap above Fight (between it and the ticket count) is too
+          // tight for a full-size arrow, but the open space to the left
+          // (screen padding, nothing else there) has plenty of room.
+          dungeonEnterActive&&React.createElement("div",{
+            style:{position:"absolute",right:"100%",top:"50%",transform:"translate(0,-50%)",marginRight:10,fontSize:24,lineHeight:1,color:"#534AB7",animation:"pointerBounceX 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}
+          },"➡️"),
+          React.createElement("button",{
+            onClick:()=>{
+              if(!boss)return;
+              if(passes<1){setBuyPassesOpen(true);return;}
+              setDPlanning(true);
+              if(dungeonEnterActive){setTutorialRestricted(false);setTutorialStep(null);}
+            },
+            disabled:!boss,
+            style:{padding:"8px 28px",fontSize:14,fontWeight:700,
+              background:boss?"#534AB7":"#ccc",
+              color:"#fff",border:"none",borderRadius:20,
+              cursor:boss?"pointer":"default"}
+          },"⚔️ Fight")
+        ),
         React.createElement("button",{
-          onClick:()=>{
-            if(!boss)return;
-            if(passes<1){setBuyPassesOpen(true);return;}
-            setDPlanGrid({});setDPlanning(true);
-          },
-          disabled:!boss,
+          onClick:()=>{if(dungeonEnterActive)return;openFight();},disabled:!boss||dungeonEnterActive,
           style:{padding:"8px 28px",fontSize:14,fontWeight:700,
-            background:boss?"#534AB7":"#ccc",
+            background:boss&&!dungeonEnterActive?"#7c3aed":"#ccc",
             color:"#fff",border:"none",borderRadius:20,
-            cursor:boss?"pointer":"default"}
-        },"⚔️ Fight"),
-        React.createElement("button",{
-          onClick:openFight,disabled:!boss,
-          style:{padding:"8px 28px",fontSize:14,fontWeight:700,
-            background:boss?"#7c3aed":"#ccc",
-            color:"#fff",border:"none",borderRadius:20,
-            cursor:boss?"pointer":"default"}
+            cursor:boss&&!dungeonEnterActive?"pointer":"default"}
         },"⚡ Auto Fight")
       )
     ),
     React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",flexShrink:0,paddingBottom:"env(safe-area-inset-bottom)"}},
       React.createElement("div",{style:{display:"flex",borderTop:"1px solid #e0e0e0"}},
         DUNGEON_BOSSES.map(b=>React.createElement("button",{
-          key:b.key,onClick:()=>setSelected(b.key),
+          key:b.key,onClick:()=>{if(dungeonEnterActive)return;setSelected(b.key);},
           style:{
             flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
             padding:"8px 2px",border:"none",
             borderTop:"3px solid "+(selected===b.key?"#534AB7":"transparent"),
             background:selected===b.key?"#f0effe":"#fff",
-            cursor:"pointer",transition:"all .15s",
+            cursor:dungeonEnterActive?"not-allowed":"pointer",transition:"all .15s",
+            opacity:dungeonEnterActive?0.5:1,
           }
         },
           React.createElement("span",{style:{fontSize:20}},TYPE_EMOJI[b.type]||"👾"),

@@ -51,8 +51,8 @@ function flairStatGain(stat,base,buffs){
   return Math.ceil(raw);
 }
 
-function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
-  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep, setPetLevelUps, setEquipLevelUps, flairGuideStep, setFlairGuideStep } = useGame();
+function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
+  const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep, setPetLevelUps, setEquipLevelUps, flairGuideStep, setFlairGuideStep, candyGuideStep, setCandyGuideStep } = useGame();
   // "slot"/"item" cover the whole guided equip flow (creature page -> slot
   // picker); "item" narrows further to the picker itself, where only the
   // Iron Band tile should respond so the pointer arrow isn't a red herring.
@@ -840,11 +840,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
       tabs.map(t=>{
         const tabLocked=equipTutorialLock&&t.id!=="levelup";
         const showFlairGuideArrow=flairGuideStep==="flair"&&t.id==="flair";
+        const showCandyGuideArrow=candyGuideStep==="candySkins"&&t.id==="skins";
         return React.createElement("button",{
           key:t.id,
           disabled:tabLocked,
-          "data-guide-target":t.id==="flair"?"flair":undefined,
-          onClick:()=>{if(tabLocked)return;setTab(t.id);if(flairGuideStep==="flair"&&t.id==="flair")setFlairGuideStep("feed");},
+          "data-guide-target":t.id==="flair"?"flair":t.id==="skins"?"candySkins":undefined,
+          onClick:()=>{if(tabLocked)return;setTab(t.id);if(flairGuideStep==="flair"&&t.id==="flair")setFlairGuideStep("feed");if(candyGuideStep==="candySkins"&&t.id==="skins")setCandyGuideStep("candyFeed");},
           style:{flex:1,padding:"7px 0",fontSize:13,fontWeight:600,border:"none",borderRadius:7,cursor:tabLocked?"not-allowed":"pointer",
             position:"relative",
             background:tab===t.id?"#fff":"transparent",
@@ -853,7 +854,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
             opacity:tabLocked?0.6:1,
             transition:"all .15s"}
         },
-          showFlairGuideArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+          (showFlairGuideArrow||showCandyGuideArrow)&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
           t.label
         );
       })
@@ -974,7 +975,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed}){
     tab==="flair"&&React.createElement(FlairSection,{displayEmoji,def,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep}),
     tab==="skins"&&React.createElement(SkinSection,{
       ownedData,def,currencies,setCurrencies,setOwned,
-      unlockedSkins,setUnlockedSkins,skinShards,setSkinShards
+      unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,
+      onCandyUsed,candyGuideStep,setCandyGuideStep
     })
   );
 }

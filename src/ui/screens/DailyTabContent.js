@@ -37,7 +37,17 @@ function DailyTabContent({setRewardPopup,onNavigate}){
     const hasLocked=dailySelectedMissions.some(id=>(id==="dm_dung1"&&!unlockedFeatures.dungeon)||(id==="dm_farm"&&!unlockedFeatures.plots)||(id==="dm_boss"&&!unlockedFeatures.boss)||(id==="dm_arena"&&!unlockedFeatures.arena));
     if(hasLocked)setDailySelectedMissions(pickDailyMissions(unlockedFeatures));
   },[dailySelectedMissions,unlockedFeatures.dungeon,unlockedFeatures.plots,unlockedFeatures.boss,unlockedFeatures.arena]);
-  const snap=dailyMissionsSnapshot||{eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,petLevelUps:0,equipLevelUps:0,currencies:{}};
+  // When today's snapshot hasn't been taken yet (brand new day, or the very
+  // first visit ever), the effect above will reset it to current counters --
+  // but that effect only runs after this first render commits. Rendering
+  // with the stale (often many-days-old) snapshot in the meantime would
+  // compute today's "progress so far" as ALL cumulative progress since that
+  // stale baseline, i.e. bars would briefly show as mostly/fully complete
+  // before snapping down to 0 a frame later. Computing the same fresh
+  // baseline here, synchronously, means the first paint is already correct.
+  const isFreshDay=dailyMissionsDate!==today;
+  const freshSnap={eggsHatched:questState.eggsHatched||0,dungeonsCleared:questState.dungeonsCleared||0,arenaFights:questState.arenaFights||0,bananasUsed:questState.bananasUsed||0,dailyBossFights:questState.dailyBossFights||0,plotsGrown:questState.plotsGrown||0,labyrinthFights:questState.labyrinthFights||0,fieldHarvests:questState.fieldHarvests||0,petLevelUps:questState.petLevelUps||0,equipLevelUps:questState.equipLevelUps||0,currencies:{...questState.currencies}};
+  const snap=isFreshDay?freshSnap:(dailyMissionsSnapshot||freshSnap);
   const qs=questState||{};
   function showReward(reward){
     const entries=Object.entries(reward);
@@ -65,9 +75,14 @@ function DailyTabContent({setRewardPopup,onNavigate}){
   const todaysMissions=dailySelectedMissions&&dailySelectedMissions.length>0
     ?DAILY_MISSIONS.filter(m=>dailySelectedMissions.includes(m.id))
     :DAILY_MISSIONS;
-  const allDone=todaysMissions.every(m=>dailyMissionsDone.has(m.id));
-  const canClaimCompletion=allDone&&!dailyCompletionClaimed;
-  const completedCount=todaysMissions.filter(m=>dailyMissionsDone.has(m.id)).length;
+  // Same stale-until-the-effect-runs issue as snap above: yesterday's claimed
+  // set (and completion flag) can otherwise flash "done" on today's missions
+  // for a frame if the same mission id happened to be claimed yesterday too.
+  const doneSet=isFreshDay?new Set():dailyMissionsDone;
+  const completionClaimed=isFreshDay?false:dailyCompletionClaimed;
+  const allDone=todaysMissions.every(m=>doneSet.has(m.id));
+  const canClaimCompletion=allDone&&!completionClaimed;
+  const completedCount=todaysMissions.filter(m=>doneSet.has(m.id)).length;
   if(rewardItems){
     const allVisible=visibleCount>=rewardItems.length;
     return React.createElement("div",{onClick:allVisible?()=>setRewardItems(null):undefined,style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200,cursor:allVisible?"pointer":"default"}},
@@ -132,7 +147,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
         },"🎁 Claim Completion Reward"),
       ),
       todaysMissions.map(m=>{
-        const claimed=dailyMissionsDone.has(m.id);
+        const claimed=doneSet.has(m.id);
         let ready=false;
         let prog={cur:0,max:1};
         try{ready=m.check(qs,snap);prog=m.progress(qs,snap);}catch{}

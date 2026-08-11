@@ -29,7 +29,7 @@ function collapseGearEntries(entries){
 }
 
 function QuestsScreen({onBack}){
-  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, setFlairGuideStep, setFarmDeepLink, setPendingDungeonReveal } = useGame();
+  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, setFlairGuideStep, setCandyGuideStep, setFarmDeepLink, setDungeonDeepLink, setArenaDeepLink, setPendingDungeonReveal } = useGame();
   const [questTab,setQuestTab]=React.useState("general");
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
@@ -97,10 +97,18 @@ function QuestsScreen({onBack}){
     if(!q.nav)return;
     if(q.nav==="dailyTab"){setQuestTab("daily");return;}
     if(q.nav==="labyrinth"){setGameMode("labyrinth");setTab("play");return;}
+    if(q.nav==="dailyboss"){setGameMode("dailyboss");setTab("play");return;}
+    if(q.nav==="dungeon"){if(q.navBoss)setDungeonDeepLink(q.navBoss);setGameMode("dungeon");setTab("play");return;}
+    if(q.nav==="arena"){if(q.navArena)setArenaDeepLink(q.navArena);setGameMode("arena");setTab("play");return;}
     // "Use 1 Flair Banana" gets a guided hand-off: arrows walk the player to
     // the first creature, its Flair tab, then the Feed button. Re-tapping
     // this quest always restarts the guide from step one.
     if(q.id==="g0b"){setFlairGuideStep("collection");setTab("collection");return;}
+    // "Use a Candy" mirrors that same hand-off, walking the player to the
+    // first creature, its Skins tab, then the Feed button instead. Kept on
+    // its own candyGuideStep so the two guides never collide if one's left
+    // mid-way -- re-tapping this quest always restarts from step one.
+    if(q.id==="g2_candy"){setCandyGuideStep("candyCollection");setTab("collection");return;}
     setTab(q.nav);
   }
 

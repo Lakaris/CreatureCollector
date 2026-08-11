@@ -68,20 +68,26 @@ function NewPlayerGiftScreen({onBack}){
     );
   }
   return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200,animation:"screenSlideUp .22s ease-out"}},
-    React.createElement("div",{style:{padding:"24px 20px 12px",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:20,fontWeight:800,color:"#111"}},"New Player Welcome Gift"),
+    // Header -- fixed above the scroll area, never scrolls with the track
+    React.createElement("div",{style:{flexShrink:0,borderBottom:"1px solid #ede8ff"}},
+      React.createElement("div",{style:{padding:"20px 20px 12px",display:"flex",alignItems:"center",gap:12}},
+        React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
+        React.createElement("div",{style:{flex:1,fontSize:20,fontWeight:800,color:"#111"}},"New Player Welcome Gift")
+      ),
+      React.createElement("div",{style:{padding:"0 20px 14px"}},
+        React.createElement("button",{onClick:claimDay,disabled:!canClaim,style:{width:"100%",padding:"10px 0",borderRadius:12,border:"none",cursor:canClaim?"pointer":"default",background:canClaim?PURPLE:"#e8e8e8",color:canClaim?"#fff":"#aaa",fontWeight:700,fontSize:13}},"🎁 Collect All")
+      )
     ),
-    !finished&&React.createElement("div",{style:{padding:"0 16px 12px",flexShrink:0}},
+    !finished&&!newPlayerGiftDoubled&&React.createElement("div",{style:{padding:"12px 16px 0",flexShrink:0}},
       React.createElement("button",{
         onClick:purchaseDouble,
-        disabled:newPlayerGiftDoubled,
-        style:{width:"100%",padding:"12px 14px",borderRadius:14,border:"none",cursor:newPlayerGiftDoubled?"default":"pointer",
-          background:newPlayerGiftDoubled?"#dcfce7":"linear-gradient(135deg,#f59e0b,#f97316)",
-          color:newPlayerGiftDoubled?"#166534":"#fff",fontWeight:700,fontSize:14,
+        style:{width:"100%",padding:"12px 14px",borderRadius:14,border:"none",cursor:"pointer",
+          background:"linear-gradient(135deg,#f59e0b,#f97316)",
+          color:"#fff",fontWeight:700,fontSize:14,
           display:"flex",alignItems:"center",justifyContent:"center",gap:8,
-          boxShadow:newPlayerGiftDoubled?"none":"0 4px 16px rgba(249,115,22,0.3)"}
+          boxShadow:"0 4px 16px rgba(249,115,22,0.3)"}
       },
-        newPlayerGiftDoubled?"✓ Double Rewards Active":"✨ Double All Rewards — $4.99"
+        "✨ Double All Rewards — $4.99"
       )
     ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}},
@@ -91,7 +97,7 @@ function NewPlayerGiftScreen({onBack}){
       React.createElement("div",{style:{position:"sticky",top:0,zIndex:2,background:"#f8f8ff",display:"flex",justifyContent:"center",alignItems:"center",gap:14,padding:"8px 0"}},
         React.createElement("div",{style:{flex:1,maxWidth:BOX_MAX,textAlign:"center",fontSize:16,fontWeight:800,color:PURPLE,letterSpacing:1}},"🎁 NORMAL"),
         React.createElement("div",{style:{width:NODE_COL_W}}),
-        React.createElement("div",{style:{flex:1,maxWidth:BOX_MAX,textAlign:"center",fontSize:16,fontWeight:800,color:GOLD,letterSpacing:1}},"✨ DOUBLED")
+        React.createElement("div",{style:{flex:1,maxWidth:BOX_MAX,textAlign:"center",fontSize:16,fontWeight:800,color:GOLD,letterSpacing:1}},"✨ PREMIUM")
       ),
       React.createElement("div",{style:{position:"relative",display:"flex",flexDirection:"column",gap:12,padding:"4px 0"}},
         React.createElement("div",{style:{display:"flex",justifyContent:"center",position:"relative",zIndex:1,marginBottom:4}},
@@ -148,16 +154,13 @@ function NewPlayerGiftScreen({onBack}){
               }
             },
               React.createElement("div",{style:{fontSize:28,lineHeight:1,filter:!isPast&&!newPlayerGiftDoubled?"grayscale(70%)":"none"}},r.emoji),
-              React.createElement("div",{style:{fontSize:14,fontWeight:800,color:isPast?"#bbb":!newPlayerGiftDoubled?"#aaa":GOLD}},"x"+baseQty),
+              React.createElement("div",{style:{fontSize:14,fontWeight:800,color:isPast?"#bbb":!newPlayerGiftDoubled?"#aaa":GOLD}},"x"+(baseQty*2)),
               React.createElement("div",{style:{...badgeBase,color:rightLocked?"#999":"#fff",background:rightLocked?"#eaeaea":GOLD,visibility:rightBadgeVisible?"visible":"hidden"}},rightLocked?"🔒 Locked":"CLAIM")
             )
           );
         })
       ),
       finished&&React.createElement("div",{style:{marginTop:16,textAlign:"center",fontSize:13,color:"#aaa",fontWeight:600}},"🏆 New player gift complete")
-    ),
-    React.createElement("div",{style:{display:"flex",justifyContent:"center",padding:"12px 0 28px",flexShrink:0}},
-      React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},"✕")
     ),
     popup
   );

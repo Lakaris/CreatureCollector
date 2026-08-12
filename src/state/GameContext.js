@@ -98,6 +98,10 @@ export function GameProvider({ children }) {
   // of state (rather than reusing flairGuideStep's step names) so the two
   // guided flows never interfere with each other if one is left mid-way.
   const [candyGuideStep, setCandyGuideStep] = useState(null);
+  // Same idea again, for the "Use 1 Ancient Fertilizer" quest: null |
+  // "upgradeField". Only one step (the quest just points at the Field's
+  // Upgrade button), cleared the same way by App.js's global click watcher.
+  const [farmGuideStep, setFarmGuideStep] = useState(null);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
@@ -250,6 +254,7 @@ export function GameProvider({ children }) {
   const [fieldHarvests, setFieldHarvests] = useState(() => initialSave?.fieldHarvests ?? 0);
   const [petLevelUps, setPetLevelUps] = useState(() => initialSave?.petLevelUps ?? 0);
   const [equipLevelUps, setEquipLevelUps] = useState(() => initialSave?.equipLevelUps ?? 0);
+  const [fertilizerUsed, setFertilizerUsed] = useState(() => initialSave?.fertilizerUsed ?? 0);
   // True forever once the player has fully cleared a day's Daily Quests at
   // least once -- unlike dailyCompletionClaimed, this never resets.
   const [everCompletedDailyQuests, setEverCompletedDailyQuests] = useState(() => initialSave?.everCompletedDailyQuests ?? false);
@@ -352,7 +357,7 @@ export function GameProvider({ children }) {
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked,
     dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, newFeaturePillsSeen,
     eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, labyrinthFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown, fieldHarvests,
-    petLevelUps, equipLevelUps, everCompletedDailyQuests,
+    petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests,
     questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
     dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions, lastFreeBananaDate,
     battlepassLastReset, battlepassClaimed, battlepassPaidClaimed, battlepassPremium, battlepassPoints,
@@ -394,12 +399,12 @@ export function GameProvider({ children }) {
       owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
       eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
       labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
-      petLevelUps, equipLevelUps, everCompletedDailyQuests, equipmentLevels, equipmentCopies,
+      petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests, equipmentLevels, equipmentCopies,
     }),
     [owned, currencies, unlockedSkins, arenaProgress, arenaLevels, dungeonBossLevels,
      eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown,
      labyrinthDepth, labyrinthBestDepth, labyrinthFights, fieldHarvests,
-     petLevelUps, equipLevelUps, everCompletedDailyQuests, equipmentLevels, equipmentCopies]
+     petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests, equipmentLevels, equipmentCopies]
   );
 
   const value = {
@@ -412,6 +417,7 @@ export function GameProvider({ children }) {
     creatureOverlay, setCreatureOverlay,
     dexOverlay, setDexOverlay,
     flairGuideStep, setFlairGuideStep,
+    farmGuideStep, setFarmGuideStep,
     candyGuideStep, setCandyGuideStep,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,
@@ -469,6 +475,7 @@ export function GameProvider({ children }) {
     dailyBossFights, setDailyBossFights, plotsGrown, setPlotsGrown,
     fieldHarvests, setFieldHarvests,
     petLevelUps, setPetLevelUps, equipLevelUps, setEquipLevelUps,
+    fertilizerUsed, setFertilizerUsed,
     everCompletedDailyQuests, setEverCompletedDailyQuests,
     // quests
     questBatchIdx, setQuestBatchIdx, claimedQuests, setClaimedQuests,

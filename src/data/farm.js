@@ -17,21 +17,32 @@ export const PLOT_CROPS=[
   {key:"ascensionMelon",label:"Ascension Melon",emoji:"🍈", yield:1, upgradeEvery:5},
 ];
 
-// Field: 100 levels, one Ancient Fertilizer each (see FarmScreen.js) --
-// deliberately 1:1 with the 100 total Ancient Fertilizer a full 5000-floor
-// Labyrinth clear pays out (1 every 50 floors). A player who spends
-// fertilizer as they climb keeps field level roughly in step with floor/50,
-// which lines up with Labyrinth's difficulty tiers (getEnemyLevelForDepth in
-// core/labyrinth.js: enemy level = floor/10) and with energyCost's growth in
-// core/creatures.js, so food production scales fast enough to keep pace with
-// each tier's target creature level. A player who never spends fertilizer
-// stays near the level-1 rate, where even modest leveling takes weeks.
-const FIELD_MAX_LEVEL = 100;
+// Field: 500 levels, one Ancient Fertilizer each (see FarmScreen.js) --
+// deliberately 1:1 with the 500 total Ancient Fertilizer a full 5000-floor
+// Labyrinth clear pays out (1 every 10 floors). A player who spends
+// fertilizer as they climb keeps field level roughly in step with floor/10,
+// which is also the Labyrinth's target creature level (getEnemyLevelForDepth
+// in core/labyrinth.js: enemy level = floor/10), so field level ~= the
+// creature level the player is currently pushing.
+//
+// The rate curves are paired with the upgrade cost curves on purpose:
+// - Food grows as l^1.6, the same exponent as energyCost in core/creatures.js,
+//   so at any depth ~10 creature levels (= 10 field levels = 100 floors) cost
+//   about one week of capped harvests -- steady pace the whole way up.
+// - Gear Shards grow as l^1.72, the same exponent as equipUpgradeCost in
+//   core/equipment.js, funding ~2 equipment levels per week with equipment
+//   level ~= field/5 (equip 100 lands at endgame alongside creature 500).
+// The flat pedestals (6 food, 20 shards) keep level-1 income meaningful: a
+// fresh player's first 24h harvest buys a few upgrades, and the first
+// 10-level creature band takes ~a week. A player who never spends fertilizer
+// stays near the level-1 rate, where even modest leveling takes weeks, and
+// a high-level field makes re-leveling lower creatures/items trivial.
+const FIELD_MAX_LEVEL = 500;
 export const FIELD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
-  l === 0 ? 0 : Math.round(8.2 * Math.pow(l, 1.72))
+  l === 0 ? 0 : Math.round(6 + 0.48 * Math.pow(l, 1.6))
 ); // food per hour at each level (index=level)
 export const FIELD_SHARD_RATES = Array.from({ length: FIELD_MAX_LEVEL + 1 }, (_, l) =>
-  l === 0 ? 0 : Math.round(20 + FIELD_RATES[l] * 0.5)
+  l === 0 ? 0 : Math.round(20 + 0.019 * Math.pow(l, 1.72))
 ); // equipment shards per hour at each level (index=level)
 export const FIELD_CAP_HOURS=24;
 export const FIELD_MIN_HOURS=1;

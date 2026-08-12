@@ -30,7 +30,7 @@ function collapseGearEntries(entries){
 }
 
 function QuestsScreen({onBack}){
-  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, setFlairGuideStep, setCandyGuideStep, setFarmDeepLink, setDungeonDeepLink, setArenaDeepLink, setPendingDungeonReveal } = useGame();
+  const { questState, questBatchIdx, setQuestBatchIdx, setCurrencies, setEquipmentCopies, claimedQuests, setClaimedQuests, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, setBattlepassPoints, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, labyrinthBestDepth, setTab, setGameMode, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, setFlairGuideStep, setCandyGuideStep, setFarmGuideStep, setFarmDeepLink, setDungeonDeepLink, setArenaDeepLink, setPendingDungeonReveal } = useGame();
   const [questTab,setQuestTab]=React.useState("general");
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
@@ -110,6 +110,9 @@ function QuestsScreen({onBack}){
     // its own candyGuideStep so the two guides never collide if one's left
     // mid-way -- re-tapping this quest always restarts from step one.
     if(q.id==="g2_candy"){setCandyGuideStep("candyCollection");setTab("collection");return;}
+    // "Use 1 Ancient Fertilizer" gets the same single-arrow hand-off, pointing
+    // at the Field's Upgrade button. Re-tapping this quest always re-shows it.
+    if(q.id==="g0g"){setFarmGuideStep("upgradeField");setGameMode(null);setTab("farm");return;}
     setTab(q.nav);
   }
 

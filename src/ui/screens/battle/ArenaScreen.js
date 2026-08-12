@@ -380,8 +380,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     const won=battleOutcome==="won";
     return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
-      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?(isBoss?"Boss Defeated!":"Stage Clear!"):"Defeat!"),
-      React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?(isBoss?"Boss stage "+wonStageRef.current+" complete!":"Stage "+wonStageRef.current+" complete!"):""),
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:20}},won?(isBoss?"Boss Defeated!":"Victory!"):"Defeat!"),
       won&&(()=>{const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
       React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setPlanGrid({});setBattleSelectedUid(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
@@ -393,7 +392,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+arenaTitle(tabDef)+" — Stage "+stage+" · Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
+          React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},tabDef.emoji+" "+arenaTitle(tabDef)+" — Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
         ),
         DEV_MODE&&React.createElement("button",{onClick:winStage,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏆 Win (Dev)"),
         React.createElement("button",{onClick:restartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
@@ -751,9 +750,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 React.createElement("div",{style:{fontSize:17,fontWeight:800,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#999"}},arenaEnemyLevel(level,stageNum))
               ),
               React.createElement("div",{style:{flex:1,minWidth:0}},
-                React.createElement("div",{style:{fontSize:11,fontWeight:700,color:isThisBoss?"#ff9800":isCurrent?"#534AB7":"#aaa",marginBottom:3}},
-                  isPast?"COMPLETE":"Stage "+stageNum
-                ),
+                isPast&&React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}},"COMPLETE"),
                 React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center",opacity:isPast?0.3:1,overflow:"hidden"}},
                   enemies.map((e,ei)=>React.createElement("span",{key:ei,style:{fontSize:22,lineHeight:1,flexShrink:0}},e))
                 )

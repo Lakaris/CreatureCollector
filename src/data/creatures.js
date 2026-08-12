@@ -1888,3 +1888,16 @@ CREATURE_MAP["__vine_minion"]={id:"__vine_minion",emoji:"🌱",name:"Vine Minion
 
 export const FINAL_FORMS=CREATURES.filter(c=>!c.evolutionId);
 export const ALL_TYPES=[...new Set(CREATURES.map(c=>c.type))].sort();
+
+/** Every creature form (every evolution stage, not just final forms), grouped by
+ * family with each family ordered base-to-final -- so pre-evolutions sit right
+ * next to the form they evolve into instead of scattered by their position in
+ * CREATURES (which is grouped by stage batch, not by family). Family order
+ * matches FINAL_FORMS. Walks `evolutionOf` directly rather than importing
+ * core/creatures.js's getChain, to avoid a data/core circular import. */
+export const ALL_DEX_FORMS=FINAL_FORMS.flatMap(final=>{
+  const chain=[];
+  let cur=final;
+  while(cur){chain.unshift(cur);cur=cur.evolutionOf?CREATURE_MAP[cur.evolutionOf]:null;}
+  return chain;
+});

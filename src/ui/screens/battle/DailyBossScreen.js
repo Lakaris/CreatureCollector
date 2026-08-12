@@ -235,7 +235,12 @@ function DailyBossScreen({onBack,onViewCreature}){
     const anyAlive=s.playerUnits.some(u=>u.hp>0);
     if(s.boss.hp<=0){
       stopLoops();
-      setDailyBossData(prev=>({...prev,date:today,fights:0,wins:0,rewardsCollectedDate:null}));
+      // Beating the tier always grants a reward set (on top of the once-a-day
+      // guaranteed set below) -- winning also satisfies that daily guarantee
+      // when it hasn't been claimed yet today.
+      const winRewards=rollDungeonRewards(5,boss.type,level);
+      setDailyBossData(prev=>({...prev,date:today,fights:0,wins:0,rewardsCollectedDate:today}));
+      setRewards(winRewards);
       setTimeout(()=>setPhase("won"),600);
     } else if(!anyAlive){
       stopLoops();
@@ -290,6 +295,11 @@ function DailyBossScreen({onBack,onViewCreature}){
   function continueAfterWin(){
     setDailyBossLevel(l=>(l||1)+1);
     setPhase("idle");
+  }
+  function collectWinRewards(){
+    setEquipmentCopies(prev=>{const n={...prev};for(const item of rewards)n[item.id]=(n[item.id]||0)+1;return n;});
+    setRewards(null);
+    continueAfterWin();
   }
   const MAX_DEPLOYED=10;
   function applyDrop(r,c,{id,fromCell}){
@@ -348,11 +358,40 @@ function DailyBossScreen({onBack,onViewCreature}){
     selectedRanged.forEach((s,i)=>{if(i<GRID_COLS)grid[(GRID_ROWS-1)+","+i]=s.id;});
     setPlanGrid(grid);
   }
-  // Victory screen — no item rewards, matches Dungeon/Arena's plain victory screen
+  // Victory rewards screen — beating the tier always drops a reward set
+  if(rewards&&phase==="won")return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"✅ Victory!"),
+      React.createElement("div",{style:{fontSize:13,color:"#888"}},"Rewards")
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
+      rewards.map((item,i)=>{
+        const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
+        const stats=Object.entries(item.stats||{}).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ");
+        return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
+          React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
+          React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
+          stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
+        );
+      })
+    ),
+    previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
+        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},previewItem.emoji),
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
+        previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
+        React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
+      )
+    ),
+    React.createElement("div",{style:{padding:"12px 16px 28px",flexShrink:0}},
+      React.createElement("button",{onClick:collectWinRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
+    )
+  );
+  // Fallback victory screen (defensive — win always rolls rewards above)
   if(phase==="won")return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
     React.createElement("div",{style:{fontSize:64,marginBottom:12}},"✅"),
     React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#534AB7",marginBottom:4}},"Victory!"),
-    React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},"Daily rewards have been refreshed"),
     React.createElement("button",{onClick:continueAfterWin,style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
   );
   // Rewards screen (consolation reward for a loss)

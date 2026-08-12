@@ -8,13 +8,13 @@ import { EQUIPMENT_MAP } from "../data/equipment.js";
 import { STAT_LABELS } from "../data/rarity.js";
 
 /** Gear Shard cost to take an item from `level` to the next.
- * Uses the same ^1.72 growth as the Field's shard-rate curve (data/farm.js)
- * so a day's income buys roughly the same number of upgrades at any level --
- * doubling per level (the old curve) instead outran income within a dozen
- * levels and left a day's shards good for exactly one upgrade, on any item,
- * forever after. Matching exponents keeps that ratio (~4 upgrades/day at
- * matching field/item level) constant, whether spent on one item or spread
- * across several. */
+ * Uses the same ^1.72 growth as the Field's shard-rate curve (data/farm.js),
+ * which is calibrated so income at field level F funds ~2 upgrades per week
+ * on an item at level ~F/5 (equipment 100 lands at endgame alongside
+ * creature 500) -- doubling per level (the old curve) instead outran income
+ * within a dozen levels and left a day's shards good for exactly one
+ * upgrade, on any item, forever after. Matching exponents keeps the pace
+ * constant, whether shards go into one item or are spread across several. */
 export function equipUpgradeCost(level) {
   return Math.floor(25 * Math.pow(level, 1.72));
 }

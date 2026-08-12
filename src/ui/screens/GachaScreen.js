@@ -17,11 +17,16 @@ function GachaScreen({onHatch}){
   const [result,setResult]=useState(null);
   const [multiResults,setMultiResults]=useState(null);
   const [visibleCount,setVisibleCount]=useState(0);
-  const [showRates,setShowRates]=useState(false);
+  const [showInfo,setShowInfo]=useState(false);
   const [bannerIdx,setBannerIdx]=useState(0);
   const [pendingHatch,setPendingHatch]=useState(null);
   const [detailItem,setDetailItem]=useState(null);
   const banner=BANNERS[bannerIdx];
+  // Only the Storm banner shows blurb text, but every banner reserves the
+  // same space for it (see the gacha-sub render below) -- reusing Storm's
+  // own text as the hidden placeholder guarantees identical line-wrapping,
+  // so the box beneath is always the same height regardless of banner.
+  const stormSub=BANNERS.find(b=>b.id==="stormwyvern")?.sub||"";
   const SINGLE=100,MULTI=900;
 
   useEffect(()=>{
@@ -114,75 +119,104 @@ function GachaScreen({onHatch}){
     }
   }
 
-  return React.createElement("div",null,
+  return React.createElement("div",{style:{height:"100%",display:"flex",flexDirection:"column"}},
     React.createElement(ScreenHeader,{title:"Hatch",right:React.createElement(React.Fragment,null,
       React.createElement(CurrencyChip,{emoji:"🥚",value:currencies.eggs}),
-      (currencies.legendaryEggs||0)>0&&React.createElement(CurrencyChip,{emoji:"🥚✨",value:currencies.legendaryEggs}),
+      React.createElement(CurrencyChip,{emoji:"🥚✨",value:currencies.legendaryEggs||0}),
       React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
     )}),
-    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
-      React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i-1+BANNERS.length)%BANNERS.length);setShowRates(false);},
-        style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:18,color:"#555",lineHeight:1}},"‹"),
-      React.createElement("div",{style:{flex:1,textAlign:"center",fontSize:12,color:"#666",fontWeight:500}},
-        (bannerIdx+1)+" / "+BANNERS.length+"  •  "+banner.name),
-      React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i+1)%BANNERS.length);setShowRates(false);},
-        style:{background:"none",border:"1px solid #ddd",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:18,color:"#555",lineHeight:1}},"›")
+    // Title (and, only for the Storm banner, its blurb) live above the
+    // colored box now rather than inside it -- banner-switch arrows flank
+    // the title+blurb column directly instead of a separate "1 / 3 • Name"
+    // row. alignItems:"center" on this outer row is what centers the arrows
+    // against the full two-line block (title+blurb) rather than just the
+    // title line, so they sit centered in the gap above the box instead of
+    // hugging the top next to the title alone. space-between (instead of a
+    // centered gap) also pins them to fixed positions at the row's edges --
+    // they no longer drift inward/outward as the title text's width changes
+    // between banners.
+    React.createElement("div",{style:{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 8px",marginBottom:14}},
+      React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i-1+BANNERS.length)%BANNERS.length);setShowInfo(false);},
+        style:{background:"none",border:"1px solid #ddd",borderRadius:10,padding:"8px 16px",cursor:"pointer",fontSize:26,color:"#555",lineHeight:1,flexShrink:0}},"‹"),
+      React.createElement("div",{style:{flex:1,textAlign:"center"}},
+        React.createElement("div",{className:"gacha-title",style:{color:banner.titleColor,marginBottom:0}},banner.name),
+        // Always rendered (blank when there's no blurb) so this block is the
+        // same height for every banner -- otherwise the box below, which
+        // fills whatever space is left, would be shorter on the one banner
+        // with a blurb line.
+        React.createElement("div",{className:"gacha-sub",style:{marginBottom:0,visibility:banner.id==="stormwyvern"?"visible":"hidden"}},stormSub)
+      ),
+      React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i+1)%BANNERS.length);setShowInfo(false);},
+        style:{background:"none",border:"1px solid #ddd",borderRadius:10,padding:"8px 16px",cursor:"pointer",fontSize:26,color:"#555",lineHeight:1,flexShrink:0}},"›")
     ),
-    React.createElement("div",{className:"gacha-banner",style:{position:"relative",background:banner.color,borderColor:banner.border}},
+    // flex:1 + centered content so this box absorbs whatever vertical space
+    // is left between the header above and the banner-nav/hatch buttons
+    // below, instead of the page overflowing on tall screens or leaving a
+    // big empty gap on short ones.
+    React.createElement("div",{className:"gacha-banner",style:{position:"relative",background:banner.color,borderColor:banner.border,flex:1,minHeight:0,display:"flex",flexDirection:"column",justifyContent:"center",overflow:"hidden"}},
       React.createElement("button",{
-        onClick:()=>setShowRates(r=>!r),
+        onClick:()=>setShowInfo(true),
         style:{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",color:banner.titleColor,padding:2,lineHeight:1,opacity:.7}
       },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}})),
-      React.createElement("div",{className:"gacha-title",style:{color:banner.titleColor}},banner.name),
-      React.createElement("div",{className:"gacha-sub"},banner.sub),
-      React.createElement("span",{className:"egg-tap",onClick:()=>canAfford(1)&&doHatch(1)},
-        banner.featured?CREATURE_MAP[banner.featured].emoji:"🥚"),
-      (()=>{
-        const threshold=PITY_THRESHOLD[banner.id]||200;
-        const cur=pity[banner.id]||0;
-        const pct=Math.round(cur/threshold*100);
-        return React.createElement("div",{style:{marginTop:8,marginBottom:2}},
-          cur>=threshold
-            ? React.createElement("div",{style:{fontSize:11,fontWeight:700,color:banner.titleColor,marginBottom:3,textAlign:"center"}},
-                "⭐ Next hatch guaranteed Legendary!")
-            : React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:11,color:banner.titleColor,opacity:.75,marginBottom:3}},
-                React.createElement("span",null,"⭐ Pity"),
-                React.createElement("span",null,cur+" / "+threshold)
-              ),
-          React.createElement("div",{style:{height:5,borderRadius:4,background:"rgba(0,0,0,0.12)",overflow:"hidden"}},
-            React.createElement("div",{style:{height:"100%",width:pct+"%",background:banner.titleColor,opacity:.7,borderRadius:4,transition:"width .3s"}})
-          )
-        );
-      })(),
-      showRates&&React.createElement("div",{className:"rates-table",style:{marginTop:12,marginBottom:0,background:"#fff",borderRadius:8}},
-        banner.rates
-          ? banner.rates.map((entry,i)=>{
-              const label=entry.type==="creature"
-                ? CREATURE_MAP[entry.id].name+" ⭐"
-                : entry.type==="rarity_excl"
-                  ? RARITY_CONFIG[entry.rarity].label+" (other)"
-                  : RARITY_CONFIG[entry.rarity].label;
-              const badgeColor=entry.type==="creature"||entry.type==="rarity_excl"
-                ? RARITY_CONFIG[entry.rarity||"legendary"].color
-                : RARITY_CONFIG[entry.rarity].color;
-              return React.createElement("div",{key:i,className:"rates-row"},
-                React.createElement("span",{className:"badge "+badgeColor},label),
-                React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},entry.rate+"%")
-              );
-            })
-          : Object.entries(RARITY_CONFIG).map(([r,cfg])=>
-              React.createElement("div",{key:r,className:"rates-row"},
-                React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                  React.createElement("span",{className:"badge "+cfg.color},cfg.label),
-                  React.createElement("span",{style:{fontSize:11,color:"#666"}},"("+CREATURES.filter(c=>c.rarity===r&&!c.evolutionOf).length+" creatures)")
-                ),
-                React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},cfg.rate+"%")
-              )
-            )
-      )
+      React.createElement("span",{className:"egg-tap",style:{flexShrink:0},onClick:()=>canAfford(1)&&doHatch(1)},
+        banner.featured?CREATURE_MAP[banner.featured].emoji:"🥚")
     ),
-    React.createElement("button",{className:"btn btn-primary",onClick:()=>canAfford(1)&&setPendingHatch(1),disabled:!canAfford(1)},"Hatch ×1  —  "+costLabel(1)),
-    React.createElement("button",{className:"btn",style:{background:"#3C3489",color:"#fff",borderColor:"#3C3489"},onClick:()=>canAfford(10)&&setPendingHatch(10),disabled:!canAfford(10)},"Hatch ×10  —  "+costLabel(10)),
+    // Pity + rates are opt-in detail, bundled into one popup behind the (i)
+    // button instead of a bar that's always on the page or an inline
+    // expansion that grows the box.
+    showInfo&&(()=>{
+      const threshold=PITY_THRESHOLD[banner.id]||200;
+      const cur=pity[banner.id]||0;
+      const pct=Math.round(cur/threshold*100);
+      return React.createElement("div",{className:"modal-overlay",onClick:()=>setShowInfo(false)},
+        React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
+          React.createElement("div",{style:{fontSize:16,fontWeight:600,color:"#000",marginBottom:14}},banner.name),
+          React.createElement("div",{style:{marginBottom:16}},
+            cur>=threshold
+              ? React.createElement("div",{style:{fontSize:12,fontWeight:700,color:banner.titleColor,marginBottom:4,textAlign:"center"}},
+                  "⭐ Next hatch guaranteed Legendary!")
+              : React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#666",marginBottom:4}},
+                  React.createElement("span",null,"⭐ Pity"),
+                  React.createElement("span",null,cur+" / "+threshold)
+                ),
+            React.createElement("div",{style:{height:5,borderRadius:4,background:"#e0e0e0",overflow:"hidden"}},
+              React.createElement("div",{style:{height:"100%",width:pct+"%",background:banner.titleColor,opacity:.7,borderRadius:4,transition:"width .3s"}})
+            )
+          ),
+          React.createElement("div",{className:"rates-table",style:{marginTop:0,marginBottom:16,textAlign:"left",maxHeight:"50vh",overflowY:"auto"}},
+            banner.rates
+              ? banner.rates.map((entry,i)=>{
+                  const label=entry.type==="creature"
+                    ? CREATURE_MAP[entry.id].name+" ⭐"
+                    : entry.type==="rarity_excl"
+                      ? RARITY_CONFIG[entry.rarity].label+" (other)"
+                      : RARITY_CONFIG[entry.rarity].label;
+                  const badgeColor=entry.type==="creature"||entry.type==="rarity_excl"
+                    ? RARITY_CONFIG[entry.rarity||"legendary"].color
+                    : RARITY_CONFIG[entry.rarity].color;
+                  return React.createElement("div",{key:i,className:"rates-row"},
+                    React.createElement("span",{className:"badge "+badgeColor},label),
+                    React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},entry.rate+"%")
+                  );
+                })
+              : Object.entries(RARITY_CONFIG).map(([r,cfg])=>
+                  React.createElement("div",{key:r,className:"rates-row"},
+                    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                      React.createElement("span",{className:"badge "+cfg.color},cfg.label),
+                      React.createElement("span",{style:{fontSize:11,color:"#666"}},"("+CREATURES.filter(c=>c.rarity===r&&!c.evolutionOf).length+" creatures)")
+                    ),
+                    React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},cfg.rate+"%")
+                  )
+                )
+          ),
+          React.createElement("button",{className:"btn",style:{marginBottom:0,background:"#e0e0e0",color:"#333"},onClick:()=>setShowInfo(false)},"Close")
+        )
+      );
+    })(),
+    React.createElement("div",{style:{flexShrink:0,paddingTop:10}},
+      React.createElement("button",{className:"btn btn-primary",style:{marginBottom:8},onClick:()=>canAfford(1)&&setPendingHatch(1),disabled:!canAfford(1)},"Hatch ×1  —  "+costLabel(1)),
+      React.createElement("button",{className:"btn",style:{background:"#3C3489",color:"#fff",borderColor:"#3C3489",marginBottom:12},onClick:()=>canAfford(10)&&setPendingHatch(10),disabled:!canAfford(10)},"Hatch ×10  —  "+costLabel(10))
+    ),
     pendingHatch&&React.createElement("div",{className:"modal-overlay",onClick:()=>setPendingHatch(null)},
       React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
         React.createElement("div",{style:{fontSize:40,marginBottom:8}},banner.featured?CREATURE_MAP[banner.featured].emoji:"🥚"),

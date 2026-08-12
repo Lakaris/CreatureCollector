@@ -40,9 +40,10 @@ export const QUEST_DEFS={
       {id:"g0a",reward:{eggs:1},label:"Hatch 10 eggs",check:s=>s.eggsHatched>=10,progress:s=>({cur:Math.min(s.eggsHatched,10),max:10}),nav:"hatch"},
       {id:"g0b",reward:{flairBanana:1},label:"Use 1 Flair Banana",check:s=>s.bananasUsed>=1,progress:s=>({cur:Math.min(s.bananasUsed,1),max:1}),nav:"collection"},
       {id:"g0c",reward:{com_hp_atk2:1,com_hp_def2:1,com_hp_def:1,com_atk_def2:1,com_atk_def:1},label:"Complete all Daily Quests",check:s=>!!s.everCompletedDailyQuests,progress:s=>({cur:s.everCompletedDailyQuests?1:0,max:1}),nav:"dailyTab"},
-      {id:"g0d",reward:{food:500},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
-      {id:"g0e",reward:{equipShards:500},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
+      {id:"g0d",reward:{food:100},label:"Level up 5 creatures to level 2",check:s=>Object.values(s.owned).filter(o=>o.level>=2).length>=5,progress:s=>({cur:Math.min(Object.values(s.owned).filter(o=>o.level>=2).length,5),max:5}),nav:"collection"},
+      {id:"g0e",reward:{equipShards:100},label:"Level up equipment 5 times",check:s=>s.equipLevelUps>=5,progress:s=>({cur:Math.min(s.equipLevelUps,5),max:5}),nav:"equipment"},
       {id:"g0f",reward:{eggs:1},label:"Complete Floor 30 of the Labyrinth",check:s=>(s.labyrinthBestDepth||1)>=31,progress:s=>({cur:Math.min((s.labyrinthBestDepth||1)-1,30),max:30}),nav:"labyrinth"},
+      {id:"g0g",reward:{eggs:1},label:"Use 1 Ancient Fertilizer",check:s=>(s.fertilizerUsed||0)>=1,progress:s=>({cur:Math.min(s.fertilizerUsed||0,1),max:1}),nav:"farm"},
     ]},
     {reward:{plots:1},quests:[
       {id:"g1_boss",reward:{eggs:1},label:"Fight the Daily Boss",check:s=>s.dailyBossFights>=1,progress:s=>({cur:Math.min(s.dailyBossFights,1),max:1}),nav:"dailyboss"},

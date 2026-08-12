@@ -203,6 +203,7 @@ function App() {
     newFeaturePillsSeen, setNewFeaturePillsSeen,
     flairGuideStep, setFlairGuideStep,
     candyGuideStep, setCandyGuideStep,
+    farmGuideStep, setFarmGuideStep,
   } = useGame();
 
   const contentRef = React.useRef(null);
@@ -237,6 +238,16 @@ function App() {
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, [candyGuideStep]);
+  // Same idea again, for the "Use 1 Ancient Fertilizer" quest's single-step
+  // guide (an arrow at the Field's Upgrade button).
+  React.useEffect(() => {
+    if (!farmGuideStep) return;
+    function onClick(e) {
+      if (!e.target.closest('[data-guide-target="' + farmGuideStep + '"]')) setFarmGuideStep(null);
+    }
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [farmGuideStep]);
   const viewCreature = (id) => setCreatureOverlay(id);
   const starterName = (() => {
     const first = Object.values(owned || {})[0];
@@ -575,7 +586,7 @@ function App() {
     React.createElement("h2", { className: "sr-only" }, "Creature Collector"),
     React.createElement(
       "div",
-      { className: "app-content", ref: contentRef, style: tab === "home" ? { overflow: "hidden" } : undefined },
+      { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" ? { overflow: "hidden" } : undefined },
       tab === "home" && React.createElement(HomeScreen),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
       tab === "collection" &&
@@ -587,8 +598,11 @@ function App() {
         }),
       tab === "store" && React.createElement(StoreScreen),
       tab === "equipment" && React.createElement(EquipmentScreen),
-      tab !== "home" && DEV_MODE && React.createElement(DevPanel),
-      React.createElement("div", { style: { height: 12 } })
+      // Dev tools are excluded on Hatch specifically -- that screen is laid
+      // out to fill exactly one viewport with no scrolling, and the dev
+      // panel's height would blow past that.
+      tab !== "home" && tab !== "hatch" && DEV_MODE && React.createElement(DevPanel),
+      tab !== "hatch" && React.createElement("div", { style: { height: 12 } })
     ),
     React.createElement(NavBar, {
       tab,

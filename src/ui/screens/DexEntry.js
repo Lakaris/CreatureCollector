@@ -8,8 +8,9 @@ import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js
 import { getChain, getSkinsForCreature } from "../../core/creatures.js";
 import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel } from "../../core/abilityText.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
+import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
 
-function DexEntry({def,onBack,onNavigate}){
+function DexEntry({def,onBack,onNavigate,navList}){
   const { unlockedSkins } = useGame();
   const [skinPreview,setSkinPreview]=useState(null);
   const [abilityTagPopup,setAbilityTagPopup]=useState(null);
@@ -19,7 +20,26 @@ function DexEntry({def,onBack,onNavigate}){
   const abilityKeys=["basic","special","unique"];
   const chainSkins=getSkinsForCreature(def.id);
 
-  return React.createElement("div",null,
+  // Swipe left/right pages through navList (whatever ordered set of final
+  // forms the caller is browsing -- DexScreen's filtered grid, or the full
+  // dex when opened out-of-context via CreatureOverlayHost's Evolutions
+  // button). "if able" means it's simply a no-op at either end of the list.
+  const swipeBlocked=!!(abilityTagPopup||skinPreview);
+  const navIdx=navList?navList.findIndex(d=>d.id===def.id):-1;
+  const swipeHandlers=useSwipeNav({
+    onSwipeLeft:()=>{
+      if(swipeBlocked||navIdx<0)return;
+      const next=navList[navIdx+1];
+      if(next)onNavigate(next);
+    },
+    onSwipeRight:()=>{
+      if(swipeBlocked||navIdx<0)return;
+      const prev=navList[navIdx-1];
+      if(prev)onNavigate(prev);
+    },
+  });
+
+  return React.createElement("div",swipeHandlers,
     abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[abilityTagPopup].label),

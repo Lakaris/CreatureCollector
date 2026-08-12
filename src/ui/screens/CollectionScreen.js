@@ -93,7 +93,17 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
       unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,
       equipmentLevels,setEquipmentLevels,
       equipmentAscensions,setEquipmentAscensions,equipmentCopies,setEquipmentCopies,
-      equipFavorites,setEquipFavorites
+      equipFavorites,setEquipFavorites,
+      // Swipe left/right pages through the same filtered/sorted list shown
+      // in the grid behind this detail view -- "if able" means it's simply
+      // a no-op at either end of the list.
+      onSwipeNav:(dir)=>{
+        const idx=filtered.findIndex(f=>f.owned.id===selected);
+        if(idx<0)return;
+        const nextIdx=dir==="next"?idx+1:idx-1;
+        if(nextIdx<0||nextIdx>=filtered.length)return;
+        setSelected(filtered[nextIdx].owned.id);
+      }
     }),
     React.createElement(NavBar,{tab,setTab,style:{position:"fixed",bottom:0,left:0,right:0,background:"rgba(245,245,245,0.95)",backdropFilter:"blur(8px)"}})
   );
@@ -108,18 +118,18 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     // Hidden for the whole tutorial -- there's nothing to search yet, and it
     // would otherwise sit right above the card the tutorial points the
     // player at.
-    !tutorialRestricted&&React.createElement("div",{style:{position:"relative",marginBottom:8}},
-      React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
-      React.createElement("input",{
-        type:"text",value:search,onChange:e=>setSearch(e.target.value),
-        placeholder:"Search creatures...",
-        style:{width:"100%",padding:"8px 10px 8px 32px",border:"0.5px solid rgba(0,0,0,0.15)",borderRadius:8,fontSize:13,outline:"none",background:"#fff"}
-      })
-    ),
     !tutorialRestricted&&React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginBottom:6}},
       React.createElement("button",{onClick:()=>setFiltersOpen(p=>!p),style:{fontSize:11,color:"#534AB7",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}},filtersOpen?"Hide Filters ▲":"Filter ▼")
     ),
     !tutorialRestricted&&filtersOpen&&React.createElement("div",{style:{marginBottom:10}},
+      React.createElement("div",{style:{position:"relative",marginBottom:8}},
+        React.createElement("i",{className:"ti ti-search",style:{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#aaa",fontSize:15,pointerEvents:"none"}}),
+        React.createElement("input",{
+          type:"text",value:search,onChange:e=>setSearch(e.target.value),
+          placeholder:"Search creatures...",
+          style:{width:"100%",padding:"8px 10px 8px 32px",border:"0.5px solid rgba(0,0,0,0.15)",borderRadius:8,fontSize:13,outline:"none",background:"#fff"}
+        })
+      ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Rarity"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},

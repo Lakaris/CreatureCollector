@@ -98,12 +98,15 @@ export const LABYRINTH_REWARD_DISPLAY = {
   ancientFertilizer: ["🪴", "Ancient Fertilizer", "Ancient Fertilizer"],
 };
 
-/** Reward for clearing a given depth -- repeats on a 50-floor cycle. */
+/** Reward for clearing a given depth -- repeats on a 50-floor cycle.
+ * Ancient Fertilizer drops on every 10th floor (500 total over 5000 floors),
+ * matching the Field's 500 levels at 1 fertilizer each -- see the design
+ * note in data/farm.js. */
 export function getDepthReward(depth) {
   if (depth === 1) return { eggs: 5 };
   const m = depth % 50;
   if (m === 0) return { legendaryEggs: 1, ancientFertilizer: 1 };
-  if (m === 10 || m === 20 || m === 30 || m === 40) return { eggs: 1 };
+  if (m === 10 || m === 20 || m === 30 || m === 40) return { eggs: 1, ancientFertilizer: 1 };
   if (m === 5 || m === 15 || m === 25 || m === 45) return { dungeonPass: 10 };
   if (m === 3 || m === 13 || m === 23 || m === 33 || m === 43) return { flairBanana: 1 };
   if (m === 7 || m === 17 || m === 27 || m === 37 || m === 47) return { mysteriousOre: 1 };

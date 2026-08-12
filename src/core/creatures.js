@@ -28,6 +28,14 @@ export function getChain(creatureId) {
   return chain;
 }
 
+/** 1-indexed position of this creature within its own evolution chain
+ * (1 = base form). Every chain in the roster is at most 4 stages deep. */
+export function getEvolutionStage(creatureId) {
+  let n = 1, cur = CREATURE_MAP[creatureId];
+  while (cur && cur.evolutionOf) { n++; cur = CREATURE_MAP[cur.evolutionOf]; }
+  return n;
+}
+
 /** Every skin set that applies to any form in this creature's chain. */
 export function getSkinsForCreature(creatureId) {
   const chain = getChain(creatureId);
@@ -89,13 +97,14 @@ export function getDisplayEmoji(def, ownedData, unlockedSkins) {
   return (skinSet.appearances[vid] && skinSet.appearances[vid].emoji) || def.emoji;
 }
 
-/** Food cost to level a creature up from `lvl`. Paired with the Field's
- * food-rate curve in data/farm.js -- see that file's header comment for how
- * the two are calibrated together against Labyrinth's level breakpoints.
- * The ^1.6 exponent (steeper than the old ^1.35) grows faster than a fresh
- * creature's early levels, which stay cheap regardless -- so pushing one
- * already-high creature further costs noticeably more than spreading the
- * same food across several lower-level ones. */
+/** Food cost to level a creature up from `lvl`. The Field's food-rate curve
+ * in data/farm.js uses this same ^1.6 exponent so ~10 levels at the player's
+ * current frontier cost about one week of harvests at the matching field
+ * level -- see that file's header comment for the full calibration against
+ * the Labyrinth's floor/10 target level. The ^1.6 exponent (steeper than the
+ * old ^1.35) grows faster than a fresh creature's early levels, which stay
+ * cheap regardless -- so pushing one already-high creature further costs
+ * noticeably more than spreading the same food across several lower ones. */
 export function energyCost(lvl) {
   return Math.floor(8 * Math.pow(lvl, 1.6));
 }

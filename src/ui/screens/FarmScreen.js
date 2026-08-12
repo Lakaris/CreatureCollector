@@ -9,7 +9,7 @@ import { formatDuration, formatNum } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
 function FarmScreen({onBack,onPlant,onGoToStore}){
-  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, tutorialRestricted, tutorialStep, setTutorialStep, plotsUnlocked, farmDeepLink, setFarmDeepLink } = useGame();
+  const { farmPlots, setFarmPlots, currencies, setCurrencies, farmFieldLevel, setFarmFieldLevel, farmFieldLastHarvest, setFarmFieldLastHarvest, farmFieldSeed, setFarmFieldSeed, farmCrops, setFarmCrops, plotUpgrades, specialPurchased, setHarvestPopup, setRevealedCount, setFieldHarvests, setFertilizerUsed, tutorialRestricted, tutorialStep, setTutorialStep, plotsUnlocked, farmDeepLink, setFarmDeepLink, farmGuideStep, setFarmGuideStep } = useGame();
   // The tutorial's field visit is scripted: storage always reads as full and
   // only Food/Gear Shards drop, so the guided harvest is guaranteed and
   // doesn't hand out melons/candy the player hasn't been introduced to yet.
@@ -28,6 +28,21 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   const [speedUpConfirm,setSpeedUpConfirm]=useState(null);
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(t);},[]);
+  // The Farm tab renders full-bleed (this screen fills the whole viewport;
+  // App.js floats NavBar on top as its own translucent overlay, not a flex
+  // sibling that reserves space -- see App.js's "Farm tab" comment). That's
+  // fine for scrollable content, but the no-scroll Field layout below needs
+  // to know NavBar's real height (padding + safe-area-inset-bottom, so this
+  // can't be a hardcoded constant) to reserve room for it, or its last
+  // button ends up hidden underneath the overlay. Measured rather than
+  // assumed so it stays correct if NavBar's own styling ever changes.
+  const [navH,setNavH]=useState(0);
+  useEffect(()=>{
+    const measure=()=>{const el=document.querySelector(".nav");if(el)setNavH(el.getBoundingClientRect().height);};
+    measure();
+    window.addEventListener("resize",measure);
+    return()=>window.removeEventListener("resize",measure);
+  },[]);
   // Jumps straight to a sub-tab when navigated here from e.g. the "Grow a
   // Plot" daily mission; consumed once then cleared, same pattern as
   // CollectionScreen's deepLinkId.
@@ -91,6 +106,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     if(!canUpgrade)return;
     setCurrencies(c=>({...c,ancientFertilizer:(c.ancientFertilizer||0)-upgradeFertilizerCost}));
     setFarmFieldLevel(l=>l+1);
+    setFertilizerUsed(c=>c+upgradeFertilizerCost);
     showNotify("Field upgraded to Level "+(farmFieldLevel+1)+"!");
   }
 
@@ -104,7 +120,26 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       onBack&&React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
-      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🌾 Farm")
+      React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🌾 Farm"),
+      // Dev time-skip buttons live in the header now, swapping which state
+      // they poke based on the active tab -- kept out of the scrollable
+      // content so they don't shift as the player switches tabs.
+      DEV_MODE&&React.createElement("div",{style:{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",justifyContent:"flex-end"}},
+        ...(farmTab==="field"?[1,6,12,24]:[1,6,12]).map(h=>React.createElement("button",{key:h,
+          onClick:()=>farmTab==="field"
+            ?setFarmFieldLastHarvest(t=>t-h*3600000)
+            :setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:c.plantedAt-h*3600000}:c)),
+          style:{padding:"4px 8px",fontSize:11,fontWeight:700,background:"#3C3489",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
+          "+"+h+"h"
+        )),
+        React.createElement("button",{
+          onClick:()=>farmTab==="field"
+            ?setFarmFieldLastHarvest(Date.now())
+            :setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:Date.now()}:c)),
+          style:{padding:"4px 8px",fontSize:11,fontWeight:700,background:"#555",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
+          "Reset"
+        )
+      )
     ),
     React.createElement("div",{style:{display:"flex",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
       [{id:"field",label:"Field"},{id:"plots",label:"Plots"}].map(t=>{
@@ -129,24 +164,11 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         );
       })
     ),
-    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:16}},
-    farmTab==="field"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
-      DEV_MODE&&React.createElement("div",{style:{background:"#1e1e2e",borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}},
-        React.createElement("span",{style:{fontSize:11,color:"#aaa",fontWeight:600,marginRight:4}},"⏱ Dev"),
-        ...[1,6,12,24].map(h=>React.createElement("button",{key:h,
-          onClick:()=>setFarmFieldLastHarvest(t=>t-h*3600000),
-          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#3C3489",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
-          "+"+h+"h"
-        )),
-        React.createElement("button",{
-          onClick:()=>setFarmFieldLastHarvest(Date.now()),
-          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#555",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",marginLeft:"auto"}},
-          "Reset"
-        )
-      ),
+    React.createElement("div",{style:{flex:1,minHeight:0,overflowY:"hidden",padding:16,paddingBottom:16+navH,display:"flex",flexDirection:"column"}},
+    farmTab==="field"&&React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",gap:12}},
       React.createElement("div",{style:{
         background:"#e8f5e9",border:"3px solid #66bb6a",borderRadius:20,
-        padding:"24px 16px",textAlign:"center",position:"relative",
+        padding:"24px 16px",textAlign:"center",position:"relative",flexShrink:0,
       }},
         React.createElement("button",{
           disabled:harvestTutorialLock,
@@ -155,10 +177,13 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}})),
         React.createElement("div",{style:{position:"absolute",top:10,left:0,right:0,textAlign:"center",fontSize:14,fontWeight:700,color:"#555",pointerEvents:"none"}},"Lv."+farmFieldLevel),
         React.createElement("div",{style:{fontSize:56,marginBottom:6}},"🌾"),
-        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:2}},accumulated>0?"Ready to harvest":"Growing..."),
-        React.createElement("div",{style:{fontSize:14,color:"#666",textAlign:"center"}},"🍖 "+formatNum(rate)+"/hr")
+        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:2}},accumulated>0?"Ready to harvest":"Growing...")
       ),
-      React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px"}},
+      // flex:1 + a spacer just above the action buttons (below) absorbs
+      // whatever vertical space is left, pinning Harvest/Upgrade to the
+      // bottom of the card instead of the page overflowing on tall screens
+      // or leaving a big empty gap on short ones -- same treatment as Hatch.
+      React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px",flex:1,minHeight:0,display:"flex",flexDirection:"column",overflow:"hidden"}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#888",marginBottom:4}},
           React.createElement("span",null,atCap?"⚠️ Storage full! Harvest now":"Time since last harvest: "+fmtTime(elapsedMs)),
@@ -202,10 +227,14 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             })
           )
           :React.createElement("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",padding:"6px 0",marginBottom:10}},"Nothing yet — check back soon"),
-        !canHarvest&&!atCap&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},
+        React.createElement("div",{style:{flex:1,minHeight:0}}),
+        // "Available in" lives at the bottom of the card, directly above the
+        // Harvest button, instead of floating mid-card. The rate itself
+        // isn't duplicated here -- it's already in the (i) info popup.
+        !canHarvest&&!atCap&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8,flexShrink:0}},
           "Harvest available in "+fmtTime(Math.max(0,farmFieldLastHarvest+3600000-now))
         ),
-        React.createElement("div",{style:{display:"flex",gap:8,marginBottom:0,position:"relative"}},
+        React.createElement("div",{style:{display:"flex",gap:8,marginBottom:0,position:"relative",flexShrink:0}},
           harvestTutorialLock&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-40,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
           React.createElement("button",{
             onClick:harvest,
@@ -236,32 +265,29 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
               React.createElement("div",null)
             ),
-            React.createElement("button",{
-              disabled:harvestTutorialLock,
-              onClick:()=>{if(harvestTutorialLock)return;setShowFieldUpgrade(true);},
-              style:{width:"100%",padding:"10px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:14,
-                cursor:harvestTutorialLock?"not-allowed":"pointer",background:harvestTutorialLock?"#ccc":"#534AB7",color:"#fff",transition:"background .2s"},
-            },"Upgrade Field")
+            React.createElement("div",{style:{position:"relative"}},
+              farmGuideStep==="upgradeField"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-32,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+              React.createElement("button",{
+                "data-guide-target":"upgradeField",
+                disabled:harvestTutorialLock,
+                onClick:()=>{if(harvestTutorialLock)return;setShowFieldUpgrade(true);if(farmGuideStep==="upgradeField")setFarmGuideStep(null);},
+                style:{width:"100%",padding:"8px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:14,
+                  cursor:harvestTutorialLock?"not-allowed":"pointer",background:harvestTutorialLock?"#ccc":"#534AB7",color:"#fff",transition:"background .2s",
+                  display:"flex",flexDirection:"column",alignItems:"center",gap:1},
+              },
+                React.createElement("span",null,"Upgrade Field"),
+                React.createElement("span",{style:{fontSize:11,fontWeight:600,opacity:0.85,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?undefined:"#ffcdd2"}},"🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost)
+              )
+            )
           )
       ),
     ),
-    farmTab==="plots"&&React.createElement(React.Fragment,null,
+    // flex:1 grid with 3 even rows fills the screen edge-to-edge instead of
+    // fixed-height cards that leave the page free to scroll -- same
+    // no-scroll treatment as Field/Hatch.
+    farmTab==="plots"&&React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",gap:12}},
 
-      DEV_MODE&&React.createElement("div",{style:{background:"#1e1e2e",borderRadius:10,padding:"10px 12px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}},
-        React.createElement("span",{style:{fontSize:11,color:"#aaa",fontWeight:600,marginRight:4}},"⏱ Dev"),
-        ...[1,6,12].map(h=>React.createElement("button",{key:h,
-          onClick:()=>setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:c.plantedAt-h*3600000}:c)),
-          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#3C3489",color:"#fff",border:"none",borderRadius:6,cursor:"pointer"}},
-          "+"+h+"h"
-        )),
-        React.createElement("button",{
-          onClick:()=>setFarmCrops(fc=>fc.map(c=>c?{...c,plantedAt:Date.now()}:c)),
-          style:{padding:"4px 10px",fontSize:11,fontWeight:700,background:"#555",color:"#fff",border:"none",borderRadius:6,cursor:"pointer",marginLeft:"auto"}},
-          "Reset"
-        )
-      ),
-
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+      React.createElement("div",{style:{flex:1,minHeight:0,display:"grid",gridTemplateColumns:"1fr 1fr",gridTemplateRows:"repeat(3,1fr)",gap:12}},
         Array.from({length:MAX_PLOTS},(_,i)=>{
           const isStorePlot=i>=MAX_MONEY_PLOTS;
           const unlocked=isStorePlot?specialPurchased:i<farmPlots;
@@ -291,7 +317,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               cursor:(isNext||isStorePlot&&!unlocked)?"pointer":"default",
               opacity:!unlocked&&!isNext&&!isStorePlot?0.5:1,
               transition:"all .15s",
-              height:160,boxSizing:"border-box",
+              height:"100%",boxSizing:"border-box",
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
             }
           },
@@ -348,7 +374,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           );
         })
       ),
-      farmPlots>=MAX_MONEY_PLOTS&&specialPurchased&&React.createElement("div",{style:{textAlign:"center",fontSize:14,fontWeight:600,color:"#2e7d32",padding:20}},"All plots unlocked! 🎉")
+      farmPlots>=MAX_MONEY_PLOTS&&specialPurchased&&React.createElement("div",{style:{textAlign:"center",fontSize:14,fontWeight:600,color:"#2e7d32",padding:20,flexShrink:0}},"All plots unlocked! 🎉")
     )
     ),
     speedUpConfirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}},
@@ -404,7 +430,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},formatNum(shardRate)+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]?formatNum(FIELD_SHARD_RATES[farmFieldLevel+1]):"?")+"/hr")
           )
         ),
-        React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 🪴 "+upgradeFertilizerCost+" Ancient Fertilizer"),
+        React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost+" Ancient Fertilizer"),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
           React.createElement("button",{onClick:()=>setShowFieldUpgrade(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Close"),
           React.createElement("button",{

@@ -33,6 +33,10 @@ function CreatureOverlayHost() {
         onBack: () => setDexOverlay(null),
         onNavigate: (d) => setDexOverlay(d.id),
         unlockedSkins,
+        // No navList here: this is opened out-of-context (e.g. a creature's
+        // own "Evolutions" button) with `def` often a non-final evolution
+        // stage, which FINAL_FORMS wouldn't contain -- DexEntry already
+        // no-ops swipe cleanly when navList can't locate the current def.
       })
     );
   }

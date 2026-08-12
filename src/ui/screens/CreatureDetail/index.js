@@ -19,6 +19,7 @@ import SkinSection from "../../../ui/screens/CreatureDetail/SkinSection.js";
 import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js";
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
+import useSwipeNav from "../../../ui/hooks/useSwipeNav.js";
 import { formatNum } from "../../../core/format.js";
 
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
@@ -52,7 +53,7 @@ function flairStatGain(stat,base,buffs){
   return Math.ceil(raw);
 }
 
-function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
+function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSwipeNav}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep, setPetLevelUps, setEquipLevelUps, flairGuideStep, setFlairGuideStep, candyGuideStep, setCandyGuideStep } = useGame();
   // "slot"/"item" cover the whole guided equip flow (creature page -> slot
   // picker); "item" narrows further to the picker itself, where only the
@@ -153,12 +154,27 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
 
   function notify_(msg,dur=2200){setNotify(msg);setTimeout(()=>setNotify(null),dur);}
 
+  // Mirrored every render (not just on mount) so the press-and-hold interval
+  // below always reads the current level/food instead of whatever was true
+  // when the hold started -- level and cost climb every step, so a stale
+  // closure would either overcharge or refuse to stop at max level/0 food.
+  const ownedDataRef=useRef(ownedData);
+  ownedDataRef.current=ownedData;
+  const currenciesRef=useRef(currencies);
+  currenciesRef.current=currencies;
+  const levelHoldRef=useRef(null);
+
+  /** Returns true if a level-up happened, false if maxed or unaffordable --
+   * the hold-to-repeat loop below uses that to know when to stop itself. */
   function doLevelUp(){
-    if(!hasFood||isMaxLevel)return;
-    const gainedStat=LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length];
-    setCurrencies(c=>({...c,food:c.food-cost}));
+    const od=ownedDataRef.current;
+    if(od.level>=MAX_LEVEL)return false;
+    const c=energyCost(od.level);
+    if((currenciesRef.current.food||0)<c)return false;
+    const gainedStat=LEVEL_STAT_CYCLE[od.nextStatIdx%LEVEL_STAT_CYCLE.length];
+    setCurrencies(cur=>({...cur,food:cur.food-c}));
     setOwned(prev=>{
-      const e={...prev[ownedData.id]};
+      const e={...prev[od.id]};
       if(e.level>=MAX_LEVEL)return prev;
       e.level=e.level+1;e.nextStatIdx=(e.nextStatIdx+1)%LEVEL_STAT_CYCLE.length;
       return{...prev,[e.id]:e};
@@ -171,7 +187,22 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
     // guided harvest, that's level 6. Further level-ups after this stay
     // fully available, they just no longer move the tutorial forward.
     if(tutorialStep==="levelupCreature")setTutorialStep("toEquipment");
+    return true;
   }
+
+  // Press-and-hold: levels up immediately on press, then repeats every 180ms
+  // after a short delay -- stops on release (mouseup/leave/touchend) or the
+  // moment doLevelUp can't proceed (max level or out of food).
+  function stopLevelHold(){
+    if(levelHoldRef.current){clearTimeout(levelHoldRef.current);clearInterval(levelHoldRef.current);levelHoldRef.current=null;}
+  }
+  function startLevelHold(){
+    if(!doLevelUp())return;
+    levelHoldRef.current=setTimeout(()=>{
+      levelHoldRef.current=setInterval(()=>{if(!doLevelUp())stopLevelHold();},180);
+    },500);
+  }
+  useEffect(()=>stopLevelHold,[]);
 
   function doFeed(){
     if(getMelonAvailable(currencies,def.type)<1){notify_("Not enough "+getMelonLabel(def.type)+"s!");return;}
@@ -324,15 +355,46 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
     });
   }
 
+  // Mirrored every render, same reasoning as ownedDataRef/currenciesRef above.
+  const equipmentLevelsRef=useRef(equipmentLevels);
+  equipmentLevelsRef.current=equipmentLevels;
+  const equipUpgradeHoldRef=useRef(null);
+
+  /** Returns true if the upgrade happened, false if maxed or unaffordable --
+   * the hold-to-repeat loop below uses that to know when to stop itself. */
   function doUpgrade(itemId){
-    const lvl=equipmentLevels[itemId]||1;
-    if(lvl>=EQUIP_MAX_LEVEL)return;
-    const cost=equipUpgradeCost(lvl);
-    if((currencies.equipShards||0)<cost){notify_("Not enough 🔧 Gear Shards!");return;}
+    const curLvl=equipmentLevelsRef.current[itemId]||1;
+    if(curLvl>=EQUIP_MAX_LEVEL)return false;
+    const cost=equipUpgradeCost(curLvl);
+    if((currenciesRef.current.equipShards||0)<cost){notify_("Not enough 🔧 Gear Shards!");return false;}
     setCurrencies(c=>({...c,equipShards:(c.equipShards||0)-cost}));
     setEquipmentLevels(prev=>({...prev,[itemId]:(prev[itemId]||1)+1}));
     setEquipLevelUps(c=>c+1);
+    return true;
   }
+
+  function stopEquipUpgradeHold(){
+    if(equipUpgradeHoldRef.current){clearTimeout(equipUpgradeHoldRef.current);clearInterval(equipUpgradeHoldRef.current);equipUpgradeHoldRef.current=null;}
+  }
+  function startEquipUpgradeHold(itemId){
+    if(!doUpgrade(itemId))return;
+    equipUpgradeHoldRef.current=setTimeout(()=>{
+      equipUpgradeHoldRef.current=setInterval(()=>{if(!doUpgrade(itemId))stopEquipUpgradeHold();},180);
+    },500);
+  }
+  useEffect(()=>stopEquipUpgradeHold,[]);
+
+  // Swipe left/right pages to the next/previous creature in whatever list
+  // the parent (CollectionScreen) is showing -- blocked while any popup is
+  // open over this page so a swipe-dismiss-ish gesture there doesn't also
+  // change the creature underneath. equipDetailPage/showEquipPage are their
+  // own early returns below, so they're excluded automatically. Must stay
+  // above those early returns -- hooks can't be called conditionally.
+  const swipeBlocked=!!(ascPopup||confirmMelon||statInfoPopup||abilityTagPopup||equipConflict||equipSlotPicker);
+  const swipeHandlers=useSwipeNav({
+    onSwipeLeft:()=>{if(!swipeBlocked&&onSwipeNav)onSwipeNav("next");},
+    onSwipeRight:()=>{if(!swipeBlocked&&onSwipeNav)onSwipeNav("prev");},
+  });
 
   function doAscendEquip(itemId){
     const asc=equipmentAscensions[itemId]||0;
@@ -424,7 +486,11 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
               lvl<EQUIP_MAX_LEVEL
                 ? React.createElement("div",null,
                     React.createElement("div",{style:{fontSize:12,color:"#534AB7",marginBottom:8}},"Lv "+(lvl+1)+": "+equipBonusStr(nextUpgradeBonuses)),
-                    React.createElement("button",{onClick:()=>doUpgrade(pi.id),disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa"}},"🔧 Upgrade "+formatNum(currencies.equipShards||0)+" / "+formatNum(upgradeCost))
+                    React.createElement("button",{
+                      onMouseDown:()=>startEquipUpgradeHold(pi.id),onMouseUp:stopEquipUpgradeHold,onMouseLeave:stopEquipUpgradeHold,
+                      onTouchStart:e=>{e.preventDefault();startEquipUpgradeHold(pi.id);},onTouchEnd:stopEquipUpgradeHold,
+                      disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa",userSelect:"none"}
+                    },"🔧 Upgrade "+formatNum(currencies.equipShards||0)+" / "+formatNum(upgradeCost))
                   )
                 : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},"✦ Max Level")
             ),
@@ -697,7 +763,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
     );
   }
 
-  return React.createElement("div",null,
+  return React.createElement("div",swipeHandlers,
     statInfoPopupEl,
     abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
@@ -873,7 +939,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed}){
               ),
               React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length]])
             ),
-        React.createElement("button",{className:"btn btn-primary",onClick:doLevelUp,disabled:!hasFood||levelUpButtonLock,style:{marginBottom:0,opacity:levelUpButtonLock?0.5:1}},
+        React.createElement("button",{className:"btn btn-primary",
+          onMouseDown:startLevelHold,onMouseUp:stopLevelHold,onMouseLeave:stopLevelHold,
+          onTouchStart:e=>{e.preventDefault();startLevelHold();},onTouchEnd:stopLevelHold,
+          disabled:!hasFood||levelUpButtonLock,style:{marginBottom:0,opacity:levelUpButtonLock?0.5:1,userSelect:"none"}},
           isMaxLevel?"Lv "+ownedData.level:"Level Up — 🍖 "+cost
         )
       ),

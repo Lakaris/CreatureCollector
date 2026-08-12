@@ -20,6 +20,18 @@ function EquipmentDetail({ itemId, onBack }) {
   const [pickerOpen, setPickerOpen] = React.useState(false);
   function notify_(msg) { setNotify(msg); setTimeout(() => setNotify(null), 2200); }
 
+  // Mirrored every render so the press-and-hold loop below always reads the
+  // current level/shard balance instead of a stale closure -- see the same
+  // pattern (and the reason for it) in CreatureDetail's doLevelUp. Declared
+  // here, above both early returns below, because hooks can't be called
+  // conditionally.
+  const equipmentLevelsRef = React.useRef(equipmentLevels);
+  equipmentLevelsRef.current = equipmentLevels;
+  const currenciesRef = React.useRef(currencies);
+  currenciesRef.current = currencies;
+  const upgradeHoldRef = React.useRef(null);
+  React.useEffect(() => stopUpgradeHold, []);
+
   const pi = EQUIPMENT_MAP[itemId];
   if (!pi) { onBack(); return null; }
 
@@ -39,16 +51,30 @@ function EquipmentDetail({ itemId, onBack }) {
 
   const equippedBy = Object.values(owned || {}).filter((p) => (p.equipped || []).includes(pi.id));
 
+  /** Returns true if the upgrade happened, false if maxed or unaffordable --
+   * the hold-to-repeat loop below uses that to know when to stop itself. */
   function doUpgrade() {
-    if (lvl >= EQUIP_MAX_LEVEL) return;
-    const cost = equipUpgradeCost(lvl);
-    if ((currencies.equipShards || 0) < cost) { notify_("Not enough 🔧 Gear Shards!"); return; }
+    const curLvl = equipmentLevelsRef.current[pi.id] || 1;
+    if (curLvl >= EQUIP_MAX_LEVEL) return false;
+    const cost = equipUpgradeCost(curLvl);
+    if ((currenciesRef.current.equipShards || 0) < cost) { notify_("Not enough 🔧 Gear Shards!"); return false; }
     setCurrencies((c) => ({ ...c, equipShards: (c.equipShards || 0) - cost }));
     setEquipmentLevels((prev) => ({ ...prev, [pi.id]: (prev[pi.id] || 1) + 1 }));
     setEquipLevelUps((c) => c + 1);
     // Advances once, the first time -- further upgrades after this stay
     // fully available, they just no longer move the tutorial forward.
     if (tutorialStep === "upgradeItem") setTutorialStep("toHome");
+    return true;
+  }
+
+  function stopUpgradeHold() {
+    if (upgradeHoldRef.current) { clearTimeout(upgradeHoldRef.current); clearInterval(upgradeHoldRef.current); upgradeHoldRef.current = null; }
+  }
+  function startUpgradeHold() {
+    if (!doUpgrade()) return;
+    upgradeHoldRef.current = setTimeout(() => {
+      upgradeHoldRef.current = setInterval(() => { if (!doUpgrade()) stopUpgradeHold(); }, 180);
+    }, 500);
   }
 
   function doAscendEquip() {
@@ -105,7 +131,11 @@ function EquipmentDetail({ itemId, onBack }) {
                 React.createElement("div", { style: { fontSize: 12, color: "#534AB7", marginBottom: 8 } }, "Lv " + (lvl + 1) + ": " + equipBonusStr(nextUpgradeBonuses)),
                 (() => {
                   const enabled = canAffordUpgrade && tutorialStep !== "toHome";
-                  return React.createElement("button", { onClick: doUpgrade, disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa" } }, "🔧 Upgrade " + formatNum(currencies.equipShards || 0) + " / " + formatNum(upgradeCost));
+                  return React.createElement("button", {
+                    onMouseDown: startUpgradeHold, onMouseUp: stopUpgradeHold, onMouseLeave: stopUpgradeHold,
+                    onTouchStart: (e) => { e.preventDefault(); startUpgradeHold(); }, onTouchEnd: stopUpgradeHold,
+                    disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa", userSelect: "none" }
+                  }, "🔧 Upgrade " + formatNum(currencies.equipShards || 0) + " / " + formatNum(upgradeCost));
                 })()
               )
             : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Level")

@@ -22,8 +22,9 @@ export function debuffsFor(u) {
   return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
 }
 
-function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, debuffs, onClose }) {
+function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
+  const chargePct = abilChargeMax > 0 ? Math.max(0, Math.min(100, ((abilCharge || 0) / abilChargeMax) * 100)) : 0;
   return React.createElement("div", {
     style: { width: 150, flexShrink: 0, background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", boxSizing: "border-box" },
   },
@@ -45,6 +46,15 @@ function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, debuff
     ),
     React.createElement("div", { style: { height: 6, background: "#eee", borderRadius: 3, overflow: "hidden" } },
       React.createElement("div", { style: { height: "100%", width: pct + "%", background: pct > 25 ? "#22c55e" : "#ef4444", borderRadius: 3, transition: "width 0.35s ease-out" } })
+    ),
+    abilChargeMax > 0 && React.createElement(React.Fragment, null,
+      React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#888", marginTop: 6, marginBottom: 2, display: "flex", justifyContent: "space-between", gap: 6 } },
+        React.createElement("span", { style: { flexShrink: 0 } }, "Ability Charge"),
+        abilityName && React.createElement("span", { style: { color: "#3b82f6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, abilityName)
+      ),
+      React.createElement("div", { style: { height: 5, background: "#eee", borderRadius: 3, overflow: "hidden" } },
+        React.createElement("div", { style: { height: "100%", width: chargePct + "%", background: "#3b82f6", borderRadius: 3, transition: "width 0.35s linear" } })
+      )
     ),
     shield > 0 && React.createElement(React.Fragment, null,
       React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#888", marginTop: 6, marginBottom: 2, display: "flex", justifyContent: "space-between" } },

@@ -2,7 +2,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
-import { calcStats } from "../core/creatures.js";
+import { calcStats, getSpecialCharge } from "../core/creatures.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
@@ -81,7 +81,10 @@ export function makeArenaBattle(
       spd,
       isRanged: cdef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
-      abilCd: 0, // reserved; decremented but not yet read by any ability
+      // Special-ability charge: +abilitySpeed (Haste) per tick, fires at abilChargeMax.
+      abilitySpeed: stats.abilitySpeed || 1,
+      abilCharge: 0,
+      abilChargeMax: getSpecialCharge(cdef),
       abilityLevels: oc?.abilityLevels ? { ...oc.abilityLevels } : { basic: 0, special: 0, unique: 0 },
     };
   });
@@ -128,7 +131,9 @@ export function makeArenaBattle(
       spd,
       isRanged: edef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
-      abilCd: 0,
+      abilitySpeed: (lvlStats || edef?.stats)?.abilitySpeed || 1,
+      abilCharge: 0,
+      abilChargeMax: getSpecialCharge(edef),
     };
   });
 

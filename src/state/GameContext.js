@@ -18,6 +18,7 @@
 import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "../react.js";
 import { DUNGEON_BOSSES, ARENA_TABS } from "../data/bosses.js";
 import { isPastEasternNoon, easternNoonDayKey } from "../core/dates.js";
+import { DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, DUNGEON_PASS_OVERFLOW_MULT } from "../battle/constants.js";
 
 const GameContext = createContext(null);
 
@@ -43,6 +44,7 @@ const SAVE_VERSION = 1;
 const SET_FIELDS = [
   "everOwnedCreatureIds", "equipFavorites", "claimedQuests",
   "dailyMissionsDone", "collectedTreasures", "completedTreasureSets",
+  "purchasedOneTimeBundles",
 ];
 
 function loadSave() {
@@ -102,6 +104,11 @@ export function GameProvider({ children }) {
   // "upgradeField". Only one step (the quest just points at the Field's
   // Upgrade button), cleared the same way by App.js's global click watcher.
   const [farmGuideStep, setFarmGuideStep] = useState(null);
+  // True while EquipmentScreen is showing a single item's detail page (not
+  // the grid) -- App.js reads this to give that page the same full-screen,
+  // no-scroll, no-dev-tools treatment as Hatch/Farm, since it's a sub-view
+  // of the "equipment" tab rather than a tab of its own.
+  const [equipmentDetailOpen, setEquipmentDetailOpen] = useState(false);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
@@ -210,6 +217,13 @@ export function GameProvider({ children }) {
   // True once the "Plots" progression-quest reward has been claimed --
   // replaces the old labyrinth-depth gate for unlocking extra Farm plots.
   const [plotsUnlocked, setPlotsUnlocked] = useState(() => initialSave?.plotsUnlocked ?? false);
+  // Ids of one-time Store bundles already bought (see purchaseBundle below).
+  // Bundles with a dedicated gameplay effect track ownership through their
+  // own flag instead (starter_pack -> specialPurchased, dungeon_starter_pack
+  // -> dungeonStarterPackPurchased) since other screens need to read it
+  // directly; this Set is for the rest, so a future purely-cosmetic one-time
+  // bundle doesn't need a new state field of its own.
+  const [purchasedOneTimeBundles, setPurchasedOneTimeBundles] = useState(() => initialSave?.purchasedOneTimeBundles ?? new Set());
 
   // ── Dungeon / daily boss ─────────────────────────────────────────────────
   const [dungeonBossLevels, setDungeonBossLevels] = useState(() =>
@@ -220,6 +234,11 @@ export function GameProvider({ children }) {
   const [lastPassRechargeReset, setLastPassRechargeReset] = useState(() => initialSave?.lastPassRechargeReset ?? "");
   const [dailyBossData, setDailyBossData] = useState(() => initialSave?.dailyBossData ?? { date: "", fights: 0, wins: 0 });
   const [dailyBossLevel, setDailyBossLevel] = useState(() => initialSave?.dailyBossLevel ?? 1);
+  // True once the one-time Dungeon Starter Pack (data/store.js) has been
+  // bought -- permanently doubles the daily free Dungeon Pass regen (see
+  // DUNGEON_PASS_DAILY_CAP_BONUS in battle/constants.js) and gates the
+  // Store card from being purchased again.
+  const [dungeonStarterPackPurchased, setDungeonStarterPackPurchased] = useState(() => initialSave?.dungeonStarterPackPurchased ?? false);
   // True once the "Dungeons" / "Daily Boss" progression-quest rewards have
   // been claimed -- replaces the old labyrinth-depth gates for these.
   const [dungeonsUnlocked, setDungeonsUnlocked] = useState(() => initialSave?.dungeonsUnlocked ?? false);
@@ -310,8 +329,9 @@ export function GameProvider({ children }) {
   useEffect(() => {
     const check = () => {
       if (isPastEasternNoon(lastDungeonPassGain)) {
+        const dailyCap = DUNGEON_PASS_DAILY_CAP + (dungeonStarterPackPurchased ? DUNGEON_PASS_DAILY_CAP_BONUS : 0);
         setCurrencies((c) =>
-          (c.dungeonPass || 0) >= 30 ? c : { ...c, dungeonPass: (c.dungeonPass || 0) + 10 }
+          (c.dungeonPass || 0) >= dailyCap * DUNGEON_PASS_OVERFLOW_MULT ? c : { ...c, dungeonPass: (c.dungeonPass || 0) + dailyCap }
         );
         setLastDungeonPassGain(easternNoonDayKey());
       }
@@ -323,7 +343,7 @@ export function GameProvider({ children }) {
     check();
     const t = setInterval(check, 60000);
     return () => clearInterval(t);
-  }, [lastDungeonPassGain, lastPassRechargeReset]);
+  }, [lastDungeonPassGain, lastPassRechargeReset, dungeonStarterPackPurchased]);
 
   // Reveals harvest results one at a time.
   useEffect(() => {
@@ -354,8 +374,8 @@ export function GameProvider({ children }) {
     pity, arenaLevels, arenaProgress,
     labyrinthDepth, labyrinthBestDepth,
     arenaPlanGrid, dungeonPlanGrid, labyrinthPlanGrid, dailyBossPlanGrid,
-    farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked,
-    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, newFeaturePillsSeen,
+    farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked, purchasedOneTimeBundles,
+    dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, dungeonStarterPackPurchased, newFeaturePillsSeen,
     eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, labyrinthFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests,
     questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
@@ -393,6 +413,42 @@ export function GameProvider({ children }) {
     try { localStorage.removeItem(SAVE_KEY); } catch {}
   }
 
+  /** True if a Store bundle's one-time reward has already been claimed. */
+  function isBundleOwned(bundle) {
+    if (bundle.id === "starter_pack") return specialPurchased;
+    if (bundle.id === "dungeon_starter_pack") return dungeonStarterPackPurchased;
+    return purchasedOneTimeBundles.has(bundle.id);
+  }
+
+  /**
+   * Grants a Store bundle (data/store.js): its flat `grants` currencies, plus
+   * whatever gameplay effect its id maps to (starter_pack unlocks Farm's
+   * Plot 5/6 via specialPurchased; dungeon_starter_pack permanently doubles
+   * the daily Dungeon Pass regen via dungeonStarterPackPurchased -- see that
+   * flag's use in the regen effect above). No real payment provider is
+   * wired in, so this is the entire "purchase" -- it just grants instantly.
+   * No-ops on an already-owned one-time bundle, the real guard against a
+   * double-grant (e.g. two rapid taps) since StoreScreen also disables the card.
+   */
+  function purchaseBundle(bundle) {
+    if (bundle.oneTime && isBundleOwned(bundle)) return;
+    if (bundle.grants) {
+      setCurrencies((c) => {
+        const next = { ...c };
+        for (const [key, amount] of Object.entries(bundle.grants)) next[key] = (next[key] || 0) + amount;
+        return next;
+      });
+    }
+    if (bundle.id === "starter_pack") setSpecialPurchased(true);
+    else if (bundle.id === "dungeon_starter_pack") setDungeonStarterPackPurchased(true);
+    else if (bundle.oneTime) setPurchasedOneTimeBundles((prev) => new Set(prev).add(bundle.id));
+  }
+
+  /** Grants a Store gem pack (data/store.js): always repeatable, no ownership tracking. */
+  function purchaseGemPack(pack) {
+    setCurrencies((c) => ({ ...c, gems: (c.gems || 0) + pack.gems + (pack.bonus || 0) }));
+  }
+
   /** The bag of state quest `check()`/`progress()` predicates read. */
   const questState = useMemo(
     () => ({
@@ -418,6 +474,7 @@ export function GameProvider({ children }) {
     dexOverlay, setDexOverlay,
     flairGuideStep, setFlairGuideStep,
     farmGuideStep, setFarmGuideStep,
+    equipmentDetailOpen, setEquipmentDetailOpen,
     candyGuideStep, setCandyGuideStep,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,
@@ -460,12 +517,15 @@ export function GameProvider({ children }) {
     farmCrops, setFarmCrops, plotUpgrades, setPlotUpgrades,
     specialPurchased, setSpecialPurchased,
     plotsUnlocked, setPlotsUnlocked,
+    // store
+    purchasedOneTimeBundles, setPurchasedOneTimeBundles, purchaseBundle, purchaseGemPack, isBundleOwned,
     // dungeon / daily boss
     dungeonBossLevels, setDungeonBossLevels,
     passRechargeCount, setPassRechargeCount,
     dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel,
     dungeonsUnlocked, setDungeonsUnlocked, dailyBossUnlocked, setDailyBossUnlocked,
     arenaUnlocked, setArenaUnlocked, treasureUnlocked, setTreasureUnlocked,
+    dungeonStarterPackPurchased, setDungeonStarterPackPurchased,
     newFeaturePillsSeen, setNewFeaturePillsSeen,
     devTimeOffset, setDevTimeOffset, nowMs,
     // counters

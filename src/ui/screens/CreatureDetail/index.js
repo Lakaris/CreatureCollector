@@ -7,7 +7,7 @@ import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABE
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
-import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
+import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, getSpecialCharge, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus } from "../../../core/abilityText.js";
 import { getMelonLabel, getMelonAvailable, deductMelon } from "../../../core/melons.js";
@@ -469,8 +469,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         ),
         React.createElement("div",{className:"card",style:{marginTop:8,padding:"24px 20px",position:"relative",display:"flex",flexDirection:"column",minHeight:"calc(100vh - 90px)"}},
           rarCfg&&React.createElement("div",{style:{position:"absolute",top:10,left:12,fontSize:10,fontWeight:700,color:rarCfg.color,background:rarCfg.bg,borderRadius:4,padding:"2px 7px"}},rarCfg.label),
-          (pi.element||pi.role)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
-            [pi.element,pi.role].filter(Boolean).join(" · ")+" exclusive"
+          (pi.element||pi.role||pi.attackType)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
+            [pi.element,pi.role,pi.attackType].filter(Boolean).join(" · ")+" exclusive"
           ),
           React.createElement("div",{style:{textAlign:"center",marginBottom:16}},
             React.createElement("div",{style:{fontSize:64,marginBottom:4}},pi.emoji),
@@ -668,13 +668,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                 if(equipFilterHasEffect&&!item.effect)return false;
                 if(equipFilterElements.size>0&&!equipFilterElements.has(item.element))return false;
                 if(equipFilterRoles.size>0&&!equipFilterRoles.has(item.role))return false;
-                if(equipFilterHideIncompatible&&!equipped.includes(item.id)&&((item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)))return false;
+                if(equipFilterHideIncompatible&&!equipped.includes(item.id)&&((item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)||(item.attackType&&def.attackType!==item.attackType)))return false;
                 return true;
               })
               .sort((a,b)=>{
   const ea=equipped.includes(a.id)?1:0,eb=equipped.includes(b.id)?1:0;if(eb!==ea)return eb-ea;
-  const dA=((a.element&&def.type!==a.element)||(a.role&&def.role!==a.role))?1:0;
-  const dB=((b.element&&def.type!==b.element)||(b.role&&def.role!==b.role))?1:0;
+  const dA=((a.element&&def.type!==a.element)||(a.role&&def.role!==a.role)||(a.attackType&&def.attackType!==a.attackType))?1:0;
+  const dB=((b.element&&def.type!==b.element)||(b.role&&def.role!==b.role)||(b.attackType&&def.attackType!==b.attackType))?1:0;
   if(dA!==dB)return dA-dB;
   const ascA=equipmentAscensions[a.id]||0,ascB=equipmentAscensions[b.id]||0;
   const copA=equipmentCopies[a.id]||0,copB=equipmentCopies[b.id]||0;
@@ -697,7 +697,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             const isEquippedSlot1=equipped[1]===item.id;
             const equippedByPet=owned&&Object.values(owned).find(p=>p.id!==ownedData.id&&(p.equipped||[]).includes(item.id));
             const equippedByDef=equippedByPet?CREATURE_MAP[equippedByPet.id]:null;
-            const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role);
+            const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)||(item.attackType&&def.attackType!==item.attackType);
             // During the guided "choose gear" step, only the Iron Band tile
             // the pointer arrow highlights should respond to a tap.
             const tutorialBlocked=pickerTutorialLock&&!(tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID);
@@ -729,8 +729,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=EQUIP_MAX_LEVEL?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=EQUIP_MAX_LEVEL?"MAX":"Lv "+lvl),
-                (item.element||item.role)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
-                  [item.element,item.role].filter(Boolean).join(" · ")+" exclusive"
+                (item.element||item.role||item.attackType)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
+                  [item.element,item.role,item.attackType].filter(Boolean).join(" · ")+" exclusive"
                 )
               ),
               !tutorialBlocked&&React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
@@ -1019,6 +1019,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
                 React.createElement("span",{className:"ability-name"},abl.name),
                 React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
+                  k==="special"&&React.createElement("button",{
+                    onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
+                    style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
+                  },"⚡ "+getSpecialCharge(def)),
                   ...abilityTags.map(tag=>React.createElement("button",{
                     key:tag,
                     onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},

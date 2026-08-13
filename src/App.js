@@ -204,6 +204,7 @@ function App() {
     flairGuideStep, setFlairGuideStep,
     candyGuideStep, setCandyGuideStep,
     farmGuideStep, setFarmGuideStep,
+    equipmentDetailOpen,
   } = useGame();
 
   const contentRef = React.useRef(null);
@@ -568,7 +569,11 @@ function App() {
                 : React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
             )
           )
-        )
+        ),
+        // Play has its own render path outside the default shell below, so it
+        // needs its own DEV_MODE gate to get the same dev panel every other
+        // tab shows.
+        DEV_MODE && React.createElement(DevPanel)
       ),
       React.createElement(
         "div",
@@ -586,7 +591,7 @@ function App() {
     React.createElement("h2", { className: "sr-only" }, "Creature Collector"),
     React.createElement(
       "div",
-      { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" ? { overflow: "hidden" } : undefined },
+      { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" || (tab === "equipment" && equipmentDetailOpen) ? { overflow: "hidden" } : undefined },
       tab === "home" && React.createElement(HomeScreen),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
       tab === "collection" &&
@@ -598,11 +603,11 @@ function App() {
         }),
       tab === "store" && React.createElement(StoreScreen),
       tab === "equipment" && React.createElement(EquipmentScreen),
-      // Dev tools are excluded on Hatch specifically -- that screen is laid
-      // out to fill exactly one viewport with no scrolling, and the dev
-      // panel's height would blow past that.
-      tab !== "home" && tab !== "hatch" && DEV_MODE && React.createElement(DevPanel),
-      tab !== "hatch" && React.createElement("div", { style: { height: 12 } })
+      // Dev tools are excluded on Hatch, and on an open Equipment item's
+      // detail page -- both are laid out to fill exactly one viewport with
+      // no scrolling, and the dev panel's height would blow past that.
+      tab !== "home" && tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && DEV_MODE && React.createElement(DevPanel),
+      tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && React.createElement("div", { style: { height: 12 } })
     ),
     React.createElement(NavBar, {
       tab,

@@ -321,41 +321,49 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
             }
           },
-            unlocked&&React.createElement("div",{style:{position:"absolute",top:6,left:0,right:0,textAlign:"center",fontSize:12,fontWeight:700,color:"#888"}},"Lv."+((plotUpgrades[i]||0)+1)),
             unlocked&&crop&&!ready&&React.createElement("button",{
               onClick:e=>{e.stopPropagation();setCancelling(i);},
-              style:{position:"absolute",top:6,left:8,background:"none",border:"none",fontSize:16,color:"#aaa",cursor:"pointer",lineHeight:1,padding:2}
+              style:{position:"absolute",top:4,left:6,background:"none",border:"none",fontSize:26,color:"#aaa",cursor:"pointer",lineHeight:1,padding:4}
             },"×"),
-            React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?cropDef.emoji:"🌱"):"🔒"),
+            // Growing crops get their own full-height layout: emoji+name stay
+            // centered in the middle of the box, while progress/time/speed-up
+            // move down to sit just above the bottom edge, instead of the
+            // whole group being centered together.
+            !(unlocked&&crop&&!ready)&&React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?cropDef.emoji:"🌱"):"🔒"),
             unlocked&&!crop&&React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:6}},
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();setPicking(i);},
                 style:{padding:"10px 28px",background:"#4caf50",color:"#fff",border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",fontSize:15}
               },"Grow")
             ),
-            unlocked&&crop&&!ready&&React.createElement(React.Fragment,null,
-              React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600,marginBottom:4}},cropDef.label+" × "+formatNum(effectiveYield)),
-              React.createElement("div",{style:{background:"#e0e0e0",borderRadius:4,height:6,margin:"0 4px 6px",overflow:"hidden",width:"100%"}},
-                React.createElement("div",{style:{width:(pct*100)+"%",height:"100%",background:"#534AB7",transition:"width .5s"}})
+            unlocked&&crop&&!ready&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",padding:12,boxSizing:"border-box"}},
+              React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}},
+                React.createElement("div",{style:{fontSize:36,marginBottom:8}},cropDef.emoji),
+                React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600}},cropDef.label+" × "+formatNum(effectiveYield))
               ),
-              React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:6}},hLeft+"h "+mLeft+"m left"),
-              React.createElement("button",{
-                onClick:e=>{
-                  e.stopPropagation();
-                  const speedCost=Math.ceil(500*msLeft/PLOT_GROW_MS);
-                  if((currencies.gems||0)<speedCost){showNotify("Not enough 💎 Gems!");return;}
-                  setSpeedUpConfirm({cost:speedCost,onConfirm:()=>{
-                    setCurrencies(c=>({...c,gems:(c.gems||0)-speedCost}));
-                    const t=Date.now();
-                    setFarmCrops(fc=>{const a=[...fc];a[i]={...a[i],plantedAt:t-PLOT_GROW_MS};return a;});
-                    setNow(t);
-                  }});
-                },
-                style:{padding:"4px 10px",background:"#7b1fa2",color:"#fff",border:"none",borderRadius:7,fontWeight:700,cursor:"pointer",fontSize:11}
-              },"⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎")
+              React.createElement("div",{style:{width:"100%",flexShrink:0}},
+                React.createElement("div",{style:{background:"#e0e0e0",borderRadius:4,height:6,margin:"0 4px 6px",overflow:"hidden",width:"100%",boxSizing:"border-box"}},
+                  React.createElement("div",{style:{width:(pct*100)+"%",height:"100%",background:"#534AB7",transition:"width .5s"}})
+                ),
+                React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:6}},hLeft+"h "+mLeft+"m left"),
+                React.createElement("button",{
+                  onClick:e=>{
+                    e.stopPropagation();
+                    const speedCost=Math.ceil(500*msLeft/PLOT_GROW_MS);
+                    if((currencies.gems||0)<speedCost){showNotify("Not enough 💎 Gems!");return;}
+                    setSpeedUpConfirm({cost:speedCost,onConfirm:()=>{
+                      setCurrencies(c=>({...c,gems:(c.gems||0)-speedCost}));
+                      const t=Date.now();
+                      setFarmCrops(fc=>{const a=[...fc];a[i]={...a[i],plantedAt:t-PLOT_GROW_MS};return a;});
+                      setNow(t);
+                    }});
+                  },
+                  style:{padding:"4px 10px",background:"#7b1fa2",color:"#fff",border:"none",borderRadius:7,fontWeight:700,cursor:"pointer",fontSize:11}
+                },"⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎")
+              )
             ),
             unlocked&&crop&&ready&&React.createElement(React.Fragment,null,
-              React.createElement("div",{style:{fontSize:11,color:"#e65100",fontWeight:600,marginBottom:6}},cropDef.emoji+" "+formatNum(effectiveYield)+" "+cropDef.label+" ready!"),
+              React.createElement("div",{style:{fontSize:11,color:"#e65100",fontWeight:600,marginBottom:6}},"Ready!"),
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();harvestPlot();},
                 style:{padding:"6px 14px",background:"#ff9800",color:"#fff",border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:12}
@@ -368,7 +376,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             !unlocked&&!isNext&&React.createElement(React.Fragment,null,
               React.createElement("div",{style:{fontSize:13,fontWeight:700,color:isStorePlot?"#7b1fa2":"#aaa",marginBottom:4}},"Plot "+(i+1)),
               isStorePlot
-                ?React.createElement("div",{style:{fontSize:11,color:"#7b1fa2",fontWeight:600,textAlign:"center"}},React.createElement("i",{className:"ti ti-shopping-cart",style:{marginRight:3}}),"Starter Pack")
+                ?React.createElement("div",{style:{fontSize:11,color:"#7b1fa2",fontWeight:600,textAlign:"center"}},React.createElement("i",{className:"ti ti-shopping-cart",style:{marginRight:3}}),"Starter Pack Exclusive")
                 :React.createElement("div",{style:{fontSize:11,color:"#bbb"}},"Locked")
             )
           );

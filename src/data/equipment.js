@@ -31,6 +31,51 @@ export const EQUIPMENT_DEFS=[
   {id:"sig_hp",  name:"Life Sigil",   emoji:"❤️", rarity:"rare", stats:{hp:18},           effect:"Gain 10% more HP",    statBonus:{stat:"hp",  pct:10}},
   {id:"sig_atk", name:"Fury Sigil",   emoji:"⚔️", rarity:"rare", stats:{atk:18},          effect:"Gain 10% more ATK",   statBonus:{stat:"atk", pct:10}},
   {id:"sig_def", name:"Iron Sigil",   emoji:"🛡️", rarity:"rare", stats:{def:18},          effect:"Gain 10% more DEF",   statBonus:{stat:"def", pct:10}},
+  // Rare effect items. Stats sit below plain rares (two-stat 5/6 vs 7/7,
+  // single-stat 13 vs the Sigils' 18) to pay for the effect, mirroring how
+  // Epic type-exclusives are costed vs plain Epics. Effects are deliberately
+  // the weakest rung of each effect family -- the Epic/Legendary versions of
+  // the same idea should always read as clear upgrades.
+  // Rare type-exclusives (2 per element)
+  {id:"rar_typ_fire_atk",    name:"Kindled Charm",   emoji:"🔥", rarity:"rare", element:"Fire",    stats:{atk:13},       effect:"Fire moves deal 8% more damage"},
+  {id:"rar_typ_fire_hp_atk", name:"Ashen Pendant",   emoji:"🪔", rarity:"rare", element:"Fire",    stats:{hp:5,atk:6},   effect:"Attacks have 10% chance to Burn for 1 turn"},
+  {id:"rar_typ_water_hp",    name:"Dewdrop Charm",   emoji:"💧", rarity:"rare", element:"Water",   stats:{hp:13},        effect:"Restore 1% HP whenever a Water move hits"},
+  {id:"rar_typ_water_hp_def",name:"Coral Band",      emoji:"🪸", rarity:"rare", element:"Water",   stats:{hp:6,def:5},   effect:"Water moves deal 8% more damage"},
+  {id:"rar_typ_nat_hp",      name:"Sprout Locket",   emoji:"🌱", rarity:"rare", element:"Nature",  stats:{hp:13},        effect:"Regenerate 1% HP each turn"},
+  {id:"rar_typ_nat_def_atk", name:"Thorn Ring",      emoji:"🌵", rarity:"rare", element:"Nature",  stats:{def:6,atk:5},  effect:"Gain +2% DEF each time you're struck, up to +10%"},
+  {id:"rar_typ_ear_def",     name:"Pebble Talisman", emoji:"🪨", rarity:"rare", element:"Earth",   stats:{def:13},       effect:"Reduce all damage taken by 2%"},
+  {id:"rar_typ_ear_hp_def",  name:"Clay Bangle",     emoji:"🏺", rarity:"rare", element:"Earth",   stats:{hp:5,def:6},   effect:"Earth moves have 10% chance to Slow for 1 turn"},
+  {id:"rar_typ_wind_atk",    name:"Breeze Feather",  emoji:"🪶", rarity:"rare", element:"Wind",    stats:{atk:13},       effect:"Wind moves deal 8% more damage"},
+  {id:"rar_typ_wind_hp_atk", name:"Zephyr Knot",     emoji:"💨", rarity:"rare", element:"Wind",    stats:{hp:5,atk:6},   effect:"Abilities recharge 10% faster", hasteEffect:true},
+  {id:"rar_typ_elec_def",    name:"Capacitor Charm", emoji:"🔋", rarity:"rare", element:"Electric",stats:{def:13},       effect:"When struck, 10% chance to Shock the attacker for 1 turn"},
+  {id:"rar_typ_elec_atk_def",name:"Copper Coil",     emoji:"🧲", rarity:"rare", element:"Electric",stats:{atk:5,def:6},  effect:"Electric moves deal 8% more damage"},
+  {id:"rar_typ_light_hp",    name:"Sunbeam Locket",  emoji:"🌞", rarity:"rare", element:"Light",   stats:{hp:13},        effect:"Healing received is 10% stronger"},
+  {id:"rar_typ_light_hp_def",name:"Glow Band",       emoji:"✨", rarity:"rare", element:"Light",   stats:{hp:6,def:5},   effect:"Light moves deal 8% more damage"},
+  {id:"rar_typ_dark_atk",    name:"Duskfang Charm",  emoji:"🦇", rarity:"rare", element:"Dark",    stats:{atk:13},       effect:"Deal 8% more damage to enemies below 30% HP"},
+  {id:"rar_typ_dark_hp_atk", name:"Umbral Thread",   emoji:"🕸️", rarity:"rare", element:"Dark",    stats:{hp:6,atk:5},   effect:"Recover 1% HP each time you apply a debuff to an enemy"},
+  // Rare role-exclusives (2 per role)
+  {id:"rar_role_atk_edge",   name:"Duelist's Edge",  emoji:"🗡️", rarity:"rare", role:"Attacker", stats:{atk:6,def:5},  effect:"[Attacker] Basic attacks deal 5% more damage"},
+  {id:"rar_role_atk_hunter", name:"Hunter's Mark",   emoji:"🎯", rarity:"rare", role:"Attacker", stats:{atk:13},       effect:"[Attacker] Deal 8% more damage to enemies below 50% HP"},
+  {id:"rar_role_tank_plate", name:"Squire's Plate",  emoji:"🛡️", rarity:"rare", role:"Tank",     stats:{hp:6,def:5},   effect:"[Tank] Reduce all incoming damage by 4%"},
+  {id:"rar_role_tank_grit",  name:"Grit Band",       emoji:"💪", rarity:"rare", role:"Tank",     stats:{def:13},       effect:"[Tank] Gain +8% DEF when below 50% HP"},
+  {id:"rar_role_sup_charm",  name:"Mender's Charm",  emoji:"💚", rarity:"rare", role:"Support",  stats:{hp:13},        effect:"[Support] Healing applied by this creature is 10% stronger"},
+  {id:"rar_role_sup_bell",   name:"Chorus Bell",     emoji:"🔔", rarity:"rare", role:"Support",  stats:{hp:5,def:6},   effect:"[Support] Adjacent allies take 4% less damage"},
+  // Rare range-exclusives (2 per attack type)
+  {id:"rar_rng_melee_grip",   name:"Brawler's Grip",   emoji:"🤜", rarity:"rare", attackType:"Melee",  stats:{hp:6,atk:5},  effect:"[Melee] Deal 8% bonus damage while adjacent to 2 or more enemies"},
+  {id:"rar_rng_melee_greaves",name:"Charger's Greaves",emoji:"🥾", rarity:"rare", attackType:"Melee",  stats:{def:5,atk:6}, effect:"[Melee] After moving, your next attack deals 6% more damage"},
+  {id:"rar_rng_ranged_scope", name:"Keen Scope",       emoji:"🔭", rarity:"rare", attackType:"Ranged", stats:{atk:13},      effect:"[Ranged] Deal 8% bonus damage to enemies 3 or more tiles away"},
+  {id:"rar_rng_ranged_quiver",name:"Light Quiver",     emoji:"🏹", rarity:"rare", attackType:"Ranged", stats:{hp:5,atk:6},  effect:"[Ranged] Attacks have 10% chance to push the target back 1 tile"},
+  // Rare general effect items (equippable by anyone)
+  {id:"rar_gen_hp_shield",   name:"Vitality Bead",   emoji:"❤️", rarity:"rare", stats:{hp:13},        effect:"Start each battle with a shield equal to 5% of max HP"},
+  {id:"rar_gen_atk_focus",   name:"Focus Band",      emoji:"🧿", rarity:"rare", stats:{atk:13},       effect:"Every 5th attack deals 25% bonus damage"},
+  {id:"rar_gen_def_moss",    name:"Mossy Charm",     emoji:"🍀", rarity:"rare", stats:{def:13},       effect:"Reduce damage from adjacent enemies by 5%"},
+  {id:"rar_gen_hp_atk_leech",name:"Leech Ring",      emoji:"🪱", rarity:"rare", stats:{hp:5,atk:6},   effect:"Recover 2% of all damage dealt as HP"},
+  {id:"rar_gen_hp_def_cloak",name:"Traveler's Cloak",emoji:"🧣", rarity:"rare", stats:{hp:6,def:5},   effect:"Take 6% less damage while at full HP"},
+  {id:"rar_gen_atk_def_spike",name:"Spiked Pauldron",emoji:"🦔", rarity:"rare", stats:{atk:5,def:6},  effect:"Counter-attack for 5% ATK when struck"},
+  {id:"rar_gen_hp_coin",     name:"Lucky Coin",      emoji:"🪙", rarity:"rare", stats:{hp:13},        effect:"5% chance to take half damage from a hit"},
+  {id:"rar_gen_def_sentry",  name:"Sentry Emblem",   emoji:"🗿", rarity:"rare", stats:{def:13},       effect:"Reduce incoming projectile damage by 6%"},
+  {id:"rar_gen_def_anchor",  name:"Anchor Charm",    emoji:"⚓", rarity:"rare", stats:{def:13},       effect:"Cannot be pushed or pulled"},
+  {id:"rar_gen_atk_def_haste",name:"Runner's Band",  emoji:"🏃", rarity:"rare", stats:{atk:5,def:5},  effect:"Abilities recharge 8% faster", hasteEffect:true},
   // Epic (base 11 per stat)
   {id:"epi_hp_atk",  name:"Warlord's Seal",   emoji:"🔥",  rarity:"epic",      stats:{hp:11, atk:11}},
   {id:"epi_hp_def",  name:"Citadel Core",     emoji:"🏰",  rarity:"epic",      stats:{hp:11, def:11}},
@@ -63,6 +108,35 @@ export const EQUIPMENT_DEFS=[
   {id:"typ_wind_hp_def",   name:"Featherweight Wrap",emoji:"🪶", rarity:"epic", element:"Wind",    stats:{hp:9,def:8},           effect:"Reduce incoming projectile damage by 10%"},
   {id:"typ_wind_def_atk",  name:"Cyclone Guard",     emoji:"🌀", rarity:"epic", element:"Wind",    stats:{def:8,atk:8},          effect:"After taking a hit, gain +10% SPD until your next turn", speedEffect:true},
   {id:"typ_wind_hp_atk2",  name:"Jetstream Sigil",   emoji:"⚡", rarity:"epic", element:"Wind",    stats:{hp:8,atk:8},           effect:"Using an ability grants +8% ATK until the end of the turn (Turn Based)"},
+  // Epic effect items, second wave. Same costing as the type-exclusive Epics
+  // above (two-stat 8/9 vs plain 11/11; single-stat 19 vs the Crests' 25).
+  // Each effect is the middle rung of its family: stronger than the Rare
+  // version, clearly weaker than the Legendary one.
+  // Epic type-exclusives (1 per element)
+  {id:"epi_typ_fire_atk",    name:"Flarebrand Ring",  emoji:"🔥", rarity:"epic", element:"Fire",    stats:{atk:19},       effect:"Fire moves deal 12% more damage"},
+  {id:"epi_typ_water_hp",    name:"Springwell Charm", emoji:"⛲", rarity:"epic", element:"Water",   stats:{hp:19},        effect:"Recover 5% of damage dealt by Water moves as HP"},
+  {id:"epi_typ_nat_hp_def",  name:"Verdant Weave",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:9,def:8},   effect:"Regenerate 2% HP each turn"},
+  {id:"epi_typ_ear_def",     name:"Basalt Ward",      emoji:"⛰️", rarity:"epic", element:"Earth",   stats:{def:19},       effect:"Reduce all damage taken by 4%"},
+  {id:"epi_typ_wind_atk_def",name:"Tailwind Talon",   emoji:"🌬️", rarity:"epic", element:"Wind",    stats:{atk:9,def:8},  effect:"Abilities recharge 15% faster", hasteEffect:true},
+  {id:"epi_typ_elec_atk",    name:"Voltaic Fang",     emoji:"⚡", rarity:"epic", element:"Electric",stats:{atk:19},       effect:"Attacks have 20% chance to Shock for 1 turn"},
+  {id:"epi_typ_light_hp",    name:"Dawnlight Halo",   emoji:"😇", rarity:"epic", element:"Light",   stats:{hp:19},        effect:"Healing received is 20% stronger"},
+  {id:"epi_typ_dark_hp_atk", name:"Gloomreaper Chain",emoji:"⛓️", rarity:"epic", element:"Dark",    stats:{hp:8,atk:9},   effect:"Deal 15% more damage to enemies below 40% HP"},
+  // Epic role-exclusives (1 per role)
+  {id:"epi_role_atk_slayer", name:"Slayer's Band",    emoji:"⚔️", rarity:"epic", role:"Attacker", stats:{atk:9,hp:8},   effect:"[Attacker] After defeating an enemy, gain +10% ATK until end of battle"},
+  {id:"epi_role_tank_bastion",name:"Bastion Plate",   emoji:"🛡️", rarity:"epic", role:"Tank",     stats:{hp:9,def:8},   effect:"[Tank] At the start of each battle, gain a barrier equal to 12% of max HP"},
+  {id:"epi_role_sup_cantor", name:"Cantor's Beads",   emoji:"📿", rarity:"epic", role:"Support",  stats:{hp:19},        effect:"[Support] All healing and buffs applied by this creature are 15% stronger"},
+  // Epic range-exclusives (1 per attack type)
+  {id:"epi_rng_melee_vanguard",name:"Vanguard Gauntlet",emoji:"🥊", rarity:"epic", attackType:"Melee",  stats:{atk:8,def:9}, effect:"[Melee] Deal 12% bonus damage while adjacent to 2 or more enemies"},
+  {id:"epi_rng_ranged_lens",   name:"Longshot Lens",    emoji:"🔍", rarity:"epic", attackType:"Ranged", stats:{atk:19},      effect:"[Ranged] Deal 12% bonus damage to enemies 3 or more tiles away"},
+  // Epic general effect items (equippable by anyone)
+  {id:"epi_gen_hp_atk_vamp", name:"Vampiric Band",    emoji:"🧛", rarity:"epic", stats:{hp:8,atk:9},   effect:"Recover 4% of all damage dealt as HP"},
+  {id:"epi_gen_atk_def_retort",name:"Retort Mail",    emoji:"⚙️", rarity:"epic", stats:{atk:8,def:9},  effect:"Counter-attack for 8% ATK when struck"},
+  {id:"epi_gen_hp_def_aegis",name:"Aegis Charm",      emoji:"🔰", rarity:"epic", stats:{hp:9,def:8},   effect:"Start each battle with a shield equal to 10% of max HP"},
+  {id:"epi_gen_atk_oath",    name:"Duelist's Oath",   emoji:"🤺", rarity:"epic", stats:{atk:19},       effect:"Your first attack each battle deals 40% bonus damage"},
+  {id:"epi_gen_hp_idol",     name:"Guardian Idol",    emoji:"🪬", rarity:"epic", stats:{hp:19},        effect:"Take 10% less damage while below 30% HP"},
+  {id:"epi_gen_def_bulwark", name:"Bulwark Sigil",    emoji:"🏛️", rarity:"epic", stats:{def:19},       effect:"Every 4th hit taken deals half damage"},
+  {id:"epi_gen_def_nettle",  name:"Nettle Guard",     emoji:"🌾", rarity:"epic", stats:{def:19},       effect:"Enemies that strike you lose 3% ATK for the rest of the battle, up to -15%"},
+  {id:"epi_gen_def_sentinel",name:"Sentinel Idol",    emoji:"🗿", rarity:"epic", stats:{def:19},       effect:"Gain +12% DEF for the first 3 turns of each battle"},
   // Stat Relics — Legendary single-stat (base 35), +25% that stat
   {id:"rel_hp",  name:"Life Relic",   emoji:"❤️", rarity:"legendary", stats:{hp:35},           effect:"Gain 25% more HP",    statBonus:{stat:"hp",          pct:25}},
   {id:"rel_atk", name:"Fury Relic",   emoji:"⚔️", rarity:"legendary", stats:{atk:35},          effect:"Gain 25% more ATK",   statBonus:{stat:"atk",         pct:25}},

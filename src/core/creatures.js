@@ -36,6 +36,22 @@ export function getEvolutionStage(creatureId) {
   return n;
 }
 
+/** Fallback special-ability charge for defs that don't declare one (see data/creatures.js). */
+export const DEFAULT_SPECIAL_CHARGE = 15;
+
+/**
+ * Ticks of battle time needed to fully charge this creature's special ability.
+ * Every battle tick adds the creature's Haste (abilitySpeed, base 1) to the
+ * charge; the ability triggers when the charge reaches this number, then the
+ * bar resets and charges again. Values are placeholders in data/creatures.js
+ * until abilities are implemented for real.
+ */
+export function getSpecialCharge(defOrId) {
+  const def = typeof defOrId === "string" ? CREATURE_MAP[defOrId] : defOrId;
+  if (!def?.abilities?.special) return 0; // no special ability, nothing to charge
+  return def.abilities.special.charge || DEFAULT_SPECIAL_CHARGE;
+}
+
 /** Every skin set that applies to any form in this creature's chain. */
 export function getSkinsForCreature(creatureId) {
   const chain = getChain(creatureId);

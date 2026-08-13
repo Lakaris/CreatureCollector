@@ -62,10 +62,16 @@ function DailyScreen({onBack}){
     );
   }
   return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200,animation:"screenSlideUp .22s ease-out"}},
-    React.createElement("div",{style:{padding:"24px 20px 12px",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:20,fontWeight:800,color:"#111"}},"Daily Rewards"),
+    // White top bar with a back arrow, matching every other screen in the
+    // game, instead of the round "✕" button that used to float at the
+    // bottom of this one.
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+      React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+        React.createElement("i",{className:"ti ti-arrow-left"})
+      ),
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111"}},"Daily Rewards")
     ),
-    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}},
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"16px 16px"}},
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}},
         DAILY_REWARDS.map((raw,i)=>{
           const r=resolveDailyReward(raw,farmFieldLevel);
@@ -92,9 +98,6 @@ function DailyScreen({onBack}){
           );
         })
       )
-    ),
-    React.createElement("div",{style:{display:"flex",justifyContent:"center",padding:"12px 0 28px",flexShrink:0}},
-      React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},"✕")
     ),
     popup
   );

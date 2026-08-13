@@ -7,6 +7,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { makeOwnedCreature } from "../../core/creatures.js";
 import { TYPE_EMOJI } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
+import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge } from "../../battle/tick.js";
 import { MELEE_RANGE, RANGED_RANGE, COOLDOWN_TICKS_AT_SPD_1 } from "../../battle/constants.js";
 import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../battle/geometry.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
@@ -240,6 +241,10 @@ function TutorialOverlay() {
     const newFx = [];
     function actUnit(u, foes) {
       u.atkCd = Math.max(0, u.atkCd - 1);
+      // Special-ability charge, same as the real Arena tick: no specials are
+      // implemented here, so a full bar flashes the "!" marker and recharges.
+      tickSpecialCharge(u);
+      if (specialChargeReady(u)) consumeSpecialCharge(u);
       const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
       const byCheb = [...foes].sort((a, b) => aChebDist(u.row, u.col, a.row, a.col) - aChebDist(u.row, u.col, b.row, b.col));
       let atkTgt = null, moveTgt = byCheb[0];
@@ -991,10 +996,16 @@ function TutorialOverlay() {
                     style: { position: "absolute", width: TUTORIAL_TILE, height: TUTORIAL_TILE, display: "flex", alignItems: "center", justifyContent: "center", opacity: u.hp > 0 ? 1 : 0, zIndex: 5 },
                   },
                   React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: 32 }),
+                  (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 13, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!"),
                   React.createElement(
                     "div",
                     { style: { position: "absolute", bottom: 3, left: 4, right: 4, height: 4, background: "#ddd", borderRadius: 2, overflow: "hidden" } },
                     React.createElement("div", { className: "tut-hp-fill", style: { height: "100%", width: (u.hp / u.maxHp * 100) + "%", background: u.uid[0] === "e" ? "#ef4444" : "#22c55e", borderRadius: 2 } })
+                  ),
+                  (u.abilChargeMax || 0) > 0 && React.createElement(
+                    "div",
+                    { style: { position: "absolute", bottom: 0, left: 4, right: 4, height: 2, background: "#dbeafe", borderRadius: 2, overflow: "hidden" } },
+                    React.createElement("div", { style: { height: "100%", width: (Math.min(1, (u.abilCharge || 0) / u.abilChargeMax) * 100) + "%", background: "#3b82f6", borderRadius: 2, transition: "width 0.35s linear" } })
                   )
                 )
               )

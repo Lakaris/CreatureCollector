@@ -10,25 +10,39 @@ import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
-import { TYPE_EMOJI, ROLE_CONFIG } from "../../data/types.js";
+import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { equipBonus, equipBonusStr, itemAffectsStat } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
+import EquipmentDexScreen from "../../ui/screens/EquipmentDexScreen.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the
 // tutorial's guided walkthrough points at equipping/upgrading.
 const TUTORIAL_ITEM_ID="com_hp_atk";
 
+/** Star string for a given ascension count -- "✦"x10 once maxed, otherwise one "★" per ascension. */
+function ascStars(asc) {
+  return asc >= EQUIP_MAX_ASCENSION ? "✦".repeat(EQUIP_MAX_ASCENSION) : "★".repeat(asc);
+}
+
 function EquipmentScreen() {
-  const { owned, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, setEquipmentAscensions, equipFavorites, setEquipFavorites, tutorialRestricted, tutorialStep, setTutorialStep } = useGame();
+  const { owned, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, setEquipmentAscensions, equipFavorites, setEquipFavorites, tutorialRestricted, tutorialStep, setTutorialStep, setEquipmentDetailOpen } = useGame();
   const [selected, setSelected] = useState(null);
+  const [showDex, setShowDex] = useState(false);
+  const [ascendAllResult, setAscendAllResult] = useState(null);
   // Resuming mid-tutorial after a reload: "upgradeItem" expects the Iron
   // Band's detail page already open, but `selected` is local state that
   // doesn't survive a reload.
   useEffect(() => {
     if (tutorialRestricted && tutorialStep === "upgradeItem") setSelected(TUTORIAL_ITEM_ID);
   }, []);
+  // Lets App.js give the detail sub-view (not the grid) the same full-screen,
+  // no-scroll, no-dev-tools treatment as Hatch/Farm -- synced whenever
+  // `selected` changes, and force-cleared on unmount so navigating away via
+  // the NavBar while a detail page is open can't leave it stuck on.
+  useEffect(() => { setEquipmentDetailOpen(!!selected); }, [selected]);
+  useEffect(() => () => setEquipmentDetailOpen(false), []);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterRarities, setFilterRarities] = useState(new Set());
   const [filterStats, setFilterStats] = useState(new Set());
@@ -36,14 +50,17 @@ function EquipmentScreen() {
   const [filterFavorites, setFilterFavorites] = useState(false);
   const [filterElements, setFilterElements] = useState(new Set());
   const [filterRoles, setFilterRoles] = useState(new Set());
+  const [filterRanges, setFilterRanges] = useState(new Set());
 
   function toggleFavorite(id, e) { e.stopPropagation(); setEquipFavorites((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
   function toggleRarity(r) { setFilterRarities((prev) => { const n = new Set(prev); n.has(r) ? n.delete(r) : n.add(r); return n; }); }
   function toggleStat(s) { setFilterStats((prev) => { const n = new Set(prev); n.has(s) ? n.delete(s) : n.add(s); return n; }); }
   function toggleElement(t) { setFilterElements((prev) => { const n = new Set(prev); n.has(t) ? n.delete(t) : n.add(t); return n; }); }
   function toggleRole(r) { setFilterRoles((prev) => { const n = new Set(prev); n.has(r) ? n.delete(r) : n.add(r); return n; }); }
+  function toggleRange(r) { setFilterRanges((prev) => { const n = new Set(prev); n.has(r) ? n.delete(r) : n.add(r); return n; }); }
 
   if (selected) return React.createElement(EquipmentDetail, { itemId: selected, onBack: () => setSelected(null) });
+  if (showDex) return React.createElement(EquipmentDexScreen, { onBack: () => setShowDex(false) });
 
   const equippedAnywhere = new Set();
   const equippedByMap = {};
@@ -69,6 +86,7 @@ function EquipmentScreen() {
       if (filterHasEffect && !item.effect) return false;
       if (filterElements.size > 0 && !filterElements.has(item.element)) return false;
       if (filterRoles.size > 0 && !filterRoles.has(item.role)) return false;
+      if (filterRanges.size > 0 && !filterRanges.has(item.attackType)) return false;
       return true;
     })
     .sort((a, b) => {
@@ -84,23 +102,47 @@ function EquipmentScreen() {
     });
 
   return React.createElement("div", null,
+    ascendAllResult && React.createElement("div", { className: "modal-overlay", onClick: () => setAscendAllResult(null) },
+      React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 20, padding: "24px 20px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.18)" } },
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 4 } }, "✦ Equipment Ascended"),
+        ascendAllResult.length === 0
+          ? React.createElement("div", { style: { fontSize: 13, color: "#666", padding: "12px 0" } }, "Nothing was ready to ascend.")
+          : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 12, maxHeight: "50vh", overflowY: "auto", textAlign: "left" } },
+              ascendAllResult.map((r) => React.createElement("div", { key: r.id, style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 12px" } },
+                React.createElement("div", { style: { fontSize: 26, flexShrink: 0 } }, r.emoji),
+                React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 700, color: "#111" } }, r.name),
+                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#f59e0b", letterSpacing: 1, flexShrink: 0 } }, ascStars(r.asc))
+              ))
+            ),
+        React.createElement("button", { onClick: () => setAscendAllResult(null), style: { marginTop: 20, width: "100%", padding: "10px 0", borderRadius: 12, border: "none", background: "#534AB7", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "OK")
+      )
+    ),
     React.createElement(ScreenHeader, {
       title: "Equipment",
-      right: anyReady && React.createElement("button", {
-        onClick: () => {
-          const newCopies = { ...equipmentCopies };
-          const newAsc = { ...equipmentAscensions };
-          EQUIPMENT_DEFS.forEach((item) => {
-            let asc = newAsc[item.id] || 0;
-            let copies = newCopies[item.id] || 0;
-            while (asc < EQUIP_MAX_ASCENSION && copies >= EQUIP_ASC_COSTS[asc]) { copies -= EQUIP_ASC_COSTS[asc]; asc++; }
-            newAsc[item.id] = asc; newCopies[item.id] = copies;
-          });
-          setEquipmentCopies(newCopies);
-          setEquipmentAscensions(newAsc);
-        },
-        style: { fontSize: 12, fontWeight: 800, color: "#fff", background: "#f59e0b", border: "none", borderRadius: 9, cursor: "pointer", padding: "6px 12px", letterSpacing: ".03em" }
-      }, "✦ Ascend All"),
+      right: React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+        anyReady && React.createElement("button", {
+          onClick: () => {
+            const newCopies = { ...equipmentCopies };
+            const newAsc = { ...equipmentAscensions };
+            const results = [];
+            EQUIPMENT_DEFS.forEach((item) => {
+              const startAsc = newAsc[item.id] || 0;
+              let asc = startAsc;
+              let copies = newCopies[item.id] || 0;
+              while (asc < EQUIP_MAX_ASCENSION && copies >= EQUIP_ASC_COSTS[asc]) { copies -= EQUIP_ASC_COSTS[asc]; asc++; }
+              newAsc[item.id] = asc; newCopies[item.id] = copies;
+              if (asc > startAsc) results.push({ id: item.id, name: item.name, emoji: item.emoji, asc });
+            });
+            setEquipmentCopies(newCopies);
+            setEquipmentAscensions(newAsc);
+            setAscendAllResult(results);
+          },
+          style: { fontSize: 12, fontWeight: 800, color: "#fff", background: "#f59e0b", border: "none", borderRadius: 9, cursor: "pointer", padding: "6px 12px", letterSpacing: ".03em" }
+        }, "✦ Ascend All"),
+        // Same tutorial lock as Collection's Dex button -- the Dex isn't part
+        // of any guided flow, so it stays inert until the tutorial is done.
+        React.createElement("button", { className: "btn btn-primary btn-sm", onClick: () => { if (tutorialRestricted) return; setShowDex(true); }, disabled: tutorialRestricted, style: { marginBottom: 0, padding: "4px 12px", border: "none", lineHeight: 1.2, opacity: tutorialRestricted ? 0.5 : 1, cursor: tutorialRestricted ? "not-allowed" : "pointer" } }, "Dex")
+      ),
     }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 } },
       React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#666" } }, "All Gear"),
@@ -129,6 +171,12 @@ function EquipmentScreen() {
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Role"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
           ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, ROLE_CONFIG[r].emoji + " " + r))
+        )
+      ),
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
+        React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Range"),
+        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
+          ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, ATTACK_TYPE_CONFIG[r].emoji + " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 10 } },
@@ -162,7 +210,7 @@ function EquipmentScreen() {
                 React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl)
               ),
               React.createElement("div", { style: { position: "absolute", top: 6, right: 8, fontSize: 16, cursor: "pointer", color: equipFavorites.has(item.id) ? "#f59e0b" : "#ccc", lineHeight: 1 }, onClick: (e) => toggleFavorite(item.id, e) }, equipFavorites.has(item.id) ? "★" : "☆"),
-              asc > 0 && React.createElement("div", { style: { position: "absolute", top: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#f59e0b", lineHeight: "14px", pointerEvents: "none" } }, asc >= EQUIP_MAX_ASCENSION ? "✦".repeat(10) : (asc <= 5 ? "★".repeat(asc) : "★".repeat(5) + "★".repeat(asc - 5))),
+              asc > 0 && React.createElement("div", { style: { position: "absolute", top: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#f59e0b", lineHeight: "14px", pointerEvents: "none" } }, ascStars(asc)),
               React.createElement("div", { style: { position: "relative", display: "inline-block", marginTop: 4 } },
                 React.createElement("span", { style: { fontSize: 22 } }, item.emoji)
               ),

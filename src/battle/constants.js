@@ -15,6 +15,18 @@ export const DUNGEON_PLAYER_START_ROW = 6;
 export const DUNGEON_TILE = 44;
 export const DUNGEON_MAX_DEPLOYED = 6;
 
+/**
+ * Daily free Dungeon Pass regen (granted at Eastern noon, see GameContext),
+ * and the ratio of that amount above which the free regen stops topping you
+ * up (currently 3x -- an anti-hoarding gate, not a hard inventory cap).
+ * Permanently raised by DUNGEON_PASS_DAILY_CAP_BONUS once the Dungeon
+ * Starter Pack (data/store.js) is purchased -- see
+ * GameContext's dungeonStarterPackPurchased.
+ */
+export const DUNGEON_PASS_DAILY_CAP = 10;
+export const DUNGEON_PASS_DAILY_CAP_BONUS = 10;
+export const DUNGEON_PASS_OVERFLOW_MULT = 3;
+
 /** Melee units attack at Chebyshev distance 1; ranged at 3. */
 export const MELEE_RANGE = 1;
 export const RANGED_RANGE = 3;

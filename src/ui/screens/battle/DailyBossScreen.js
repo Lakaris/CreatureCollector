@@ -562,10 +562,14 @@ function DailyBossScreen({onBack,onViewCreature}){
             },
               React.createElement("div",{style:{position:"relative",lineHeight:1}},
                 React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
-                (u.burnTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥")
+                (u.burnTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥"),
+                (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-9,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
               ),
               React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
                 React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:(u.burnTicks||0)>0?"#f97316":"#22c55e",borderRadius:2}})
+              ),
+              (u.abilChargeMax||0)>0&&React.createElement("div",{style:{position:"absolute",bottom:0,left:3,right:3,height:2,background:"#dbeafe",borderRadius:2,overflow:"hidden"}},
+                React.createElement("div",{style:{height:"100%",width:(Math.min(1,(u.abilCharge||0)/u.abilChargeMax)*100)+"%",background:"#3b82f6",borderRadius:2,transition:"width 0.35s linear"}})
               )
             )
           )
@@ -576,6 +580,8 @@ function DailyBossScreen({onBack,onViewCreature}){
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          abilityName:CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
+          abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setBattleSelected(null)
         }):selectedBoss?React.createElement(UnitInfoPanel,{

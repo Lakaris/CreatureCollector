@@ -85,16 +85,20 @@ function EquipmentDetail({ itemId, onBack }) {
     setEquipmentAscensions((prev) => ({ ...prev, [pi.id]: (prev[pi.id] || 0) + 1 }));
   }
 
-  return React.createElement("div", null,
+  return React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column" } },
     notify && React.createElement(Notify, { msg: notify }),
     // "toHome" is the hand-off right after that single upgrade -- Back stays
     // locked the same as during "upgradeItem" so the only way forward is the
     // NavBar arrow to Home.
     React.createElement(ScreenHeader, { title: "", onBack, backDisabled: tutorialStep === "upgradeItem" || tutorialStep === "toHome" }),
-    React.createElement("div", { className: "card", style: { position: "relative" } },
+    // flex:1 fills whatever's left below the header instead of the page
+    // overflowing on tall screens or leaving a big empty gap on short ones
+    // -- same no-scroll treatment as Hatch/Farm. A spacer between the item
+    // info and the Upgrade/Ascension controls pins those to the bottom.
+    React.createElement("div", { className: "card", style: { position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" } },
       rarCfg && React.createElement("div", { style: { position: "absolute", top: 10, left: 12, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
-      (pi.element || pi.role) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
-        [pi.element, pi.role].filter(Boolean).join(" · ") + " exclusive"
+      (pi.element || pi.role || pi.attackType) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
+        [pi.element, pi.role, pi.attackType].filter(Boolean).join(" · ") + " exclusive"
       ),
       (() => {
         const pet = equippedBy[0];
@@ -114,7 +118,7 @@ function EquipmentDetail({ itemId, onBack }) {
               ]
         );
       })(),
-      React.createElement("div", { style: { textAlign: "center", marginBottom: 16, paddingTop: 12 } },
+      React.createElement("div", { style: { textAlign: "center", marginBottom: 16, paddingTop: 12, flexShrink: 0 } },
         React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, pi.emoji),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 2 } }, pi.name),
         asc > 0 && React.createElement("div", { style: { fontSize: 14, color: "#f59e0b", letterSpacing: 2, marginBottom: 4 } }, starStr),
@@ -122,7 +126,8 @@ function EquipmentDetail({ itemId, onBack }) {
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: pi.effect ? 6 : 0 } }, equipBonusStr(bonuses)),
         pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + pi.effect)
       ),
-      React.createElement("div", { style: { borderTop: "1px solid #eee", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10 } },
+      React.createElement("div", { style: { flex: 1, minHeight: 0 } }),
+      React.createElement("div", { style: { borderTop: "1px solid #eee", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10, flexShrink: 0 } },
         React.createElement("div", { style: { position: "relative" } },
           tutorialStep === "upgradeItem" && React.createElement("div", { style: { position: "absolute", left: "50%", top: -6, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "UPGRADE"),

@@ -8,7 +8,7 @@ import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../../data/equipment.js"
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
-import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED } from "../../../battle/constants.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED, DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS } from "../../../battle/constants.js";
 import { aEase } from "../../../battle/geometry.js";
 import { getBossModule, getHighlightTiles } from "../../../battle/bosses/registry.js";
 import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/context.js";
@@ -22,8 +22,9 @@ import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
 function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
-  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrid, setDungeonPlanGrid: setDPlanGrid, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep } = useGame();
+  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrid, setDungeonPlanGrid: setDPlanGrid, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, dungeonStarterPackPurchased } = useGame();
   const PASS_COST=1;
+  const dungeonPassDailyCap=DUNGEON_PASS_DAILY_CAP+(dungeonStarterPackPurchased?DUNGEON_PASS_DAILY_CAP_BONUS:0);
   const rechargeCost=100*Math.pow(2,passRechargeCount);
   // Tail end of the post-Set-1 Dungeon reveal (see App.js's Play hub): while
   // active, every button on the boss-select screen is inert except Fight --
@@ -369,10 +370,14 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
               React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
               isBurned&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥"),
               isDotted&&React.createElement("div",{style:{position:"absolute",top:-4,left:-6,fontSize:10,lineHeight:1}},"🟣"),
-              isWeak&&React.createElement("div",{style:{position:"absolute",bottom:-4,right:-6,fontSize:10,lineHeight:1}},"⬇️")
+              isWeak&&React.createElement("div",{style:{position:"absolute",bottom:-4,right:-6,fontSize:10,lineHeight:1}},"⬇️"),
+              (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-9,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
             ),
             React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
               React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:u.uid[0]==="e"?"#ef4444":isBurned?"#f97316":isDotted?"#7c3aed":"#22c55e",borderRadius:2}})
+            ),
+            (u.abilChargeMax||0)>0&&React.createElement("div",{style:{position:"absolute",bottom:0,left:3,right:3,height:2,background:"#dbeafe",borderRadius:2,overflow:"hidden"}},
+              React.createElement("div",{style:{height:"100%",width:(Math.min(1,(u.abilCharge||0)/u.abilChargeMax)*100)+"%",background:"#3b82f6",borderRadius:2,transition:"width 0.35s linear"}})
             )
           );})
         ),
@@ -382,6 +387,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||(selectedUnit.creatureId==="__vine_minion"?"Vine":selectedUnit.creatureId),
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          abilityName:CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
+          abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setDBattleSelected(null)
         }):selectedBoss?React.createElement(UnitInfoPanel,{
@@ -688,10 +695,11 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
         React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},previewItem.emoji),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        (previewItem.element||previewItem.role)&&React.createElement("div",{style:{textAlign:"center",marginBottom:8}},
+        (previewItem.element||previewItem.role||previewItem.attackType)&&React.createElement("div",{style:{textAlign:"center",marginBottom:8}},
           React.createElement("span",{style:{fontSize:11,fontWeight:600,color:"#7c5cf6",background:"#f0effe",borderRadius:20,padding:"3px 12px",display:"inline-block"}},
             previewItem.element?(TYPE_EMOJI[previewItem.element]||"")+" "+previewItem.element+" type exclusive"
-            :{Attacker:"⚔️",Tank:"🛡️",Support:"💚"}[previewItem.role]+" "+previewItem.role+" role exclusive"
+            :previewItem.role?{Attacker:"⚔️",Tank:"🛡️",Support:"💚"}[previewItem.role]+" "+previewItem.role+" role exclusive"
+            :{Melee:"🗡️",Ranged:"🏹"}[previewItem.attackType]+" "+previewItem.attackType+" exclusive"
           )
         ),
         previewItem.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},Object.entries(previewItem.stats).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ")),
@@ -714,7 +722,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     ),
     React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"0 24px 40px",flexShrink:0}},
       React.createElement("div",{style:{position:"relative",display:"inline-block"}},
-        React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#111"}},"🎫 "+passes+" / 10"),
+        React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#111"}},"🎫 "+passes+" / "+dungeonPassDailyCap),
         React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setBuyPassesOpen(true);},style:{position:"absolute",top:-6,right:-24,width:20,height:20,borderRadius:"50%",background:dungeonEnterActive?"#ccc":"#534AB7",color:"#fff",border:"none",fontSize:14,fontWeight:700,cursor:dungeonEnterActive?"not-allowed":"pointer",padding:0,lineHeight:"20px",textAlign:"center"}},"+")
       ),
       React.createElement("div",{style:{fontSize:11,color:"#bbb"}},"Refreshes in "+getTimeToNoon()),

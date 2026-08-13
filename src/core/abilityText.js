@@ -108,6 +108,7 @@ export const ABILITY_TAG_DEFS = {
   closest: { label: "Closest", description: "Targets the closest enemy in range" },
   farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range" },
   burn: { label: "🔥 Burn", description: "Deals damage over time" },
+  energy: { label: "⚡ Energy", description: "Energy needed to use this ability" },
 };
 
 /** sacredwasp/divinedrone/holyswarm (Starlit/Starbright/Starburn) currently share identical ability values. */

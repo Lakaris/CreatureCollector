@@ -52,7 +52,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
     .filter((o) => !(o.equipped || []).includes(itemId)) // already-equipped creature isn't a switch target
     .filter((o) => {
       const d = CREATURE_MAP[o.id];
-      return (!item.element || d.type === item.element) && (!item.role || d.role === item.role);
+      return (!item.element || d.type === item.element) && (!item.role || d.role === item.role) && (!item.attackType || d.attackType === item.attackType);
     });
 
   const replacePet = replaceCreatureId ? owned[replaceCreatureId] : null;
@@ -90,11 +90,11 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
     React.createElement(ScreenHeader, { title: "Choose a Creature", onBack }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 12, color: "#666" } },
       React.createElement("span", { style: { fontSize: 20 } }, item.emoji),
-      React.createElement("span", null, "Equipping " + item.name + (item.element ? " · " + item.element + " only" : "") + (item.role ? " · " + item.role + " only" : ""))
+      React.createElement("span", null, "Equipping " + item.name + (item.element ? " · " + item.element + " only" : "") + (item.role ? " · " + item.role + " only" : "") + (item.attackType ? " · " + item.attackType + " only" : ""))
     ),
     entries.length === 0
       ? React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#666" } },
-          React.createElement("p", { style: { fontSize: 13 } }, item.element || item.role ? "No eligible creatures for this gear yet." : "No creatures yet — hatch some eggs!")
+          React.createElement("p", { style: { fontSize: 13 } }, item.element || item.role || item.attackType ? "No eligible creatures for this gear yet." : "No creatures yet — hatch some eggs!")
         )
       : React.createElement("div", { className: "creature-grid" },
           entries.map((o) => {

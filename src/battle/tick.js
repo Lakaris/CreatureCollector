@@ -61,6 +61,34 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
   };
 }
 
+/** How long the "!" ability-ready marker stays visible, in ticks. */
+const ABILITY_FLASH_TICKS = 3;
+
+/**
+ * Advance a unit's special-ability charge by its Haste (abilitySpeed, base 1)
+ * per tick, holding at full until the special actually fires. Units without a
+ * chargeable special (abilChargeMax unset, e.g. vine minions) are skipped.
+ * Also counts down the "!" ready-flash marker set by consumeSpecialCharge.
+ *
+ * Exported (with specialChargeReady/consumeSpecialCharge) for Arena and
+ * Labyrinth, whose lighter minion-only tick loops live in their screens.
+ */
+export function tickSpecialCharge(u) {
+  if (u.abilFlashTicks) u.abilFlashTicks--;
+  if (!u.abilChargeMax) return;
+  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1));
+}
+
+export function specialChargeReady(u) {
+  return !!u.abilChargeMax && u.abilCharge >= u.abilChargeMax;
+}
+
+/** The special fired (or placeholder-triggered): reset the bar, flash the "!" marker. */
+export function consumeSpecialCharge(u) {
+  u.abilCharge = 0;
+  u.abilFlashTicks = ABILITY_FLASH_TICKS;
+}
+
 /** Move a unit one BFS step toward (tr,tc), keeping the occupancy set in sync. */
 function stepUnit(u, tr, tc, blocked, allOcc, now) {
   const [nr, nc] = aBestStep(u.row, u.col, tr, tc, blocked);
@@ -129,7 +157,7 @@ export function runBattleTick(state, config) {
   // ── 1. Player units ──────────────────────────────────────────────────────
   for (const u of aliveP) {
     u.atkCd = Math.max(0, u.atkCd - 1);
-    u.abilCd = Math.max(0, (u.abilCd || 0) - 1);
+    tickSpecialCharge(u);
     tickAtkMod(u);
 
     const canMove = !isRooted(u);
@@ -141,13 +169,21 @@ export function runBattleTick(state, config) {
     const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
     const dmgMult = abilMod?.dmgMultForAttack ? abilMod.dmgMultForAttack(u) : 1;
 
-    // Special abilities (e.g. Blazehornet's Charging Pierce) run on their own
-    // cooldown, independent of the basic-attack loop below -- they can move
-    // the unit, so they run first and everything after sees the new position.
-    if (abilMod?.special && u.abilCd <= 0 && canMove && (aliveE.length || bossAlive)) {
-      const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now) });
-      abilMod.special(u, specialCtx);
-      u.abilCd = abilMod.specialCooldown ? abilMod.specialCooldown(u) : 20;
+    // Special abilities run off the charge bar (see tickSpecialCharge),
+    // independent of the basic-attack loop below. Implemented specials (e.g.
+    // Blazehornet's Charging Pierce) can move the unit, so they run first and
+    // everything after sees the new position. Creatures whose special isn't
+    // implemented yet just flash the ready marker and start recharging.
+    if (specialChargeReady(u)) {
+      if (abilMod?.special) {
+        if (canMove && (aliveE.length || bossAlive)) {
+          const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now) });
+          abilMod.special(u, specialCtx);
+          consumeSpecialCharge(u);
+        }
+      } else {
+        consumeSpecialCharge(u);
+      }
     }
 
     // A custom basicAttack hook (e.g. Starlit's piercing beam) fully replaces
@@ -214,6 +250,10 @@ export function runBattleTick(state, config) {
   // ── 2. Enemy minions ─────────────────────────────────────────────────────
   for (const u of aliveE) {
     u.atkCd = Math.max(0, u.atkCd - 1);
+    // Enemy creatures charge specials too; none are implemented, so a full
+    // bar just flashes the ready marker and recharges.
+    tickSpecialCharge(u);
+    if (specialChargeReady(u)) consumeSpecialCharge(u);
     tickAtkMod(u);
     const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
     const { atkTgt, moveTgt } = selectTarget(u, aliveP);

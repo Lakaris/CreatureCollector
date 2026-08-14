@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { makeOwnedCreature, getChain } from "../../core/creatures.js";
-import { TYPE_EMOJI } from "../../data/types.js";
+import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
 import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge, specialTargetInRange } from "../../battle/tick.js";
 import { MELEE_RANGE, RANGED_RANGE, COOLDOWN_TICKS_AT_SPD_1 } from "../../battle/constants.js";
@@ -40,7 +40,12 @@ const TUTORIAL_ITEM_ID = "com_hp_atk";
 const EGG_CHOICE_AFTER_LINE = 1;
 const STARTER_CHOICES = ["emberpup", "droplette", "leafling"];
 
-/** Final-evolution-stage def for a starter id -- shown as a preview above the egg row. */
+/** Full evolution chain, base to final, for a starter id -- shown as a preview above the egg row. */
+function chainDefsFor(starterId) {
+  return getChain(starterId).map((id) => CREATURE_MAP[id]);
+}
+
+/** Final-evolution-stage def for a starter id. */
 function finalFormDef(starterId) {
   const chain = getChain(starterId);
   return CREATURE_MAP[chain[chain.length - 1]];
@@ -418,18 +423,65 @@ function TutorialOverlay() {
           },
         },
         // Fixed-height preview of the selected egg's fully-evolved form, above
-        // the egg row -- reserved space (not just conditionally rendered) so
-        // picking an egg doesn't shift the row below it. Swaps instantly to
-        // whichever egg is currently selected.
+        // the egg row -- reserved space (not just conditionally rendered, and
+        // sized for 3 flat ability rows even while empty) so picking an egg
+        // doesn't shift the egg row/button below it. Swaps instantly to
+        // whichever egg is currently selected. Ability summary shows the
+        // FINAL form's kit (not the base egg that actually hatches) since
+        // that's what's being previewed here.
         React.createElement(
           "div",
-          { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 96, justifyContent: "flex-end" } },
-          selectedEgg
-            ? [
-                React.createElement("div", { key: "emoji", style: { fontSize: 64, lineHeight: 1 } }, finalFormDef(selectedEgg).emoji),
-                React.createElement("div", { key: "label", style: { fontSize: 12, fontWeight: 600, color: "#888" } }, "Fully evolved"),
-              ]
-            : React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: "#bbb" } }, "Pick an egg to preview its final form")
+          { style: { minHeight: 186, marginBottom: -8 } },
+          selectedEgg && React.createElement(CreatureAbilitySummary, { def: finalFormDef(selectedEgg), flat: true })
+        ),
+        // Full base-to-final evolution line, mirroring the Dex's "Evolution
+        // Line" card -- not just the final form -- so picking an egg previews
+        // the whole growth path, not just the endpoint. Role/range pills
+        // (final form's traits) sit centered directly under the chain, in
+        // the same wrapper so the gap between them stays tight rather than
+        // falling out to the outer column's full 32px gap.
+        React.createElement(
+          "div",
+          { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minHeight: 90 } },
+          React.createElement(
+            "div",
+            { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexWrap: "wrap", maxWidth: 320 } },
+            selectedEgg
+              ? chainDefsFor(selectedEgg).map((d, i) =>
+                  React.createElement(
+                    React.Fragment,
+                    { key: d.id },
+                    i > 0 && React.createElement("span", { style: { color: "#aaa", fontSize: 16, lineHeight: "40px" } }, "→"),
+                    React.createElement(
+                      "div",
+                      { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2 } },
+                      React.createElement("span", { style: { fontSize: 40, lineHeight: 1 } }, d.emoji),
+                      React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: "#222" } }, d.name)
+                    )
+                  )
+                )
+              : null
+          ),
+          selectedEgg &&
+            (() => {
+              const fd = finalFormDef(selectedEgg);
+              return React.createElement(
+                "div",
+                { style: { display: "flex", justifyContent: "center", gap: 6 } },
+                fd.role &&
+                  React.createElement(
+                    "span",
+                    { key: "role", style: { fontSize: 11, fontWeight: 600, color: ROLE_CONFIG[fd.role].color, background: ROLE_CONFIG[fd.role].bg, borderRadius: 8, padding: "2px 7px" } },
+                    ROLE_CONFIG[fd.role].emoji + " " + fd.role
+                  ),
+                fd.attackType &&
+                  React.createElement(
+                    "span",
+                    { key: "range", style: { fontSize: 11, fontWeight: 600, color: ATTACK_TYPE_CONFIG[fd.attackType].color, background: ATTACK_TYPE_CONFIG[fd.attackType].bg, borderRadius: 8, padding: "2px 7px" } },
+                    ATTACK_TYPE_CONFIG[fd.attackType].emoji + " " + fd.attackType
+                  )
+              );
+            })()
         ),
         React.createElement(
           "div",
@@ -514,11 +566,6 @@ function TutorialOverlay() {
           "div",
           { style: { fontSize: 13, fontWeight: 600, color: "#888", marginTop: -8 } },
           (TYPE_EMOJI[pickedDef.type] || "") + " " + pickedDef.type
-        ),
-        React.createElement(
-          "div",
-          { style: { marginTop: 12 } },
-          React.createElement(CreatureAbilitySummary, { def: pickedDef, flat: true })
         )
       ),
     phase === "reveal" &&

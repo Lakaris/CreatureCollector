@@ -22,7 +22,7 @@ export function debuffsFor(u) {
   return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
 }
 
-function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, debuffs, onClose }) {
+function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   const chargePct = abilChargeMax > 0 ? Math.max(0, Math.min(100, ((abilCharge || 0) / abilChargeMax) * 100)) : 0;
   return React.createElement("div", {
@@ -53,7 +53,9 @@ function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilit
         abilityName && React.createElement("span", { style: { color: "#3b82f6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, abilityName)
       ),
       React.createElement("div", { style: { height: 5, background: "#eee", borderRadius: 3, overflow: "hidden" } },
-        React.createElement("div", { style: { height: "100%", width: chargePct + "%", background: "#3b82f6", borderRadius: 3, transition: "width 0.35s linear" } })
+        // Snap (no transition) around the fire so the bar visibly hits 100%
+        // instead of easing down from wherever the animation had reached.
+        React.createElement("div", { style: { height: "100%", width: chargePct + "%", background: "#3b82f6", borderRadius: 3, transition: (abilFlashTicks || 0) > 0 ? "none" : "width 0.35s linear" } })
       )
     ),
     shield > 0 && React.createElement(React.Fragment, null,

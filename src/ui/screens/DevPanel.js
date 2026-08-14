@@ -10,15 +10,28 @@ import { DAILY_MISSIONS, QUEST_DEFS } from "../../data/quests.js";
 import { makeOwnedCreature, getChain, MAX_LEVEL, MAX_ASCENSION } from "../../core/creatures.js";
 import { MAX_LABYRINTH_DEPTH } from "../../core/labyrinth.js";
 import { FIELD_RATES } from "../../data/farm.js";
-import { ARENA_TABS } from "../../data/bosses.js";
+import { ARENA_TABS, DUNGEON_BOSSES } from "../../data/bosses.js";
 import { STORE_BUNDLES } from "../../data/store.js";
+import { easternNoonDayKey } from "../../core/dates.js";
+import { INITIAL_CURRENCIES } from "../../state/GameContext.js";
 import { DEV_MODE } from "../../config.js";
 
 const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
 const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, dungeonStarterPackPurchased, setDungeonStarterPackPurchased, setPurchasedOneTimeBundles, purchaseBundle } = useGame();
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, dungeonStarterPackPurchased, setDungeonStarterPackPurchased, setPurchasedOneTimeBundles, purchaseBundle,
+  // Added for a truly complete "Reset everything" -- see resetAll below.
+  setCandyUsed, setFertilizerUsed, setEquipFavorites, setPity,
+  setArenaPlanGrid, setDungeonPlanGrid, setLabyrinthPlanGrid, setDailyBossPlanGrid,
+  setDungeonBossLevels, setPassRechargeCount, setLastDungeonPassGain, setLastPassRechargeReset,
+  setDailyBossData, setDailyBossLevel, setNewFeaturePillsSeen,
+  setPostTutorialPopupPending, setShowQuestsArrow, setPendingDungeonReveal,
+  setUsername, setProfileEmoji, setProfileAvatarId, setProfileFrame, setProfileTitle,
+  setEverOwnedCreatureIds,
+  setBattlepassLastReset, setBattlepassClaimed, setBattlepassPaidClaimed, setBattlepassPremium, setBattlepassPoints,
+  setCollectedTreasures, setCompletedTreasureSets,
+  } = useGame();
   const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",questSet:"1"});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
@@ -68,14 +81,60 @@ function DevPanel(){
     setGameMode(null);
     setTab("home");
   }
-  function resetAll(){setOwned({});setCurrencies({gems:0,food:0,candy:0,eggs:0,legendaryEggs:0,melonFire:0,melonWater:0,melonNature:0,melonEarth:0,melonWind:0,melonElectric:0,melonLight:0,melonDark:0,melonRainbow:0,flairBanana:0,mythicalFlairBanana:0,ancientFlairBanana:0,flairShard:0});setSkinShards(0);setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);setTab("home");setLabyrinthDepth(1);setLabyrinthBestDepth(1);setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());setFarmFieldLevel(1);setFarmPlots(1);setFarmFieldLastHarvest(Date.now());setFarmFieldSeed((Math.random()*1e9)|0);setFarmCrops(Array(6).fill(null));setPlotUpgrades(Array(6).fill(0));setSpecialPurchased(false);setDungeonStarterPackPurchased(false);setPurchasedOneTimeBundles(new Set());
+  /**
+   * Wipes every persisted field back to a fresh-install default -- this must
+   * stay in sync with each field's own `initialSave?.x ?? DEFAULT` in
+   * GameContext.js (persistedRef.current there is the authoritative list of
+   * what's actually saved). It's easy for this to drift as new features add
+   * new persisted state (that's exactly how currencies, dungeon boss levels,
+   * plan grids, Battle Pass, and Treasure all previously ended up NOT being
+   * reset here) -- if you add a new useState to GameContext that gets saved,
+   * add its reset here too.
+   */
+  function resetAll(){
+    setOwned({});
+    // Currencies: INITIAL_CURRENCIES is the same object new saves start
+    // from, so this can't drift out of sync the way a hand-copied literal
+    // did (that literal was missing equipShards, dungeonPass, and every ore/
+    // fertilizer currency -- they silently survived past resets).
+    setCurrencies({...INITIAL_CURRENCIES});
+    setSkinShards(0);
+    setEquipmentCopies({});setEquipmentLevels({});setEquipmentAscensions({});setEquipFavorites(new Set());
+    setPity({standard:0,stormwyvern:0,legendary:0});
+    setEverOwnedCreatureIds(new Set());
+    setUsername("Player");setProfileEmoji("🧑‍✈️");setProfileAvatarId("default");setProfileFrame("none");setProfileTitle(null);
+    setTutorialSeen(false);setTutorialRestricted(false);setTutorialStep(null);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);
+    setPostTutorialPopupPending(false);setShowQuestsArrow(false);setPendingDungeonReveal(false);
+    setTab("home");setGameMode(null);
+    setArenaPlanGrid({});setDungeonPlanGrid({});setLabyrinthPlanGrid({});setDailyBossPlanGrid({});
+    setLabyrinthDepth(1);setLabyrinthBestDepth(1);
+    setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);
+    setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);
+    setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});
+    setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);
+    setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());
+    setFarmFieldLevel(1);setFarmPlots(1);setFarmFieldLastHarvest(Date.now());setFarmFieldSeed((Math.random()*1e9)|0);setFarmCrops(Array(6).fill(null));setPlotUpgrades(Array(6).fill(0));setSpecialPurchased(false);
+    setDungeonStarterPackPurchased(false);setPurchasedOneTimeBundles(new Set());
+    setDungeonBossLevels(Object.fromEntries(DUNGEON_BOSSES.map(b=>[b.key,1])));
+    setPassRechargeCount(0);
+    // Marking both "already claimed today" (rather than the empty-string
+    // sentinel a truly-never-saved player gets) keeps this consistent with
+    // the freshly-reset currencies.dungeonPass=10 above -- otherwise the
+    // regen effect in GameContext would see a past-due date and immediately
+    // top the player up a second time on the very next tick.
+    setLastDungeonPassGain(easternNoonDayKey());setLastPassRechargeReset(easternNoonDayKey());
+    setDailyBossData({date:"",fights:0,wins:0});setDailyBossLevel(1);
+    setNewFeaturePillsSeen({arena:false,dungeon:false,dailyBoss:false,treasure:false});
     // Quest batchIdx/claimed alone aren't enough -- every check()/progress()
     // in data/quests.js reads these live counters, so they have to reset too
     // or a "completed" quest stays completed even after its set rewinds.
     setUnlockedSkins([]);setArenaLevels(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));setArenaProgress(Object.fromEntries(ARENA_TABS.map(t=>[t.id,1])));
-    setEggsHatched(0);setDungeonsCleared(0);setDungeonAutoFights(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setEverCompletedDailyQuests(false);
+    setEggsHatched(0);setDungeonsCleared(0);setDungeonAutoFights(0);setArenaFights(0);setLabyrinthFights(0);setBananasUsed(0);setCandyUsed(0);setDailyBossFights(0);setPlotsGrown(0);setFieldHarvests(0);setPetLevelUps(0);setEquipLevelUps(0);setFertilizerUsed(0);setEverCompletedDailyQuests(false);
     setPlotsUnlocked(false);setDungeonsUnlocked(false);setDailyBossUnlocked(false);setArenaUnlocked(false);setTreasureUnlocked(false);
-    clearSave();}
+    setBattlepassLastReset(null);setBattlepassClaimed(Array(30).fill(false));setBattlepassPaidClaimed(Array(30).fill(false));setBattlepassPremium(false);setBattlepassPoints(0);
+    setCollectedTreasures(new Set());setCompletedTreasureSets(new Set());
+    clearSave();
+  }
 
   function giveMaxInvestedCreatures(){
     const all={};

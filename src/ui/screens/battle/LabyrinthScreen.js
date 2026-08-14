@@ -12,7 +12,7 @@ import { applyRewards } from "../../../core/rewards.js";
 import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, COOLDOWN_TICKS_AT_SPD_1 } from "../../../battle/constants.js";
 import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
-import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge } from "../../../battle/tick.js";
+import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge, specialTargetInRange } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
@@ -247,9 +247,10 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     function actUnit(u, foes) {
       u.atkCd = Math.max(0, u.atkCd - 1);
       // Special-ability charge; no labyrinth specials are implemented yet, so
-      // a full bar just flashes the "!" ready marker and starts recharging.
+      // a full bar just flashes the "!" ready marker and starts recharging --
+      // holding at full until a foe (or ally, for Supports) is in range.
       tickSpecialCharge(u);
-      if (specialChargeReady(u)) consumeSpecialCharge(u);
+      if (specialChargeReady(u) && specialTargetInRange(u, u.uid[0] === "p" ? aliveP : aliveE, foes, null)) consumeSpecialCharge(u);
       const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
       const byCheb = [...foes].sort((a, b) => aChebDist(u.row, u.col, a.row, a.col) - aChebDist(u.row, u.col, b.row, b.col));
       let atkTgt = null, moveTgt = byCheb[0];
@@ -460,7 +461,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               React.createElement("div", { className: "hp-fill", style: { height: "100%", width: (u.hp / u.maxHp * 100) + "%", background: u.uid[0] === "e" ? "#ef4444" : (u.burnTicks||0)>0 ? "#f97316" : "#22c55e", borderRadius: 2 } })
             ),
             (u.abilChargeMax || 0) > 0 && React.createElement("div", { style: { position: "absolute", bottom: 0, left: 3, right: 3, height: 2, background: "#dbeafe", borderRadius: 2, overflow: "hidden" } },
-              React.createElement("div", { style: { height: "100%", width: (Math.min(1, (u.abilCharge || 0) / u.abilChargeMax) * 100) + "%", background: "#3b82f6", borderRadius: 2, transition: "width 0.35s linear" } })
+              // Snap (no transition) around the fire so the bar visibly hits
+              // 100% instead of easing down from wherever the animation was.
+              React.createElement("div", { style: { height: "100%", width: (Math.min(1, (u.abilCharge || 0) / u.abilChargeMax) * 100) + "%", background: "#3b82f6", borderRadius: 2, transition: (u.abilFlashTicks || 0) > 0 ? "none" : "width 0.35s linear" } })
             )
           )),
         ),
@@ -471,7 +474,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? level : (owned?.[selectedUnit.creatureId]?.level || 1)),
           hp: selectedUnit.hp, maxHp: selectedUnit.maxHp,
           abilityName: CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
-          abilCharge: selectedUnit.abilCharge, abilChargeMax: selectedUnit.abilChargeMax,
+          abilCharge: selectedUnit.abilCharge, abilChargeMax: selectedUnit.abilChargeMax, abilFlashTicks: selectedUnit.abilFlashTicks,
           debuffs: debuffsFor(selectedUnit),
           onClose: () => setBattleSelectedUid(null),
         }) : React.createElement("div", { style: { width: 150, flexShrink: 0 } }))

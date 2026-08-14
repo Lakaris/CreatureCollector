@@ -377,7 +377,10 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
               React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:u.uid[0]==="e"?"#ef4444":isBurned?"#f97316":isDotted?"#7c3aed":"#22c55e",borderRadius:2}})
             ),
             (u.abilChargeMax||0)>0&&React.createElement("div",{style:{position:"absolute",bottom:0,left:3,right:3,height:2,background:"#dbeafe",borderRadius:2,overflow:"hidden"}},
-              React.createElement("div",{style:{height:"100%",width:(Math.min(1,(u.abilCharge||0)/u.abilChargeMax)*100)+"%",background:"#3b82f6",borderRadius:2,transition:"width 0.35s linear"}})
+              // No transition around the fire: the full-width frame and the
+              // reset to 0 both snap, so the bar visibly hits 100% instead of
+              // easing down from wherever the animation had reached.
+              React.createElement("div",{style:{height:"100%",width:(Math.min(1,(u.abilCharge||0)/u.abilChargeMax)*100)+"%",background:"#3b82f6",borderRadius:2,transition:(u.abilFlashTicks||0)>0?"none":"width 0.35s linear"}})
             )
           );})
         ),
@@ -388,7 +391,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
           abilityName:CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
-          abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,
+          abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setDBattleSelected(null)
         }):selectedBoss?React.createElement(UnitInfoPanel,{

@@ -911,21 +911,21 @@ export const CREATURES=[
    },role:"Support",attackType:"Ranged",evolutionOf:"spectrumcrab",shardsToAscend:22,ascensionsToEvolve:null},
   // Light line 3
   {id:"holymoth",name:"Sacramoth",emoji:"🦋",type:"Light",rarity:"rare",description:"A moth that orbits holy shrines. Where it lands, wounds close and darkness retreats.",
-   stats:{hp:42,atk:28,def:35,spd:1,abilitySpeed:1},
+   stats:{hp:54,atk:36,def:45,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Holy Dust",upgrades:["8 dmg; 22% blind 1s","11 dmg","14 dmg","18 dmg","28% blind 1.5s; regen 4 HP/s 2s on hit ally"]},
      special:{name:"Sacred Aura",charge:22,upgrades:["Aura; all allies +12% ATK+DEF 4s","Aura +16%","Aura +20%","Aura +25%","Aura +30%; also +10% Ability Speed; remove 1 debuff each"]},
      unique:{name:"Sacred Wings",upgrades:["Passive: Ability Speed +20% for all allies; each ability cast heals caster 8 HP","+26%; heal 11","30%; heal 14","+36%; heal 18","+44%; heal 24; abilities also cleanse 1 debuff from caster"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"radiantmoth"},
   {id:"radiantmoth",name:"Lumimoth",emoji:"🦋",type:"Light",rarity:"rare",description:"Holymoth evolved. Its wing scales now emit a radiance that makes allies temporarily invulnerable.",
-   stats:{hp:62,atk:42,def:52,spd:1,abilitySpeed:1},
+   stats:{hp:80,atk:54,def:67,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Holy Dust",upgrades:["8 dmg; blind 22%","11 dmg","14 dmg","18 dmg","Blind 1.5s; regen 4 HP/s ally"]},
      special:{name:"Radiant Aura",charge:8,upgrades:["All allies +20% ATK+DEF+Ability Speed 5s","Aura +26%","Aura +32%","Aura +40%","Aura +48%; remove all debuffs; grant overshield 30 HP"]},
      unique:{name:"Moth Radiance",upgrades:["Passive: Ability Speed +30% allies; each ability heals all allies 10 HP","+38%; heal 14","+46%; heal 18","+56%; heal 24","+66%; heal 32; abilities also have 20% chance to fully cleanse all debuffs from all allies"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"holymoth",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"celestimoth"},
   {id:"celestimoth",name:"Celestimoth",emoji:"🦋",type:"Light",rarity:"rare",description:"Radiantmoth's celestial final form. The light from its wings can be seen from the other side of the world.",
-   stats:{hp:84,atk:58,def:70,spd:1,abilitySpeed:1},
+   stats:{hp:108,atk:74,def:90,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Celestial Dust",upgrades:["11 dmg; blind 28% 2s; heal 1 ally 12 HP","14 dmg","18 dmg","24 dmg","35% blind 2.5s; heal all allies 8 HP"]},
      special:{name:"Celestial Aura",charge:14,upgrades:["All allies +30% ATK+DEF+Ability Speed; remove all debuffs 6s","Aura +38%","Aura +46%","Aura +56%","Aura +66%; grant immunity to all debuffs 6s; regen 15 HP/s"]},
@@ -1510,7 +1510,7 @@ export const CREATURES=[
      unique:{name:"Storm Lord",upgrades:["Passive: nearby allies gain +12 ATK and +10 SPD","Nearby allies gain +18 ATK and +16 SPD","Nearby allies gain +24 ATK and +22 SPD","Nearby allies gain +32 ATK and +28 SPD; Stormwyvern itself gains +15 SPD","Nearby allies gain +42 ATK and +36 SPD; Stormwyvern gains +25 SPD; allies also deal +10% wind damage"]}
    },role:"Support",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"tempestlord"},
   {id:"celestialux",name:"Celestialux",emoji:"✨",type:"Light",rarity:"legendary",description:"A being of pure starlight existing between dimensions. Its true form cannot be seen — only felt.",
-   stats:{hp:130,atk:120,def:100,spd:1,abilitySpeed:1},
+   stats:{hp:111,atk:103,def:86,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Starfire",upgrades:["55 dmg","72 dmg","90 dmg","112 dmg","Starfire pierces through all enemies in a line"]},
      special:{name:"Stellar Veil",charge:18,upgrades:["Reflect 15% dmg","Reflect 20%","Reflect 28%","Reflect 35%","Stellar Veil also heals 15 HP per reflected hit"]},
@@ -1518,7 +1518,7 @@ export const CREATURES=[
    },role:"Support",attackType:"Ranged",shardsToAscend:30,ascensionsToEvolve:5,evolutionId:"nebulalux"},
   // Wind line 1 final
   {id:"tempestlord",name:"Tempestlord",emoji:"🌪️",type:"Wind",rarity:"legendary",description:"The storm given eternal form. Where Tempestlord passes, the age of clear skies ends permanently.",
-   stats:{hp:145,atk:138,def:118,spd:1,abilitySpeed:1},
+   stats:{hp:132,atk:126,def:106,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gale Sovereign",upgrades:["55 dmg wind; chain 3 foes 60%","70 dmg","88 dmg","110 dmg","Chain all enemies; each hit applies -8% SPD stack; no cap"]},
      special:{name:"Eternal Tempest",charge:22,upgrades:["All allies +55 ATK+45 SPD+30% wind dmg 7s","Aura stronger","Even stronger","Max","Permanent aura; also grant +20% Ability Speed; allies immune to wind dmg"]},
@@ -1526,7 +1526,7 @@ export const CREATURES=[
    },role:"Support",attackType:"Melee",evolutionOf:"stormwyvern",shardsToAscend:30,ascensionsToEvolve:null},
   // Light line 1 final
   {id:"nebulalux",name:"Nebulalux",emoji:"🌌",type:"Light",rarity:"legendary",description:"Celestialux absorbed an entire nebula. It now contains more light than a small galaxy and shares all of it.",
-   stats:{hp:152,atk:140,def:118,spd:1,abilitySpeed:1},
+   stats:{hp:133,atk:124,def:103,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Nebula Beam",upgrades:["72 dmg; pierce all; heal all allies 28 HP","90 dmg; heal 36","112 dmg; heal 46","140 dmg; heal 58","Nebula Beam crits always; heals 80 HP; arc 3 extra beams to random foes"]},
      special:{name:"Stellar Veil",charge:18,upgrades:["Reflect 40% dmg; heal 25 HP per reflected hit","Reflect 50%; heal 34","Reflect 62%; heal 44","Reflect 76%; heal 57","Reflect 92%; heal 74; reflected dmg also blinds attacker 3s; allies immune to reflected dmg"]},
@@ -1541,7 +1541,7 @@ export const CREATURES=[
      unique:{name:"Eternal Flame",upgrades:["Passive: revives once per fight; each revival stronger+32% ATK; burn ignores 30% DEF; fire dmg +35%","Ignores 38%; +44%","Ignores 46%; +55%","Ignores 56%; +68%","Ignores 68%; +84%; Blazephoenix revives endlessly until 3 revivals; final death is a supernova 300 dmg all"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"solarpyre"},
   {id:"solarpyre",name:"Solarpyre",emoji:"🌟",type:"Fire",rarity:"legendary",description:"Blazephoenix's true form. A solar storm wearing feathers. Astronomers have filed formal complaints.",
-   stats:{hp:130,atk:225,def:96,spd:1,abilitySpeed:1},
+   stats:{hp:98,atk:168,def:72,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Solar Talon",upgrades:["40 dmg+burn 12/s 4s; arc all; burn can't be removed","50 dmg","62 dmg","78 dmg","Burn 18/s 5s; all arcs crit; crits trigger free arc chain"]},
      special:{name:"Solar Rebirth",charge:18,upgrades:["Transform to pure solar energy; emerge 4s later full HP; 140 dmg AOE+burn all 8s","Emerge 175 dmg","Emerge 218 dmg","Emerge 272 dmg","Emerge 340 dmg; stun all 3s; strip all buffs; arena on fire 6s 40/s after emerge"]},
@@ -1556,7 +1556,7 @@ export const CREATURES=[
      unique:{name:"Mantle Dragon",upgrades:["Passive: all burn deals +30% dmg; DEF melts -2% per hit (no cap); fire+earth dmg +25%","Burn +38%; -2.5%/hit; +32%","Burn +48%; -3%/hit; +40%","Burn +60%; -3.5%/hit; +50%","Burn +75%; -4%/hit; +62%; melted foes (DEF -40%+) take 80/s auto-fire dmg; Ignisdragon immune to all dmg while channeling"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"pyredragon"},
   {id:"pyredragon",name:"Pyresaur",emoji:"🐉",type:"Fire",rarity:"legendary",description:"Ignisdragon fully ignited. Every scale is a miniature sun. Sunglasses are not sufficient protection.",
-   stats:{hp:152,atk:222,def:136,spd:1,abilitySpeed:1},
+   stats:{hp:114,atk:166,def:102,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Solar Breath",upgrades:["44 dmg cone+burn 18/s 5s; DEF-20%; width tripled","56 dmg","70 dmg","88 dmg","Burn 26/s 6s; DEF-28%; burns can't be removed; breath chains to all nearby of each hit foe"]},
      special:{name:"Magma Dominion",charge:12,upgrades:["Channel; 70/s 6s; DEF-12%/s; enemy at 0 DEF explodes 150 dmg","88/s","108/s","132/s","162/s 7s; explosion 200 dmg; explosion spreads burn max stacks to all nearby"]},
@@ -1571,7 +1571,7 @@ export const CREATURES=[
      unique:{name:"Living Volcano",upgrades:["Passive: every step erupts 60 dmg nearby; -28 all dmg; all attackers burned 5s 20/s; fire zone at all times 25/s","Step 76; -36; burn 28/s","Step 96; -46; burn 36/s","Step 120; -58; burn 46/s","Step 150; -72; burn 58/s; Magmatitan immune to all fire and earth dmg; revives once as a full volcanic eruption"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"infernocolossus"},
   {id:"infernocolossus",name:"Infernocolossus",emoji:"🌋",type:"Fire",rarity:"legendary",description:"Magmatitan evolved past the concept of cooling down. It is now classified as an active geological event.",
-   stats:{hp:238,atk:126,def:264,spd:1,abilitySpeed:1},
+   stats:{hp:178,atk:94,def:198,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Inferno Stomp",upgrades:["32 dmg; lava pool 5s 28/s; stagger 1.5s; pool spreads 4m","40 dmg","50 dmg","64 dmg","Stagger 2s+stun 0.5s; pool spreads 6m; all stepping in pool burned max stacks"]},
      special:{name:"Volcano Armor",charge:10,upgrades:["DEF+180+burn aura 48/s 7s+thorns 45; CC immune; allies -25% dmg taken","DEF+228","DEF+284; thorns 58","DEF+350","DEF+432; thorns 74; aura 68/s 8s; allies -38% dmg; reflect 30% all dmg taken"]},
@@ -1586,7 +1586,7 @@ export const CREATURES=[
      unique:{name:"Hydra Regeneration",upgrades:["Passive: regrow 1 head every 8s (max 8); each head +12% ATK+8% DEF; heads add blizzard aura 15/s","Every 6s; +15% ATK+10% DEF; aura 20/s","Every 5s; +18%+12%; aura 26/s","Every 4s; +22%+15%; aura 34/s","Every 3s; +28%+20%; aura 44/s; at 8 heads become invincible 1s every 5s; revives once regrowing to 8 heads instantly"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"glacialhydra"},
   {id:"glacialhydra",name:"Glacivore",emoji:"🐉",type:"Water",rarity:"legendary",description:"Frosthydra's final form. An eight-headed ice leviathan. Geographers have started naming seas after it.",
-   stats:{hp:168,atk:212,def:148,spd:1,abilitySpeed:1},
+   stats:{hp:126,atk:158,def:110,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Glacial Bite",upgrades:["38 dmg+freeze 25% 2.5s; all 8 heads target all enemies","48 dmg","60 dmg","74 dmg","Freeze 38% 3s; shatter 100 dmg; strip 2 buffs per head"]},
      special:{name:"Ultimate Regen",charge:20,upgrades:["Instantly regrow to 8 heads; heal full HP; 8-head ATK+DEF boost immediately","Also grant allies full HP","Also revive 1 fallen ally","Also revive 2 fallen","Also grant all allies 5s invincibility+full cleanse; Frosthydra buffs doubled"]},
@@ -1601,7 +1601,7 @@ export const CREATURES=[
      unique:{name:"Abyss Sovereign",upgrades:["Passive: -26 all dmg; 8 tentacle aura each 20/s; grabbed foes take +30% dmg+drain 15/s","Reduce 34; 28/s; +38%","Reduce 44; 38/s; +48%","Reduce 56; 50/s; +60%","Reduce 70; 65/s; +75%; Abyssraken immune to all water dmg; revives once all tentacles auto-grab all enemies"]}
    },role:"Tank",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"deepkraken"},
   {id:"deepkraken",name:"Bathykraken",emoji:"🦑",type:"Water",rarity:"legendary",description:"Abyssraken grown to its true size. Oceans look small standing next to it. It considers this 'a tight fit.'",
-   stats:{hp:222,atk:116,def:248,spd:1,abilitySpeed:1},
+   stats:{hp:166,atk:86,def:186,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Kraken Tentacle",upgrades:["28 dmg; grab 3 foes; root 3s; drain 30 HP; strip 1 buff","36 dmg","46 dmg","58 dmg","Root 4s; drain 44 HP; silence 2s; strip all buffs; grabbed foes take +30% dmg"]},
      special:{name:"Abyss Ink",charge:20,upgrades:["Blind all 5s; -55% ATK+SPD 6s; allies +38% dodge; remove all enemy buffs","Blind 6s; -66%; dodge +46%","Blind 6s; -80%; dodge +56%","Blind 7s; -96%; dodge +68%","Blind 7s; -115%; dodge +82%; silence all 3s; drain 40/s all enemies; heal all allies 80 HP"]},
@@ -1616,7 +1616,7 @@ export const CREATURES=[
      unique:{name:"Ancient Ocean",upgrades:["Passive: slow 40% on all attacks; freeze dmg +55%; coiled foes take +35% dmg; arc always hits all","Slow 50%; freeze +68%; coiled +44%","Slow 62%; freeze +84%; coiled +55%","Slow 76%; freeze +104%; coiled +68%","Slow 94%; freeze +128%; coiled +84%; Oceanwyrm immune to all water+ice; revives once as a world-flood tsunami"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"tidaldragon"},
   {id:"tidaldragon",name:"Tidalorca",emoji:"🐉",type:"Water",rarity:"legendary",description:"Oceanwyrm's draconic final form. Every ocean current on the planet follows its movements.",
-   stats:{hp:125,atk:222,def:93,spd:1,abilitySpeed:1},
+   stats:{hp:94,atk:166,def:70,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Tidal Fang",upgrades:["38 dmg+freeze 28% 2.5s+slow 50%; arc all; shatter frozen 80 dmg","48 dmg","60 dmg","74 dmg","Freeze 42% 3s; slow 65%; strip 2 buffs; shatter 120 dmg; arc all enemies always"]},
      special:{name:"World Coil",charge:18,upgrades:["Coil entire enemy team; 80/s for 6s; root+freeze+drain 50/s","96/s","116/s","140/s","170/s for 7s; drain 70/s; frozen coiled foes shatter 150 dmg; drain distributes to all allies; coiled lose all buffs"]},
@@ -1631,7 +1631,7 @@ export const CREATURES=[
      unique:{name:"Permafrost Hide",upgrades:["Passive: -30 all dmg; frozen+slowed foes deal -20% dmg; counter 18 dmg on each hit taken","Reduce 38; -26%; counter 24","Reduce 48; -33%; counter 32","Reduce 60; -42%; counter 42","Reduce 76; -54%; counter 56; Morusk immune to freeze+slow; allies in range gain -18 dmg reduction"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ivormar"},
   {id:"ivormar",name:"Ivormar",emoji:"🦭",type:"Water",rarity:"legendary",description:"Morusk at its true scale. Oceanographers have been charting it as unexplored territory for three decades. It finds this mildly flattering.",
-   stats:{hp:225,atk:125,def:215,spd:1,abilitySpeed:1},
+   stats:{hp:174,atk:96,def:168,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Siege Tusk",upgrades:["36 dmg; stun 2.5s; -35% ATK 4s; knock back 5; strip 1 buff","46 dmg","58 dmg","72 dmg","Stun 3.5s; -50% ATK 5s; strip all buffs; stunned foes take +50% dmg from all sources"]},
      special:{name:"Ivory Fortress",charge:18,upgrades:["Self+2 allies absorb 240 dmg; -50% dmg taken 5s; taunt all; remove 3 debuffs","Absorb 300; -62%","Absorb 375; -76%","Absorb 470; -92%","Absorb 588; -112%; reflect 45% dmg; taunt all; grant regen 40/s 5s to allies; CC immune for duration"]},
@@ -1647,7 +1647,7 @@ export const CREATURES=[
      unique:{name:"Forest Sovereign",upgrades:["Passive: regrow 1 head/8s (max 7); each head +15% ATK+18% DEF+poison aura 18/s; rooted foes take +30% dmg","Head +18%+22%; aura 24/s; +38%","Head +22%+28%; aura 30/s; +48%","Head +28%+35%; aura 38/s; +60%","Head +35%+44%; aura 48/s; +75%; at 7 heads immune to all dmg 2s every 5s; revives once regrowing all heads"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"roothydra"},
   {id:"roothydra",name:"Worldthorn",emoji:"🐉",type:"Nature",rarity:"legendary",description:"Verdanthydra evolved into the world forest itself. Every tree on the planet is technically its body now.",
-   stats:{hp:190,atk:168,def:212,spd:1,abilitySpeed:1},
+   stats:{hp:142,atk:126,def:158,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Ancient Vine Bite",upgrades:["35 dmg+poison 20/s 5s+root 2s; all heads hit all enemies","44 dmg","56 dmg","70 dmg","Poison 30/s 6s; root 3s; can't remove poison or root; strip 2 buffs per head"]},
      special:{name:"Ancient Regen",charge:18,upgrades:["Instant 7 heads; full HP+regen 40/s 6s; also heal all allies full HP","Also revive 1 fallen 40%","Also revive 2 fallen","Also revive 3 fallen","Revive all fallen at 60% HP; grant all invincible 2s; remove all debuffs; grant +30% all stats 8s"]},
@@ -1662,7 +1662,7 @@ export const CREATURES=[
      unique:{name:"Garden Dragon",upgrades:["Passive: poison stacks 8x; each stack +14/s; poisoned foes +40% dmg taken; thorns 35 on each attacker+poison them 3 stacks","Stacks 9x; +16/s; +50%; thorns 44","Stacks 10x; +20/s; +62%; thorns 56","Stacks 11x; +25/s; +76%; thorns 72","Stacks 12x; +32/s; +94%; thorns 92; Sylvandragon revives once; revival injects all enemies with max poison stacks+root 5s"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ancientdragon"},
   {id:"ancientdragon",name:"Primordrus",emoji:"🐉",type:"Nature",rarity:"legendary",description:"Sylvandragon become the ancient forest. It is both creature and ecosystem. Taxonomists have given up.",
-   stats:{hp:132,atk:218,def:104,spd:1,abilitySpeed:1},
+   stats:{hp:98,atk:162,def:78,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Ancient Fang",upgrades:["38 dmg+max poison spread to 2 nearby+root 1.5s; thorn 55 return","48 dmg","60 dmg","74 dmg","Spread to all nearby; root 2s; thorn 80; strip 2 buffs; poison can't be removed"]},
      special:{name:"Primordial Venom",charge:20,upgrades:["Inject all enemies; max 12-stack poison+root 4s; 160 dmg total","192 dmg","230 dmg","276 dmg","Root 5s; inject 12-stack; 280 dmg total; can't cure; death spreads to nearby; all allies fully healed"]},
@@ -1677,7 +1677,7 @@ export const CREATURES=[
      unique:{name:"Eternal Bloom",upgrades:["Passive: revives endlessly (3x) each revival healing all allies 100 HP+removing all debuffs+granting bloom aura 8s; Ability Speed +45% all allies","Revival heals 125 HP; +55% Ability Speed","Revival heals 155 HP; +68%","Revival heals 192 HP; +84%","Revival heals 240 HP; +104%; on 3rd revival Bloomphoenix becomes permanent petal storm healing all allies 80/s+immune to all dmg"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"lifephoenix"},
   {id:"lifephoenix",name:"Animavis",emoji:"🌿",type:"Nature",rarity:"legendary",description:"Bloomphoenix's final form. The concept of life given wings. It sustains ecosystems just by existing nearby.",
-   stats:{hp:148,atk:84,def:160,spd:1,abilitySpeed:1},
+   stats:{hp:110,atk:62,def:120,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Life Burst",upgrades:["18 dmg; heal all allies 38 HP; cleanse all debuffs; grant 1 buff","23 dmg; heal 48","30 dmg; heal 60","38 dmg; heal 76","Bloom explosion: heal all 120 HP; cleanse all; grant 3 buffs; spread to all nearby allies also"]},
      special:{name:"Eternal Life",charge:22,upgrades:["All allies +55 HP/s+55% Ability Speed+full cleanse; revive 1 fallen 40% HP","Regen +68; +68%; revive 2 fallen","Regen +84; +84%; revive 2 at 50%","Regen +104; +104%; revive 3 at 55%","Regen +128; +128%; revive all fallen 65% HP; grant all invincible 2.5s; all stats +35% 8s"]},
@@ -1692,7 +1692,7 @@ export const CREATURES=[
      unique:{name:"Primordial Stone",upgrades:["Passive: -32 all dmg; CC immune; reflect 28% blocked; thorns 50 all attackers; shockwave 45 dmg every step","Reduce 42; reflect 36%; thorns 64; shockwave 58","Reduce 54; reflect 46%; thorns 80; shockwave 74","Reduce 68; reflect 58%; thorns 100; shockwave 94","Reduce 86; reflect 72%; thorns 126; shockwave 118; Earthgolem revives 3 times; each revival cracks the earth dealing 350 dmg all"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"titangolem"},
   {id:"titangolem",name:"Terralith",emoji:"🏔️",type:"Earth",rarity:"legendary",description:"Earthgolem grew until it became the mountain. Geographers debate whether it counts as topography.",
-   stats:{hp:250,atk:116,def:278,spd:1,abilitySpeed:1},
+   stats:{hp:186,atk:86,def:206,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Mountain Slam",upgrades:["32 dmg; quake 3s 28/s; DEF-20%+stagger 2s; shockwave 65 all nearby","40 dmg","50 dmg","64 dmg","DEF-28%; stagger 2.5s+stun 1s; shockwave 88 dmg; quake 5s; pillars erupt 4 random spots"]},
      special:{name:"Titan Ward",charge:8,upgrades:["DEF+230+thorns 65+reflect 42% 9s; allies take -50% dmg; CC immune; thorns stun attacker 0.5s","DEF+290; allies -62%","DEF+362; reflect 52%; allies -76%; thorns stun 1s","DEF+452; reflect 64%; allies -94%","DEF+565; reflect 80%; allies -100% (immune); thorns stun 1.5s; Titangolem invincible during ward"]},
@@ -1707,7 +1707,7 @@ export const CREATURES=[
      unique:{name:"Gem Hydra",upgrades:["Passive: regrow 1 head/7s (max 7); each head +16% ATK+20% DEF+crystal aura 22/s; reflect 30% blocked; thorns 35 per head","Head +20%+25%; aura 28/s; reflect 38%; thorns 44","Head +25%+32%; aura 36/s; reflect 48%; thorns 56","Head +32%+40%; aura 46/s; reflect 60%; thorns 72","Head +40%+50%; aura 58/s; reflect 74%; thorns 92; at 7 heads immune to all physical dmg; revives once regrowing all heads+crystal explosion 300 dmg"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"gemhydra"},
   {id:"gemhydra",name:"Prismarex",emoji:"🐉",type:"Earth",rarity:"legendary",description:"Quartzhydra fully crystalized. An eight-headed dragon of pure gemstone. It is its own mountain, treasury, and fortress.",
-   stats:{hp:196,atk:190,def:222,spd:1,abilitySpeed:1},
+   stats:{hp:146,atk:142,def:166,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gem Bite",upgrades:["35 dmg+DEF-22% 5s; thorn 65 return; crystal 55 AOE each bite; all 8 heads attack","44 dmg","56 dmg","70 dmg","DEF-32% 6s; thorn 90; crystal 80 AOE; each head strips 1 buff"]},
      special:{name:"Sovereign Regen",charge:22,upgrades:["Instant 8 heads; heal full HP; head bonuses max out; also heal all allies full HP","Also revive 1 fallen","Also revive 2 fallen","Also revive 3 fallen","Revive all fallen 60%; grant all invincible 2.5s; full cleanse; grant +40% all stats 8s"]},
@@ -1722,7 +1722,7 @@ export const CREATURES=[
      unique:{name:"Seismic Dragon",upgrades:["Passive: heartbeat quake every 3s 80 dmg all; -24 all dmg; shockwave on every attack; DEF-5%/hit (no cap)","Heartbeat 100 dmg every 2.5s; -32","Heartbeat 125 dmg every 2s; -40","Heartbeat 156 dmg every 1.5s; -50","Heartbeat 195 dmg every 1s; -62; CC immune; Seismicdrake revives once; revival is a magnitude-10 earthquake 400 dmg all+bury all 5s"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"quakewyrm"},
   {id:"quakewyrm",name:"Seismarex",emoji:"🐉",type:"Earth",rarity:"legendary",description:"Seismicdrake's final form. A tectonic wyrm so massive that continents shift when it turns around.",
-   stats:{hp:142,atk:210,def:125,spd:1,abilitySpeed:1},
+   stats:{hp:106,atk:156,def:94,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Tectonic Bite",upgrades:["38 dmg+quake 3s 30/s; DEF-22%+stagger 2s; shockwave 70 dmg+stun all nearby 0.5s","48 dmg","60 dmg","74 dmg","DEF-32%; stagger 2.5s; shockwave 100 dmg+stun 1s; fissure 4s 40/s at each target"]},
      special:{name:"World Roar",charge:16,upgrades:["All enemies -55% all stats 8s; quake 6s 45/s; all allies +45% all stats 8s","Enemies -68%; allies +56%","Enemies -84%; allies +70%","Enemies -104%; allies +88%","Enemies -128%; allies +110%; also silence all enemies 4s; remove all enemy buffs; grant ally immunity 3s"]},
@@ -1737,7 +1737,7 @@ export const CREATURES=[
      unique:{name:"Storm Phoenix",upgrades:["Passive: revives endlessly (3x); each revival: stronger +35% ATK+full SPD; hurricane 6s 45/s on each revival; enemies -55% SPD around revival point","Revival +44% ATK; hurricane 7s 58/s","Revival +55%; 8s 74/s","Revival +68%; 9s 94/s","Revival +84%; 10s 118/s; 3rd revival: permanent storm form+untargetable for 4s every 8s; enemies always -40% SPD"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"skyphoenix"},
   {id:"skyphoenix",name:"Skyphoenix",emoji:"✨",type:"Wind",rarity:"legendary",description:"Galephoenix's true form. A creature of pure atmospheric power that rewrites the rules of weather by existing.",
-   stats:{hp:116,atk:228,def:83,spd:1,abilitySpeed:1},
+   stats:{hp:86,atk:170,def:62,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Sky Feather",upgrades:["38 dmg+push+slow 55% 3.5s; arc all; each arc also pushes+slows; cyclone 3s 35/s at landing","48 dmg","60 dmg","74 dmg","Slow 72%; cyclone 4s 50/s; cyclone stuns 1s on enter; strip 2 buffs per arc"]},
      special:{name:"Sky Rebirth",charge:18,upgrades:["Become sky itself; emerge 4.5s later full HP+8s invincible; 160 dmg F10 hurricane on emerge; all enemies trapped","Emerge 200 dmg","Emerge 250 dmg","Emerge 312 dmg","Emerge 390 dmg; hurricane 8s 80/s; allies immune to wind+gain +65 SPD+50% dodge permanently in fight"]},
@@ -1752,7 +1752,7 @@ export const CREATURES=[
      unique:{name:"Cyclone Drake",upgrades:["Passive: immune to all ground; +36% dodge; cyclone aura 36/s; all enemies in range -50% SPD+ATK; SPD scales dmg +1.5%/5 SPD","Dodge +44%; aura 46/s; -62%","Dodge +54%; aura 58/s; -76%","Dodge +66%; aura 72/s; -94%","Dodge +80%; aura 90/s; -116%; Cyclonedrake permanently airborne+untargetable unless attacking; revives once as a mega cyclone"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"vortexwyrm"},
   {id:"vortexwyrm",name:"Maelstrix",emoji:"🐉",type:"Wind",rarity:"legendary",description:"Cyclonedrake's final form. A wyrm of living wind that exists simultaneously everywhere the wind blows.",
-   stats:{hp:104,atk:218,def:77,spd:1,abilitySpeed:1},
+   stats:{hp:78,atk:162,def:58,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Vortex Talon",upgrades:["35 dmg+push+vortex 4s 50/s at each landing; slow 62%; chain all","44 dmg","56 dmg","70 dmg","Slow 80%; chain all at 100%; vortex sucks enemies in; each chain strip 1 buff; stun 0.5s on entry"]},
      special:{name:"Vortex Form",charge:20,upgrades:["Become wind; attack from everywhere simultaneously; 60 dmg 6 hits+pull+slow 80% 5s","72 dmg","88 dmg","106 dmg","8 hits; slow 100% (root); silence 3s; all hits strip 1 buff; emerge dealing 120 additional dmg"]},
@@ -1767,7 +1767,7 @@ export const CREATURES=[
      unique:{name:"Thunder Regen",upgrades:["Passive: regrow 1 head/7s (max 6); each head +14% ATK+10% DEF+arc aura 20/s+paralyze 12%/s; lightning zone at all times","Head +18%+13%; aura 26/s; paralyze 16%/s","Head +22%+16%; aura 34/s; paralyze 21%/s","Head +28%+20%; aura 44/s; paralyze 27%/s","Head +35%+25%; aura 56/s; paralyze 35%/s; at 6 heads immune to electric dmg; revives once regrowing all heads+EMP 300 dmg all"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"stormhydra"},
   {id:"stormhydra",name:"Arcmajor",emoji:"🐉",type:"Electric",rarity:"legendary",description:"Thunderhydra's final form. Nine heads, nine storms. Meteorologists have collectively retired.",
-   stats:{hp:152,atk:206,def:142,spd:1,abilitySpeed:1},
+   stats:{hp:114,atk:154,def:106,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Storm Bite",upgrades:["35 dmg+arc all 100%; paralyze 40% 2.5s; stun 1s on paralyze; all 9 heads attack; each chain to all","44 dmg","56 dmg","70 dmg","Paralyze 55% 3s; stun 1.5s; each arc also strips 1 buff; arcs deal full dmg to all"]},
      special:{name:"World Lightning",charge:16,upgrades:["Release 9-head lightning; 120 dmg per head to 1 foe each; stun all 2s; regrow to 9 heads","150 dmg per head","188 dmg","235 dmg","295 dmg; all enemies paralyzed 3s+stripped all buffs; heal all allies 80 HP; all lightning arcs chain to each other"]},
@@ -1782,7 +1782,7 @@ export const CREATURES=[
      unique:{name:"Electric Phoenix",upgrades:["Passive: revives endlessly (3x); each revival: EMP stun all 3s+paralyze all 4s+arc all 100% 200 dmg; +38% ATK; immune to all electric","Revival +48%; EMP 225 dmg","Revival +60%; EMP 250 dmg","Revival +75%; EMP 280 dmg","Revival +94%; EMP 312 dmg; 3rd revival: become permanent lightning form dealing 100/s to all enemies; allies immune"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"arcphoenix"},
   {id:"arcphoenix",name:"Arcondor",emoji:"🌩️",type:"Electric",rarity:"legendary",description:"Voltphoenix's true form. Pure electricity given feathers and a bad attitude toward things that conduct poorly.",
-   stats:{hp:116,atk:225,def:83,spd:1,abilitySpeed:1},
+   stats:{hp:86,atk:168,def:62,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Arc Feather",upgrades:["35 dmg+arc all 100%+paralyze 38% 2.5s; stun 1s; chains to all; stun on paralyze","44 dmg","56 dmg","70 dmg","Paralyze 52% 3s; stun 1.5s; each chain also arcs again; strip 1 buff per arc"]},
      special:{name:"Arc Rebirth",charge:20,upgrades:["Become arc; emerge 4s full HP; EMP 240 dmg+stun 3s+paralyze all 5s+disable abilities 6s on emerge","Emerge 300 dmg","Emerge 375 dmg","Emerge 469 dmg","Emerge 586 dmg; strip all buffs; allies immune to electric 8s+gain +60% ATK 5s; Arcphoenix also gains +55% ATK 5s"]},
@@ -1797,7 +1797,7 @@ export const CREATURES=[
      unique:{name:"Thunder Core",upgrades:["Passive: -30 all dmg; electric field always active 44/s+paralyze 28%/s; charges max 12; each charge +18 dmg to next attack; gain 1 charge/3s; release burst 220 dmg+paralyze all 3s","Reduce 38; field 56/s; burst 275","Reduce 48; field 70/s; burst 344","Reduce 60; field 88/s; burst 430","Reduce 76; field 110/s; burst 538; CC immune; revives 3 times each EMP stunning all enemies 6s+dealing 600 dmg"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"staticgolem"},
   {id:"staticgolem",name:"Arcvast",emoji:"🌩️",type:"Electric",rarity:"legendary",description:"Galvanigolem's final form. A walking thunderstorm in metal armor. Nations have tried to weaponize it. Nations have failed.",
-   stats:{hp:238,atk:120,def:264,spd:1,abilitySpeed:1},
+   stats:{hp:178,atk:90,def:198,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Lightning Fist",upgrades:["32 dmg+shock 28/s 4s+stagger 1.5s; paralyze 30% 2s; arc all 90%","40 dmg","50 dmg","64 dmg","Shock 40/s 5s; stagger 2s+stun 0.5s; paralyze 44% 2.5s; arc all 100%+chain twice"]},
      special:{name:"Static Fortress",charge:8,upgrades:["DEF+200+electric field 56/s 9s+paralyze 44%/s; immune CC; disable on entry 3s; allies -40% dmg taken","DEF+250; allies -50%","DEF+312; paralyze 56%/s; allies -62%","DEF+390; allies -76%","DEF+488; paralyze 70%/s 10s; allies -94% (near immune); field also stuns on entry 1s; reflect 50% all dmg"]},
@@ -1812,7 +1812,7 @@ export const CREATURES=[
      unique:{name:"Solar Phoenix",upgrades:["Passive: revives endlessly (3x); each revival: blind all 5s+heal all allies 200 HP+grant invincible 2s; light dmg +40%; heals +35%","Light +50%; heals +44%","Light +62%; heals +55%","Light +76%; heals +68%","Light +94%; heals +84%; Solarphoenix immune to all blind; crits always heal all allies 55 HP; revives at full power"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"divinephoenix"},
   {id:"divinephoenix",name:"Celestialis",emoji:"☀️",type:"Light",rarity:"legendary",description:"Solarphoenix ascended to true divinity. It can no longer be described using standard luminosity measurements.",
-   stats:{hp:128,atk:222,def:96,spd:1,abilitySpeed:1},
+   stats:{hp:96,atk:166,def:72,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Divine Feather",upgrades:["38 dmg+blind 38% 3s; heal all 28 HP; arc all; each arc heals 1 ally 18 HP","48 dmg; heal 36/22","60 dmg; heal 46/28","74 dmg; heal 58/36","Divine burst: blind all 5s; heal all 92 HP; each arc heals all allies 46 HP; strip all buffs from each hit"]},
      special:{name:"Divine Rebirth",charge:14,upgrades:["Become divine light; emerge 4s full HP; 192 dmg+blind all 6s; heal all 160 HP+invincible 3s; revive 1 fallen 40%","Emerge 240; heal 200; revive 2","Emerge 300; heal 250; revive 2 at 50%","Emerge 375; heal 312; revive 3 at 55%","Emerge 469; heal 390; revive all at 65%; grant all +45% all stats 8s; full cleanse"]},
@@ -1827,7 +1827,7 @@ export const CREATURES=[
      unique:{name:"Holy Sovereign",upgrades:["Passive: -28 all dmg; allies regen 24/s; blind aura 28% all enemies; absorb 35% ally dmg; Holydragon immune to blind+all CC","Reduce 36; regen 30/s; aura 36%; absorb 44%","Reduce 46; regen 38/s; aura 46%; absorb 56%","Reduce 58; regen 48/s; aura 58%; absorb 70%","Reduce 72; regen 60/s; aura 72%; absorb 88%; Holydragon revives 3 times each healing all allies to full HP+granting invincible 3s"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"celestialdragon"},
   {id:"celestialdragon",name:"Lumimajor",emoji:"🐉",type:"Light",rarity:"legendary",description:"Holydragon's celestial final form. A dragon of pure starlight and divine grace. Its very presence is a blessing.",
-   stats:{hp:218,atk:110,def:244,spd:1,abilitySpeed:1},
+   stats:{hp:162,atk:82,def:182,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Celestial Breath",upgrades:["28 dmg cone+blind 34% 3s; heal all 36 HP; DEF-22% all hit; cleanse all allies 1 debuff","36 dmg; heal 46","46 dmg; heal 58","58 dmg; heal 72","Celestial explosion: blind all 5s; heal all 115 HP; DEF-32%; cleanse all allies all debuffs; grant 1 buff each"]},
      special:{name:"Celestial Fortress",charge:20,upgrades:["DEF+178+blind aura 45% 9s+regen 36/s; allies take -50% dmg; immune CC; immune blind; redirect 30% ally dmg","DEF+222; allies -62%; redirect 38%","DEF+278; aura 56%; allies -78%; redirect 48%","DEF+347; allies -96%; redirect 60%","DEF+434; aura 70%; allies immune to all dmg 2s then -80%; redirect 100%; Celestialdragon immune during fortress"]},
@@ -1842,7 +1842,7 @@ export const CREATURES=[
      unique:{name:"Void Sovereign",upgrades:["Passive: regrow 1 head/7s (max 7); each head +14% ATK+12% DEF+void aura 20/s; drain aura 18/s all enemies; silence 1s every 4s per head","Head +18%+15%; aura 26/s; drain 24/s","Head +22%+18%; aura 34/s; drain 32/s","Head +28%+22%; aura 44/s; drain 42/s","Head +35%+28%; aura 56/s; drain 55/s; at 7 heads immune to all dmg 2s every 5s; revives once regrowing all heads+consuming 50% of all enemy HP"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"nihilhydra"},
   {id:"nihilhydra",name:"Nullravene",emoji:"🐉",type:"Dark",rarity:"legendary",description:"Voidhydra's final form. The nothing between galaxies given nine heads and a purpose. The purpose is unclear. It is likely terrible.",
-   stats:{hp:158,atk:212,def:142,spd:1,abilitySpeed:1},
+   stats:{hp:118,atk:158,def:106,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Nihil Bite",upgrades:["35 dmg+silence 2.5s+drain 35 HP; all 9 heads hit all enemies; strip 3 buffs each","44 dmg","56 dmg","70 dmg","Silence 3.5s; drain 50 HP; drain distributes to all allies; drained HP becomes permanent bonus HP"]},
      special:{name:"Annihilation Regen",charge:22,upgrades:["Instant 9 heads; full HP; release void wave 120 dmg+silence all 4s+drain 40% all HP","Drain 50% HP","Drain 60% HP","Drain 72% HP","Drain 85% HP; wave also strips all buffs; heal all allies full HP; grant all invincible 2s; permanent drain aura 80/s"]},
@@ -1857,7 +1857,7 @@ export const CREATURES=[
      unique:{name:"Dark Phoenix",upgrades:["Passive: revives endlessly (3x); each revival: stronger +38% ATK; void wave 150 dmg+silence all 5s+drain 40% HP; stealth 4s after revival","Revival +48%; wave 188 dmg; drain 50%","Revival +60%; wave 235; drain 60%","Revival +75%; wave 294; drain 72%","Revival +94%; wave 368; drain 85%; 3rd revival: permanent dark form; immune to all targeting unless attacking; always crits; silent all enemies permanently"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"oblivionphoenix"},
   {id:"oblivionphoenix",name:"Nihilvour",emoji:"🌑",type:"Dark",rarity:"legendary",description:"Darkphoenix's true form. Oblivion given wings. The concept of light files a restraining order and loses.",
-   stats:{hp:120,atk:222,def:88,spd:1,abilitySpeed:1},
+   stats:{hp:90,atk:166,def:66,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Oblivion Feather",upgrades:["35 dmg+silence 2s+drain 28 HP; always crit from stealth; arc all at 100%; drain to all allies","44 dmg","56 dmg","70 dmg","Silence 3s; drain 40 HP; strip 2 buffs per arc; stealth crits deal +80% bonus dmg"]},
      special:{name:"Oblivion Rebirth",charge:20,upgrades:["Become oblivion; emerge 4s full HP+stealth 6s; 175 dmg void wave+silence all 5s+drain 50% all HP on emerge; strip all buffs","Emerge 219 dmg; drain 62%","Emerge 274 dmg; drain 76%","Emerge 342 dmg; drain 92%","Emerge 428 dmg; silence 6s; drain 100% (consume); allies gain all drained HP; revive 1 fallen 45% HP"]},
@@ -1872,7 +1872,7 @@ export const CREATURES=[
      unique:{name:"Void Core",upgrades:["Passive: -30 all dmg; void aura 48/s; drain aura 30/s all enemies; attackers take 60 void+silence 2s+strip 1 buff; CC immune","Reduce 38; aura 60/s; drain 38/s; attacker void 76","Reduce 48; aura 76/s; drain 48/s; void 96","Reduce 60; aura 96/s; drain 60/s; void 120","Reduce 76; aura 120/s; drain 76/s; void 150; Abyssgolem revives 3 times each consuming 40% of all enemy HP and stunning all enemies 5s"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"nihilgolem"},
   {id:"nihilgolem",name:"Nullith",emoji:"💀",type:"Dark",rarity:"legendary",description:"Abyssgolem's final form. The end of all things wearing the shape of a golem. The void is pleased with its performance.",
-   stats:{hp:244,atk:116,def:272,spd:1,abilitySpeed:1},
+   stats:{hp:182,atk:86,def:202,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Nihil Slam",upgrades:["32 dmg; silence 3s; drain 50 HP; attackers take 90 void+silence 2.5s+strip all buffs+lose 20% current HP","40 dmg","50 dmg","64 dmg","Silence 4s; drain 72 HP; attacker void 130+silence 3.5s+strip all+lose 30% current HP; drain to all allies"]},
      special:{name:"Nihil Ward",charge:16,upgrades:["DEF+200+void aura 62/s+drain 55/s all 9s; silence all 4s; allies take -55% dmg; redirect 45% all ally dmg to Nihilgolem","DEF+250; drain 70/s; allies -68%; redirect 56%","DEF+312; drain 88/s; allies -84%; redirect 70%","DEF+390; drain 110/s; allies -104% (immune); redirect 88%","DEF+488; drain 138/s; allies immune; redirect 100%; silence 5s; immune to all dmg during ward; all drained to all allies"]},

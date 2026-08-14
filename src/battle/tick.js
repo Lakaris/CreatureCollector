@@ -13,6 +13,7 @@
 // owns React state, timers, rewards, and win/lose handling; this function only
 // advances the simulation and reports what happened.
 
+import { CREATURE_MAP } from "../data/creatures.js";
 import { MELEE_RANGE, RANGED_RANGE, BOSS_SIZE } from "./constants.js";
 import {
   aChebDist, aCardinalDist, aBestStep,
@@ -76,6 +77,13 @@ const ABILITY_FLASH_TICKS = 3;
 export function tickSpecialCharge(u) {
   if (u.abilFlashTicks) u.abilFlashTicks--;
   if (!u.abilChargeMax) return;
+  // The tick after the special fired: the bar got its one full-width frame
+  // (see consumeSpecialCharge), now the recharge actually starts over.
+  if (u.abilJustFired) {
+    u.abilJustFired = false;
+    u.abilCharge = 0;
+    return;
+  }
   u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1));
 }
 
@@ -83,9 +91,43 @@ export function specialChargeReady(u) {
   return !!u.abilChargeMax && u.abilCharge >= u.abilChargeMax;
 }
 
-/** The special fired (or placeholder-triggered): reset the bar, flash the "!" marker. */
+/**
+ * Generic "is there something to use the special on" gate: a full charge bar
+ * HOLDS (stays at 100%, no fire) until this passes, then fires immediately.
+ * "In range" means an enemy within the unit's own attack range (Chebyshev;
+ * the boss counts via its 2x2 body), or -- for Support creatures, whose
+ * specials usually target allies -- another ally within that same range.
+ *
+ * This is the default for creatures whose special isn't implemented yet;
+ * implemented abilities can override it per-module via `specialInRange(u,
+ * {aliveE, aliveP, boss})` (e.g. Blazehornet's dash is an engage tool that
+ * deliberately fires from anywhere).
+ */
+export function specialTargetInRange(u, allies, enemies, boss) {
+  const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+  for (const e of enemies) {
+    if (aChebDist(u.row, u.col, e.row, e.col) <= range) return true;
+  }
+  if (boss && boss.hp > 0 && distToBoss(boss, u.row, u.col) <= range) return true;
+  if (CREATURE_MAP[u.creatureId]?.role === "Support") {
+    for (const a of allies) {
+      if (a !== u && a.hp > 0 && aChebDist(u.row, u.col, a.row, a.col) <= range) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The special fired (or placeholder-triggered): flash the "!" marker and mark
+ * the charge as spent. The charge value itself deliberately stays at max for
+ * the rest of this tick -- snapshots are taken after the tick runs, so
+ * zeroing here would mean the bar never renders full: it would visually
+ * reset from the previous tick's ~90% (worse at 2x/4x, where the bar's CSS
+ * transition also lags behind). tickSpecialCharge does the real reset at the
+ * start of the next tick, giving the UI exactly one full-width frame.
+ */
 export function consumeSpecialCharge(u) {
-  u.abilCharge = 0;
+  u.abilJustFired = true;
   u.abilFlashTicks = ABILITY_FLASH_TICKS;
 }
 
@@ -174,14 +216,21 @@ export function runBattleTick(state, config) {
     // Blazehornet's Charging Pierce) can move the unit, so they run first and
     // everything after sees the new position. Creatures whose special isn't
     // implemented yet just flash the ready marker and start recharging.
+    // Either way, a full bar HOLDS until there's actually something in range
+    // to use it on (specialTargetInRange, or the module's own specialInRange),
+    // then fires the moment a target closes in.
     if (specialChargeReady(u)) {
+      const rangeBoss = bossAlive ? boss : null;
+      const inRange = abilMod?.specialInRange
+        ? abilMod.specialInRange(u, { aliveE, aliveP, boss: rangeBoss })
+        : specialTargetInRange(u, aliveP, aliveE, rangeBoss);
       if (abilMod?.special) {
-        if (canMove && (aliveE.length || bossAlive)) {
+        if (canMove && inRange) {
           const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now) });
           abilMod.special(u, specialCtx);
           consumeSpecialCharge(u);
         }
-      } else {
+      } else if (inRange) {
         consumeSpecialCharge(u);
       }
     }
@@ -251,9 +300,11 @@ export function runBattleTick(state, config) {
   for (const u of aliveE) {
     u.atkCd = Math.max(0, u.atkCd - 1);
     // Enemy creatures charge specials too; none are implemented, so a full
-    // bar just flashes the ready marker and recharges.
+    // bar just flashes the ready marker and recharges -- holding, like player
+    // units, until a target (a player unit, or a fellow minion for Supports)
+    // is in range.
     tickSpecialCharge(u);
-    if (specialChargeReady(u)) consumeSpecialCharge(u);
+    if (specialChargeReady(u) && specialTargetInRange(u, aliveE, aliveP, null)) consumeSpecialCharge(u);
     tickAtkMod(u);
     const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
     const { atkTgt, moveTgt } = selectTarget(u, aliveP);

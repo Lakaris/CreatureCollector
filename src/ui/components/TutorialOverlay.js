@@ -4,10 +4,10 @@
 import React, { useState, useRef, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { makeOwnedCreature } from "../../core/creatures.js";
+import { makeOwnedCreature, getChain } from "../../core/creatures.js";
 import { TYPE_EMOJI } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
-import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge } from "../../battle/tick.js";
+import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge, specialTargetInRange } from "../../battle/tick.js";
 import { MELEE_RANGE, RANGED_RANGE, COOLDOWN_TICKS_AT_SPD_1 } from "../../battle/constants.js";
 import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../battle/geometry.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
@@ -17,7 +17,7 @@ import CreatureIcon from "./CreatureIcon.js";
 
 const TUTORIAL_LINES = [
   "You wake up on the shore of a deserted looking island with no memory of how you got there.",
-  "You head into the forest to explore and see 3 abandoned eggs beneath a tree.",
+  "You head into the forest to explore, and see 3 abandoned eggs beneath a tree.",
   "Curious, you pick it up and it starts to hatch!",
 ];
 
@@ -26,7 +26,7 @@ const REVEAL_LINE = "The egg shudders and shakes, and hatches into a mysterious 
 
 // Shown after the reveal card, before the tutorial ends.
 const POST_REVEAL_LINES = [
-  "Suddenly the bushes rustle and an angry creature bursts out, it looks like you disturbed its lunch.",
+  "A creature bursts out of some nearby bushes, angry that you stole its meal!",
   "Your newly hatched creature rushes out to defend you. It's time to fight!",
 ];
 
@@ -39,6 +39,12 @@ const TUTORIAL_ITEM_ID = "com_hp_atk";
 // Index of the line after which the egg-choice screen appears.
 const EGG_CHOICE_AFTER_LINE = 1;
 const STARTER_CHOICES = ["emberpup", "droplette", "leafling"];
+
+/** Final-evolution-stage def for a starter id -- shown as a preview above the egg row. */
+function finalFormDef(starterId) {
+  const chain = getChain(starterId);
+  return CREATURE_MAP[chain[chain.length - 1]];
+}
 
 // The tutorial's first fight uses a smaller grid than a real arena/dungeon
 // battle, with a single fixed level-1 Murkwing as the only enemy. Tile size
@@ -242,9 +248,10 @@ function TutorialOverlay() {
     function actUnit(u, foes) {
       u.atkCd = Math.max(0, u.atkCd - 1);
       // Special-ability charge, same as the real Arena tick: no specials are
-      // implemented here, so a full bar flashes the "!" marker and recharges.
+      // implemented here, so a full bar flashes the "!" marker and recharges
+      // -- holding at full until a foe (or ally, for Supports) is in range.
       tickSpecialCharge(u);
-      if (specialChargeReady(u)) consumeSpecialCharge(u);
+      if (specialChargeReady(u) && specialTargetInRange(u, u.uid[0] === "p" ? aliveP : aliveE, foes, null)) consumeSpecialCharge(u);
       const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
       const byCheb = [...foes].sort((a, b) => aChebDist(u.row, u.col, a.row, a.col) - aChebDist(u.row, u.col, b.row, b.col));
       let atkTgt = null, moveTgt = byCheb[0];
@@ -371,7 +378,7 @@ function TutorialOverlay() {
     },
     // Always available, even mid-battle -- pinned to the corner least likely
     // to collide with whatever the current phase is showing up top (the
-    // Fight button and Planning Phase/Battle! title both live on the right
+    // Fight button and the Planning Phase title both live on the right
     // and center during battlePlan/battle, so Skip moves to the left there).
     React.createElement(
         "button",
@@ -410,6 +417,20 @@ function TutorialOverlay() {
             gap: 32,
           },
         },
+        // Fixed-height preview of the selected egg's fully-evolved form, above
+        // the egg row -- reserved space (not just conditionally rendered) so
+        // picking an egg doesn't shift the row below it. Swaps instantly to
+        // whichever egg is currently selected.
+        React.createElement(
+          "div",
+          { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 96, justifyContent: "flex-end" } },
+          selectedEgg
+            ? [
+                React.createElement("div", { key: "emoji", style: { fontSize: 64, lineHeight: 1 } }, finalFormDef(selectedEgg).emoji),
+                React.createElement("div", { key: "label", style: { fontSize: 12, fontWeight: 600, color: "#888" } }, "Fully evolved"),
+              ]
+            : React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: "#bbb" } }, "Pick an egg to preview its final form")
+        ),
         React.createElement(
           "div",
           { style: { display: "flex", gap: 24 } },
@@ -886,7 +907,6 @@ function TutorialOverlay() {
           React.createElement(
             "div",
             { style: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 16px 12px", flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
-            React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, "Battle!"),
             !battleOutcome &&
               React.createElement(
                 "button",
@@ -1005,7 +1025,9 @@ function TutorialOverlay() {
                   (u.abilChargeMax || 0) > 0 && React.createElement(
                     "div",
                     { style: { position: "absolute", bottom: 0, left: 4, right: 4, height: 2, background: "#dbeafe", borderRadius: 2, overflow: "hidden" } },
-                    React.createElement("div", { style: { height: "100%", width: (Math.min(1, (u.abilCharge || 0) / u.abilChargeMax) * 100) + "%", background: "#3b82f6", borderRadius: 2, transition: "width 0.35s linear" } })
+                    // Snap (no transition) around the fire so the bar visibly
+                    // hits 100% instead of easing down from mid-animation.
+                    React.createElement("div", { style: { height: "100%", width: (Math.min(1, (u.abilCharge || 0) / u.abilChargeMax) * 100) + "%", background: "#3b82f6", borderRadius: 2, transition: (u.abilFlashTicks || 0) > 0 ? "none" : "width 0.35s linear" } })
                   )
                 )
               )

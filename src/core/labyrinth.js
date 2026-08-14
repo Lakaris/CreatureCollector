@@ -1,6 +1,8 @@
 // Labyrinth reward schedule and difficulty curve -- shared between the
 // planning/battle screen and the home entry point.
 
+import { CREATURES } from "../data/creatures.js";
+
 export const MAX_LABYRINTH_DEPTH = 5000;
 
 /**
@@ -13,20 +15,66 @@ export function getEnemyLevelForDepth(depth) {
   return Math.min(500, Math.max(1, Math.ceil(depth / 10)));
 }
 
-/**
- * Enemy HP/ATK/DEF multiplier curve, calibrated at each 1000-floor tier
- * boundary against the game's real level/ascension/equipment stat math (see
- * plan notes) so a team at roughly that tier's target investment can clear
- * it. Interpolated linearly between breakpoints -- retune these values after
- * playtesting via the Dev Panel's Labyrinth floor-jump buttons.
- */
-export const DIFFICULTY_BREAKPOINTS = [
-  { depth: 0, hpMult: -0.94, atkMult: -0.59, defMult: -0.45 },
-  { depth: 1000, hpMult: 1, atkMult: 14, defMult: 20 },
-  { depth: 2000, hpMult: 7.5, atkMult: 64, defMult: 90 },
-  { depth: 3000, hpMult: 26, atkMult: 205, defMult: 294 },
-  { depth: 4000, hpMult: 71, atkMult: 555, defMult: 798 },
-  { depth: 5000, hpMult: 115, atkMult: 900, defMult: 1300 },
+// ── Difficulty model ────────────────────────────────────────────────────
+// Enemy multipliers are computed at EVERY depth (not interpolated between
+// hand-tuned breakpoints) as
+//
+//   mult(depth) = targetRatio(depth) * playerPower(depth) / enemyBase(depth) - 1
+//
+// so each 10-floor progression step stays balanced against the investment a
+// player on-curve actually has there: creature level depth/10 (ascension
+// level/10) funded by the Field loop, gear level depth/50 (ascension
+// level/10). `targetRatio` encodes the intended difficulty ramp -- its
+// anchors reproduce the original hand-tuned curve's enemy:player stat ratios
+// at each 1000-floor boundary, translated through the 2026-08 stat rebalance
+// (flat RARITY_STAT_MULT, legendary finals at stage-1 x1.2, equipment curve
+// capped at ~30x). Retune difficulty by editing the anchors, not the model.
+
+const CORE_STATS = ["hp", "atk", "def"];
+
+// Average base stats of each evolution-stage enemy pool, computed from the
+// live roster so creature rebalances feed straight into the curve.
+const POOL_AVG = (() => {
+  const groups = {
+    base: CREATURES.filter((c) => !c.evolutionOf),
+    mid: CREATURES.filter((c) => c.evolutionOf && c.evolutionId),
+    final: CREATURES.filter((c) => c.evolutionOf && !c.evolutionId),
+  };
+  const out = {};
+  for (const g in groups) {
+    out[g] = { hp: 0, atk: 0, def: 0 };
+    for (const c of groups[g]) for (const k of CORE_STATS) out[g][k] += c.stats[k] / groups[g].length;
+  }
+  return out;
+})();
+
+// Modeled on-curve player: average of a final-form common/epic/legendary
+// (Ashmonarch / Thunderdrake / Glacialhydra) wearing 4 two-stat legendary
+// items -- the same benchmark the ratio anchors were derived with. Growth
+// mirrors calcStats (level bumps of 5% base across 3 stats, +8% per
+// ascension) and equipBonus, smoothed to real-valued levels.
+const PLAYER_BENCH = { hp: 118.7, atk: 146, def: 90 };
+const GEAR_BASE_PER_STAT = 17 * (8 / 3);
+
+function playerPowerAt(depth) {
+  const L = Math.max(1, depth / 10), A = depth / 100;
+  const G = Math.max(1, depth / 50), ga = G / 10;
+  const gear = GEAR_BASE_PER_STAT * (1 + G * 0.09 + G * G * 0.0002) * (1 + ga * 0.15);
+  const out = {};
+  for (const k of CORE_STATS) out[k] = PLAYER_BENCH[k] * (1 + ((L - 1) / 3) * 0.05) * (1 + A * 0.08) + gear;
+  return out;
+}
+
+/** Target enemy-stat : player-stat ratios -- the difficulty ramp itself.
+ * Piecewise-linear between anchors; values reproduce the pre-rebalance
+ * curve's difficulty at each 1000-floor boundary. */
+export const DIFFICULTY_RATIO_ANCHORS = [
+  { depth: 0, hp: 0.02, atk: 0.117, def: 0.189 },
+  { depth: 1000, hp: 0.071, atk: 0.464, def: 0.703 },
+  { depth: 2000, hp: 0.134, atk: 0.913, def: 1.358 },
+  { depth: 3000, hp: 0.259, atk: 1.756, def: 2.652 },
+  { depth: 4000, hp: 0.462, atk: 3.216, def: 4.823 },
+  { depth: 5000, hp: 0.477, atk: 3.352, def: 5.012 },
 ];
 
 // Floor 1 is most players' first real fight, right out of the tutorial --
@@ -41,19 +89,23 @@ const FLOOR_1_DIFFICULTY = { hpMult: -0.25, atkMult: -0.83, defMult: -0.32 };
 
 export function getDifficultyMultipliers(depth) {
   if (depth === 1) return FLOOR_1_DIFFICULTY;
-  const d = Math.min(MAX_LABYRINTH_DEPTH, Math.max(0, depth));
-  const pts = DIFFICULTY_BREAKPOINTS;
+  const d = Math.min(MAX_LABYRINTH_DEPTH, Math.max(2, depth));
+  const pts = DIFFICULTY_RATIO_ANCHORS;
   let lo = pts[0], hi = pts[pts.length - 1];
   for (let i = 0; i < pts.length - 1; i++) {
     if (d >= pts[i].depth && d <= pts[i + 1].depth) { lo = pts[i]; hi = pts[i + 1]; break; }
   }
   const span = hi.depth - lo.depth;
   const t = span > 0 ? (d - lo.depth) / span : 0;
-  return {
-    hpMult: lo.hpMult + (hi.hpMult - lo.hpMult) * t,
-    atkMult: lo.atkMult + (hi.atkMult - lo.atkMult) * t,
-    defMult: lo.defMult + (hi.defMult - lo.defMult) * t,
-  };
+  const mix = getEnemyEvolutionMixForDepth(d);
+  const player = playerPowerAt(d);
+  const out = {};
+  for (const k of CORE_STATS) {
+    const ratio = lo[k] + (hi[k] - lo[k]) * t;
+    const enemyBase = (mix.base * POOL_AVG.base[k] + mix.mid * POOL_AVG.mid[k] + mix.final * POOL_AVG.final[k]) / 6;
+    out[k + "Mult"] = ratio * player[k] / enemyBase - 1;
+  }
+  return out;
 }
 
 /**

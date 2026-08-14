@@ -288,8 +288,13 @@ function App() {
   // Horizontal position is derived from the tab's index so it always lines
   // up with NavBar's own layout (evenly split across TABS.length columns).
   // `text` is optional -- pass null/undefined for an arrow-only nudge when
-  // the destination doesn't need re-explaining.
-  function navHandoff(text, tabId) {
+  // the destination doesn't need re-explaining. `textBottom` overrides the
+  // text box's default `bottom: 150` for a hand-off shown while still
+  // standing on a screen whose own bottom-of-card buttons would otherwise
+  // sit underneath it (e.g. Farm's Speed Up / Upgrade Field) -- the arrow
+  // stays pinned at `bottom: 80` regardless, since it's just pointing at the
+  // destination tab and never overlaps anything.
+  function navHandoff(text, tabId, textBottom = 150) {
     const idx = TABS.findIndex((t) => t.id === tabId);
     const leftPct = ((idx + 0.5) / TABS.length) * 100 + "vw";
     return React.createElement(
@@ -300,7 +305,7 @@ function App() {
           "div",
           {
             style: {
-              position: "fixed", left: 16, right: 16, bottom: 150,
+              position: "fixed", left: 16, right: 16, bottom: textBottom,
               background: "#fff", border: "2px solid #534AB7", borderRadius: 16,
               padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4,
               boxShadow: "0 4px 16px rgba(0,0,0,0.14)", zIndex: 60,
@@ -329,9 +334,12 @@ function App() {
     tutorialStep === "farm" && navHandoff("Your new friend seems to have found something and is beckoning you to follow.", "farm");
 
   // Shown right after harvesting: hands the player off to Collection for a
-  // level-up detour before they're allowed back to Home/Descend.
+  // level-up detour before they're allowed back to Home/Descend. Shown while
+  // still standing on Farm, so the text box is raised well above its default
+  // position -- Farm's own Speed Up / Upgrade Field buttons live right where
+  // the default `bottom: 150` would otherwise sit.
   const levelupNavPointer =
-    tutorialStep === "levelupNav" && navHandoff("Let's level up " + starterName + ".", "collection");
+    tutorialStep === "levelupNav" && navHandoff("Let's level up " + starterName + ".", "collection", 260);
 
   // Shown as soon as the player's leveled their creature up once (see
   // CreatureDetail's doLevelUp): hands off to the Equipment tab so they can

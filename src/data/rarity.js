@@ -13,7 +13,13 @@ export const SKIN_TIER_CONFIG={
   legendary:{label:"Legendary",rate:0.5,shardValue:150,shardCost:500,color:"badge-legendary"},
 };
 export const SKIN_FAIL_SHARDS=3;
-export const RARITY_STAT_MULT={common:1,rare:1.15,epic:1.3,legendary:1.5};
+// Per-level growth is rarity-independent: level-up gains scale off base stats
+// alone, so the max-level power ratio between two creatures equals their
+// base-stat ratio. Rarity's edge lives entirely in the base statlines
+// (legendaries start at ~epic-stage-2 strength and finish ~5-10% above other
+// finals). The old values (rare 1.15 / epic 1.3 / legendary 1.5) compounded
+// over 500 levels into a ~45% endgame gap on top of that base edge.
+export const RARITY_STAT_MULT={common:1,rare:1,epic:1,legendary:1};
 export const STAT_CYCLE=["hp","atk","def","spd","abilitySpeed"];
 /** HP/ATK/DEF only, excluding Speed and Haste. Shared by the level-up stat rotation and the ascension popup. */
 export const CORE_STAT_CYCLE=["hp","atk","def"];

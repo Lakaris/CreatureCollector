@@ -22,9 +22,10 @@ import { DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, DUNGEON_PASS_OVER
 
 const GameContext = createContext(null);
 
-/** Starting currency balances for a new save -- everyone starts at zero. */
-const INITIAL_CURRENCIES = {
-  gems: 0, food: 0, candy: 0, equipShards: 0, dungeonPass: 0,
+/** Starting currency balances for a new save -- everyone starts at zero,
+ * except Dungeon Passes: new (and reset) players start with 10. */
+export const INITIAL_CURRENCIES = {
+  gems: 0, food: 0, candy: 0, equipShards: 0, dungeonPass: 10,
   eggs: 0, legendaryEggs: 0,
   melonFire: 0, melonWater: 0, melonNature: 0, melonEarth: 0,
   melonWind: 0, melonElectric: 0, melonLight: 0, melonDark: 0, melonRainbow: 0,
@@ -230,7 +231,10 @@ export function GameProvider({ children }) {
     initialSave?.dungeonBossLevels ?? Object.fromEntries(DUNGEON_BOSSES.map((b) => [b.key, 1]))
   );
   const [passRechargeCount, setPassRechargeCount] = useState(() => initialSave?.passRechargeCount ?? 0);
-  const [lastDungeonPassGain, setLastDungeonPassGain] = useState(() => initialSave?.lastDungeonPassGain ?? "");
+  // Defaults to "already claimed today" (not "") for a brand-new save --
+  // INITIAL_CURRENCIES.dungeonPass already starts players at 10, so the
+  // regen effect below shouldn't ALSO top them up the moment the app mounts.
+  const [lastDungeonPassGain, setLastDungeonPassGain] = useState(() => initialSave?.lastDungeonPassGain ?? easternNoonDayKey());
   const [lastPassRechargeReset, setLastPassRechargeReset] = useState(() => initialSave?.lastPassRechargeReset ?? "");
   const [dailyBossData, setDailyBossData] = useState(() => initialSave?.dailyBossData ?? { date: "", fights: 0, wins: 0 });
   const [dailyBossLevel, setDailyBossLevel] = useState(() => initialSave?.dailyBossLevel ?? 1);
@@ -493,7 +497,7 @@ export function GameProvider({ children }) {
     // currencies + collection
     currencies, setCurrencies, owned, setOwned,
     unlockedSkins, setUnlockedSkins, skinShards, setSkinShards,
-    everOwnedCreatureIds,
+    everOwnedCreatureIds, setEverOwnedCreatureIds,
     // equipment
     equipmentLevels, setEquipmentLevels,
     equipmentAscensions, setEquipmentAscensions,
@@ -522,6 +526,8 @@ export function GameProvider({ children }) {
     // dungeon / daily boss
     dungeonBossLevels, setDungeonBossLevels,
     passRechargeCount, setPassRechargeCount,
+    lastDungeonPassGain, setLastDungeonPassGain,
+    lastPassRechargeReset, setLastPassRechargeReset,
     dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel,
     dungeonsUnlocked, setDungeonsUnlocked, dailyBossUnlocked, setDailyBossUnlocked,
     arenaUnlocked, setArenaUnlocked, treasureUnlocked, setTreasureUnlocked,

@@ -41,7 +41,7 @@ const TAB_TUTORIAL_STEPS = {
 // tutorial state -- unlike TAB_TUTORIAL_STEPS above, this never re-locks
 // once cleared.
 const TAB_PROGRESS_GATES = {
-  play: { minBestDepth: 21, message: "Unlocks once you beat Floor 20 of the Labyrinth" },
+  play: { minBestDepth: 21, message: "Unlocks via progression quest" },
 };
 
 function NavBar({ tab, setTab, onNavigate, style }) {

@@ -19,11 +19,17 @@ export function equipUpgradeCost(level) {
   return Math.floor(25 * Math.pow(level, 1.72));
 }
 
-/** Stat contribution of one item at a given level/ascension. */
+/** Stat contribution of one item at a given level/ascension.
+ * Curve is calibrated against the creature stat pipeline: at full investment
+ * (level 100, ascension 10) the multiplier is ~30x, so a maxed two-stat
+ * legendary item gives ~1k total stats and a full set of 4 maxed items adds
+ * ~20-25% of a maxed creature's own stats -- gear should be noticeable, never
+ * bigger than the creature wearing it. (The old curve's dominant level^2 term
+ * reached 565x, letting one item out-stat an entire maxed legendary.) */
 export function equipBonus(itemId, level, asc = 0) {
   const e = EQUIPMENT_MAP[itemId];
   if (!e) return {};
-  const mult = (1 + level + level * level * 0.0125) * (1 + asc * 0.15);
+  const mult = (1 + level * 0.09 + level * level * 0.0002) * (1 + asc * 0.15);
   return Object.fromEntries(
     Object.entries(e.stats).map(([stat, base]) => [stat, Math.round(base * mult)])
   );

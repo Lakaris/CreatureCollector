@@ -149,7 +149,11 @@ function HomeScreen(){
       React.createElement("span",{style:{fontSize:8,fontWeight:700,color:"#534AB7",textAlign:"center",lineHeight:1.1}},"New Player Welcome Gift"),
       easternNoonDayKey()!==newPlayerGiftLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
     ),
-    (!tutorialRestricted||tutorialStep==="descend")&&(()=>{
+    // Stays hidden through the whole tutorial (not just before the "descend"
+    // step) -- the Descend button itself is still shown/usable during that
+    // step below, but the reward preview doesn't appear until the guided
+    // walkthrough is fully over.
+    !tutorialRestricted&&(()=>{
       const depth=labyrinthDepth||1;
       const reward=getDepthReward(depth);
       const onCurrent=Object.keys(reward).length>0;

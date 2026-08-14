@@ -163,6 +163,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const currenciesRef=useRef(currencies);
   currenciesRef.current=currencies;
   const levelHoldRef=useRef(null);
+  // After a tap, browsers replay the gesture as emulated mousedown/mouseup --
+  // and React's root touch listeners are passive, so onTouchStart's
+  // preventDefault() can't stop it. Without this guard a single tap ran
+  // startLevelHold twice (once for the touch, once for the mouse replay),
+  // double-leveling every time. Mouse events arriving within this window of
+  // any touch are the replay and get ignored. Shared by every hold-to-repeat
+  // button on this screen (Level Up + the equip upgrade page).
+  const lastTouchRef=useRef(0);
+  const TOUCH_MOUSE_REPLAY_MS=800;
+  function isMouseReplay(){return Date.now()-lastTouchRef.current<TOUCH_MOUSE_REPLAY_MS;}
+  function markTouch(){lastTouchRef.current=Date.now();}
 
   /** Returns true if a level-up happened, false if maxed or unaffordable --
    * the hold-to-repeat loop below uses that to know when to stop itself. */
@@ -197,6 +208,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     if(levelHoldRef.current){clearTimeout(levelHoldRef.current);clearInterval(levelHoldRef.current);levelHoldRef.current=null;}
   }
   function startLevelHold(){
+    if(levelHoldRef.current)return; // already holding -- ignore duplicate start
     if(!doLevelUp())return;
     levelHoldRef.current=setTimeout(()=>{
       levelHoldRef.current=setInterval(()=>{if(!doLevelUp())stopLevelHold();},180);
@@ -377,6 +389,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     if(equipUpgradeHoldRef.current){clearTimeout(equipUpgradeHoldRef.current);clearInterval(equipUpgradeHoldRef.current);equipUpgradeHoldRef.current=null;}
   }
   function startEquipUpgradeHold(itemId){
+    if(equipUpgradeHoldRef.current)return; // already holding -- ignore duplicate start
     if(!doUpgrade(itemId))return;
     equipUpgradeHoldRef.current=setTimeout(()=>{
       equipUpgradeHoldRef.current=setInterval(()=>{if(!doUpgrade(itemId))stopEquipUpgradeHold();},180);
@@ -462,17 +475,19 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       const ascCost=asc<EQUIP_MAX_ASCENSION?EQUIP_ASC_COSTS[asc]:null;
       const canAffordAsc=ascCost!==null&&copies>=ascCost;
       const starStr="★".repeat(asc);
-      return React.createElement("div",{style:{minHeight:"100vh",background:"#f5f5f5",padding:"16px"}},
+      // Matches EquipmentDetail.js's own page exactly (white ScreenHeader bar,
+      // no-scroll flex layout, identical card styling/colors) -- this is the
+      // same item, just reached by holding a gear tile from inside a
+      // creature's Gear tab instead of the standalone Equipment tab.
+      return React.createElement("div",{style:{height:"100%",display:"flex",flexDirection:"column"}},
         notify&&React.createElement(Notify,{msg:notify}),
-        React.createElement("button",{className:"back-btn",onClick:()=>setEquipDetailPage(null)},
-          React.createElement("i",{className:"ti ti-arrow-left"}),"Back"
-        ),
-        React.createElement("div",{className:"card",style:{marginTop:8,padding:"24px 20px",position:"relative",display:"flex",flexDirection:"column",minHeight:"calc(100vh - 90px)"}},
+        React.createElement(ScreenHeader,{title:"",onBack:()=>setEquipDetailPage(null)}),
+        React.createElement("div",{className:"card",style:{position:"relative",flex:1,minHeight:0,display:"flex",flexDirection:"column",overflow:"hidden"}},
           rarCfg&&React.createElement("div",{style:{position:"absolute",top:10,left:12,fontSize:10,fontWeight:700,color:rarCfg.color,background:rarCfg.bg,borderRadius:4,padding:"2px 7px"}},rarCfg.label),
           (pi.element||pi.role||pi.attackType)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
             [pi.element,pi.role,pi.attackType].filter(Boolean).join(" · ")+" exclusive"
           ),
-          React.createElement("div",{style:{textAlign:"center",marginBottom:16}},
+          React.createElement("div",{style:{textAlign:"center",marginBottom:16,paddingTop:12,flexShrink:0}},
             React.createElement("div",{style:{fontSize:64,marginBottom:4}},pi.emoji),
             React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#000",marginBottom:2}},pi.name),
             asc>0&&React.createElement("div",{style:{fontSize:14,color:"#f59e0b",letterSpacing:2,marginBottom:4}},starStr),
@@ -480,15 +495,16 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:pi.effect?6:0}},equipBonusStr(bonuses)),
             pi.effect&&React.createElement("div",{style:{fontSize:12,color:"#7F77DD",fontWeight:600}},"✦ "+pi.effect)
           ),
-          React.createElement("div",{style:{borderTop:"1px solid #eee",paddingTop:14,marginTop:"auto",display:"flex",flexDirection:"column",gap:10}},
+          React.createElement("div",{style:{flex:1,minHeight:0}}),
+          React.createElement("div",{style:{borderTop:"1px solid #eee",paddingTop:14,display:"flex",flexDirection:"column",gap:10,flexShrink:0}},
             React.createElement("div",null,
               React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#666",marginBottom:6}},"UPGRADE"),
               lvl<EQUIP_MAX_LEVEL
                 ? React.createElement("div",null,
                     React.createElement("div",{style:{fontSize:12,color:"#534AB7",marginBottom:8}},"Lv "+(lvl+1)+": "+equipBonusStr(nextUpgradeBonuses)),
                     React.createElement("button",{
-                      onMouseDown:()=>startEquipUpgradeHold(pi.id),onMouseUp:stopEquipUpgradeHold,onMouseLeave:stopEquipUpgradeHold,
-                      onTouchStart:e=>{e.preventDefault();startEquipUpgradeHold(pi.id);},onTouchEnd:stopEquipUpgradeHold,
+                      onMouseDown:()=>{if(isMouseReplay())return;startEquipUpgradeHold(pi.id);},onMouseUp:stopEquipUpgradeHold,onMouseLeave:stopEquipUpgradeHold,
+                      onTouchStart:()=>{markTouch();startEquipUpgradeHold(pi.id);},onTouchEnd:()=>{markTouch();stopEquipUpgradeHold();},
                       disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa",userSelect:"none"}
                     },"🔧 Upgrade "+formatNum(currencies.equipShards||0)+" / "+formatNum(upgradeCost))
                   )
@@ -701,6 +717,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             // During the guided "choose gear" step, only the Iron Band tile
             // the pointer arrow highlights should respond to a tap.
             const tutorialBlocked=pickerTutorialLock&&!(tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID);
+            // Long-press-to-preview stays off for every tile during the
+            // guided pick -- including the Iron Band itself, whose tap IS
+            // allowed above (see tutorialBlocked's exception) -- since the
+            // tutorial isn't ready to hand the player the full equipment
+            // detail page yet. Re-enabled the instant tutorialRestricted
+            // clears (pickerTutorialLock requires it).
+            const longPressBlocked=pickerTutorialLock;
             const onTapClick=equipSlotPicker!==null
               ? ()=>{if(didLongPress.current){didLongPress.current=false;return;}
                   if(tutorialBlocked)return;
@@ -716,7 +739,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                 }
               : ()=>{if(didLongPress.current){didLongPress.current=false;}};
             const cardKey="card-"+item.id;
-            const onPressStart=e=>{if(tutorialBlocked)return;e.preventDefault();setHoldEquip(cardKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);setEquipDetailPage(item.id);},500);};
+            const onPressStart=e=>{if(longPressBlocked)return;e.preventDefault();setHoldEquip(cardKey);longPressTimer.current=setTimeout(()=>{didLongPress.current=true;setHoldEquip(null);setEquipDetailPage(item.id);},500);};
             const onPressEnd=()=>{clearTimeout(longPressTimer.current);setHoldEquip(null);};
             const highlight=isEquippedSlot0||isEquippedSlot1;
             const canAscendItem=asc<EQUIP_MAX_ASCENSION&&copies>=EQUIP_ASC_COSTS[asc];
@@ -940,8 +963,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:8}},"Next stat: "+STAT_LABELS[LEVEL_STAT_CYCLE[ownedData.nextStatIdx%LEVEL_STAT_CYCLE.length]])
             ),
         React.createElement("button",{className:"btn btn-primary",
-          onMouseDown:startLevelHold,onMouseUp:stopLevelHold,onMouseLeave:stopLevelHold,
-          onTouchStart:e=>{e.preventDefault();startLevelHold();},onTouchEnd:stopLevelHold,
+          onMouseDown:()=>{if(isMouseReplay())return;startLevelHold();},onMouseUp:stopLevelHold,onMouseLeave:stopLevelHold,
+          onTouchStart:()=>{markTouch();startLevelHold();},onTouchEnd:()=>{markTouch();stopLevelHold();},
           disabled:!hasFood||levelUpButtonLock,style:{marginBottom:0,opacity:levelUpButtonLock?0.5:1,userSelect:"none"}},
           isMaxLevel?"Lv "+ownedData.level:"Level Up — 🍖 "+cost
         )

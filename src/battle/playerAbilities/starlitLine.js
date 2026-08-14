@@ -164,6 +164,20 @@ export function makeStarlitModule(cfg) {
       return Math.max(8, Math.round(20 / (unit.spd || 1)));
     },
 
+    /**
+     * Radiant Exchange needs its blast center inside rangeOf(unit) -- the
+     * exact same targeting special() uses below. Holding the full charge
+     * until this passes means the cast can no longer whiff (the old code
+     * consumed the charge even when special() found nothing in range).
+     */
+    specialInRange(unit, { aliveE, boss }) {
+      const range = rangeOf(unit);
+      for (const e of aliveE) {
+        if (Math.max(Math.abs(e.row - unit.row), Math.abs(e.col - unit.col)) <= range) return true;
+      }
+      return !!(boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= range);
+    },
+
     special(unit, ctx) {
       const { aliveE, aliveP, boss, newFx, now } = ctx;
 

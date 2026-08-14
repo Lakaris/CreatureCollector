@@ -30,6 +30,16 @@ function EquipmentDetail({ itemId, onBack }) {
   const currenciesRef = React.useRef(currencies);
   currenciesRef.current = currencies;
   const upgradeHoldRef = React.useRef(null);
+  // After a tap, browsers replay the gesture as emulated mousedown/mouseup --
+  // and React's root touch listeners are passive, so onTouchStart's
+  // preventDefault() can't stop it. Without this guard a single tap ran
+  // startUpgradeHold twice (once for the touch, once for the mouse replay),
+  // double-upgrading every time. Mouse events arriving within this window of
+  // any touch are the replay and get ignored.
+  const lastTouchRef = React.useRef(0);
+  const TOUCH_MOUSE_REPLAY_MS = 800;
+  function isMouseReplay() { return Date.now() - lastTouchRef.current < TOUCH_MOUSE_REPLAY_MS; }
+  function markTouch() { lastTouchRef.current = Date.now(); }
   React.useEffect(() => stopUpgradeHold, []);
 
   const pi = EQUIPMENT_MAP[itemId];
@@ -71,6 +81,7 @@ function EquipmentDetail({ itemId, onBack }) {
     if (upgradeHoldRef.current) { clearTimeout(upgradeHoldRef.current); clearInterval(upgradeHoldRef.current); upgradeHoldRef.current = null; }
   }
   function startUpgradeHold() {
+    if (upgradeHoldRef.current) return; // already holding -- ignore duplicate start
     if (!doUpgrade()) return;
     upgradeHoldRef.current = setTimeout(() => {
       upgradeHoldRef.current = setInterval(() => { if (!doUpgrade()) stopUpgradeHold(); }, 180);
@@ -137,8 +148,8 @@ function EquipmentDetail({ itemId, onBack }) {
                 (() => {
                   const enabled = canAffordUpgrade && tutorialStep !== "toHome";
                   return React.createElement("button", {
-                    onMouseDown: startUpgradeHold, onMouseUp: stopUpgradeHold, onMouseLeave: stopUpgradeHold,
-                    onTouchStart: (e) => { e.preventDefault(); startUpgradeHold(); }, onTouchEnd: stopUpgradeHold,
+                    onMouseDown: () => { if (isMouseReplay()) return; startUpgradeHold(); }, onMouseUp: stopUpgradeHold, onMouseLeave: stopUpgradeHold,
+                    onTouchStart: () => { markTouch(); startUpgradeHold(); }, onTouchEnd: () => { markTouch(); stopUpgradeHold(); },
                     disabled: !enabled, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: enabled ? "pointer" : "default", background: enabled ? "#534AB7" : "#e0e0e0", color: enabled ? "#fff" : "#aaa", userSelect: "none" }
                   }, "🔧 Upgrade " + formatNum(currencies.equipShards || 0) + " / " + formatNum(upgradeCost));
                 })()

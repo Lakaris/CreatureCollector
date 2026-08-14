@@ -84,6 +84,16 @@ export function makeBlazehornetModule(defBonusByLevel) {
     },
 
     /**
+     * Charging Pierce is an engage tool -- the dash crosses the whole grid to
+     * reach its target, so unlike the engine's default in-attack-range hold
+     * (see specialTargetInRange in battle/tick.js) it fires whenever any foe
+     * exists at all.
+     */
+    specialInRange(unit, { aliveE, boss }) {
+      return aliveE.length > 0 || !!(boss && boss.hp > 0);
+    },
+
+    /**
      * Charging Pierce: dash in a straight line toward the nearest foe until
      * hitting the grid wall, dealing damage to every enemy along the way
      * (1 lane at low level, 3 parallel lanes -- self + 1 either side -- from

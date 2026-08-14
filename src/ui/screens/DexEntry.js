@@ -76,7 +76,11 @@ function DexEntry({def,onBack,onNavigate,navList}){
           def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
         )
       ),
-      React.createElement("p",{style:{fontSize:12,color:"#666",lineHeight:1.6,textAlign:"center"}},def.description)
+      // minHeight reserves room for the longest description in the roster
+      // (3 lines at this font/width, e.g. Skyeel's) so the card is sized for
+      // the worst case up front instead of growing when a longer one loads --
+      // most descriptions are 2 lines and just leave a little breathing room.
+      React.createElement("p",{style:{fontSize:12,color:"#666",lineHeight:1.6,textAlign:"center",minHeight:"57.6px"}},def.description)
     ),
 
     chainDefs.length>1&&React.createElement("div",{className:"card",style:{marginBottom:12}},

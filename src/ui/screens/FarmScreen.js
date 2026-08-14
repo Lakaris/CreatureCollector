@@ -14,6 +14,14 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   // only Food/Gear Shards drop, so the guided harvest is guaranteed and
   // doesn't hand out melons/candy the player hasn't been introduced to yet.
   const harvestTutorialLock = tutorialRestricted && tutorialStep === "harvest";
+  // Once harvested, the tutorial hands the player off to Collection (see
+  // levelupNavPointer in App.js) -- interaction on this screen needs to stay
+  // locked through that hand-off too, not just during the harvest itself, or
+  // Speed Up / Upgrade Field are still sitting right there to tempt a
+  // distracted tap. Kept separate from harvestTutorialLock, which also drives
+  // the scripted-harvest-state overrides just below (elapsedHours/canHarvest/
+  // fieldBonuses) that should stay scoped to the "harvest" step only.
+  const farmInteractionLocked = tutorialRestricted && (tutorialStep === "harvest" || tutorialStep === "levelupNav");
   // Plots stay locked until the "Plots" Progression-quest reward (Set 1) is claimed.
   const plotsLocked=!plotsUnlocked;
   const MAX_PLOTS=6;
@@ -143,12 +151,12 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     ),
     React.createElement("div",{style:{display:"flex",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
       [{id:"field",label:"Field"},{id:"plots",label:"Plots"}].map(t=>{
-        const tabLocked=harvestTutorialLock||(t.id==="plots"&&plotsLocked);
+        const tabLocked=farmInteractionLocked||(t.id==="plots"&&plotsLocked);
         // Disabling the button outright (native `disabled`) would also
         // swallow the click, so the Plots progress-gate stays clickable --
         // that's how its "not yet" toast gets a chance to fire.
-        return React.createElement("button",{key:t.id,disabled:harvestTutorialLock,onClick:()=>{
-          if(harvestTutorialLock)return;
+        return React.createElement("button",{key:t.id,disabled:farmInteractionLocked,onClick:()=>{
+          if(farmInteractionLocked)return;
           if(t.id==="plots"&&plotsLocked){showNotify("Unlocks via progression quest");return;}
           setFarmTab(t.id);
         },style:{
@@ -171,9 +179,9 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         padding:"24px 16px",textAlign:"center",position:"relative",flexShrink:0,
       }},
         React.createElement("button",{
-          disabled:harvestTutorialLock,
-          onClick:e=>{e.stopPropagation();if(harvestTutorialLock)return;setShowFieldInfo(v=>!v);},
-          style:{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:harvestTutorialLock?"not-allowed":"pointer",color:"#555",padding:2,lineHeight:1,opacity:harvestTutorialLock?.3:.7}
+          disabled:farmInteractionLocked,
+          onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setShowFieldInfo(v=>!v);},
+          style:{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:farmInteractionLocked?"not-allowed":"pointer",color:"#555",padding:2,lineHeight:1,opacity:farmInteractionLocked?.3:.7}
         },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}})),
         React.createElement("div",{style:{position:"absolute",top:10,left:0,right:0,textAlign:"center",fontSize:14,fontWeight:700,color:"#555",pointerEvents:"none"}},"Lv."+farmFieldLevel),
         React.createElement("div",{style:{fontSize:56,marginBottom:6}},"🌾"),
@@ -243,8 +251,9 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               background:canHarvest?"#4caf50":"#ccc",color:"#fff",transition:"background .2s"},
           },"Harvest"),
           !atCap&&React.createElement("button",{
+            disabled:farmInteractionLocked,
             onClick:()=>{
-              if(harvestTutorialLock)return;
+              if(farmInteractionLocked)return;
               const msLeft=Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs);
               const speedCost=Math.ceil(500*msLeft/(FIELD_CAP_HOURS*3600000));
               if((currencies.gems||0)<speedCost){showNotify("Not enough 💎 Gems!");return;}
@@ -255,7 +264,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               }});
             },
             style:{padding:"12px 10px",border:"none",borderRadius:10,fontWeight:700,fontSize:13,
-              cursor:"pointer",background:"#534AB7",color:"#fff",whiteSpace:"nowrap"}
+              cursor:farmInteractionLocked?"not-allowed":"pointer",background:farmInteractionLocked?"#ccc":"#534AB7",color:"#fff",whiteSpace:"nowrap"}
           },"⚡ "+Math.ceil(500*Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs)/(FIELD_CAP_HOURS*3600000))+" 💎")
         ),
         React.createElement("div",{style:{marginTop:10}}),
@@ -269,10 +278,10 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               farmGuideStep==="upgradeField"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-32,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("button",{
                 "data-guide-target":"upgradeField",
-                disabled:harvestTutorialLock,
-                onClick:()=>{if(harvestTutorialLock)return;setShowFieldUpgrade(true);if(farmGuideStep==="upgradeField")setFarmGuideStep(null);},
+                disabled:farmInteractionLocked,
+                onClick:()=>{if(farmInteractionLocked)return;setShowFieldUpgrade(true);if(farmGuideStep==="upgradeField")setFarmGuideStep(null);},
                 style:{width:"100%",padding:"8px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:14,
-                  cursor:harvestTutorialLock?"not-allowed":"pointer",background:harvestTutorialLock?"#ccc":"#534AB7",color:"#fff",transition:"background .2s",
+                  cursor:farmInteractionLocked?"not-allowed":"pointer",background:farmInteractionLocked?"#ccc":"#534AB7",color:"#fff",transition:"background .2s",
                   display:"flex",flexDirection:"column",alignItems:"center",gap:1},
               },
                 React.createElement("span",null,"Upgrade Field"),
@@ -494,7 +503,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       )
     ),
     harvestTutorialLock&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:96,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:15}},
-      "You see a large field filled with food and mysterious shards, and no one in sight."
+      "You see a large field filled with food and strange shards, and no one in sight."
     )
   );
 }

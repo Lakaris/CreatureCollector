@@ -82,7 +82,8 @@
       "Bash(perl -i -pe ' *)",
       "Bash(grep -c 'special:{name:\"[^\"]*\",charge:' src/data/creatures.js)",
       "Bash(grep -o 'special:{name:\"Charging Pierce\",charge:[0-9]*\\\\|special:{name:\"Radiant Exchange\",charge:[0-9]*' src/data/creatures.js)",
-      "Bash(grep -o 'special:{name:\"Tail Spin\",charge:[0-9]*' src/data/creatures.js)"
+      "Bash(grep -o 'special:{name:\"Tail Spin\",charge:[0-9]*' src/data/creatures.js)",
+      "Bash(grep -n \"const { currencies, setCurrencies\" src/ui/screens/DevPanel.js)"
     ]
   }
 }

@@ -58,6 +58,18 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     return list;
   },[ownedDefs,activeRarities,activeTypes,activeRoles,search]);
 
+  // Swipe-nav order, frozen for as long as a detail view stays open. The
+  // grid's live sort is level-first, so levelling a creature inside the
+  // detail view used to reshuffle `filtered` mid-browse and swipes would
+  // jump around the reordered list. The snapshot is taken when the detail
+  // opens and cleared when it closes -- the grid itself re-sorts as normal
+  // once the player exits back out to it.
+  const [frozenNavIds,setFrozenNavIds]=useState(null);
+  useEffect(()=>{
+    if(selected==null){setFrozenNavIds(null);return;}
+    setFrozenNavIds(prev=>prev??filtered.map(f=>f.owned.id));
+  },[selected]);
+
   if(showDex)return React.createElement(DexScreen,{onBack:()=>setShowDex(false),unlockedSkins,owned});
 
   if(selected&&owned[selected])return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
@@ -86,7 +98,13 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     ),
     React.createElement(CreatureDetail,{
       ownedData:owned[selected],owned,onBack:()=>setSelected(null),
-      onEvolve:(newId,fromName,toName,toEmoji,statsBefore,statsAfter)=>{setSelected(newId);setPendingEvo({fromName,toName,toEmoji,statsBefore,statsAfter});},
+      onEvolve:(newId,fromName,toName,toEmoji,statsBefore,statsAfter)=>{
+        // Evolution replaces the owned id, so patch it in place in the frozen
+        // swipe order too or the evolved creature would fall out of the list
+        // (indexOf -1) and swiping would dead-end until the detail is closed.
+        setFrozenNavIds(prev=>prev?prev.map(id=>id===selected?newId:id):prev);
+        setSelected(newId);setPendingEvo({fromName,toName,toEmoji,statsBefore,statsAfter});
+      },
       onBananaUsed,
       onCandyUsed,
       currencies,setCurrencies,setOwned,
@@ -98,11 +116,15 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
       // in the grid behind this detail view -- "if able" means it's simply
       // a no-op at either end of the list.
       onSwipeNav:(dir)=>{
-        const idx=filtered.findIndex(f=>f.owned.id===selected);
+        // Swipes walk the order frozen when the detail view opened (see
+        // frozenNavIds above), not the live level-sorted list.
+        const order=frozenNavIds||filtered.map(f=>f.owned.id);
+        const idx=order.indexOf(selected);
         if(idx<0)return;
         const nextIdx=dir==="next"?idx+1:idx-1;
-        if(nextIdx<0||nextIdx>=filtered.length)return;
-        setSelected(filtered[nextIdx].owned.id);
+        if(nextIdx<0||nextIdx>=order.length)return;
+        if(!owned[order[nextIdx]])return;
+        setSelected(order[nextIdx]);
       }
     }),
     React.createElement(NavBar,{tab,setTab,style:{position:"fixed",bottom:0,left:0,right:0,background:"rgba(245,245,245,0.95)",backdropFilter:"blur(8px)"}})

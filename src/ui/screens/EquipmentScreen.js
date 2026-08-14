@@ -47,6 +47,7 @@ function EquipmentScreen() {
   const [filterRarities, setFilterRarities] = useState(new Set());
   const [filterStats, setFilterStats] = useState(new Set());
   const [filterHasEffect, setFilterHasEffect] = useState(false);
+  const [filterUniversal, setFilterUniversal] = useState(false);
   const [filterFavorites, setFilterFavorites] = useState(false);
   const [filterElements, setFilterElements] = useState(new Set());
   const [filterRoles, setFilterRoles] = useState(new Set());
@@ -84,6 +85,7 @@ function EquipmentScreen() {
       if (filterStats.size > 0 && ![...filterStats].every((s) => itemAffectsStat(item, s))) return false;
       if (filterFavorites && !equipFavorites.has(item.id)) return false;
       if (filterHasEffect && !item.effect) return false;
+      if (filterUniversal && (item.element || item.role || item.attackType)) return false;
       if (filterElements.size > 0 && !filterElements.has(item.element)) return false;
       if (filterRoles.size > 0 && !filterRoles.has(item.role)) return false;
       if (filterRanges.size > 0 && !filterRanges.has(item.attackType)) return false;
@@ -182,7 +184,8 @@ function EquipmentScreen() {
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 10 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Show"),
         React.createElement("button", { className: "filter-chip" + (filterFavorites ? " active" : ""), onClick: () => setFilterFavorites((p) => !p) }, "★ Favorites"),
-        React.createElement("button", { className: "filter-chip" + (filterHasEffect ? " active" : ""), onClick: () => setFilterHasEffect((p) => !p) }, "Has Effect")
+        React.createElement("button", { className: "filter-chip" + (filterHasEffect ? " active" : ""), onClick: () => setFilterHasEffect((p) => !p) }, "Has Effect"),
+        React.createElement("button", { className: "filter-chip" + (filterUniversal ? " active" : ""), onClick: () => setFilterUniversal((p) => !p) }, "Universal")
       )
     ),
     items.length === 0
@@ -206,8 +209,13 @@ function EquipmentScreen() {
               style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
             },
               showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
-              React.createElement("div", { style: { position: "absolute", top: 6, left: 8 } },
-                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl)
+              React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
+                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl),
+                (item.element || item.role || item.attackType) && React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: "#7F77DD", background: "#7F77DD1a", borderRadius: 6, padding: "2px 6px", lineHeight: "12px", whiteSpace: "nowrap" } },
+                  item.element ? TYPE_EMOJI[item.element] + " " + item.element
+                    : item.role ? ROLE_CONFIG[item.role].emoji + " " + item.role
+                    : ATTACK_TYPE_CONFIG[item.attackType].emoji + " " + item.attackType
+                )
               ),
               React.createElement("div", { style: { position: "absolute", top: 6, right: 8, fontSize: 16, cursor: "pointer", color: equipFavorites.has(item.id) ? "#f59e0b" : "#ccc", lineHeight: 1 }, onClick: (e) => toggleFavorite(item.id, e) }, equipFavorites.has(item.id) ? "★" : "☆"),
               asc > 0 && React.createElement("div", { style: { position: "absolute", top: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#f59e0b", lineHeight: "14px", pointerEvents: "none" } }, ascStars(asc)),

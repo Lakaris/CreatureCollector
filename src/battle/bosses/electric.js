@@ -1,7 +1,7 @@
 // Electric boss — Volt Strike / Arc Burst / Piercing Current.
 // Stationary. Fires piercing cardinal lines and chains bolts to random targets.
 
-import { RANGED_RANGE, BOSS_SIZE } from "../constants.js";
+import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { randomOf } from "../../core/random.js";
 
 /** Every tile in one cardinal line out from the boss body to the grid edge. */
@@ -47,7 +47,7 @@ export default {
     if (tgt) {
       const fromR = boss.row + 0.5, fromC = boss.col + 0.5;
       tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.08));
-      tgt.shockTicks = (tgt.shockTicks || 0) + 6;
+      tgt.shockTicks = STATUS_TICKS;
 
       // Extend the bolt past its target to the grid edge.
       const pdr = tgt.row + 0.5 - fromR, pdc = tgt.col + 0.5 - fromC;
@@ -105,7 +105,7 @@ export default {
     }
     for (const t of aliveP.filter((u) => tiles.some(([r, c]) => u.row === r && u.col === c))) {
       t.hp = Math.max(0, t.hp - ctx.dmg(0.1));
-      t.shockTicks = (t.shockTicks || 0) + 5;
+      t.shockTicks = STATUS_TICKS;
       newFx.push({ id: now + "vs" + t.uid, row: t.row, col: t.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     }
     boss.atkCd = 11;

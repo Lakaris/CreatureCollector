@@ -28,7 +28,10 @@ export const TABS = [
 // card is tapped inside CollectionScreen instead, not here).
 const TAB_TUTORIAL_STEPS = {
   collection: { collection: null, levelupNav: "levelupPick" },
-  farm: { farm: "harvest" },
+  // "fertilizerReveal": the floor-10 Ancient Fertilizer hand-off (arrow at
+  // Farm) advances to "fertilizerUpgrade" once tapped -- see FarmScreen.js,
+  // which locks everything but the Upgrade Field button/flow for that step.
+  farm: { farm: "harvest", fertilizerReveal: "fertilizerUpgrade" },
   equipment: { toEquipment: "equipItem" },
   home: { toHome: "descend" },
   // Post-Set-1 Dungeon reveal: arrow at Play ("dungeonReveal") hands off to

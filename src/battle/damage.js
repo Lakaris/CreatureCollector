@@ -1,6 +1,6 @@
 // Damage formulas.
 
-import { weakenMultiplier, atkModMultiplier } from "./status.js";
+import { weakenMultiplier, atkModMultiplier, defShredMultiplier, spdModMultiplier } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 
 /** Base attack roll: ±20% spread around the attacker's power. */
@@ -14,7 +14,8 @@ export function attackRoll(atk) {
  */
 export function unitDamage(attacker, defender) {
   const raw = attackRoll(attacker.atk) * weakenMultiplier(attacker) * atkModMultiplier(attacker);
-  return Math.max(1, Math.round(Math.max(1, raw - (defender.def || 20) * 0.35)));
+  const def = (defender.def || 20) * defShredMultiplier(defender);
+  return Math.max(1, Math.round(Math.max(1, raw - def * 0.35)));
 }
 
 /**
@@ -42,7 +43,7 @@ export function damageBoss(boss, dmg) {
   else boss.hp = Math.max(0, boss.hp - dmg);
 }
 
-/** Ticks until a unit can act again, slowed by Slow/Shock. */
+/** Ticks until a unit can act again, slowed by Slow/Shock and sped up by Speed buffs. */
 export function attackCooldown(unit, penalty = 1) {
-  return Math.max(3, Math.round((COOLDOWN_TICKS_AT_SPD_1 / unit.spd) * penalty));
+  return Math.max(3, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * spdModMultiplier(unit))) * penalty));
 }

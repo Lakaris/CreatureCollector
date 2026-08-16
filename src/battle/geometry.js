@@ -34,8 +34,15 @@ export function aStepToward(r, c, tr, tc) {
  * unreachable (commonly: it's occupied by the enemy being attacked), it returns
  * the first step toward the closest reachable cell instead. That fallback is
  * what stops units oscillating when their goal tile is blocked.
+ *
+ * (avoidR, avoidC) marks a cell that may not be taken as the FIRST step --
+ * callers pass the cell the unit just vacated so that stateless re-planning
+ * every tick can't flip-flop between two equal-cost routes (units visibly
+ * pacing left-right against a full front line). The cell stays usable as a
+ * later step of a longer route; when no other step improves, the unit stands
+ * still instead of backtracking.
  */
-export function aBestStep(r, c, tr, tc, isBlocked) {
+export function aBestStep(r, c, tr, tc, isBlocked, avoidR, avoidC) {
   if (r === tr && c === tc) return [r, c];
   const visited = new Set([r + "," + c]);
   const queue = [[r, c, null]];
@@ -51,6 +58,9 @@ export function aBestStep(r, c, tr, tc, isBlocked) {
     ]) {
       const key = nr + "," + nc;
       if (visited.has(key)) continue;
+      // Not as a first step; left unvisited so a longer route may still pass
+      // through it.
+      if (!first && nr === avoidR && nc === avoidC) continue;
       visited.add(key);
       if (isBlocked(nr, nc)) continue;
       const step = first || [nr, nc];

@@ -362,6 +362,14 @@ function App() {
     tutorialRestricted && tutorialStep === "dungeonReveal" &&
     navHandoff("The ground begins to shake and a new structure rises up from the ground.", "play");
 
+  // Shown right after Exiting floor 10's win screen (the first Ancient
+  // Fertilizer): hands off to Farm, where the rest of this restricted flow
+  // (lock everything but Upgrade Field, then the closing message) lives in
+  // FarmScreen.js.
+  const fertilizerRevealPointer =
+    tutorialRestricted && tutorialStep === "fertilizerReveal" &&
+    navHandoff("As you defeat the last creature, a small bag of fertilizer brimming with magical energy drops to the ground.", "farm");
+
   // ── Settings: its own full-screen page, no bottom nav ─────────────────────
   if (settingsOpen)
     return React.createElement(
@@ -630,7 +638,8 @@ function App() {
     tutorialSeen && farmPointer,
     tutorialSeen && toEquipmentPointer,
     tutorialSeen && toHomeFinalPointer,
-    tutorialSeen && dungeonRevealPointer
+    tutorialSeen && dungeonRevealPointer,
+    tutorialSeen && fertilizerRevealPointer
   );
 }
 

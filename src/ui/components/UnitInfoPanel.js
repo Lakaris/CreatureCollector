@@ -14,6 +14,8 @@ export const DEBUFF_DEFS = [
   { key: "slowTicks", icon: "🐌", label: "Slowed" },
   { key: "shockTicks", icon: "⚡", label: "Shocked" },
   { key: "healImmuneTicks", icon: "🚫", label: "Heal Block" },
+  { key: "defShredTicks", icon: "🛡️", label: "DEF Shred" },
+  { key: "spdModTicks", icon: "💨", label: "Speed Up" },
 ];
 
 /** Build the debuffs list UnitInfoPanel expects from a unit's raw tick fields. */

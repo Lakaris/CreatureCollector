@@ -83,7 +83,22 @@
       "Bash(grep -c 'special:{name:\"[^\"]*\",charge:' src/data/creatures.js)",
       "Bash(grep -o 'special:{name:\"Charging Pierce\",charge:[0-9]*\\\\|special:{name:\"Radiant Exchange\",charge:[0-9]*' src/data/creatures.js)",
       "Bash(grep -o 'special:{name:\"Tail Spin\",charge:[0-9]*' src/data/creatures.js)",
-      "Bash(grep -n \"const { currencies, setCurrencies\" src/ui/screens/DevPanel.js)"
+      "Bash(grep -n \"const { currencies, setCurrencies\" src/ui/screens/DevPanel.js)",
+      "Bash(node -e \"require\\('./src/data/quests.js'\\)\")",
+      "Bash(sed -i 's/u\\\\.weakTicks = \\(u\\\\.weakTicks || 0\\) + 10;/u.weakTicks = STATUS_TICKS;/; s/u\\\\.healImmuneTicks = \\(u\\\\.healImmuneTicks || 0\\) + 12;/u.healImmuneTicks = STATUS_TICKS;/; s/u\\\\.dotTicks = \\(u\\\\.dotTicks || 0\\) + 8;/u.dotTicks = STATUS_TICKS;/' src/battle/bosses/dark.js)",
+      "Bash(sed -i 's/u\\\\.slowTicks = \\(u\\\\.slowTicks || 0\\) + [0-9]*;/u.slowTicks = STATUS_TICKS;/' src/battle/bosses/earth.js)",
+      "Bash(sed -i 's/tgt\\\\.shockTicks = \\(tgt\\\\.shockTicks || 0\\) + 6;/tgt.shockTicks = STATUS_TICKS;/; s/t\\\\.shockTicks = \\(t\\\\.shockTicks || 0\\) + 5;/t.shockTicks = STATUS_TICKS;/' src/battle/bosses/electric.js)",
+      "Bash(sed -i 's/u\\\\.burnTicks = \\(u\\\\.burnTicks || 0\\) + 6;/u.burnTicks = STATUS_TICKS;/; s/tgt\\\\.burnTicks = \\(tgt\\\\.burnTicks || 0\\) + 4;/tgt.burnTicks = STATUS_TICKS;/' src/battle/bosses/fire.js)",
+      "Bash(sed -i 's/u\\\\.rootTicks = \\(u\\\\.rootTicks || 0\\) + 8;/u.rootTicks = STATUS_TICKS;/; s/u\\\\.poisonTicks = \\(u\\\\.poisonTicks || 0\\) + 10;/u.poisonTicks = STATUS_TICKS;/' src/battle/bosses/nature.js)",
+      "Bash(grep -E \"^\\(==>|import|//|$\\)\")",
+      "Bash(sed -i 's/import { MELEE_RANGE, BOSS_SIZE } from \"..\\\\/constants.js\";/import { MELEE_RANGE, BOSS_SIZE, STATUS_TICKS } from \"..\\\\/constants.js\";/' src/battle/bosses/earth.js src/battle/bosses/fire.js)",
+      "Bash(sed -i 's/import { RANGED_RANGE, BOSS_SIZE } from \"..\\\\/constants.js\";/import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from \"..\\\\/constants.js\";/' src/battle/bosses/electric.js)",
+      "Bash(sed -i 's/import { MELEE_RANGE } from \"..\\\\/constants.js\";/import { MELEE_RANGE, STATUS_TICKS } from \"..\\\\/constants.js\";/' src/battle/bosses/nature.js)",
+      "Bash(sed -i '0,/^export default {/s//import { STATUS_TICKS } from \"..\\\\/constants.js\";\\\\n\\\\nexport default {/' src/battle/bosses/dark.js)",
+      "Bash(sed -i 's/atkModPct: 15, atkModTicks: 6,/atkModPct: 15, atkModTicks: STATUS_TICKS,/g' src/battle/playerAbilities/starlitLine.js)",
+      "Bash(sed -i 's/import { RANGED_RANGE, BOSS_SIZE } from \"..\\\\/constants.js\";/import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from \"..\\\\/constants.js\";/' src/battle/playerAbilities/starlitLine.js)",
+      "Bash(sed -i 's/import { tickStatusEffects, isRooted, speedPenalty, tickAtkMod } from \".\\\\/status.js\";/import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods } from \".\\\\/status.js\";/; s/    tickAtkMod\\(u\\);/    tickTimedMods\\(u\\);/g; s/    tickAtkMod\\(boss\\);/    tickTimedMods\\(boss\\);/' src/battle/tick.js)",
+      "Bash(sed -i 's/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss }\\)/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols }\\)/; s/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null }\\)/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols }\\)/' src/battle/tick.js)"
     ]
   }
 }

@@ -41,6 +41,19 @@ export const BATTLE_TIME_MS = 60000;
 export const BOSS_SIZE = 2;
 
 /**
+ * Universal duration for every timed buff and debuff (burn, poison, root,
+ * slow, shock, weaken, heal-block, dark DoT, ATK modifiers, Speed Up, ...),
+ * in ticks: 6 ticks = 3 seconds at 1x speed.
+ *
+ * Policy: reapplying a non-stacking effect REFRESHES this timer (assign, never
+ * add), it does not extend beyond it. Buffs granted by charged specials
+ * therefore always have downtime -- every special takes longer than 6 ticks to
+ * recharge. Deliberate exceptions: while-in-range auras (Guardian Grove) and
+ * until-an-event effects (Antler Dart's stacks) manage their own lifetime.
+ */
+export const STATUS_TICKS = 6;
+
+/**
  * Attack cooldown, in ticks, is COOLDOWN_TICKS_AT_SPD_1 / spd. Every creature's
  * base Speed is now a normalized 1.0, so this constant alone defines "normal"
  * attack pace (it replaces the old design where a raw spd around 50 was typical

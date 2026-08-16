@@ -503,6 +503,28 @@ function DailyBossScreen({onBack,onViewCreature}){
                 pointerEvents:"none",zIndex:25,
               }});
             }
+            if(e.isHeal){
+              return React.createElement("div",{key:e.id,style:{
+                position:"absolute",
+                left:e.col*TILE,top:e.row*TILE,
+                width:TILE,height:TILE,borderRadius:"50%",
+                background:"rgba(34,197,94,0.4)",
+                boxShadow:"inset 0 0 8px rgba(22,163,74,0.9)",
+                animation:"splashWave 0.7s ease-out forwards",
+                pointerEvents:"none",zIndex:21,
+              }});
+            }
+            if(e.isPillar){
+              return React.createElement("div",{key:e.id,style:{
+                position:"absolute",
+                left:e.col*TILE,top:e.row*TILE,
+                width:TILE,height:TILE,
+                background:"rgba(251,146,60,0.6)",
+                boxShadow:"inset 0 0 8px rgba(239,68,68,0.8)",
+                animation:"pillarFlame 0.7s ease-out forwards",
+                pointerEvents:"none",zIndex:20,
+              }});
+            }
             if(e.isRanged){
               const dRow=e.row-e.fromRow, dCol=e.col-e.fromCol;
               const dist=Math.sqrt(dRow*dRow+dCol*dCol)||1;

@@ -5,9 +5,17 @@
 // only for bosses, melons, and arena tabs. That is intentional, not a gap.
 
 export const TYPE_EMOJI={Fire:"🔥",Water:"💧",Nature:"🌿",Earth:"🪨",Wind:"💨",Electric:"⚡",Light:"✨",Dark:"🌑"};
-export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,emoji,key:"melon"+type,label:type+" Melon"}));
-MELON_TYPES.push({type:null,emoji:"🌈",key:"melonRainbow",label:"Rainbow Melon"});
-MELON_TYPES.push({type:null,emoji:"🍈",key:"ascensionMelon",label:"Ascension Melon"});
+// fieldRate/fieldAmount drive the Farm field's hourly bonus-drop rolls (and
+// the rates tooltip) -- one roll per melon per hour, paying fieldAmount on a hit.
+export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,emoji,key:"melon"+type,label:type+" Melon",fieldRate:0.005,fieldAmount:1}));
+MELON_TYPES.push({type:null,emoji:"🌈",key:"melonRainbow",label:"Rainbow Melon",fieldRate:0.005,fieldAmount:1});
+// Ascension melons are rarity-gated: ascending a creature spends the melon
+// matching its rarity. The legendary one keeps the pre-rename "ascensionMelon"
+// key so existing saves' balances carry over.
+MELON_TYPES.push({type:null,rarity:"common",   emoji:"🍈⚪",key:"ascensionMelonCommon",label:"Common Ascension Melon",   fieldRate:0.003,fieldAmount:4});
+MELON_TYPES.push({type:null,rarity:"rare",     emoji:"🍈🔵",key:"ascensionMelonRare",  label:"Rare Ascension Melon",    fieldRate:0.003,fieldAmount:3});
+MELON_TYPES.push({type:null,rarity:"epic",     emoji:"🍈🟣",key:"ascensionMelonEpic",  label:"Epic Ascension Melon",    fieldRate:0.003,fieldAmount:2});
+MELON_TYPES.push({type:null,rarity:"legendary",emoji:"🍈",  key:"ascensionMelon",      label:"Legendary Ascension Melon",fieldRate:0.003,fieldAmount:1});
 
 export const ROLE_CONFIG={
   Attacker:{emoji:"⚔️",color:"#9B2020",bg:"#FDEAEA"},

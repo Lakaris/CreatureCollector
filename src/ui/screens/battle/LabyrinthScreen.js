@@ -9,10 +9,10 @@ import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
 import { applyRewards } from "../../../core/rewards.js";
-import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, COOLDOWN_TICKS_AT_SPD_1 } from "../../../battle/constants.js";
-import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../../battle/geometry.js";
+import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED } from "../../../battle/constants.js";
+import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
-import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge, specialTargetInRange } from "../../../battle/tick.js";
+import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
@@ -235,46 +235,10 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   }
   function runTick() {
     const s = bRef.current; if (!s) return;
-    s.tick++;
-    const now = Date.now();
-    const damageDealt = s.damageDealt || (s.damageDealt = {});
-    const MELEE_RANGE = 1, RANGED_RANGE = 3;
-    const aliveP = s.playerUnits.filter((u) => u.hp > 0);
-    const aliveE = s.enemyUnits.filter((u) => u.hp > 0);
-    if (!aliveP.length || !aliveE.length) return;
-    const allOcc = new Set([...aliveP, ...aliveE].map((u) => u.row + "," + u.col));
-    const newFx = [];
-    function actUnit(u, foes) {
-      u.atkCd = Math.max(0, u.atkCd - 1);
-      // Special-ability charge; no labyrinth specials are implemented yet, so
-      // a full bar just flashes the "!" ready marker and starts recharging --
-      // holding at full until a foe (or ally, for Supports) is in range.
-      tickSpecialCharge(u);
-      if (specialChargeReady(u) && specialTargetInRange(u, u.uid[0] === "p" ? aliveP : aliveE, foes, null)) consumeSpecialCharge(u);
-      const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
-      const byCheb = [...foes].sort((a, b) => aChebDist(u.row, u.col, a.row, a.col) - aChebDist(u.row, u.col, b.row, b.col));
-      let atkTgt = null, moveTgt = byCheb[0];
-      if (u.isRanged) {
-        const inRange = foes.filter((f) => aCardinalDist(u.row, u.col, f.row, f.col) <= RANGED_RANGE);
-        if (inRange.length) atkTgt = inRange.sort((a, b) => aCardinalDist(u.row, u.col, a.row, a.col) - aCardinalDist(u.row, u.col, b.row, b.col))[0];
-      }
-      const tgt = atkTgt || moveTgt; if (!tgt) return;
-      const dist = atkTgt ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col) : aChebDist(u.row, u.col, tgt.row, tgt.col);
-      if (dist <= range && u.atkCd <= 0) {
-        const rawDmg = u.atk * (0.8 + Math.random() * 0.4);
-        const dmg = Math.max(1, Math.round(Math.max(1, rawDmg - (tgt.def || 20) * 0.35)));
-        tgt.hp = Math.max(0, tgt.hp - dmg);
-        if (u.uid[0] === "p") damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmg;
-        u.atkCd = Math.max(3, Math.round(COOLDOWN_TICKS_AT_SPD_1 / u.spd));
-        newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: u.uid[0] === "e" });
-      } else if (dist > range) {
-        const blk = (r2, c2) => allOcc.has(r2 + "," + c2) || r2 < 0 || r2 >= ARENA_GRID_ROWS || c2 < 0 || c2 >= ARENA_GRID_COLS;
-        const [nr, nc] = aBestStep(u.row, u.col, tgt.row, tgt.col, blk, u.prevRow, u.prevCol);
-        if (nr !== u.row || nc !== u.col) { const newKey = nr + "," + nc; allOcc.delete(u.row + "," + u.col); u.prevRow = u.row; u.prevCol = u.col; u.lastMoveTime = now; u.row = nr; u.col = nc; allOcc.add(newKey); }
-      }
-    }
-    for (const u of aliveP) actUnit(u, aliveE);
-    for (const u of aliveE) actUnit(u, aliveP);
+    // Same engine as Dungeon/Daily Boss -- player abilities, statuses, and
+    // targeting behave identically everywhere; the Labyrinth just has no boss
+    // unit (s.boss is undefined, which the engine treats as "no boss").
+    const { newFx, now } = runBattleTick(s, { gridRows: ARENA_GRID_ROWS, gridCols: ARENA_GRID_COLS });
     if (newFx.length) setAtkEffects((prev) => [...prev.filter((e) => now - e.t < 700), ...newFx]);
     setBSnap({
       playerUnits: s.playerUnits.map((u) => ({ ...u })),
@@ -337,7 +301,10 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   }
   function exitToPlanning() {
     clearContinueTimer();
-    setBattling(false); setBattleOutcome(null); setBSnap(null); setAtkEffects([]); setPlanGrid({}); setBattleSelectedUid(null);
+    // Deliberately NOT clearing planGrid: the last team stays on the grid as
+    // the default for the next floor (it's part of the autosave, so it also
+    // survives closing the app). "Clear All" is the explicit way to empty it.
+    setBattling(false); setBattleOutcome(null); setBSnap(null); setAtkEffects([]); setBattleSelectedUid(null);
   }
   React.useEffect(() => {
     // Floor 1's victory screen is exit-only (see the render below) -- no
@@ -379,6 +346,14 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       won
         ? (wonDepthRef.current === 1
             ? React.createElement("button", { onClick: () => { exitToPlanning(); onBack && onBack(); setTab("home"); }, style: { padding: "12px 36px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit")
+            // Floor 10's first Ancient Fertilizer is also exit-only, same as
+            // floor 1 -- Continuing straight into floor 11 would blow past
+            // the Farm hand-off this reward is meant to trigger (see the
+            // "fertilizerReveal" restricted-tutorial flow in App.js/
+            // NavBar.js/FarmScreen.js, which teaches the Field's Upgrade
+            // button using the fertilizer just won).
+            : wonDepthRef.current === 10
+            ? React.createElement("button", { onClick: () => { exitToPlanning(); onBack && onBack(); setTab("home"); setTutorialRestricted(true); setTutorialStep("fertilizerReveal"); }, style: { padding: "12px 36px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit")
             : React.createElement("div", { style: { display: "flex", gap: 10 } },
                 React.createElement("button", { onClick: exitToPlanning, style: { padding: "12px 28px", background: "#eee", color: "#444", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Exit"),
                 React.createElement("button", { onClick: continueToNextFight, style: { padding: "12px 28px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: "pointer" } }, "Continue (" + continueSeconds + ")")
@@ -418,6 +393,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           ),
           atkEffects.map((e) => {
             const color = e.isEnemy ? "#ef4444" : "#a78bfa";
+            if (e.isHeal) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * ARENA_TILE, top: e.row * ARENA_TILE, width: ARENA_TILE, height: ARENA_TILE, borderRadius: "50%", background: "rgba(34,197,94,0.4)", boxShadow: "inset 0 0 8px rgba(22,163,74,0.9)", animation: "splashWave 0.7s ease-out forwards", pointerEvents: "none", zIndex: 21 } }); }
+            if (e.isPillar) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * ARENA_TILE, top: e.row * ARENA_TILE, width: ARENA_TILE, height: ARENA_TILE, background: "rgba(251,146,60,0.6)", boxShadow: "inset 0 0 8px rgba(239,68,68,0.8)", animation: "pillarFlame 0.7s ease-out forwards", pointerEvents: "none", zIndex: 20 } }); }
             if (e.isRanged) {
               const dRow = e.row - e.fromRow, dCol = e.col - e.fromCol;
               const dist = Math.sqrt(dRow * dRow + dCol * dCol) || 1;

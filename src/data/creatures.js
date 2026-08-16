@@ -48,9 +48,9 @@ export const CREATURES=[
   {id:"breezekit",name:"Breezekit",emoji:"💨",image:"images/breezekit.png",type:"Wind",rarity:"common",description:"Always in motion, this breezy critter can outrun most predators easily.",
    stats:{hp:38,atk:30,def:22,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Gust Swipe",upgrades:["Deals 10 dmg","Deals 14 dmg","Deals 18 dmg","Deals 24 dmg","Pushes target back 1 tile"]},
-     special:{name:"Tail Wind",charge:8,upgrades:["+20 SPD for 3s","+28 SPD","+36 SPD","+45 SPD","Also boosts nearby allies speed by 15"]},
-     unique:{name:"Slipstream",upgrades:["Passive: nearby allies gain +8 SPD","Nearby allies gain +14 SPD","Nearby allies gain +20 SPD","Nearby allies gain +26 SPD; Breezekit also gains +10 SPD","Nearby allies gain +35 SPD; Breezekit gains +18 SPD; allies also gain +5% dodge chance"]}
+     basic:{name:"Gust Swipe",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg. Enemy loses 0.5% Defense (stacking) when hit"]},
+     special:{name:"Zephyr Step",charge:8,upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg. Gain Speed Up"]},
+     unique:{name:"Slipstream",upgrades:["Attacks Pierce enemies and deal 5% more damage","Attacks Pierce enemies and deal 10% more damage","Attacks Pierce enemies and deal 15% more damage","Attacks Pierce enemies and deal 20% more damage","Attacks Pierce enemies and deal 20% more damage. Attacks have +1 Range"]}
    },role:"Support",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"galestride"},
   {id:"galestride",name:"Galestride",emoji:"🌪️",type:"Wind",rarity:"common",description:"A fully grown Breezekit that leaves mini-tornadoes as footprints.",
    stats:{hp:62,atk:55,def:38,spd:1,abilitySpeed:1},
@@ -1551,16 +1551,16 @@ export const CREATURES=[
   {id:"ignisdragon",name:"Ignissaur",emoji:"🐲",type:"Fire",rarity:"legendary",description:"A dragon forged in the earth's mantle and never told it could leave. Surprisingly well-adjusted about it.",
    stats:{hp:95,atk:138,def:85,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Inferno Breath",upgrades:["28 dmg cone+burn 9/s 3s; melt DEF-10%","36 dmg","46 dmg","58 dmg","Burn 14/s 4s; DEF-16%; breath width doubled"]},
-     special:{name:"Magma Core",charge:8,upgrades:["Channel; 45/s 5s; armor melts: foe DEF-5%/s","55/s 6s; -6%/s","68/s 6s; -7%/s","84/s 7s; -8%/s","104/s 7s; -10%/s; fully melted foe stunned 2s"]},
-     unique:{name:"Mantle Dragon",upgrades:["Passive: all burn deals +30% dmg; DEF melts -2% per hit (no cap); fire+earth dmg +25%","Burn +38%; -2.5%/hit; +32%","Burn +48%; -3%/hit; +40%","Burn +60%; -3.5%/hit; +50%","Burn +75%; -4%/hit; +62%; melted foes (DEF -40%+) take 80/s auto-fire dmg; Ignisdragon immune to all dmg while channeling"]}
+     basic:{name:"Magma Fang",upgrades:["30 dmg","34 dmg","38 dmg","43 dmg","43 dmg and inflict Burn"]},
+     special:{name:"Inferno Breath",charge:8,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and inflict Burn"]},
+     unique:{name:"Stoked Flames",upgrades:["Deals 1% extra damage for each stack of Burn on the enemy","Deals 2% extra damage for each stack of Burn on the enemy","Deals 3% extra damage for each stack of Burn on the enemy","Deals 4% extra damage for each stack of Burn on the enemy","Deals 5% extra damage for each stack of Burn on the enemy"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"pyredragon"},
   {id:"pyredragon",name:"Pyresaur",emoji:"🐉",type:"Fire",rarity:"legendary",description:"Ignisdragon fully ignited. Every scale is a miniature sun. Sunglasses are not sufficient protection.",
    stats:{hp:114,atk:166,def:102,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Solar Breath",upgrades:["44 dmg cone+burn 18/s 5s; DEF-20%; width tripled","56 dmg","70 dmg","88 dmg","Burn 26/s 6s; DEF-28%; burns can't be removed; breath chains to all nearby of each hit foe"]},
-     special:{name:"Magma Dominion",charge:12,upgrades:["Channel; 70/s 6s; DEF-12%/s; enemy at 0 DEF explodes 150 dmg","88/s","108/s","132/s","162/s 7s; explosion 200 dmg; explosion spreads burn max stacks to all nearby"]},
-     unique:{name:"Dragon Pyre",upgrades:["Passive: burn +55% dmg; DEF melt -5%/hit; fire dmg +60%; immune to all fire; attacks set ground on fire permanently in fight","Burn +68%; -6%/hit; +74%","Burn +84%; -7.5%/hit; +90%","Burn +104%; -9%/hit; +110%","Burn +128%; -11%/hit; +135%; Pyredragon revives 3 times at full HP each causing a world-fire explosion 400 dmg all"]}
+     basic:{name:"Magma Fang",upgrades:["30 dmg","34 dmg","38 dmg","43 dmg","43 dmg and inflict Burn"]},
+     special:{name:"Inferno Breath",charge:8,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and inflict Burn"]},
+     unique:{name:"Stoked Flames",upgrades:["Deals 1% extra damage for each stack of Burn on the enemy","Deals 2% extra damage for each stack of Burn on the enemy","Deals 3% extra damage for each stack of Burn on the enemy","Deals 4% extra damage for each stack of Burn on the enemy","Deals 5% extra damage for each stack of Burn on the enemy"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"ignisdragon",shardsToAscend:30,ascensionsToEvolve:null},
   // Fire line 3
   {id:"magmatitan",name:"Magmaur",emoji:"🦣",type:"Fire",rarity:"legendary",description:"A creature so massive it reroutes lava flows. Geologists refer to it in hushed, reverent tones.",
@@ -1669,19 +1669,19 @@ export const CREATURES=[
      unique:{name:"Primordial Dragon",upgrades:["Passive: poison stacks 12x; each +38/s; poisoned foes +65% dmg; thorns 80 on attacker+poison 6 stacks; kills spread max poison+root 4s AOE","Stacks 14x; +46/s; +80%; thorns 100","Stacks 16x; +56/s; +98%; thorns 125","Stacks 18x; +68/s; +120%; thorns 155","Stacks 20x; +84/s; +148%; thorns 192; Ancientdragon revives 3 times each as a world-forest explosion rooting all+max poisoning all"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"sylvandragon",shardsToAscend:30,ascensionsToEvolve:null},
   // Nature line 3
-  {id:"bloomphoenix",name:"Bloomibis",emoji:"🦜",type:"Nature",rarity:"legendary",description:"A phoenix made of living petals. When it dies it blooms, reviving more colorful and considerably better at healing.",
+  {id:"bloomphoenix",name:"Bloomibis",emoji:"🦉",type:"Nature",rarity:"legendary",description:"A cat-faced owl crowned with living antlers. Whatever it watches over simply refuses to stay hurt.",
    stats:{hp:92,atk:52,def:100,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Petal Burst",upgrades:["12 dmg; heal all allies 22 HP; cleanse 1 debuff from healed","15 dmg; heal 28","19 dmg; heal 36","25 dmg; heal 46","Bloom burst: heal all 60 HP; cleanse all debuffs; grant +12% all stats 3s"]},
-     special:{name:"Life Bloom",charge:22,upgrades:["Bloom aura; all allies +28 HP/s+30% Ability Speed+remove all debuffs 6s","Regen +36; +38%","Regen +46; +48%","Regen +58; +60%","Regen +72; +75%; grant immunity to all debuffs 7s; revive 1 fallen ally 32% HP"]},
-     unique:{name:"Eternal Bloom",upgrades:["Passive: revives endlessly (3x) each revival healing all allies 100 HP+removing all debuffs+granting bloom aura 8s; Ability Speed +45% all allies","Revival heals 125 HP; +55% Ability Speed","Revival heals 155 HP; +68%","Revival heals 192 HP; +84%","Revival heals 240 HP; +104%; on 3rd revival Bloomphoenix becomes permanent petal storm healing all allies 80/s+immune to all dmg"]}
+     basic:{name:"Antler Dart",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg. +5% Attack to self on hit (stacking) until the next time Soothing Hoot is used"]},
+     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also cleanses all debuffs from healed allies"]},
+     unique:{name:"Guardian Grove",upgrades:["Heal 6 HP/s","Heal 8 HP/s","Heal 10 HP/s","Heal 13 HP/s","Heal 13 HP/s and gain +10% Attack"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"lifephoenix"},
   {id:"lifephoenix",name:"Animavis",emoji:"🌿",type:"Nature",rarity:"legendary",description:"Bloomphoenix's final form. The concept of life given wings. It sustains ecosystems just by existing nearby.",
    stats:{hp:110,atk:62,def:120,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Life Burst",upgrades:["18 dmg; heal all allies 38 HP; cleanse all debuffs; grant 1 buff","23 dmg; heal 48","30 dmg; heal 60","38 dmg; heal 76","Bloom explosion: heal all 120 HP; cleanse all; grant 3 buffs; spread to all nearby allies also"]},
-     special:{name:"Eternal Life",charge:22,upgrades:["All allies +55 HP/s+55% Ability Speed+full cleanse; revive 1 fallen 40% HP","Regen +68; +68%; revive 2 fallen","Regen +84; +84%; revive 2 at 50%","Regen +104; +104%; revive 3 at 55%","Regen +128; +128%; revive all fallen 65% HP; grant all invincible 2.5s; all stats +35% 8s"]},
-     unique:{name:"Life Sovereign",upgrades:["Passive: revives endlessly; each revival: all allies full HP+full cleanse+invincible 2s+petal storm 100/s all enemies for 5s; Ability Speed +65% all","Ability Speed +80%","Ability Speed +98%","Ability Speed +120%","Ability Speed +148%; Lifephoenix immune to all dmg while any ally is alive; can never be permanently killed"]}
+     basic:{name:"Antler Dart",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg. +5% Attack to self on hit (stacking) until the next time Soothing Hoot is used"]},
+     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also cleanses all debuffs from healed allies"]},
+     unique:{name:"Guardian Grove",upgrades:["Heal 6 HP/s","Heal 8 HP/s","Heal 10 HP/s","Heal 13 HP/s","Heal 13 HP/s and gain +10% Attack"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"bloomphoenix",shardsToAscend:30,ascensionsToEvolve:null},
   // Earth line 1
   {id:"earthgolem",name:"Terravast",emoji:"🗿",type:"Earth",rarity:"legendary",description:"Built by an ancient civilization as a guardian. The civilization is gone. Earthgolem is still guarding.",

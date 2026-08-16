@@ -12,6 +12,13 @@ export function getMelonLabel(type) {
   return m ? m.label : type + " Melon";
 }
 
+/** The ascension melon matching a creature's rarity (common/rare/epic/
+ * legendary each have their own currency). Falls back to the legendary melon
+ * for any unexpected rarity value. */
+export function getAscensionMelon(rarity) {
+  return MELON_TYPES.find((m) => m.rarity === rarity) || MELON_TYPES.find((m) => m.key === "ascensionMelon");
+}
+
 /** Typed melons plus rainbow melons, which can stand in for any type. */
 export function getMelonAvailable(currencies, type) {
   return (currencies[getMelonKey(type)] || 0) + (currencies.melonRainbow || 0);

@@ -9,9 +9,9 @@ import React, { useState, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
-import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
+import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { equipBonus, equipBonusStr, itemAffectsStat } from "../../core/equipment.js";
+import { equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
 import EquipmentDexScreen from "../../ui/screens/EquipmentDexScreen.js";
@@ -210,7 +210,7 @@ function EquipmentScreen() {
             },
               showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
-                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl),
+                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= equipMaxLevel(item.id) ? "MAX" : "Lv " + lvl),
                 (item.element || item.role || item.attackType) && React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: "#7F77DD", background: "#7F77DD1a", borderRadius: 6, padding: "2px 6px", lineHeight: "12px", whiteSpace: "nowrap" } },
                   item.element ? TYPE_EMOJI[item.element] + " " + item.element
                     : item.role ? ROLE_CONFIG[item.role].emoji + " " + item.role

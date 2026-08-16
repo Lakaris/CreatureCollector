@@ -6,11 +6,23 @@ import { useGame } from "../../state/GameContext.js";
 import { BP_PTS_PER_NODE, BATTLEPASS_REWARDS_FREE, BATTLEPASS_REWARDS_PAID, resolveReward, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
 import { formatDuration, formatNum } from "../../core/format.js";
+import { DEV_MODE } from "../../config.js";
 
 function BattlepassScreen({onBack}){
-  const { setCurrencies, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, farmFieldLevel } = useGame();
+  const { setCurrencies, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, farmFieldLevel } = useGame();
   const now=Date.now();
   const [rewardPopup,setRewardPopup]=React.useState(null);
+  // Claim reveal -- same "Obtained" full-screen pattern as Daily Rewards and
+  // the New Player Welcome Gift (rewardItems holds the entries granted by
+  // whichever claim just fired, stepped into view one at a time below).
+  const [rewardItems,setRewardItems]=React.useState(null);
+  const [visibleCount,setVisibleCount]=React.useState(0);
+  React.useEffect(()=>{
+    if(rewardItems&&visibleCount<rewardItems.length){
+      const t=setTimeout(()=>setVisibleCount(v=>v+1),400);
+      return()=>clearTimeout(t);
+    }
+  },[rewardItems,visibleCount]);
   React.useEffect(()=>{
     const resetTime=battlepassLastReset?new Date(battlepassLastReset).getTime():0;
     if(!battlepassLastReset||(now-resetTime)>=30*86400000){
@@ -26,21 +38,48 @@ function BattlepassScreen({onBack}){
   function nodeUnlocked(i){return pts>=(i+1)*BP_PTS_PER_NODE;}
   function claimFree(i){
     if(battlepassClaimed[i]||!nodeUnlocked(i))return;
-    applyRewards(setCurrencies,resolveReward(BATTLEPASS_REWARDS_FREE[i],farmFieldLevel));
+    const reward=resolveReward(BATTLEPASS_REWARDS_FREE[i],farmFieldLevel);
+    applyRewards(setCurrencies,reward);
     setBattlepassClaimed(prev=>{const a=[...prev];a[i]=true;return a;});
+    setRewardItems(Object.entries(reward));
+    setVisibleCount(0);
   }
   function claimPaid(i){
     if(!battlepassPremium||battlepassPaidClaimed[i]||!nodeUnlocked(i))return;
-    applyRewards(setCurrencies,resolveReward(BATTLEPASS_REWARDS_PAID[i],farmFieldLevel));
+    const reward=resolveReward(BATTLEPASS_REWARDS_PAID[i],farmFieldLevel);
+    applyRewards(setCurrencies,reward);
     setBattlepassPaidClaimed(prev=>{const a=[...prev];a[i]=true;return a;});
+    setRewardItems(Object.entries(reward));
+    setVisibleCount(0);
   }
+  // Collect All can sweep up many nodes at once -- same-key rewards are
+  // summed into one entry each (rather than showing one reveal card per
+  // node) so claiming a long backlog doesn't turn into a minutes-long
+  // step-through.
   function claimAll(){
+    const granted={};
+    let any=false;
     for(let i=0;i<30;i++){
-      claimFree(i);
-      claimPaid(i);
+      if(nodeUnlocked(i)&&!battlepassClaimed[i]){
+        Object.entries(resolveReward(BATTLEPASS_REWARDS_FREE[i],farmFieldLevel)).forEach(([k,v])=>{granted[k]=(granted[k]||0)+v;});
+        any=true;
+      }
+      if(nodeUnlocked(i)&&battlepassPremium&&!battlepassPaidClaimed[i]){
+        Object.entries(resolveReward(BATTLEPASS_REWARDS_PAID[i],farmFieldLevel)).forEach(([k,v])=>{granted[k]=(granted[k]||0)+v;});
+        any=true;
+      }
     }
+    if(!any)return;
+    applyRewards(setCurrencies,granted);
+    setBattlepassClaimed(prev=>prev.map((c,i)=>nodeUnlocked(i)?true:c));
+    if(battlepassPremium)setBattlepassPaidClaimed(prev=>prev.map((c,i)=>nodeUnlocked(i)?true:c));
+    setRewardItems(Object.entries(granted));
+    setVisibleCount(0);
   }
   const anyClaimable=Array.from({length:30},(_,i)=>i).some(i=>(nodeUnlocked(i)&&!battlepassClaimed[i])||(nodeUnlocked(i)&&battlepassPremium&&!battlepassPaidClaimed[i]));
+  // Debug-only: grants exactly one node's worth of points, simulating a
+  // single level gained (mirrors however points are actually earned).
+  function debugGainLevel(){setBattlepassPoints(p=>(p||0)+BP_PTS_PER_NODE);}
   const PURPLE="#534AB7";const GOLD="#d97706";const NODE_COL_W=64;const BOX_MAX=200;
   const level=Math.min(30,Math.floor(pts/BP_PTS_PER_NODE));
   const ptsIntoLevel=pts%BP_PTS_PER_NODE;
@@ -78,20 +117,52 @@ function BattlepassScreen({onBack}){
       )
     );
   }
+  const popup=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
+    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
+      React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},rewardPopup.emoji||REWARD_LABELS[rewardPopup.key]?.split(" ")[0]||"🎁"),
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},REWARD_LABELS[rewardPopup.key]?.split(" ").slice(1).join(" ")||rewardPopup.key),
+      React.createElement("div",{style:{fontSize:14,color:"#666",lineHeight:1.5}},REWARD_DESC[rewardPopup.key]||""),
+      React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
+    )
+  );
+  // Claim reveal screen -- identical pattern to Daily Rewards / New Player
+  // Welcome Gift: whatever claimFree/claimPaid/claimAll just granted steps
+  // into view one card at a time, then Continue returns to the track.
+  if(rewardItems){
+    const allVisible=visibleCount>=rewardItems.length;
+    return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",padding:"32px 24px 16px",flexShrink:0}},"Obtained"),
+      React.createElement("div",{style:{flex:1,padding:"0 24px",display:"flex",flexWrap:"wrap",gap:16,justifyContent:"center",alignContent:"center"}},
+        rewardItems.map(([k,v],i)=>{
+          const visible=i<visibleCount;
+          return React.createElement("div",{key:k,onClick:()=>setRewardPopup({key:k,qty:v,label:REWARD_LABELS[k]||k,emoji:REWARD_LABELS[k]?.split(" ")[0]||"🎁"}),style:{
+            width:100,height:100,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,
+            background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:16,cursor:"pointer",
+            opacity:visible?1:0,transform:visible?"scale(1)":"scale(0.7)",transition:"opacity 0.3s, transform 0.3s",
+          }},
+            React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},formatNum(v))
+          );
+        })
+      ),
+      React.createElement("div",{style:{marginTop:"auto",padding:"16px 24px 32px",flexShrink:0}},
+        // Rendered from the start (not conditionally) so this row's height
+        // never changes as items step in -- otherwise the flex:1 area above
+        // shrinks the instant Continue appears, visibly pushing the
+        // already-centered boxes upward.
+        React.createElement("button",{onClick:()=>setRewardItems(null),disabled:!allVisible,style:{width:"100%",padding:"14px 0",fontSize:15,fontWeight:700,background:"linear-gradient(135deg,#534AB7,#7c4dff)",color:"#fff",border:"none",borderRadius:14,cursor:allVisible?"pointer":"default",visibility:allVisible?"visible":"hidden"}},"Continue")
+      ),
+      popup
+    );
+  }
   return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200}},
-    rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-        React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},rewardPopup.emoji||REWARD_LABELS[rewardPopup.key]?.split(" ")[0]||"🎁"),
-        React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},REWARD_LABELS[rewardPopup.key]?.split(" ").slice(1).join(" ")||rewardPopup.key),
-        React.createElement("div",{style:{fontSize:14,color:"#666",lineHeight:1.5}},REWARD_DESC[rewardPopup.key]||""),
-        React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
-      )
-    ),
+    popup,
     // Header -- fixed above the scroll area, never scrolls with the track
     React.createElement("div",{style:{flexShrink:0,borderBottom:"1px solid #ede8ff"}},
       React.createElement("div",{style:{padding:"20px 20px 12px",display:"flex",alignItems:"center",gap:12}},
         React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
         React.createElement("div",{style:{flex:1,fontSize:20,fontWeight:800,color:"#111"}},"Battle Pass"),
+        DEV_MODE&&React.createElement("button",{onClick:debugGainLevel,style:{fontSize:10,fontWeight:700,color:"#fff",background:"#555",border:"none",borderRadius:6,padding:"4px 8px",cursor:"pointer",whiteSpace:"nowrap"}},"🐞 +1 Level"),
         battlepassPremium
           ?React.createElement("div",{style:{padding:"6px 14px",borderRadius:12,background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:12}},"⭐ Premium")
           :React.createElement("button",{onClick:()=>setBattlepassPremium(true),style:{padding:"8px 12px",borderRadius:12,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:11,cursor:"pointer"}},

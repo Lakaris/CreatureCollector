@@ -4,7 +4,7 @@
 // longer it keeps the same victim, and roots/poisons anything that closes in.
 // Also spawns vine minions at the start of the fight (see battle/minions.js).
 
-import { MELEE_RANGE } from "../constants.js";
+import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
 
 export default {
   key: "nature",
@@ -29,8 +29,8 @@ export default {
         u.row = newRow;
         allOcc.add(key);
       }
-      u.rootTicks = (u.rootTicks || 0) + 8;
-      u.poisonTicks = (u.poisonTicks || 0) + 10;
+      u.rootTicks = STATUS_TICKS;
+      u.poisonTicks = STATUS_TICKS;
       newFx.push({ id: now + 99993 + i, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row, fromCol: boss.col + 0.5, isEnemy: true });
     });
     boss.specialCd = 18;

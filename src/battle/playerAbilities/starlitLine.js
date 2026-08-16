@@ -10,7 +10,7 @@
 // flat ATK debuff; the whole party gets an ATK buff at the same time. Neither
 // stacks -- a fresh cast just refreshes the timer and magnitude.
 
-import { RANGED_RANGE, BOSS_SIZE } from "../constants.js";
+import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { aCardinalDist, distToBoss } from "../geometry.js";
 import { attackCooldown, damageBoss } from "../damage.js";
 import { speedPenalty } from "../status.js";
@@ -156,7 +156,7 @@ export function makeStarlitModule(cfg) {
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);
-      newFx.push({ id: now + "pb" + unit.uid, row: best.tr, col: best.tc, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: false });
+      newFx.push({ id: now + "pb" + unit.uid, row: best.tr, col: best.tc, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       unit.atkCd = attackCooldown(unit, speedPenalty(unit));
     },
 
@@ -231,25 +231,25 @@ export function makeStarlitModule(cfg) {
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);
-      newFx.push({ id: now + "re" + unit.uid, row: centerR, col: centerC, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: false });
+      newFx.push({ id: now + "re" + unit.uid, row: centerR, col: centerC, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
   };
 }
 
 export const sacredwasp = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
-  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: 6,
+  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,
 });
 // Starbright and Starburn intentionally mirror Starlit's numbers exactly for now -- evolutions
 // don't yet have differentiated ability scaling, only different base stats/rarity requirements.
 export const divinedrone = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
-  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: 6,
+  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,
 });
 export const holyswarm = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
-  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: 6,
+  specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,
 });

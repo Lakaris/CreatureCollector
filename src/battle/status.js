@@ -18,10 +18,16 @@ function dotDamage(boss, rate) {
  */
 export function tickStatusEffects(aliveP, boss, newFx, now) {
   for (const u of aliveP) {
-    // Burn — fire boss's Burning Touch, applied on hit.
+    // Burn — fire boss's Burning Touch (boss-ATK scaled), or an enemy
+    // Blazehornet's Burning Bond, which stores its own source ATK on the
+    // target (the fire boss never sets burnSourceAtk).
     if ((u.burnTicks || 0) > 0) {
-      u.hp = Math.max(0, u.hp - dotDamage(boss, DOT_RATES.burn));
+      const dmg = u.burnSourceAtk
+        ? Math.max(1, Math.round(u.burnSourceAtk * 0.035))
+        : dotDamage(boss, DOT_RATES.burn);
+      u.hp = Math.max(0, u.hp - dmg);
       u.burnTicks--;
+      if (!u.burnTicks) u.burnSourceAtk = 0;
       newFx.push({ id: now + "brn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     // Poison + root — nature boss's Overgrowth.
@@ -72,4 +78,35 @@ export function atkModMultiplier(u) {
 /** Decrement `atkModTicks` on a single unit (player, minion, or boss). */
 export function tickAtkMod(u) {
   if ((u.atkModTicks || 0) > 0) u.atkModTicks--;
+}
+
+/**
+ * Stacking DEF shred (e.g. Breezekit's Gust Swipe at max level): each stack
+ * removes 0.5% of the defender's DEF while active. Stacks freely with no cap;
+ * every application refreshes the shared timer, and the stacks clear when it
+ * expires.
+ */
+export function defShredMultiplier(u) {
+  if ((u.defShredTicks || 0) <= 0) return 1;
+  return Math.max(0, 1 - (u.defShredStacks || 0) * 0.005);
+}
+
+/** Timed Speed modifier (e.g. Breezekit's Speed Up buff): +/-pct% action speed. */
+export function spdModMultiplier(u) {
+  if ((u.spdModTicks || 0) <= 0) return 1;
+  return 1 + (u.spdModPct || 0) / 100;
+}
+
+/**
+ * Decrement every generic timed modifier on one unit (player, minion, or
+ * boss): ATK mod, Speed mod, and DEF shred. Ticked once per battle tick from
+ * each unit loop.
+ */
+export function tickTimedMods(u) {
+  tickAtkMod(u);
+  if ((u.spdModTicks || 0) > 0) u.spdModTicks--;
+  if ((u.defShredTicks || 0) > 0) {
+    u.defShredTicks--;
+    if (!u.defShredTicks) u.defShredStacks = 0;
+  }
 }

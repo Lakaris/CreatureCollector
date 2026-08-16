@@ -7,13 +7,14 @@
 import { getRootDef } from "../../core/creatures.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies } from "../geometry.js";
+import { STATUS_TICKS } from "../constants.js";
 
 /** Hits per attack, indexed by ability level (0-based, level 1 = index 0). */
 const HITS_BY_LEVEL = [2, 2, 3, 3, 4];
 /** Cumulative basic-attack damage multiplier, same indexing. */
 const DMG_MULT_BY_LEVEL = [1, 1.05, 1.05, 1.15, 1.15];
 
-const BURN_DURATION_TICKS = 5;
+const BURN_DURATION_TICKS = STATUS_TICKS;
 const BURN_STACK_CAP = 10;
 /** Bonus flat damage per 5 Burn stacks on the target, as a fraction of Blazehornet's ATK (unique lvl 5 only). */
 const BURN_BONUS_ATK_FRACTION = 0.08;
@@ -139,7 +140,7 @@ export function makeBlazehornetModule(defBonusByLevel) {
           r = nr; c = nc;
           last = [r, c];
           trailCells.push(r + "," + c);
-          newFx.push({ id: now + "charge" + unit.uid + r + "_" + c, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: false });
+          newFx.push({ id: now + "charge" + unit.uid + r + "_" + c, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
           const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * dmgMult));
           const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);

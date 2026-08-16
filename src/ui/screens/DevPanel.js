@@ -3,10 +3,11 @@
 import React, { useState } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
-import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION } from "../../data/equipment.js";
+import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_ASCENSION } from "../../data/equipment.js";
+import { equipMaxLevel } from "../../core/equipment.js";
 import { FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS } from "../../data/flair.js";
 import { MELON_TYPES } from "../../data/types.js";
-import { DAILY_MISSIONS, QUEST_DEFS } from "../../data/quests.js";
+import { DAILY_MISSIONS, QUEST_DEFS, QUEST_TABS } from "../../data/quests.js";
 import { makeOwnedCreature, getChain, MAX_LEVEL, MAX_ASCENSION } from "../../core/creatures.js";
 import { MAX_LABYRINTH_DEPTH } from "../../core/labyrinth.js";
 import { FIELD_RATES } from "../../data/farm.js";
@@ -18,9 +19,12 @@ import { DEV_MODE } from "../../config.js";
 
 const LABYRINTH_TIER_FLOORS=[1,1000,2000,3000,4000,5000];
 const FARM_FIELD_MAX_LEVEL=FIELD_RATES.length-1;
+// "daily" is missions, not tiered QUEST_DEFS batches -- excluded so the Set
+// jump controls only cover tabs that actually have sets to skip.
+const QUEST_SET_CATEGORIES=QUEST_TABS.filter(t=>QUEST_DEFS[t.id]);
 
 function DevPanel(){
-  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setDailyDay, setDailyLastClaimed, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, dungeonStarterPackPurchased, setDungeonStarterPackPurchased, setPurchasedOneTimeBundles, purchaseBundle,
+  const { currencies, setCurrencies, setOwned, setSkinShards, equipmentCopies, setEquipmentCopies, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, dailySelectedMissions, setDailyMissionsDone, dailyMissionsSnapshot, questState, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, farmFieldLevel, setFarmFieldLevel, clearSave, setTutorialSeen, setTutorialRestricted, setTutorialStep, setTutorialPhase, setTutorialLine, setTutorialPostLine, setTutorialPickedCreatureId, setTutorialPlayerCell, setTab, setGameMode, setNewPlayerGiftDay, setNewPlayerGiftLastClaimed, setNewPlayerGiftDoubled, setNewPlayerGiftClaimed, setNewPlayerGiftPaidClaimed, setDailyDay, setDailyLastClaimed, setDailyClaimed, setDailyClaimedCycle, setDailyMissionsDate, setDailyMissionsSnapshot, setDailyCompletionClaimed, setDailySelectedMissions, setLastFreeBananaDate, setQuestBatchIdx, setClaimedQuests, questBatchIdx, claimedQuests, setFarmPlots, setFarmFieldLastHarvest, setFarmFieldSeed, setFarmCrops, setPlotUpgrades, setSpecialPurchased, setUnlockedSkins, setArenaLevels, setArenaProgress, setEggsHatched, setDungeonsCleared, setDungeonAutoFights, setArenaFights, setLabyrinthFights, setBananasUsed, setDailyBossFights, setPlotsGrown, setFieldHarvests, setPetLevelUps, setEquipLevelUps, setEverCompletedDailyQuests, setPlotsUnlocked, setDungeonsUnlocked, setDailyBossUnlocked, setArenaUnlocked, setTreasureUnlocked, dungeonStarterPackPurchased, setDungeonStarterPackPurchased, setPurchasedOneTimeBundles, purchaseBundle,
   // Added for a truly complete "Reset everything" -- see resetAll below.
   setCandyUsed, setFertilizerUsed, setEquipFavorites, setPity,
   setArenaPlanGrid, setDungeonPlanGrid, setLabyrinthPlanGrid, setDailyBossPlanGrid,
@@ -32,7 +36,8 @@ function DevPanel(){
   setBattlepassLastReset, setBattlepassClaimed, setBattlepassPaidClaimed, setBattlepassPremium, setBattlepassPoints,
   setCollectedTreasures, setCompletedTreasureSets,
   } = useGame();
-  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",questSet:"1"});
+  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",ascensionMelonCommon:"5",ascensionMelonRare:"5",ascensionMelonEpic:"5",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",
+    ...Object.fromEntries(QUEST_SET_CATEGORIES.map(t=>["questSet_"+t.id,"1"]))});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
   function sv(k,v){setVals(p=>({...p,[k]:v}));}
@@ -81,6 +86,21 @@ function DevPanel(){
     setGameMode(null);
     setTab("home");
   }
+  // Jumps straight to the floor-10 Ancient Fertilizer hand-off (arrow at
+  // Farm, then a locked Upgrade Field flow) without actually clearing 10
+  // Labyrinth floors first. Grants 1 Ancient Fertilizer -- in the real flow
+  // that comes from the floor-10 win reward, but this trigger can be used
+  // before ever touching the Labyrinth, so it has to hand out the currency
+  // itself or the guided Upgrade Field step would softlock with nothing to
+  // spend.
+  function triggerFertilizerTutorial(){
+    setCurrencies(c=>({...c,ancientFertilizer:(c.ancientFertilizer||0)+1}));
+    setTutorialSeen(true);
+    setTutorialRestricted(true);
+    setTutorialStep("fertilizerReveal");
+    setGameMode(null);
+    setTab("home");
+  }
   /**
    * Wipes every persisted field back to a fresh-install default -- this must
    * stay in sync with each field's own `initialSave?.x ?? DEFAULT` in
@@ -109,7 +129,8 @@ function DevPanel(){
     setArenaPlanGrid({});setDungeonPlanGrid({});setLabyrinthPlanGrid({});setDailyBossPlanGrid({});
     setLabyrinthDepth(1);setLabyrinthBestDepth(1);
     setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);
-    setDailyDay(0);setDailyLastClaimed(null);setDailyMissionsDate(null);
+    setNewPlayerGiftClaimed(Array(10).fill(false));setNewPlayerGiftPaidClaimed(Array(10).fill(false));
+    setDailyDay(0);setDailyLastClaimed(null);setDailyClaimed(Array(30).fill(false));setDailyClaimedCycle(0);setDailyMissionsDate(null);
     setDailyMissionsSnapshot({eggsHatched:0,dungeonsCleared:0,arenaFights:0,bananasUsed:0,dailyBossFights:0,plotsGrown:0,labyrinthFights:0,fieldHarvests:0,currencies:{}});
     setDailyMissionsDone(new Set());setDailyCompletionClaimed(false);setDailySelectedMissions([]);setLastFreeBananaDate(null);
     setQuestBatchIdx({general:0,creature:0,gear:0,dungeon:0,arena:0});setClaimedQuests(new Set());
@@ -182,7 +203,7 @@ function DevPanel(){
   }
   function giveMaxGear(){
     const lvl={},asc={};
-    EQUIPMENT_DEFS.forEach(item=>{lvl[item.id]=EQUIP_MAX_LEVEL;asc[item.id]=EQUIP_MAX_ASCENSION;});
+    EQUIPMENT_DEFS.forEach(item=>{lvl[item.id]=equipMaxLevel(item.id);asc[item.id]=EQUIP_MAX_ASCENSION;});
     setEquipmentLevels(prev=>({...prev,...lvl}));
     setEquipmentAscensions(prev=>({...prev,...asc}));
     setEquipmentCopies(prev=>{const n={...prev};EQUIPMENT_DEFS.forEach(item=>{if(!(n[item.id]>0))n[item.id]=1;});return n;});
@@ -192,19 +213,20 @@ function DevPanel(){
     setLabyrinthDepth(d);
     setLabyrinthBestDepth(b=>Math.max(b||1,d));
   }
-  function jumpToQuestSet(n){
-    const target=Math.max(1,Math.min(QUEST_DEFS.general.length,n))-1;
-    const current=questBatchIdx.general||0;
+  function jumpToQuestSet(category,n){
+    const defs=QUEST_DEFS[category];
+    const target=Math.max(1,Math.min(defs.length,n))-1;
+    const current=questBatchIdx[category]||0;
     if(target<current){
       // Going back to an earlier set resets progress: unclaim every quest
       // from that set onward so it plays through fresh again.
       const idsToClear=new Set();
-      for(let i=target;i<QUEST_DEFS.general.length;i++){
-        QUEST_DEFS.general[i].quests.forEach(q=>idsToClear.add(q.id));
+      for(let i=target;i<defs.length;i++){
+        defs[i].quests.forEach(q=>idsToClear.add(q.id));
       }
       setClaimedQuests(prev=>new Set([...prev].filter(id=>!idsToClear.has(id))));
     }
-    setQuestBatchIdx(prev=>({...prev,general:target}));
+    setQuestBatchIdx(prev=>({...prev,[category]:target}));
   }
   function giveMaxFlair(){
     const allFlairIds=[
@@ -317,10 +339,12 @@ function DevPanel(){
           setDailyMissionsDone(new Set(missions.map(m=>m.id)));
         }},"Complete all daily missions")
       ),
-      React.createElement("div",{className:"dev-row",style:{marginTop:10}},
-        React.createElement("span",{className:"dev-label"},"📋 Progression Set (current "+((questBatchIdx.general||0)+1)+"/"+QUEST_DEFS.general.length+")"),
-        React.createElement("input",{className:"dev-input",type:"number",value:vals.questSet,onChange:e=>sv("questSet",e.target.value),style:{width:60}}),
-        React.createElement("button",{className:"dev-btn",onClick:()=>{const n=parseInt(vals.questSet,10);if(!isNaN(n))jumpToQuestSet(n);}},"Jump")
+      ...QUEST_SET_CATEGORIES.map(t=>
+        React.createElement("div",{key:t.id,className:"dev-row",style:{marginTop:10}},
+          React.createElement("span",{className:"dev-label"},t.emoji+" "+t.label+" Set (current "+((questBatchIdx[t.id]||0)+1)+"/"+QUEST_DEFS[t.id].length+")"),
+          React.createElement("input",{className:"dev-input",type:"number",value:vals["questSet_"+t.id],onChange:e=>sv("questSet_"+t.id,e.target.value),style:{width:60}}),
+          React.createElement("button",{className:"dev-btn",onClick:()=>{const n=parseInt(vals["questSet_"+t.id],10);if(!isNaN(n))jumpToQuestSet(t.id,n);}},"Jump")
+        )
       )
     ),
     devTab==="treasure"&&React.createElement(React.Fragment,null,
@@ -356,7 +380,7 @@ function DevPanel(){
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxGear},
-          "Max all gear (Lv "+EQUIP_MAX_LEVEL+", "+EQUIP_MAX_ASCENSION+" ascensions)")
+          "Max all gear (rarity level caps, "+EQUIP_MAX_ASCENSION+" ascensions)")
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:giveMaxFlair},"Unlock all flair (max flair)")
@@ -377,6 +401,9 @@ function DevPanel(){
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:triggerTutorial2},"Trigger tutorial 2 (Dungeon reveal)")
+      ),
+      React.createElement("div",{className:"dev-row"},
+        React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8},onClick:triggerFertilizerTutorial},"Trigger fertilizer tutorial (grants 🪴 1)")
       ),
       React.createElement("div",{className:"dev-row"},
         React.createElement("button",{className:"dev-btn",style:{width:"100%",padding:8,background:"#A32D2D"},onClick:resetAll},"Reset everything")

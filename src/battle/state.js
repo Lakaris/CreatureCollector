@@ -18,6 +18,17 @@ function cooldownFor(spd) {
 }
 
 /**
+ * Enemy creatures have no owned record to feed abilities with melons, so their
+ * ability level is derived from `enemyLevel` where a screen provides one
+ * (Arena's 1..500 curve maps evenly onto the 5 tiers -- a level-500 enemy
+ * fights with a maxed kit, matching how its stats already mirror a maxed
+ * player creature). Screens without an enemy level keep base-tier abilities.
+ */
+function enemyAbilityLevel(enemyLevel) {
+  return enemyLevel ? Math.min(5, Math.floor(enemyLevel / 100)) : 0;
+}
+
+/**
  * Build the unit lists for a battle.
  *
  * Player units now derive their stats from `computeCombatStats`, so level,
@@ -134,8 +145,16 @@ export function makeArenaBattle(
       abilitySpeed: (lvlStats || edef?.stats)?.abilitySpeed || 1,
       abilCharge: 0,
       abilChargeMax: getSpecialCharge(edef),
+      abilityLevels: (() => { const lvl = enemyAbilityLevel(enemyLevel); return { basic: lvl, special: lvl, unique: lvl }; })(),
     };
   });
+
+  // Enemy creatures run the same ability modules as player ones; their
+  // battle-start passives see the enemy roster as "allUnits".
+  for (const u of enemyUnits) {
+    const mod = getPlayerAbilityModule(u.creatureId);
+    if (mod?.onBattleStart) mod.onBattleStart(u, enemyUnits);
+  }
 
   return { playerUnits, enemyUnits, tick: 0 };
 }

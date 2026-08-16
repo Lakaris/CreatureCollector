@@ -287,11 +287,36 @@ export function GameProvider({ children }) {
     general: 0, creature: 0, gear: 0, dungeon: 0, arena: 0,
   });
   const [claimedQuests, setClaimedQuests] = useState(() => initialSave?.claimedQuests ?? new Set());
+  // dailyDay is a FRONTIER, same idea as newPlayerGiftDay below -- an
+  // ever-growing count of how many days have unlocked, NOT "which slot was
+  // last claimed" and NOT wrapped mod 30 itself (the 30-slot calendar display
+  // reads dailyDay % 30). Unclaimed slots stay independently claimable, so
+  // missing a day (or mashing the debug "+1 Day" button) stacks up multiple
+  // claimable rewards instead of only ever offering the single newest one.
   const [dailyDay, setDailyDay] = useState(() => initialSave?.dailyDay ?? 0);
+  // Last real day-key the frontier's date-check advanced for.
   const [dailyLastClaimed, setDailyLastClaimed] = useState(() => initialSave?.dailyLastClaimed ?? null);
+  const [dailyClaimed, setDailyClaimed] = useState(() => initialSave?.dailyClaimed ?? Array(30).fill(false));
+  // Which 30-day cycle (Math.floor(dailyDay/30)) dailyClaimed's flags belong
+  // to -- crossing into a new cycle resets the array fresh rather than
+  // reusing stale claim state from the previous lap through the calendar.
+  const [dailyClaimedCycle, setDailyClaimedCycle] = useState(() => initialSave?.dailyClaimedCycle ?? 0);
+  // newPlayerGiftDay is the claim track's FRONTIER -- how many days have
+  // unlocked so far (only advances on a real new calendar day, or the
+  // NewPlayerGiftScreen debug button), not "which day was last claimed". A
+  // day's Normal/Premium reward stays independently claimable forever once
+  // unlocked (see the two arrays below), even if the frontier moves past it,
+  // so Collect All can sweep up several skipped/unclaimed days at once.
   const [newPlayerGiftDay, setNewPlayerGiftDay] = useState(() => initialSave?.newPlayerGiftDay ?? 0);
+  // Last real day-key the frontier's date-check advanced for -- distinct
+  // from "last claimed", since claiming no longer drives the frontier.
   const [newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed] = useState(() => initialSave?.newPlayerGiftLastClaimed ?? null);
   const [newPlayerGiftDoubled, setNewPlayerGiftDoubled] = useState(() => initialSave?.newPlayerGiftDoubled ?? false);
+  // Per-day claim flags for the Normal and Premium (post-Double-purchase)
+  // reward -- independent of each other, same pattern as the Battle Pass's
+  // battlepassClaimed/battlepassPaidClaimed.
+  const [newPlayerGiftClaimed, setNewPlayerGiftClaimed] = useState(() => initialSave?.newPlayerGiftClaimed ?? Array(10).fill(false));
+  const [newPlayerGiftPaidClaimed, setNewPlayerGiftPaidClaimed] = useState(() => initialSave?.newPlayerGiftPaidClaimed ?? Array(10).fill(false));
   const [dailyMissionsDate, setDailyMissionsDate] = useState(() => initialSave?.dailyMissionsDate ?? null);
   const [dailyMissionsSnapshot, setDailyMissionsSnapshot] = useState(() => initialSave?.dailyMissionsSnapshot ?? {
     eggsHatched: 0, dungeonsCleared: 0, arenaFights: 0,
@@ -382,7 +407,7 @@ export function GameProvider({ children }) {
     dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, dungeonStarterPackPurchased, newFeaturePillsSeen,
     eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, labyrinthFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests,
-    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, dailyMissionsDate, dailyMissionsSnapshot,
+    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, dailyClaimed, dailyClaimedCycle, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, newPlayerGiftClaimed, newPlayerGiftPaidClaimed, dailyMissionsDate, dailyMissionsSnapshot,
     dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions, lastFreeBananaDate,
     battlepassLastReset, battlepassClaimed, battlepassPaidClaimed, battlepassPremium, battlepassPoints,
     collectedTreasures, completedTreasureSets,
@@ -546,8 +571,10 @@ export function GameProvider({ children }) {
     // quests
     questBatchIdx, setQuestBatchIdx, claimedQuests, setClaimedQuests,
     dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed,
+    dailyClaimed, setDailyClaimed, dailyClaimedCycle, setDailyClaimedCycle,
     newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed,
     newPlayerGiftDoubled, setNewPlayerGiftDoubled,
+    newPlayerGiftClaimed, setNewPlayerGiftClaimed, newPlayerGiftPaidClaimed, setNewPlayerGiftPaidClaimed,
     dailyMissionsDate, setDailyMissionsDate,
     dailyMissionsSnapshot, setDailyMissionsSnapshot,
     dailyMissionsDone, setDailyMissionsDone,

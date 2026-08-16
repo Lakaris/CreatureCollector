@@ -109,7 +109,73 @@ export const ABILITY_TAG_DEFS = {
   farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range" },
   burn: { label: "🔥 Burn", description: "Deals damage over time" },
   energy: { label: "⚡ Energy", description: "Energy needed to use this ability" },
+  weakest: { label: "Weakest", description: "Targets the creature with the lowest current Health" },
+  cleanse: { label: "Cleanse", description: "Removes all debuffs" },
+  line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge" },
+  speedup: { label: "💨 Speed Up", description: "Temporarily gain +25% Speed" },
 };
+
+/**
+ * Abilities whose level text is written as absolute "N dmg" / "Heal N HP" values
+ * but displayed as a fixed phrase at every level -- the number lives only in the
+ * DMG/HEAL badge (which grows per level), never in the description text and never
+ * as a "+X% damage" step message.
+ *
+ * Entry shapes: `null` is a damage ability using the generic "Deal damage to an
+ * enemy" phrase; `{phrase}` is a damage ability with its own phrase; `{phrase,
+ * heal:true}` is a heal ability whose leading "Heal N HP[/s]" clause is swapped
+ * for the phrase (N feeds the HEAL badge). An ability key absent from a
+ * creature's entry keeps the default per-level formatting (e.g. Ignissaur's
+ * passive, whose percent lives in the text itself).
+ */
+const BLOOMIBIS_PHRASES = {
+  basic: null,
+  special: { phrase: "Heal 3 allies", heal: true },
+  unique: { phrase: "Allies within range are passively healed", heal: true },
+};
+
+const IGNISSAUR_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to all enemies" },
+};
+
+const PLAIN_ABILITY_PHRASES = {
+  bloomphoenix: BLOOMIBIS_PHRASES,
+  lifephoenix: BLOOMIBIS_PHRASES,
+  ignisdragon: IGNISSAUR_PHRASES,
+  pyredragon: IGNISSAUR_PHRASES,
+  breezekit: {
+    basic: null,
+    special: { phrase: "Teleport beside and deal damage to an enemy" },
+  },
+};
+
+export function usesPlainAbilityLevels(creatureId, key) {
+  const perCreature = PLAIN_ABILITY_PHRASES[creatureId];
+  return !!perCreature && key in perCreature;
+}
+
+const LEADING_HEAL_RE = /^Heal\s+(\d+)\s*HP(?:\/s)?\b/i;
+
+/**
+ * {label, amount, healAmt} for one level of a plain-leveled ability (see
+ * PLAIN_ABILITY_PHRASES), or null for every other ability -- callers fall back
+ * to the generic formatting in that case. Text after the leading clause (e.g. a
+ * final level's bonus effect) is appended to the phrase.
+ */
+export function formatPlainAbilityLevel(creatureId, key, text) {
+  if (!usesPlainAbilityLevels(creatureId, key)) return null;
+  const cfg = PLAIN_ABILITY_PHRASES[creatureId][key];
+  if (cfg && cfg.heal) {
+    const m = LEADING_HEAL_RE.exec(text);
+    if (!m) return { label: text, amount: null, healAmt: null };
+    return { label: cfg.phrase + text.slice(m[0].length), amount: null, healAmt: Number(m[1]) };
+  }
+  const hit = extractLeadingDamage(text);
+  if (!hit) return { label: text, amount: null, healAmt: null };
+  const phrase = cfg ? cfg.phrase : "Deal damage to an enemy";
+  return { label: hit.prefix + phrase + hit.rest, amount: hit.amount, healAmt: null };
+}
 
 /** sacredwasp/divinedrone/holyswarm (Starlit/Starbright/Starburn) currently share identical ability values. */
 export function isStarlitAbilityLine(creatureId) {
@@ -138,8 +204,14 @@ export function getAbilityStatBonus(creatureId, abilityLevels) {
   return { stat: cfg.stat, pct };
 }
 
-/** Mechanic tag keys (into ABILITY_TAG_DEFS) for a given creature id + ability key ("basic"/"special"/"unique"). */
-export function getAbilityTags(creatureId, key) {
+/**
+ * Mechanic tag keys (into ABILITY_TAG_DEFS) for a given creature id + ability
+ * key ("basic"/"special"/"unique"). Pass the currently-displayed tier (0-based
+ * upgrade index, or the owned ability level) as `abilityLevel` when known to
+ * hide tags for effects that unlock at a later upgrade (Bloomibis's Cleanse,
+ * Ignissaur's Burn).
+ */
+export function getAbilityTags(creatureId, key, abilityLevel) {
   const isBlazehornetLine = getRootDef(creatureId)?.id === "blazehornet";
   const isStarlitLine = isStarlitAbilityLine(creatureId);
   const tags = [];
@@ -148,6 +220,32 @@ export function getAbilityTags(creatureId, key) {
   if (key === "unique" && isBlazehornetLine) tags.push("burn");
   if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
   if (key === "special" && isStarlitLine) tags.push("closest");
+  const isBloomibisLine = getRootDef(creatureId)?.id === "bloomphoenix";
+  if (key === "basic" && isBloomibisLine) tags.push("closest");
+  if (key === "special" && isBloomibisLine) {
+    tags.push("weakest");
+    // Soothing Hoot only cleanses from its 4th upgrade on; when the caller
+    // passes the displayed tier (the owned-creature screen), hide the tag
+    // below that. Level-less contexts (dex, gacha) show the full kit.
+    if (abilityLevel == null || abilityLevel >= 4) tags.push("cleanse");
+  }
+  const isIgnissaurLine = getRootDef(creatureId)?.id === "ignisdragon";
+  if (isIgnissaurLine && (key === "basic" || key === "special")) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") tags.push("line");
+    // Both attacks only inflict Burn from their 4th upgrade on -- same
+    // level-gating rule as Bloomibis's Cleanse above.
+    if (abilityLevel == null || abilityLevel >= 4) tags.push("burn");
+  }
+  // Breezekit only (its evolutions keep their old kits for now).
+  if (creatureId === "breezekit") {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") {
+      tags.push("weakest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
+    }
+    if (key === "unique") tags.push("pierce");
+  }
   return tags;
 }
 

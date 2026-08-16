@@ -4,6 +4,8 @@
 // handled in the player-damage path, not here: the more debuffs the party is
 // carrying, the less damage players deal back.
 
+import { STATUS_TICKS } from "../constants.js";
+
 export default {
   key: "dark",
 
@@ -13,8 +15,8 @@ export default {
 
     for (const u of aliveP) {
       u.hp = Math.max(0, u.hp - ctx.dmg(0.1));
-      u.weakTicks = (u.weakTicks || 0) + 10;
-      u.healImmuneTicks = (u.healImmuneTicks || 0) + 12;
+      u.weakTicks = STATUS_TICKS;
+      u.healImmuneTicks = STATUS_TICKS;
       newFx.push({ id: now + "cvl" + u.uid, row: u.row, col: u.col, t: now, isDark: true });
     }
     boss.specialCd = 22;
@@ -26,7 +28,7 @@ export default {
 
     for (const u of aliveP) {
       u.hp = Math.max(0, u.hp - ctx.dmg(0.11));
-      u.dotTicks = (u.dotTicks || 0) + 8;
+      u.dotTicks = STATUS_TICKS;
       newFx.push({ id: now + "drk" + u.uid, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     }
     // The sweep visually covers the whole grid.

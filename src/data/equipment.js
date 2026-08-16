@@ -209,6 +209,12 @@ export const EQUIPMENT_DEFS=[
   {id:"role_sup_inspire",    name:"Warcry Pendant",      emoji:"📯", rarity:"legendary", role:"Support", stats:{atk:21,def:13},          effect:"[Support] At battle start, all allies gain +15% ATK and SPD for 3 turns", speedEffect:true},
 ];
 export const EQUIPMENT_MAP=Object.fromEntries(EQUIPMENT_DEFS.map(e=>[e.id,e]));
+// Absolute cap (legendary). Lower rarities cap earlier -- their upgrade steps
+// are as chunky as a legendary's (min +2/level, see equipBonus), so they feel
+// rewarding to level, but they retire sooner, preserving endgame ordering
+// (maxed per-stat: common ~234 < rare ~380-410 < epic ~545-840 < legendary
+// ~750-1500). Use core/equipment.js's equipMaxLevel(itemId) for an item's cap.
 export const EQUIP_MAX_LEVEL=100;
+export const EQUIP_MAX_LEVEL_BY_RARITY={common:40,rare:60,epic:80,legendary:100};
 export const EQUIP_MAX_ASCENSION=10;
 export const EQUIP_ASC_COSTS=[2,1,2,3,4,5,6,7,8,9];

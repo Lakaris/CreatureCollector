@@ -6,8 +6,8 @@
 import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { EQUIP_RARITY_CONFIG, EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
-import { equipUpgradeCost, equipBonus, equipBonusStr } from "../../core/equipment.js";
+import { EQUIP_RARITY_CONFIG, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
+import { equipUpgradeCost, equipBonus, equipBonusStr, equipMaxLevel } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import Notify from "../../ui/components/Notify.js";
 import EquipmentPicker from "../../ui/screens/EquipmentPicker.js";
@@ -50,10 +50,11 @@ function EquipmentDetail({ itemId, onBack }) {
   const lvl = equipmentLevels[pi.id] || 1;
   const asc = equipmentAscensions[pi.id] || 0;
   const copies = equipmentCopies[pi.id] || 0;
+  const maxLvl = equipMaxLevel(pi.id);
   const bonuses = equipBonus(pi.id, lvl, asc);
-  const nextUpgradeBonuses = lvl < EQUIP_MAX_LEVEL ? equipBonus(pi.id, lvl + 1, asc) : null;
+  const nextUpgradeBonuses = lvl < maxLvl ? equipBonus(pi.id, lvl + 1, asc) : null;
   const rarCfg = EQUIP_RARITY_CONFIG[pi.rarity];
-  const upgradeCost = lvl < EQUIP_MAX_LEVEL ? equipUpgradeCost(lvl) : null;
+  const upgradeCost = lvl < maxLvl ? equipUpgradeCost(lvl) : null;
   const canAffordUpgrade = upgradeCost !== null && (currencies.equipShards || 0) >= upgradeCost;
   const ascCost = asc < EQUIP_MAX_ASCENSION ? EQUIP_ASC_COSTS[asc] : null;
   const canAffordAsc = ascCost !== null && copies >= ascCost;
@@ -65,15 +66,19 @@ function EquipmentDetail({ itemId, onBack }) {
    * the hold-to-repeat loop below uses that to know when to stop itself. */
   function doUpgrade() {
     const curLvl = equipmentLevelsRef.current[pi.id] || 1;
-    if (curLvl >= EQUIP_MAX_LEVEL) return false;
+    if (curLvl >= maxLvl) return false;
     const cost = equipUpgradeCost(curLvl);
     if ((currenciesRef.current.equipShards || 0) < cost) { notify_("Not enough 🔧 Gear Shards!"); return false; }
     setCurrencies((c) => ({ ...c, equipShards: (c.equipShards || 0) - cost }));
     setEquipmentLevels((prev) => ({ ...prev, [pi.id]: (prev[pi.id] || 1) + 1 }));
     setEquipLevelUps((c) => c + 1);
-    // Advances once, the first time -- further upgrades after this stay
-    // fully available, they just no longer move the tutorial forward.
-    if (tutorialStep === "upgradeItem") setTutorialStep("toHome");
+    // The tutorial's guided upgrade advances the step once and must apply
+    // exactly ONE level: returning false here keeps startUpgradeHold from
+    // arming its auto-repeat. That matters because this step change also
+    // disables the button, and a disabled button swallows the mouseup that
+    // would normally stop the hold -- the repeat would otherwise run until
+    // the tutorial's shards were spent (~4 unintended upgrades per click).
+    if (tutorialStep === "upgradeItem") { setTutorialStep("toHome"); return false; }
     return true;
   }
 
@@ -133,7 +138,7 @@ function EquipmentDetail({ itemId, onBack }) {
         React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, pi.emoji),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 2 } }, pi.name),
         asc > 0 && React.createElement("div", { style: { fontSize: 14, color: "#f59e0b", letterSpacing: 2, marginBottom: 4 } }, starStr),
-        React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: lvl >= EQUIP_MAX_LEVEL ? "#d97706" : "#444", marginBottom: 6 } }, lvl >= EQUIP_MAX_LEVEL ? "MAX" : "Lv " + lvl),
+        React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: lvl >= maxLvl ? "#d97706" : "#444", marginBottom: 6 } }, lvl >= maxLvl ? "MAX" : "Lv " + lvl + " / " + maxLvl),
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: pi.effect ? 6 : 0 } }, equipBonusStr(bonuses)),
         pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + pi.effect)
       ),
@@ -142,7 +147,7 @@ function EquipmentDetail({ itemId, onBack }) {
         React.createElement("div", { style: { position: "relative" } },
           tutorialStep === "upgradeItem" && React.createElement("div", { style: { position: "absolute", left: "50%", top: -6, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "UPGRADE"),
-          lvl < EQUIP_MAX_LEVEL
+          lvl < maxLvl
             ? React.createElement("div", null,
                 React.createElement("div", { style: { fontSize: 12, color: "#534AB7", marginBottom: 8 } }, "Lv " + (lvl + 1) + ": " + equipBonusStr(nextUpgradeBonuses)),
                 (() => {

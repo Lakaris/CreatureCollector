@@ -6,7 +6,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain, getSkinsForCreature, getSpecialCharge } from "../../core/creatures.js";
-import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel } from "../../core/abilityText.js";
+import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, formatPlainAbilityLevel } from "../../core/abilityText.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
 
@@ -150,11 +150,12 @@ function DexEntry({def,onBack,onNavigate,navList}){
             abl.upgrades.map((u,i)=>{
               const isFirst=i===0;
               const starlitFmt=formatStarlitAbilityLevel(def.id,k,abl.upgrades,i);
-              const fmt=starlitFmt||(isFirst?formatAbilityDisplay(u):null);
-              const step=starlitFmt||isFirst?null:formatUpgradeStep(u,abl.upgrades[i-1]);
+              const plainFmt=formatPlainAbilityLevel(def.id,k,u);
+              const fmt=starlitFmt||plainFmt||(isFirst?formatAbilityDisplay(u):null);
+              const step=fmt?null:formatUpgradeStep(u,abl.upgrades[i-1]);
               const numBits=[
                 fmt&&fmt.amount!=null?fmt.amount+" dmg":null,
-                starlitFmt&&starlitFmt.healAmt!=null?starlitFmt.healAmt+" heal":null,
+                fmt&&fmt.healAmt!=null?fmt.healAmt+" heal":null,
               ].filter(Boolean).join(" · ");
               return React.createElement("div",{key:i,style:{display:"flex",gap:8,marginBottom:4,alignItems:"baseline"}},
                 React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#7F77DD",minWidth:14,flexShrink:0}},(i+1)),

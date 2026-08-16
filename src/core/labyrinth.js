@@ -2,6 +2,7 @@
 // planning/battle screen and the home entry point.
 
 import { CREATURES } from "../data/creatures.js";
+import { equipBonus } from "./equipment.js";
 
 export const MAX_LABYRINTH_DEPTH = 5000;
 
@@ -50,16 +51,17 @@ const POOL_AVG = (() => {
 
 // Modeled on-curve player: average of a final-form common/epic/legendary
 // (Ashmonarch / Thunderdrake / Glacialhydra) wearing 4 two-stat legendary
-// items -- the same benchmark the ratio anchors were derived with. Growth
-// mirrors calcStats (level bumps of 5% base across 3 stats, +8% per
-// ascension) and equipBonus, smoothed to real-valued levels.
+// items -- the same benchmark the ratio anchors were derived with. Creature
+// growth mirrors calcStats (level bumps of 5% base across 3 stats, +8% per
+// ascension) smoothed to real-valued levels; gear goes through the REAL
+// equipBonus on a 17-base legendary item (8 stat rolls spread over 3 stats),
+// so equipment-curve changes recalibrate the difficulty automatically.
 const PLAYER_BENCH = { hp: 118.7, atk: 146, def: 90 };
-const GEAR_BASE_PER_STAT = 17 * (8 / 3);
 
 function playerPowerAt(depth) {
   const L = Math.max(1, depth / 10), A = depth / 100;
   const G = Math.max(1, depth / 50), ga = G / 10;
-  const gear = GEAR_BASE_PER_STAT * (1 + G * 0.09 + G * G * 0.0002) * (1 + ga * 0.15);
+  const gear = (8 / 3) * equipBonus("leg_hp_atk", G, ga).hp;
   const out = {};
   for (const k of CORE_STATS) out[k] = PLAYER_BENCH[k] * (1 + ((L - 1) / 3) * 0.05) * (1 + A * 0.08) + gear;
   return out;

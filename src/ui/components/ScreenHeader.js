@@ -27,8 +27,10 @@ function ScreenHeader({ title, onBack, backDisabled, right, edgeToEdge = true })
       disabled: backDisabled,
       style: { background: "none", border: "none", cursor: backDisabled ? "not-allowed" : "pointer", fontSize: 20, color: backDisabled ? "#ccc" : "#555", padding: 0, lineHeight: 1 }
     }, React.createElement("i", { className: "ti ti-arrow-left" })),
-    React.createElement("div", { style: { fontSize: 18, fontWeight: 700 } }, title),
-    right && React.createElement("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 } }, right)
+    // Single line + ellipsis so a wide right side (badges, dev pills) can
+    // never wrap the title and change the bar's height.
+    React.createElement("div", { style: { fontSize: 18, fontWeight: 700, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, title),
+    right && React.createElement("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } }, right)
   );
 }
 

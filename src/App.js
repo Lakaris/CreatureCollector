@@ -27,6 +27,7 @@ import DungeonScreen from "./ui/screens/battle/DungeonScreen.js";
 import DailyBossScreen from "./ui/screens/battle/DailyBossScreen.js";
 import ArenaScreen from "./ui/screens/battle/ArenaScreen.js";
 import LabyrinthScreen from "./ui/screens/battle/LabyrinthScreen.js";
+import TestBattleScreen from "./ui/screens/battle/TestBattleScreen.js";
 
 const CARD_BASE = {
   background: "#fff",
@@ -427,6 +428,9 @@ function App() {
       React.createElement(CreatureOverlayHost)
     );
 
+  if (tab === "play" && gameMode === "testbattle")
+    return React.createElement(TestBattleScreen, { onBack: () => setGameMode(null) });
+
   if (tab === "play" && gameMode === "treasure")
     return React.createElement(TreasureScreen, { onBack: () => setGameMode(null) });
 
@@ -583,6 +587,27 @@ function App() {
               treasureUnlocked
                 ? React.createElement("div", { style: { fontSize: 12, color: "#d97706" } }, "Open Mysterious Ore for treasures")
                 : React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+            )
+          ),
+          // Debug-only battle sandbox -- will eventually be removed or toggled
+          // off, so it rides the same DEV_MODE flag as the dev panel.
+          DEV_MODE && React.createElement(
+            "div",
+            {
+              onClick: () => setGameMode("testbattle"),
+              style: { ...CARD_BASE, border: "2px dashed #b45309", background: "#fffbeb", cursor: "pointer" },
+            },
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1 } }, "🧪"),
+            React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "div",
+                { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 2 } },
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111" } }, "Test Battle"),
+                React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#b45309", background: "#fef3c7", borderRadius: 6, padding: "2px 6px" } }, "DEBUG")
+              ),
+              React.createElement("div", { style: { fontSize: 12, color: "#b45309" } }, "Sandbox: place any creatures on both sides and fight")
             )
           )
         ),

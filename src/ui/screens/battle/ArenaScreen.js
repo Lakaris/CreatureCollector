@@ -71,7 +71,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const [arenaBSnap,setArenaBSnap]=useState(null);
   const [arenaAtkEffects,setArenaAtkEffects]=useState([]);
   const [battleSelectedUid,setBattleSelectedUid]=useState(null);
-  const _aSpd=parseInt(localStorage.getItem("battleSpeed")||"1")||1;
+  const _aSpd=Math.min(2,parseInt(localStorage.getItem("battleSpeed")||"1")||1);
   const aSpeedRef=React.useRef(_aSpd);
   const aMoveAnimRef=React.useRef(Math.round(500/_aSpd*0.84));
   const [arenaBattleSpeed,setArenaBattleSpeed]=useState(_aSpd);
@@ -300,7 +300,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     arenaTickRef.current=setInterval(runArenaTick,Math.round(500/aSpeedRef.current));
   }
   function cycleArenaSpeed(){
-    const next=arenaBattleSpeed===1?2:arenaBattleSpeed===2?4:1;
+    const next=arenaBattleSpeed===1?2:1;
     aSpeedRef.current=next;aMoveAnimRef.current=Math.round(500/next*0.84);
     localStorage.setItem("battleSpeed",next);setArenaBattleSpeed(next);
     if(arenaTickRef.current){clearInterval(arenaTickRef.current);arenaTickRef.current=setInterval(runArenaTick,Math.round(500/next));}

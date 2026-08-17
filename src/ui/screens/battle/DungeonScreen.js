@@ -172,7 +172,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     dTickRef.current=setInterval(runDTick,Math.round(500/dSpeedRef.current));
   }
   function cycleDSpeed(){
-    const next=dSpeed===1?2:dSpeed===2?4:1;
+    const next=dSpeed===1?2:1;
     dSpeedRef.current=next;dAnimRef.current=Math.round(500/next*0.84);setDSpeed(next);
     if(dTickRef.current){clearInterval(dTickRef.current);dTickRef.current=setInterval(runDTick,Math.round(500/next));}
   }

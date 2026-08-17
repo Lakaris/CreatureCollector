@@ -135,7 +135,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   }
   // ── autobattle engine ──────────────────────────────────────────
   const TICK_MS=500;
-  const _savedSpeed=parseInt(localStorage.getItem("battleSpeed")||"1")||1;
+  const _savedSpeed=Math.min(2,parseInt(localStorage.getItem("battleSpeed")||"1")||1);
   const speedRef=React.useRef(_savedSpeed);
   const moveAnimMsRef=React.useRef(Math.round(TICK_MS/_savedSpeed*0.84));
   const [battleSpeed,setBattleSpeed]=useState(_savedSpeed);
@@ -263,7 +263,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     tickRef.current=setInterval(runTick,TICK_MS);
   }
   function cycleSpeed(){
-    const next=battleSpeed===1?2:battleSpeed===2?4:1;
+    const next=battleSpeed===1?2:1;
     speedRef.current=next;
     moveAnimMsRef.current=Math.round(TICK_MS/next*0.84);
     localStorage.setItem("battleSpeed",next);

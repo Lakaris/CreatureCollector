@@ -98,7 +98,16 @@
       "Bash(sed -i 's/atkModPct: 15, atkModTicks: 6,/atkModPct: 15, atkModTicks: STATUS_TICKS,/g' src/battle/playerAbilities/starlitLine.js)",
       "Bash(sed -i 's/import { RANGED_RANGE, BOSS_SIZE } from \"..\\\\/constants.js\";/import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from \"..\\\\/constants.js\";/' src/battle/playerAbilities/starlitLine.js)",
       "Bash(sed -i 's/import { tickStatusEffects, isRooted, speedPenalty, tickAtkMod } from \".\\\\/status.js\";/import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods } from \".\\\\/status.js\";/; s/    tickAtkMod\\(u\\);/    tickTimedMods\\(u\\);/g; s/    tickAtkMod\\(boss\\);/    tickTimedMods\\(boss\\);/' src/battle/tick.js)",
-      "Bash(sed -i 's/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss }\\)/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols }\\)/; s/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null }\\)/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols }\\)/' src/battle/tick.js)"
+      "Bash(sed -i 's/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss }\\)/abilMod.specialInRange\\(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols }\\)/; s/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null }\\)/abilMod.specialInRange\\(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols }\\)/' src/battle/tick.js)",
+      "Bash(sed -i 's/width: \"calc\\(50% - 4px\\)\", minHeight: 213, boxSizing/width: \"calc\\(50% - 4px\\)\", boxSizing/' src/ui/screens/EquipmentScreen.js)",
+      "Bash(sed -i 's/width:\"calc\\(50% - 4px\\)\",minHeight:213,boxSizing/width:\"calc\\(50% - 4px\\)\",boxSizing/' src/ui/screens/CreatureDetail/index.js)",
+      "Bash(sed -i 's/width: \"calc\\(50% - 4px\\)\", boxSizing/width: \"calc\\(50% - 4px\\)\", minHeight: 170, boxSizing/' src/ui/screens/EquipmentScreen.js)",
+      "Bash(sed -i 's/width:\"calc\\(50% - 4px\\)\",boxSizing/width:\"calc\\(50% - 4px\\)\",minHeight:170,boxSizing/' src/ui/screens/CreatureDetail/index.js)",
+      "Bash(sed -i 's/const next = battleSpeed === 1 ? 2 : battleSpeed === 2 ? 4 : 1;/const next = battleSpeed === 1 ? 2 : 1;/' src/ui/screens/battle/LabyrinthScreen.js)",
+      "Bash(sed -i 's/const next=battleSpeed===1?2:battleSpeed===2?4:1;/const next=battleSpeed===1?2:1;/' src/ui/screens/battle/DailyBossScreen.js)",
+      "Bash(sed -i 's/const next=arenaBattleSpeed===1?2:arenaBattleSpeed===2?4:1;/const next=arenaBattleSpeed===1?2:1;/' src/ui/screens/battle/ArenaScreen.js)",
+      "Bash(sed -i 's/const next=dSpeed===1?2:dSpeed===2?4:1;/const next=dSpeed===1?2:1;/' src/ui/screens/battle/DungeonScreen.js)",
+      "Bash(sed -i 's/const _spd = parseInt\\(localStorage.getItem\\(\"battleSpeed\"\\) || \"1\"\\) || 1;/const _spd = Math.min\\(2, parseInt\\(localStorage.getItem\\(\"battleSpeed\"\\) || \"1\"\\) || 1\\);/' src/ui/screens/battle/LabyrinthScreen.js)"
     ]
   }
 }

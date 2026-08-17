@@ -752,7 +752,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               onClick:onTapClick,
               onMouseDown:onPressStart,onMouseUp:onPressEnd,onMouseLeave:onPressEnd,
               onTouchStart:onPressStart,onTouchEnd:onPressEnd,onTouchCancel:onPressEnd,
-              style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:tutorialBlocked?0.35:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled&&!tutorialBlocked)?"pointer":"default",width:"calc(50% - 4px)",boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
+              style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:tutorialBlocked?0.35:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled&&!tutorialBlocked)?"pointer":"default",width:"calc(50% - 4px)",minHeight:170,boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
               showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=equipMaxLevel(item.id)?"MAX":"Lv "+lvl),
@@ -769,19 +769,21 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                     style:{animation:"holdRing 0.5s linear forwards",transformOrigin:"18px 18px",transform:"rotate(-90deg)"}})
                 )
               ),
+              // Fixed-height rows (stats / effect / status) so every card is the
+              // same size whether or not it has an effect -- the effect area
+              // always reserves room for a 3-line description, and ascend +
+              // equipped-by share one slim status row.
               React.createElement("div",null,
                 React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#000"}},item.name),
-                React.createElement("div",{style:{fontSize:11,color:"#666"}},equipBonusStr(bonuses)),
-                item.effect&&React.createElement("div",{style:{fontSize:10,color:"#7F77DD",fontWeight:600,marginTop:2}},"✦ "+item.effect),
-                canAscendItem&&React.createElement("div",{style:{marginTop:3}},
-                  React.createElement("span",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#f59e0b",borderRadius:6,padding:"2px 6px",letterSpacing:".04em"}},"ASCEND READY")
-                ),
+                React.createElement("div",{style:{fontSize:11,color:"#666",minHeight:27}},equipBonusStr(bonuses)),
+                React.createElement("div",{style:{fontSize:10,color:"#7F77DD",fontWeight:600,marginTop:2,minHeight:39,lineHeight:1.3}},item.effect?"✦ "+item.effect:"")
               ),
-              React.createElement("div",{style:{fontSize:9,color:"#e65100",fontWeight:600,lineHeight:1.2,minHeight:18,display:"flex",alignItems:"center",justifyContent:"center",gap:3}},
-                equippedByPet
-                  ? [React.createElement("span",{key:"e",style:{fontSize:12}},equippedByDef?.emoji||"❓"),
-                     React.createElement("span",{key:"n"},equippedByDef?.name||equippedByPet.id)]
-                  : null
+              React.createElement("div",{style:{minHeight:18,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},
+                canAscendItem&&React.createElement("span",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#f59e0b",borderRadius:6,padding:"1px 6px",letterSpacing:".04em",whiteSpace:"nowrap"}},"ASCEND READY"),
+                equippedByPet&&React.createElement("span",{style:{fontSize:9,color:"#e65100",fontWeight:600,lineHeight:1.2,display:"flex",alignItems:"center",gap:3}},
+                  React.createElement("span",{style:{fontSize:12}},equippedByDef?.emoji||"❓"),
+                  React.createElement("span",{style:{maxWidth:70,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},equippedByDef?.name||equippedByPet.id)
+                )
               )
             );
           })

@@ -121,34 +121,34 @@ export const CREATURES=[
      unique:{name:"Storm Sovereign",upgrades:["Passive: all allies gain +60 SPD +15% dodge; wind attacks ignore 15% of enemy DEF","Allies +78 SPD +20% dodge; ignore 22% DEF","Allies +96 SPD +25% dodge; ignore 28% DEF","Allies +118 SPD +30% dodge; ignore 35% DEF","Allies +140 SPD +35% dodge; ignore 42% DEF; each dodge triggers a wind burst dealing 30 dmg to the attacker"]}
    },role:"Support",attackType:"Melee",evolutionOf:"tempesthawk",shardsToAscend:18,ascensionsToEvolve:null},
   // Fire line 2
-  {id:"ashpup",name:"Cindervix",emoji:"🦊",type:"Fire",rarity:"common",description:"A quick fire vixen made of smoldering ash. Its footprints leave scorch marks wherever it runs.",
+  {id:"ashpup",name:"Vixling",emoji:"🦊",type:"Nature",rarity:"common",description:"A woodland red fox kit with leaves tangled in its russet fur. It knows every trail in the forest, including several that don't exist.",
    stats:{hp:38,atk:44,def:22,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ember Bite",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Burns target for 4 dmg/s for 2s"]},
-     special:{name:"Ash Dash",charge:16,upgrades:["Dodge next hit; +20 SPD","Dodge; +28 SPD","Dodge; +36 SPD","Dodge; +45 SPD; leave ash cloud that blinds enemies for 1s","Dodge; +55 SPD; ash cloud also slows enemies 20% for 2s"]},
-     unique:{name:"Ash Trail",upgrades:["Passive: movement leaves ash that slows enemies 10%","Ash slows 15%","Ash slows 20% and reduces enemy ATK 8%","Ash slows 25% and reduces ATK 12%","Ash slows 30%; ATK -16%; ash ignites after 2s for 10 dmg/s"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"cinderfox"},
-  {id:"cinderfox",name:"Cinderfox",emoji:"🦊",type:"Fire",rarity:"common",description:"Cindervix grown into a cunning predator. Its tail is a whip of living flame.",
+     basic:{name:"Bramble Shot",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Poisons target for 4 dmg/s for 2s"]},
+     special:{name:"Underbrush Dash",charge:16,upgrades:["Dodge next hit; +20 SPD","Dodge; +28 SPD","Dodge; +36 SPD","Dodge; +45 SPD; leave tangling brush that snares enemies for 1s","Dodge; +55 SPD; brush also slows enemies 20% for 2s"]},
+     unique:{name:"Fern Trail",upgrades:["Passive: movement leaves undergrowth that slows enemies 10%","Slows 15%","Slows 20% and reduces enemy ATK 8%","Slows 25% and reduces ATK 12%","Slows 30%; ATK -16%; undergrowth sprouts thorns after 2s for 10 dmg/s"]}
+   },role:"Attacker",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"cinderfox"},
+  {id:"cinderfox",name:"Bramblefox",emoji:"🦊",type:"Nature",rarity:"common",description:"Vixling grown into a cunning hunter. Its tail flicks barbed brambles at anything that follows too closely.",
    stats:{hp:62,atk:70,def:38,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ember Bite",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Burns target for 4 dmg/s for 2s"]},
-     special:{name:"Ash Dash",charge:16,upgrades:["Dodge next hit; +20 SPD","Dodge; +28 SPD","Dodge; +36 SPD","Dodge; +45 SPD; leave ash cloud","Dodge; +55 SPD; ash cloud also slows enemies 20%"]},
-     unique:{name:"Flickering Form",upgrades:["Passive: 10% chance to dodge any hit","12% dodge chance","15% dodge chance; on dodge, counter for 18 dmg","18% dodge chance; counter for 25 dmg","22% dodge chance; counter for 35 dmg; counter also burns for 3s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"ashpup",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"scorchbeast"},
-  {id:"scorchbeast",name:"Scorchvix",emoji:"🐻",type:"Fire",rarity:"common",description:"Cinderfox's ferocity given massive form. Its fur permanently crackles with orange fire.",
+     basic:{name:"Bramble Shot",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Poisons target for 4 dmg/s for 2s"]},
+     special:{name:"Fern Feint",charge:16,upgrades:["Dodge next hit; +20 SPD","Dodge; +28 SPD","Dodge; +36 SPD","Dodge; +45 SPD; leave burr patch","Dodge; +55 SPD; burr patch also slows enemies 20%"]},
+     unique:{name:"Trickster's Step",upgrades:["Passive: 10% chance to dodge any hit","12% dodge chance","15% dodge chance; on dodge, counter for 18 dmg","18% dodge chance; counter for 25 dmg","22% dodge chance; counter for 35 dmg; counter also poisons for 3s"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"ashpup",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"scorchbeast"},
+  {id:"scorchbeast",name:"Sylvavix",emoji:"🍁",type:"Nature",rarity:"common",description:"Bramblefox at home in the deep woods. Moss lines its spine, and the forest quietly rearranges its trails to help it hunt.",
    stats:{hp:88,atk:95,def:58,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ember Bite",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Burns for 4 dmg/s for 2s"]},
-     special:{name:"Wildfire Charge",charge:16,upgrades:["Charge; 45 dmg on impact","58 dmg","72 dmg","90 dmg","Knocks foe airborne for 1s"]},
-     unique:{name:"Scorched Earth",upgrades:["Passive: fire attacks deal +15% dmg on burned targets","20%","26%","32%","40%; also removes 1 buff from burned enemies on hit"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"cinderfox",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"emberlord"},
-  {id:"emberlord",name:"Embervox",emoji:"🔥",type:"Fire",rarity:"common",description:"A fire titan wearing a mane of pure flame. Scorchbeast's final and most terrifying form.",
+     basic:{name:"Bramble Shot",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Poisons for 4 dmg/s for 2s"]},
+     special:{name:"Thorn Volley",charge:16,upgrades:["Volley; 45 dmg on impact","58 dmg","72 dmg","90 dmg","Pins foe in place for 1s"]},
+     unique:{name:"Nettle Marks",upgrades:["Passive: attacks deal +15% dmg on poisoned targets","20%","26%","32%","40%; also removes 1 buff from poisoned enemies on hit"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"cinderfox",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"emberlord"},
+  {id:"emberlord",name:"Verdanvox",emoji:"🌲",type:"Nature",rarity:"common",description:"A fox of the old forest wearing a mane of autumn leaves. Sylvavix's final and most cunning form.",
    stats:{hp:118,atk:128,def:78,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ember Bite",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Burns for 4 dmg/s for 2s"]},
-     special:{name:"Wildfire Charge",charge:16,upgrades:["Charge; 45 dmg on impact","58 dmg","72 dmg","90 dmg","Knocks airborne for 1s"]},
-     unique:{name:"Ember Dominion",upgrades:["Passive: burning enemies take 20% more dmg from all sources","25%","30%","36%","42%; Emberlord gains +1% ATK for each second an enemy remains burning"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"scorchbeast",shardsToAscend:18,ascensionsToEvolve:null},
+     basic:{name:"Bramble Shot",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Poisons for 4 dmg/s for 2s"]},
+     special:{name:"Thorn Volley",charge:16,upgrades:["Volley; 45 dmg on impact","58 dmg","72 dmg","90 dmg","Pins foe for 1s"]},
+     unique:{name:"Verdant Dominion",upgrades:["Passive: poisoned enemies take 20% more dmg from all sources","25%","30%","36%","42%; Verdanvox gains +1% ATK for each second an enemy remains poisoned"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"scorchbeast",shardsToAscend:18,ascensionsToEvolve:null},
   // Water line 1
   {id:"droplette",name:"Droplette",emoji:"💧",type:"Water",rarity:"common",description:"A tiny water sprite no bigger than a raindrop. Its healing tears can soothe any wound.",
    stats:{hp:45,atk:22,def:38,spd:1,abilitySpeed:1},
@@ -208,34 +208,34 @@ export const CREATURES=[
      unique:{name:"Living Glacier",upgrades:["Passive: reduce all dmg taken 20; allies behind Glaciertusk take -12% dmg","Reduce 28; -16%","Reduce 36; -20%","Reduce 46; -26%","Reduce 56; -32%; any freeze effect now lasts +1s longer"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"blizzardback",shardsToAscend:18,ascensionsToEvolve:null},
   // Nature line 2
-  {id:"sproutlet",name:"Sproutlet",emoji:"🌱",type:"Nature",rarity:"common",description:"The tiniest sprout, barely visible. What it lacks in size it makes up for in persistence.",
-   stats:{hp:48,atk:18,def:35,spd:1,abilitySpeed:1},
+  {id:"sproutlet",name:"Puddlet",emoji:"🐣",type:"Water",rarity:"common",description:"A fluffy heron hatchling with more legs than balance. It practices spear-fishing in puddles and mostly stabs its own reflection.",
+   stats:{hp:42,atk:40,def:24,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Lash",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Briefly roots target for 0.5s"]},
-     special:{name:"Nature's Touch",charge:12,upgrades:["Heal ally 18 HP","Heal 25 HP","Heal 33 HP","Heal 43 HP","Heal + grant regen 4 HP/s for 3s"]},
-     unique:{name:"Photosynthesis II",upgrades:["Passive: regen 2 HP/s in battle","Regen 3 HP/s","Regen 4 HP/s; doubles below 60% HP","Regen 5 HP/s; doubles below 60%","Regen 7 HP/s; triples below 30% HP"]}
-   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"fernback"},
-  {id:"fernback",name:"Fernback",emoji:"🌿",type:"Nature",rarity:"common",description:"Sproutlet grown into a leafy creature that spreads healing pollen wherever it walks.",
-   stats:{hp:76,atk:28,def:58,spd:1,abilitySpeed:1},
+     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers target for 0.5s"]},
+     special:{name:"Plunge Strike",charge:12,upgrades:["Dive; 30 dmg on impact","38 dmg","48 dmg","60 dmg","Also soaks target, slowing it 20% for 2s"]},
+     unique:{name:"Patient Hunter",upgrades:["Passive: +10% dmg to enemies below half HP","+14%","+18%","+24%","+30%; first strike each battle always crits"]}
+   },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"fernback"},
+  {id:"fernback",name:"Wadewing",emoji:"🐦",type:"Water",rarity:"common",description:"Puddlet grown into its stilts. It stands motionless in the shallows until something forgets it's there.",
+   stats:{hp:66,atk:64,def:40,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Lash",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Roots target 0.5s"]},
-     special:{name:"Pollen Burst",charge:8,upgrades:["Heal all allies 18 HP","Heal 25 HP","Heal 33 HP","Heal 43 HP","Heal + grant +10% ATK for 3s"]},
-     unique:{name:"Healing Pollen",upgrades:["Passive: each second, random ally heals 4 HP","Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 15 HP; also removes 1 debuff from healed ally"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"sproutlet",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"thornbeast"},
-  {id:"thornbeast",name:"Thornbeast",emoji:"🌾",type:"Nature",rarity:"common",description:"Fernback hardened by seasons. Its back is a thicket of razor thorns that puncture armor.",
-   stats:{hp:108,atk:42,def:85,spd:1,abilitySpeed:1},
+     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers target 0.5s"]},
+     special:{name:"Skimming Strike",charge:8,upgrades:["Skim; 34 dmg and knock the target back 1 tile","44 dmg","56 dmg","70 dmg","Knocks back 2 tiles"]},
+     unique:{name:"Stillwater Poise",upgrades:["Passive: after standing still for 2s, next attack deals +30% dmg","+40%","+50%","+65%","+80%; and cannot miss"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"sproutlet",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"thornbeast"},
+  {id:"thornbeast",name:"Marshlance",emoji:"🦩",type:"Water",rarity:"common",description:"Wadewing's patience honed into a spear. Its beak punches clean through armor and comes out dry.",
+   stats:{hp:94,atk:90,def:60,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Lash",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Roots 0.5s"]},
-     special:{name:"Thorn Shield",charge:12,upgrades:["Shield ally 40 HP; attacker takes 15 dmg","Shield 55; 20 dmg","Shield 72; 26 dmg","Shield 90; 32 dmg","Shield all allies 35 HP; attackers take 22 dmg"]},
-     unique:{name:"Living Thorns",upgrades:["Passive: attackers take 12 thorn dmg","Attackers take 18 dmg","Attackers take 24 dmg; also poisoned 4 dmg/s 2s","Attackers take 32 dmg; poison 6 dmg/s 2s","Attackers take 42 dmg; poison 8 dmg/s 3s; Thornbeast gains 8 HP per thorn trigger"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"fernback",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"rootkeeper"},
-  {id:"rootkeeper",name:"Rootkeeper",emoji:"🌴",type:"Nature",rarity:"common",description:"Thornbeast's final form. An ancient guardian whose roots span entire continents underground.",
-   stats:{hp:142,atk:56,def:112,spd:1,abilitySpeed:1},
+     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers 0.5s"]},
+     special:{name:"Spearfish Dive",charge:12,upgrades:["Dive; 60 dmg, ignoring 20% of DEF","75 dmg","92 dmg","115 dmg","Ignores 40% of DEF"]},
+     unique:{name:"Marsh Stalker",upgrades:["Passive: attacks ignore 10% of enemy DEF","15%","20%","26%","32%; killing blows restore 15 HP"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"fernback",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"rootkeeper"},
+  {id:"rootkeeper",name:"Heronarch",emoji:"🦢",type:"Water",rarity:"common",description:"The river's crowned sentinel. Every strike is a single perfect line. Fish reportedly organize petitions about it.",
+   stats:{hp:124,atk:120,def:80,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Lash",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Roots 0.5s"]},
-     special:{name:"Root Network",charge:8,upgrades:["Heal all allies 38 HP; remove 1 debuff each","Heal 52 HP","Heal 68 HP","Heal 88 HP","Heal 108 HP; grant all allies regen 10 HP/s for 4s"]},
-     unique:{name:"Ancient Network",upgrades:["Passive: Rootkeeper and all allies regen 6 HP/s","Regen 9 HP/s","Regen 12 HP/s; Nature abilities grant +5% extra healing","Regen 16 HP/s; +8% extra healing","Regen 22 HP/s; +12% extra healing; fallen allies regen to 20% HP over 5s once per battle"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"thornbeast",shardsToAscend:18,ascensionsToEvolve:null},
+     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers 0.5s"]},
+     special:{name:"Tidal Lance",charge:8,upgrades:["Lance; 80 dmg to the target and the tile behind it","100 dmg","124 dmg","152 dmg","Hits everything in the row behind the target"]},
+     unique:{name:"River Sovereign",upgrades:["Passive: attacks deal +15% dmg and ignore 15% of DEF","+20% dmg; ignore 20%","+26% dmg; ignore 25%","+32% dmg; ignore 30%","+40% dmg; ignore 40%; once per battle, survives a killing blow at 1 HP"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"thornbeast",shardsToAscend:18,ascensionsToEvolve:null},
   // Earth line 2
   {id:"mudpaw",name:"Mudboar",emoji:"🐗",type:"Earth",rarity:"common",description:"A stocky mud boar with rock-hard skin. It rolls into foes like a living boulder.",
    stats:{hp:58,atk:18,def:58,spd:1,abilitySpeed:1},

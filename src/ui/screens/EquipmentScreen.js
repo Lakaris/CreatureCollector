@@ -5,7 +5,7 @@
 // CreatureDetail's own Gear tab, since assigning gear to a slot only makes
 // sense in the context of one creature).
 
-import React, { useState, useEffect } from "../../react.js";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
@@ -52,6 +52,24 @@ function EquipmentScreen() {
   const [filterElements, setFilterElements] = useState(new Set());
   const [filterRoles, setFilterRoles] = useState(new Set());
   const [filterRanges, setFilterRanges] = useState(new Set());
+
+  // The Type row has 8 chips and is the only filter row that can outgrow the
+  // screen. The filter bar must never scroll sideways, so when the full
+  // "emoji + name" chips wouldn't fit the row's width (measured off an
+  // invisible ghost copy), the chips drop to emoji-only.
+  const typeRowRef = useRef(null);
+  const typeGhostRef = useRef(null);
+  const [typeEmojiOnly, setTypeEmojiOnly] = useState(false);
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (typeRowRef.current && typeGhostRef.current) {
+        setTypeEmojiOnly(typeGhostRef.current.scrollWidth > typeRowRef.current.clientWidth);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [filtersOpen]);
 
   function toggleFavorite(id, e) { e.stopPropagation(); setEquipFavorites((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
   function toggleRarity(r) { setFilterRarities((prev) => { const n = new Set(prev); n.has(r) ? n.delete(r) : n.add(r); return n; }); }
@@ -153,31 +171,37 @@ function EquipmentScreen() {
     !tutorialRestricted && filtersOpen && React.createElement("div", { style: { marginBottom: 4 } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Rarity"),
-        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
+        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
           Object.entries(EQUIP_RARITY_CONFIG).map(([r, cfg]) => React.createElement("button", { key: r, className: "filter-chip" + (filterRarities.has(r) ? " active" : ""), onClick: () => toggleRarity(r) }, cfg.label))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Stat"),
-        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
+        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
           [...CORE_STAT_CYCLE, "spd", "abilitySpeed"].map((s) => React.createElement("button", { key: s, className: "filter-chip" + (filterStats.has(s) ? " active" : ""), onClick: () => toggleStat(s) }, STAT_LABELS[s]))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Type"),
-        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), onClick: () => toggleElement(t) }, em + " " + t))
+        React.createElement("div", { ref: typeRowRef, className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible", position: "relative" } },
+          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), title: t, onClick: () => toggleElement(t) }, typeEmojiOnly ? em : em + " " + t)),
+          // Invisible full-label copy used purely to measure whether the
+          // labeled chips would fit -- keeps the emoji-only fallback reversible
+          // when the window grows again.
+          React.createElement("div", { ref: typeGhostRef, "aria-hidden": true, style: { position: "absolute", visibility: "hidden", pointerEvents: "none", display: "flex", gap: 6, whiteSpace: "nowrap", left: 0, top: 0, width: 0, overflow: "hidden" } },
+            Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" }, em + " " + t))
+          )
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Role"),
-        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
+        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
           ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, ROLE_CONFIG[r].emoji + " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Range"),
-        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
+        React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
           ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, ATTACK_TYPE_CONFIG[r].emoji + " " + r))
         )
       ),
@@ -206,7 +230,7 @@ function EquipmentScreen() {
             return React.createElement("div", {
               key: item.id,
               onClick: () => { setSelected(item.id); if (tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID) setTutorialStep("upgradeItem"); },
-              style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
+              style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", minHeight: 170, boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
             },
               showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
@@ -222,25 +246,29 @@ function EquipmentScreen() {
               React.createElement("div", { style: { position: "relative", display: "inline-block", marginTop: 4 } },
                 React.createElement("span", { style: { fontSize: 22 } }, item.emoji)
               ),
+              // Fixed-height rows (stats / effect / status) so every card is the
+              // same size whether or not it has an effect -- the effect area
+              // always reserves room for a 3-line description, and ascend +
+              // equipped-by share one slim status row.
               React.createElement("div", null,
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#000" } }, item.name),
-                React.createElement("div", { style: { fontSize: 11, color: "#666" } }, equipBonusStr(bonuses)),
-                item.effect && React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2 } }, "✦ " + item.effect),
-                canAscendItem && React.createElement("div", { style: { marginTop: 3 } },
-                  React.createElement("span", { style: { fontSize: 9, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 6, padding: "2px 6px", letterSpacing: ".04em" } }, "ASCEND READY")
-                )
+                React.createElement("div", { style: { fontSize: 11, color: "#666", minHeight: 27 } }, equipBonusStr(bonuses)),
+                React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 39, lineHeight: 1.3 } }, item.effect ? "✦ " + item.effect : "")
               ),
-              isEquipped && (() => {
-                const pet = equippedByMap[item.id];
-                const d = pet ? CREATURE_MAP[pet.id] : null;
-                if (!d) return null;
-                return React.createElement("div", {
-                  style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 1, marginTop: 2, padding: "3px 8px", borderRadius: 8, background: "#fff" }
-                },
-                  React.createElement(CreatureIcon, { def: d, size: 18 }),
-                  React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#534AB7", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, d.name)
-                );
-              })()
+              React.createElement("div", { style: { minHeight: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 } },
+                canAscendItem && React.createElement("span", { style: { fontSize: 9, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 6, padding: "1px 6px", letterSpacing: ".04em", whiteSpace: "nowrap" } }, "ASCEND READY"),
+                isEquipped && (() => {
+                  const pet = equippedByMap[item.id];
+                  const d = pet ? CREATURE_MAP[pet.id] : null;
+                  if (!d) return null;
+                  return React.createElement("div", {
+                    style: { display: "flex", alignItems: "center", gap: 3, padding: "2px 6px", borderRadius: 8, background: "#fff" }
+                  },
+                    React.createElement(CreatureIcon, { def: d, size: 14 }),
+                    React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#534AB7", maxWidth: 70, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, d.name)
+                  );
+                })()
+              )
             );
           })
         )

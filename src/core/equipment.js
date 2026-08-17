@@ -4,7 +4,7 @@
 // but its level and ascension are GLOBAL, keyed by itemId in app state --
 // upgrading an item upgrades it on every creature wearing it.
 
-import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_LEVEL_BY_RARITY } from "../data/equipment.js";
+import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL } from "../data/equipment.js";
 import { STAT_LABELS } from "../data/rarity.js";
 
 /** Gear Shard cost to take an item from `level` to the next.
@@ -19,42 +19,48 @@ export function equipUpgradeCost(level) {
   return Math.floor(25 * Math.pow(level, 1.72));
 }
 
-/** Level cap for an item -- lower rarities cap earlier (see
- * EQUIP_MAX_LEVEL_BY_RARITY's rationale in data/equipment.js). */
-export function equipMaxLevel(itemId) {
-  const e = EQUIPMENT_MAP[itemId];
-  return (e && EQUIP_MAX_LEVEL_BY_RARITY[e.rarity]) || EQUIP_MAX_LEVEL;
+/** Level cap for an item: every rarity levels to the same cap (100). */
+export function equipMaxLevel() {
+  return EQUIP_MAX_LEVEL;
 }
 
 /** Stat contribution of one item at a given level/ascension.
- * Per-level gain is gently exponential: level L adds ~G0 * 1.007^(L-1) per
- * stat, where G0 = max(2, round(base*0.115)) is the starting integer step
- * (min +2 for every item so even commons feel rewarding to upgrade; Crests
- * +3, Relics +4). Gains roughly double from level 1 to 100 (1.007^99 ~= 2),
- * so upgrades keep getting bigger -- commons ramp to +2/+3, Relics to +8.
- * Cheap items stepping as hard as legendaries is paid for by the per-rarity
- * LEVEL CAPS (equipMaxLevel: common 40 / rare 60 / epic 80 / legendary 100)
- * -- low rarities level generously but retire early, so endgame ordering
- * holds. `level` is clamped to the item's cap so over-cap legacy saves don't
- * out-stat the design. The closed-form geometric sum keeps the value
- * strictly increasing by at least 1 every level (no dead levels) and is
- * continuous in `level`, which the Labyrinth's fractional on-curve gear
+ * Per-level gain follows an exponential RAMP: level L adds roughly
+ *   S_r * (1 + K * (1 - e^-((L-1)/TAU)))
+ * per stat, where S_r is the rarity step. Early upgrades are small (+1-2),
+ * then gains accelerate hard across the first ~TAU levels (a level 10
+ * upgrade is ~3x a level 1 upgrade) and plateau at (1+K) * S_r per level
+ * (~+5 common, ~+7 legendary), so late levels stay the biggest without the
+ * total running away. The "+1 at level 1" term is baked into the curve, so
+ * every level is a strict upgrade -- no dead levels -- and the closed form
+ * is continuous in `level`, which the Labyrinth's fractional on-curve gear
  * model relies on.
- * Calibration: 17-base legendary reaches ~750/stat at its level 100 /
- * ascension 10 cap and a Relic ~1500, so a Relic still matches a maxed
- * two-stat legendary, and a full set of 4 maxed legendary items adds
- * ~25-30% of a maxed creature's own stats -- noticeable, not dominant.
+ *
+ * Rarity separation is EQUIP_STEP_BY_RARITY: higher rarities climb faster
+ * every level, so the gap widens with investment. Maxed per-stat on the
+ * flat two-stat items: common ~452 < rare ~499 < epic ~570 < legendary
+ * ~643 (each tier ~10-13% over the last). Big single-stat bases (Sigils 18,
+ * Crests 25, Relics 35) ride the same rarity step with their base offset on
+ * top -- a maxed Fury Relic ends ~660/stat, ~1650 at asc 10.
  * NOTE: core/labyrinth.js's playerPowerAt models on-curve gear through this
  * same function -- difficulty recalibrates automatically if this changes. */
-const EQUIP_LEVEL_GROWTH = 1.007;
+const EQUIP_CURVE_K = 4;    // plateau gain is (1 + K) * rarity step per level
+const EQUIP_CURVE_TAU = 12; // levels the ramp-up takes; bigger = slower ramp
+const EQUIP_STEP_BY_RARITY = { common: 1, rare: 1.1, epic: 1.25, legendary: 1.4 };
+/** Cumulative curve value at `lvl` (0 at level 1) -- the integral of the ramp above. */
+function equipCurve(lvl) {
+  const x = lvl - 1;
+  return x + EQUIP_CURVE_K * (x + EQUIP_CURVE_TAU * (Math.exp(-x / EQUIP_CURVE_TAU) - 1));
+}
 export function equipBonus(itemId, level, asc = 0) {
   const e = EQUIPMENT_MAP[itemId];
   if (!e) return {};
   const lvl = Math.min(level, equipMaxLevel(itemId));
   const ascMult = 1 + asc * 0.15;
-  const geo = (Math.pow(EQUIP_LEVEL_GROWTH, lvl - 1) - 1) / (EQUIP_LEVEL_GROWTH - 1);
+  const step = EQUIP_STEP_BY_RARITY[e.rarity] || 1;
+  const curve = equipCurve(lvl);
   return Object.fromEntries(
-    Object.entries(e.stats).map(([stat, base]) => [stat, Math.round((base + Math.max(2, Math.round(base * 0.115)) * geo) * ascMult)])
+    Object.entries(e.stats).map(([stat, base]) => [stat, Math.round((base + step * curve) * ascMult)])
   );
 }
 

@@ -38,7 +38,8 @@ const TUTORIAL_ITEM_ID = "com_hp_atk";
 
 // Index of the line after which the egg-choice screen appears.
 const EGG_CHOICE_AFTER_LINE = 1;
-const STARTER_CHOICES = ["emberpup", "droplette", "leafling"];
+// Fire / Water / Nature starter eggs: Emberpup, Puddlet (heron), Vixling (woodland fox).
+const STARTER_CHOICES = ["emberpup", "sproutlet", "ashpup"];
 
 /** Full evolution chain, base to final, for a starter id -- shown as a preview above the egg row. */
 function chainDefsFor(starterId) {

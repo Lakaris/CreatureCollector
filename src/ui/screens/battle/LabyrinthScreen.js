@@ -80,7 +80,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const [bSnap, setBSnap] = useState(null);
   const [atkEffects, setAtkEffects] = useState([]);
   const [battleSelectedUid, setBattleSelectedUid] = useState(null);
-  const _spd = parseInt(localStorage.getItem("battleSpeed") || "1") || 1;
+  const _spd = Math.min(2, parseInt(localStorage.getItem("battleSpeed") || "1") || 1);
   const speedRef = React.useRef(_spd);
   const moveAnimRef = React.useRef(Math.round(500 / _spd * 0.84));
   const [battleSpeed, setBattleSpeed] = useState(_spd);
@@ -286,7 +286,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     tickRef.current = setInterval(runTick, Math.round(500 / speedRef.current));
   }
   function cycleSpeed() {
-    const next = battleSpeed === 1 ? 2 : battleSpeed === 2 ? 4 : 1;
+    const next = battleSpeed === 1 ? 2 : 1;
     speedRef.current = next; moveAnimRef.current = Math.round(500 / next * 0.84);
     localStorage.setItem("battleSpeed", next); setBattleSpeed(next);
     if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = setInterval(runTick, Math.round(500 / next)); }

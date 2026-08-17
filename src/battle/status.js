@@ -99,8 +99,8 @@ export function spdModMultiplier(u) {
 
 /**
  * Decrement every generic timed modifier on one unit (player, minion, or
- * boss): ATK mod, Speed mod, and DEF shred. Ticked once per battle tick from
- * each unit loop.
+ * boss): ATK mod, Speed mod, DEF shred, and Taunt. Ticked once per battle
+ * tick from each unit loop.
  */
 export function tickTimedMods(u) {
   tickAtkMod(u);
@@ -108,5 +108,9 @@ export function tickTimedMods(u) {
   if ((u.defShredTicks || 0) > 0) {
     u.defShredTicks--;
     if (!u.defShredTicks) u.defShredStacks = 0;
+  }
+  if ((u.tauntTicks || 0) > 0) {
+    u.tauntTicks--;
+    if (!u.tauntTicks) u.tauntSourceUid = null;
   }
 }

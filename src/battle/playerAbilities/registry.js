@@ -12,8 +12,9 @@ import { sacredwasp, divinedrone, holyswarm } from "./starlitLine.js";
 import { bloomphoenix, lifephoenix } from "./bloomibisLine.js";
 import { ignisdragon, pyredragon } from "./ignissaurLine.js";
 import { breezekit } from "./breezekitLine.js";
+import { crystalcrab, gemcrab, gemtitan } from "./crystalcrabLine.js";
 
-export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit };
+export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, crystalcrab, gemcrab, gemtitan };
 
 /** Look up a player creature's ability module. Returns undefined if unimplemented. */
 export function getPlayerAbilityModule(creatureId) {

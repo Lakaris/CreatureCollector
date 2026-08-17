@@ -7,7 +7,7 @@ import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABE
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
-import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, getSpecialCharge, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
+import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
@@ -1054,7 +1054,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                   k==="special"&&React.createElement("button",{
                     onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                     style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
-                  },"⚡ "+getSpecialCharge(def)),
+                  },"⚡ "+getSpecialChargeAt(def,displayIdx)),
                   ...abilityTags.map(tag=>React.createElement("button",{
                     key:tag,
                     onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},

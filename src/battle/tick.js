@@ -161,10 +161,20 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
   return true;
 }
 
+/** The foe this unit is Taunt-forced onto (e.g. by Taunting Snap), or null. */
+function tauntedFoe(u, foes) {
+  if ((u.tauntTicks || 0) <= 0 || !u.tauntSourceUid) return null;
+  return foes.find((f) => f.uid === u.tauntSourceUid && f.hp > 0) || null;
+}
+
 /**
  * Pick what a unit should shoot at and what it should walk toward.
  * Ranged units need a clear cardinal line to fire; everyone falls back to
  * walking at the nearest foe by Chebyshev distance.
+ *
+ * A Taunted unit is forced onto its taunter: the candidate list collapses to
+ * that single foe while the debuff lasts (falling back to normal targeting
+ * if the taunter dies).
  *
  * Chase targeting has hysteresis: the unit keeps walking at its current
  * chase target unless some other foe is STRICTLY closer. Retargeting to
@@ -173,6 +183,8 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
  * the two approach routes.
  */
 function selectTarget(u, foes) {
+  const forced = tauntedFoe(u, foes);
+  if (forced) foes = [forced];
   let nearest = null, nearestD = Infinity;
   for (const f of foes) {
     const d = aChebDist(u.row, u.col, f.row, f.col);
@@ -282,8 +294,10 @@ export function runBattleTick(state, config) {
       continue;
     }
 
-    // Boss takes priority when in range -- hold position even while on cooldown.
-    if (distB <= range && bossAlive) {
+    // Boss takes priority when in range -- hold position even while on
+    // cooldown. A Taunted unit ignores the boss: it is forced onto the
+    // minion that taunted it (the minion-fight branch below).
+    if (distB <= range && bossAlive && !tauntedFoe(u, aliveE)) {
       if (u.atkCd <= 0) {
         let totalDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
@@ -310,12 +324,18 @@ export function runBattleTick(state, config) {
           : aChebDist(u.row, u.col, tgt.row, tgt.col);
         if (dist <= range && u.atkCd <= 0) {
           let totalDmg = 0;
+          const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
             const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
             tgt.hp = Math.max(0, tgt.hp - dmg);
             totalDmg += dmg;
             const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
             if (bonus) { tgt.hp = Math.max(0, tgt.hp - bonus); totalDmg += bonus; }
+            // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
+            // returns a slice of the hit to the attacker. Reflected damage is
+            // never itself reflected.
+            const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
+            if (reflect) u.hp = Math.max(0, u.hp - reflect);
           }
           damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
           u.atkCd = attackCooldown(u, penalty);
@@ -383,11 +403,19 @@ export function runBattleTick(state, config) {
       ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col)
       : aChebDist(u.row, u.col, tgt.row, tgt.col);
     if (dist <= range && u.atkCd <= 0) {
+      const tgtMod = getPlayerAbilityModule(tgt.creatureId);
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
         const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
         tgt.hp = Math.max(0, tgt.hp - dmg);
         const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
         if (bonus) tgt.hp = Math.max(0, tgt.hp - bonus);
+        // Reflect passives: a player-side defender's reflect counts toward
+        // its damage chart.
+        const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
+        if (reflect) {
+          u.hp = Math.max(0, u.hp - reflect);
+          damageDealt[tgt.creatureId] = (damageDealt[tgt.creatureId] || 0) + reflect;
+        }
       }
       u.atkCd = attackCooldown(u, penalty);
       newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: true });

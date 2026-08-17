@@ -5,7 +5,7 @@ import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { getChain, getSkinsForCreature, getSpecialCharge } from "../../core/creatures.js";
+import { getChain, getSkinsForCreature, getSpecialCharge, getSpecialChargeAt } from "../../core/creatures.js";
 import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, formatPlainAbilityLevel } from "../../core/abilityText.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
@@ -137,7 +137,9 @@ function DexEntry({def,onBack,onNavigate,navList}){
                 k==="special"&&React.createElement("button",{
                   onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                   style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
-                },"⚡ "+getSpecialCharge(def)),
+                // The dex shows the whole kit, so a cost that drops at the
+                // final upgrade reads as "10→9".
+                },(()=>{const base=getSpecialCharge(def);const maxed=getSpecialChargeAt(def,4);return "⚡ "+(maxed===base?base:base+"→"+maxed);})()),
                 ...abilityTags.map(tag=>React.createElement("button",{
                   key:tag,
                   onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},

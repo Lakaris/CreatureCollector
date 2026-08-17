@@ -2,7 +2,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
-import { calcStats, getSpecialCharge } from "../core/creatures.js";
+import { calcStats, getSpecialCharge, getSpecialChargeAt } from "../core/creatures.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
@@ -92,10 +92,12 @@ export function makeArenaBattle(
       spd,
       isRanged: cdef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
-      // Special-ability charge: +abilitySpeed (Haste) per tick, fires at abilChargeMax.
+      // Special-ability charge: +abilitySpeed (Haste) per tick, fires at
+      // abilChargeMax (level-aware: e.g. Taunting Snap's final upgrade
+      // reduces the cost 10%).
       abilitySpeed: stats.abilitySpeed || 1,
       abilCharge: 0,
-      abilChargeMax: getSpecialCharge(cdef),
+      abilChargeMax: getSpecialChargeAt(cdef, oc?.abilityLevels?.special || 0),
       abilityLevels: oc?.abilityLevels ? { ...oc.abilityLevels } : { basic: 0, special: 0, unique: 0 },
     };
   });
@@ -144,7 +146,7 @@ export function makeArenaBattle(
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
       abilitySpeed: (lvlStats || edef?.stats)?.abilitySpeed || 1,
       abilCharge: 0,
-      abilChargeMax: getSpecialCharge(edef),
+      abilChargeMax: getSpecialChargeAt(edef, enemyAbilityLevel(enemyLevel)),
       abilityLevels: (() => { const lvl = enemyAbilityLevel(enemyLevel); return { basic: lvl, special: lvl, unique: lvl }; })(),
     };
   });

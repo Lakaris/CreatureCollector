@@ -52,6 +52,20 @@ export function getSpecialCharge(defOrId) {
   return def.abilities.special.charge || DEFAULT_SPECIAL_CHARGE;
 }
 
+/**
+ * Charge cost at a given special-ability level. Taunting Snap's final upgrade
+ * (Crystalcrab line, special level >= 4) cuts the energy cost by 10% -- shown
+ * on the ⚡ pill rather than spelled out in the ability text. Every other
+ * special costs the flat getSpecialCharge value at every level.
+ */
+export function getSpecialChargeAt(defOrId, specialLevel) {
+  const def = typeof defOrId === "string" ? CREATURE_MAP[defOrId] : defOrId;
+  const base = getSpecialCharge(def);
+  if (!base) return 0;
+  const discounted = def && getRootDef(def.id)?.id === "crystalcrab" && (specialLevel || 0) >= 4;
+  return discounted ? Math.max(1, Math.round(base * 0.9)) : base;
+}
+
 /** Every skin set that applies to any form in this creature's chain. */
 export function getSkinsForCreature(creatureId) {
   const chain = getChain(creatureId);

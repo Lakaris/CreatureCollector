@@ -1211,23 +1211,23 @@ export const CREATURES=[
   {id:"crystalcrab",name:"Crystalcrab",emoji:"🦀",type:"Earth",rarity:"epic",description:"A crab whose shell has grown into perfect gemstone crystal. It is the only creature that is also a geological landmark.",
    stats:{hp:108,atk:50,def:120,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Crystal Claw",upgrades:["14 dmg+DEF-10% 3s; thorns 15 on retaliation","18 dmg","23 dmg","30 dmg","DEF-14% 4s; thorns 22; heal self 12 HP"]},
-     special:{name:"Prism Shell",charge:10,upgrades:["DEF+100+thorns 25+reflect 15% dmg 6s","DEF+128","DEF+158; reflect 20%","DEF+192; reflect 25%","DEF+230; reflect 32%; allies nearby take -22% dmg; immune to CC 6s"]},
-     unique:{name:"Gem Carapace",upgrades:["Passive: -25 all dmg; reflect 22% blocked; thorns 28 dmg; deflect 18% projectiles","Reduce 33; reflect 28%; thorns 36; deflect 22%","Reduce 42; reflect 34%; thorns 46; deflect 27%","Reduce 52; reflect 42%; thorns 58; deflect 32%","Reduce 64; reflect 52%; thorns 72; deflect 38%; CC immune; revives once dealing 200 crystal explosion"]}
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
+     unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"gemcrab"},
   {id:"gemcrab",name:"Gemcrab",emoji:"🦀",type:"Earth",rarity:"epic",description:"Crystalcrab's shell has grown into massive prismatic plates. Enemies go blind. Allies feel unreasonably safe.",
    stats:{hp:148,atk:69,def:163,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Crystal Claw",upgrades:["14 dmg+DEF-10% 3s; thorns 15 on retaliation","18 dmg","23 dmg","30 dmg","DEF-14% 4s; thorns 22; heal self 12 HP"]},
-     special:{name:"Prism Shell",charge:10,upgrades:["DEF+100+thorns 25+reflect 15% dmg 6s","DEF+128","DEF+158; reflect 20%","DEF+192; reflect 25%","DEF+230; reflect 32%; allies nearby take -22% dmg; immune to CC 6s"]},
-     unique:{name:"Prism Carapace",upgrades:["Passive: -32 all dmg; reflect 30% blocked; thorns 40 dmg; deflect 24% projectiles; blind attackers 15% 1s","Reduce 40; reflect 38%; thorns 52; deflect 28%; blind 20%","Reduce 50; reflect 46%; thorns 66; deflect 32%; blind 26%","Reduce 62; reflect 56%; thorns 82; deflect 38%; blind 33%","Reduce 76; reflect 68%; thorns 100; deflect 45%; blind 42%; revives once dealing 160 crystal explosion"]}
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
+     unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"crystalcrab",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"gemtitan"},
   {id:"gemtitan",name:"Gemtitan",emoji:"🦀",type:"Earth",rarity:"epic",description:"Crystalcrab's titan form. It is now its own mountain range and is frankly unreasonable about taking damage.",
    stats:{hp:175,atk:82,def:192,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Titan Claw",upgrades:["20 dmg+DEF-14% 4s; thorns 28","26 dmg","33 dmg","42 dmg","DEF-20% 5s; thorns 42; stagger 0.5s; heal self 20 HP"]},
-     special:{name:"Titan Shell",charge:16,upgrades:["DEF+160+thorns 40+reflect 28% 7s; allies invincible 1s","DEF+200; allies 1.5s","DEF+245; reflect 35%; invincible 2s","DEF+295; reflect 43%; invincible 2.5s","DEF+350; reflect 52%; invincible 3s; reflect also stuns attacker 0.5s"]},
-     unique:{name:"Gem Sovereign",upgrades:["Passive: -40 all dmg; reflect 50% blocked; thorns 60; deflect 40% projectiles; CC immune","Reduce 50; reflect 60%; thorns 76; deflect 48%","Reduce 62; reflect 72%; thorns 94; deflect 56%","Reduce 76; reflect 86%; thorns 115; deflect 65%","Reduce 92; reflect 100% blocked; thorns 140; deflect 75%; Gemtitan revives twice; each revival 200 crystal explosion"]}
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
+     unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"gemcrab",shardsToAscend:20,ascensionsToEvolve:null},
   // Earth line 2
   {id:"terradrake",name:"Terrauana",emoji:"🦎",type:"Earth",rarity:"epic",description:"A rock-armored drake that was literally born from a landslide. It considers earthquakes 'light stretching.'",

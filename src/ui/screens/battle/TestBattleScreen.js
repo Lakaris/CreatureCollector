@@ -24,7 +24,8 @@ import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import { equipBonus, equipBonusStr, equippedStatBonuses } from "../../../core/equipment.js";
-import { calcStats } from "../../../core/creatures.js";
+import { calcStats, getSpecialChargeAt } from "../../../core/creatures.js";
+import { computeCombatStats } from "../../../core/stats.js";
 
 const COLS = ARENA_GRID_COLS, ROWS = ARENA_GRID_ROWS, TILE = ARENA_TILE;
 
@@ -38,7 +39,6 @@ function TestBattleScreen({ onBack }) {
   const [selectedId, setSelectedId] = useState(null);
   const [search, setSearch] = useState("");
   const [enemyLevel, setEnemyLevel] = useState(1);
-  const [maxAbilities, setMaxAbilities] = useState(false);
   // Gear slots are stored per placement as {id, lvl} (lvl 0 = the save's real
   // level/ascension for that item; 1-100 = that exact level, ascension 0), so
   // the same item can sit on different creatures -- or different slots -- at
@@ -113,6 +113,28 @@ function TestBattleScreen({ onBack }) {
       equipped[slotIdx] = { ...equipped[slotIdx], lvl: Math.max(0, Math.min(100, lvl | 0)) };
       return { ...prev, [key]: { ...entry, equipped } };
     });
+  }
+  /** Patch arbitrary override fields (level / asc / abil) on a placement. */
+  function setCellField(key, patch) {
+    setTestGrid((prev) => (prev[key] ? { ...prev, [key]: { ...prev[key], ...patch } } : prev));
+  }
+  const MAXED_KIT = { basic: 5, special: 5, unique: 5 };
+  const baseAbilityLevels = (id) => ({ ...(owned?.[id]?.abilityLevels || { basic: 0, special: 0, unique: 0 }) });
+  const enemyTierKit = (lvl) => { const t = Math.min(5, Math.floor(lvl / 100)); return { basic: t, special: t, unique: t }; };
+  const isMaxedKit = (abil) => !!abil && abil.basic === 5 && abil.special === 5 && abil.unique === 5;
+
+  /** A placement's effective level/ascension/kit/flair, with entry overrides
+   * applied over the side's defaults (player: the owned record; enemy: Enemy Lv). */
+  function resolveOverrides(entry, isPlayer, ocBase) {
+    const lvl = (entry?.level || 0) >= 1 ? entry.level : (isPlayer ? (ocBase?.level || 1) : Math.max(1, enemyLevel | 0));
+    const asc = entry?.asc != null ? entry.asc : (isPlayer ? (ocBase?.ascensions || 0) : 0);
+    const kit = entry?.abil ? { ...entry.abil } : (isPlayer ? baseAbilityLevels(entry.id) : enemyTierKit(lvl));
+    const flair = isPlayer && entry?.flair !== false; // flair buffs on by default, player side only
+    return { lvl, asc, kit, flair };
+  }
+  /** The full owned-record shape a placement's player unit fights with. */
+  function ocForBattle(entry, ocBase, ov) {
+    return { ...ocBase, level: ov.lvl, ascensions: ov.asc, abilityLevels: { ...ov.kit }, equipped: [], unlockedFlair: ov.flair ? ocBase.unlockedFlair : [] };
   }
 
   // Battle state -- same shape as LabyrinthScreen's.
@@ -236,26 +258,62 @@ function TestBattleScreen({ onBack }) {
     }
     // Player creatures use the real owned record when there is one (levels,
     // gear, fed abilities); unowned ones get a throwaway level-1 record so
-    // anything in the dex is placeable. "Max abilities" overrides every
-    // player-side kit to 5/5/5 (enemy ability tiers follow Enemy Lv, same as
-    // Arena: level/100, so 500 = maxed).
-    const ownedForTest = {};
+    // anything in the dex is placeable. Level / ascension / ability overrides
+    // are per placement (hold a creature); enemy defaults follow Enemy Lv.
+    //
+    // When EVERY placement of a creature id shares the same overrides, they
+    // are baked into the owned record BEFORE makeArenaBattle so battle-start
+    // passives see the right levels/stats. Duplicates with DIFFERING
+    // overrides get their stats/kits rebuilt per unit afterwards (passives
+    // then acted on the shared record -- a sandbox-only edge case).
+    const ownedForTest = {}, bakedSig = {};
+    const ocOf = (id) => owned?.[id] || { id, level: 1, ascensions: 0, abilityLevels: { basic: 0, special: 0, unique: 0 } };
+    const sigOf = (entry, isPlayer, ocBase) => JSON.stringify(resolveOverrides(entry, isPlayer, ocBase));
     for (const id of Object.values(playerGrid)) {
-      const oc = owned?.[id] || { id, level: 1, ascensions: 0, abilityLevels: { basic: 0, special: 0, unique: 0 } };
+      const oc = ocOf(id);
+      const sigs = playerKeys.filter((k) => playerGrid[k] === id).map((k) => sigOf(testGrid[k], true, oc));
+      const agree = sigs.every((s) => s === sigs[0]);
+      const ov = agree ? JSON.parse(sigs[0]) : { lvl: oc.level || 1, asc: oc.ascensions || 0, kit: { ...oc.abilityLevels }, flair: true };
+      bakedSig[id] = JSON.stringify(ov);
       // Strip the record's own equipped list: gear in this sandbox is
       // per-placement (set via press-and-hold), never inherited from the save.
-      ownedForTest[id] = { ...(maxAbilities ? { ...oc, abilityLevels: { basic: 5, special: 5, unique: 5 } } : oc), equipped: [] };
+      ownedForTest[id] = ocForBattle({ id }, oc, ov);
     }
     bRef.current = makeArenaBattle(playerGrid, enemyGrid, ownedForTest, 1, moveAnimRef.current, equipmentLevels, equipmentAscensions, null, Math.max(1, enemyLevel | 0));
     // makeArenaBattle assigns uids p0..pN / e0..eN in Object.entries order,
     // which matches playerKeys/enemyKeys -- so index i maps unit -> its cell.
     bRef.current.playerUnits.forEach((u, i) => {
       const entry = testGrid[playerKeys[i]];
-      applyGear(u, CREATURE_MAP[u.creatureId], ownedForTest[u.creatureId], entry?.equipped);
+      const def = CREATURE_MAP[u.creatureId];
+      const ocBase = ocOf(u.creatureId);
+      const ov = resolveOverrides(entry, true, ocBase);
+      if (JSON.stringify(ov) !== bakedSig[u.creatureId]) {
+        // Disagreeing duplicate: rebuild this unit's stats from its own overrides.
+        const stats = computeCombatStats(def, ocForBattle(entry, ocBase, ov), equipmentLevels, equipmentAscensions);
+        const hp = Math.round((stats.hp || 60) * 4); // matches state.js's HP_SCALE
+        u.hp = hp; u.maxHp = hp;
+        u.atk = stats.atk || 30; u.def = stats.def || 20;
+        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1;
+      }
+      u.abilityLevels = { ...ov.kit };
+      u.abilChargeMax = getSpecialChargeAt(def, ov.kit.special || 0);
+      applyGear(u, def, { ...ocBase, level: ov.lvl, ascensions: ov.asc }, entry?.equipped);
     });
     bRef.current.enemyUnits.forEach((u, i) => {
       const entry = testGrid[enemyKeys[i]];
-      applyGear(u, CREATURE_MAP[u.creatureId], { level: Math.max(1, enemyLevel | 0), ascensions: 0 }, entry?.equipped);
+      const def = CREATURE_MAP[u.creatureId];
+      const ov = resolveOverrides(entry, false, null);
+      const hasOverride = (entry?.level || 0) >= 1 || entry?.asc != null || !!entry?.abil;
+      if (hasOverride) {
+        const stats = calcStats(def, { level: ov.lvl, ascensions: ov.asc });
+        const hp = Math.round((stats.hp || 60) * 4);
+        u.hp = hp; u.maxHp = hp;
+        u.atk = stats.atk || 30; u.def = stats.def || 20;
+        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1;
+        u.abilityLevels = { ...ov.kit };
+        u.abilChargeMax = getSpecialChargeAt(def, ov.kit.special || 0);
+      }
+      applyGear(u, def, { level: ov.lvl, ascensions: ov.asc }, entry?.equipped);
     });
     setAtkEffects([]);
     setOutcome(null);
@@ -401,12 +459,9 @@ function TestBattleScreen({ onBack }) {
           React.createElement("input", { type: "number", min: 0, max: 100, value: gearLevel, onChange: (e) => setGearLevel(Math.max(0, Math.min(100, parseInt(e.target.value) || 0))), style: { width: 52, padding: "4px 6px", borderRadius: 6, border: "1px solid #ccc", fontSize: 12 } }),
           React.createElement("span", { style: { fontSize: 9, color: "#aaa", fontWeight: 600 } }, gearLevel >= 1 ? "" : "(save)")
         ),
-        React.createElement("label", { style: { fontSize: 12, fontWeight: 600, color: "#666", display: "flex", alignItems: "center", gap: 4, cursor: "pointer" } },
-          React.createElement("input", { type: "checkbox", checked: maxAbilities, onChange: (e) => setMaxAbilities(e.target.checked) }), "Max abilities"
-        )
       ),
       React.createElement("div", { style: { fontSize: 11, color: "#888", textAlign: "center" } },
-        "Tap or drag to place, drag to move, tap to clear — hold a placed creature to equip gear. Duplicates allowed. " + playerCount + " player / " + enemyCount + " enemy placed."
+        "Tap or drag to place, drag to move, tap to clear — hold a placed creature for gear & abilities. Duplicates allowed. " + playerCount + " player / " + enemyCount + " enemy placed."
       ),
       React.createElement("div", { style: { width: COLS * TILE, height: ROWS * TILE, borderRadius: 12, overflow: "hidden", border: "1px solid #bbb", position: "relative", background: "#fff", flexShrink: 0 } },
         Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => {
@@ -431,7 +486,9 @@ function TestBattleScreen({ onBack }) {
             def && React.createElement("div", { style: { position: "relative", lineHeight: 1, pointerEvents: "none" } },
               React.createElement(CreatureIcon, { def, size: 22 }),
               React.createElement("div", { style: { position: "absolute", bottom: -6, left: "50%", transform: "translateX(-50%)", width: 14, height: 3, borderRadius: 2, background: p.side === "player" ? "#534AB7" : "#ef4444" } }),
-              gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: -7, right: -9, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount)
+              gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: -7, right: -9, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount),
+              p.abil && React.createElement("div", { style: { position: "absolute", top: -7, left: -9, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : "✦"),
+              ((p.level || 0) >= 1 || p.asc != null) && React.createElement("div", { style: { position: "absolute", bottom: -9, right: -10, fontSize: 7, fontWeight: 800, color: "#fff", background: "#3b82f6", borderRadius: 6, padding: "1px 3px", lineHeight: 1.3, whiteSpace: "nowrap" } }, ((p.level || 0) >= 1 ? "L" + p.level : "") + (p.asc != null ? "★" + p.asc : ""))
             )
           );
         })).flat()
@@ -488,6 +545,66 @@ function TestBattleScreen({ onBack }) {
             ),
             React.createElement("button", { onClick: () => setEquipCell(null), style: { background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Done")
           ),
+          // Per-placement creature overrides: level, ascension, and the full
+          // ability kit (all default to the side's normal values).
+          (() => {
+            const isPlayer = entry.side === "player";
+            const ocBase = isPlayer ? (owned?.[entry.id] || { level: 1, ascensions: 0 }) : null;
+            const ov = resolveOverrides(entry, isPlayer, ocBase);
+            const editKit = (k, v) => setCellField(equipCell, { abil: { ...ov.kit, [k]: Math.max(0, Math.min(5, v | 0)) } });
+            const numStyle = { width: 52, padding: "3px 5px", borderRadius: 6, border: "1px solid #ccc", fontSize: 11, textAlign: "center", boxSizing: "border-box" };
+            return React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6, background: "#f8f8fc", borderRadius: 10, padding: "8px 10px" } },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" } },
+                React.createElement("label", { title: "0 = default (" + (isPlayer ? "save Lv " + (ocBase.level || 1) : "Enemy Lv") + ")", style: { fontSize: 11, fontWeight: 700, color: "#666", display: "flex", alignItems: "center", gap: 4 } }, "Level",
+                  React.createElement("input", { type: "number", min: 0, max: 500, value: entry.level || 0, onChange: (e) => setCellField(equipCell, { level: Math.max(0, Math.min(500, parseInt(e.target.value) || 0)) }), style: numStyle }),
+                  React.createElement("span", { style: { fontSize: 9, color: "#aaa" } }, (entry.level || 0) >= 1 ? "" : "→ " + ov.lvl)
+                ),
+                React.createElement("label", { title: "Blank = default (" + (isPlayer ? "save asc " + (ocBase.ascensions || 0) : "0") + ")", style: { fontSize: 11, fontWeight: 700, color: "#666", display: "flex", alignItems: "center", gap: 4 } }, "Asc",
+                  React.createElement("input", { type: "number", min: 0, max: 50, value: entry.asc != null ? entry.asc : "", placeholder: String(ov.asc), onChange: (e) => setCellField(equipCell, { asc: e.target.value === "" ? null : Math.max(0, Math.min(50, parseInt(e.target.value) || 0)) }), style: numStyle }),
+                  entry.asc != null && React.createElement("button", { onClick: () => setCellField(equipCell, { asc: null }), title: "Reset to default", style: { background: "none", border: "none", color: "#999", fontSize: 11, cursor: "pointer", padding: 0 } }, "↺")
+                )
+              ),
+              React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap" } },
+                React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: "#666" } }, "Abilities:"),
+                React.createElement("div", { style: { display: "flex", borderRadius: 8, overflow: "hidden", border: "1.5px solid #534AB7" } },
+                  React.createElement("button", { onClick: () => setCellField(equipCell, { abil: null }), style: { padding: "3px 9px", fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer", background: !entry.abil ? "#534AB7" : "#fff", color: !entry.abil ? "#fff" : "#534AB7" } }, isPlayer ? "Default (save)" : "Default (Enemy Lv)"),
+                  React.createElement("button", { onClick: () => setCellField(equipCell, { abil: { ...MAXED_KIT } }), style: { padding: "3px 9px", fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer", background: isMaxedKit(entry.abil) ? "#534AB7" : "#fff", color: isMaxedKit(entry.abil) ? "#fff" : "#534AB7" } }, "⭐ Maxed 5/5/5")
+                )
+              ),
+              React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" } },
+                [["basic", "Basic"], ["special", "Special"], ["unique", "Passive"]].map(([k, label]) =>
+                  React.createElement("label", { key: k, style: { fontSize: 10, fontWeight: 700, color: entry.abil ? "#534AB7" : "#888", display: "flex", alignItems: "center", gap: 3 } }, label,
+                    React.createElement("input", { type: "number", min: 0, max: 5, value: ov.kit[k] ?? 0, onChange: (e) => editKit(k, parseInt(e.target.value) || 0), style: { ...numStyle, width: 40 } })
+                  )
+                ),
+                isPlayer && React.createElement("label", { title: "Include the save's unlocked flair buffs in this unit's stats", style: { fontSize: 10, fontWeight: 700, color: "#666", display: "flex", alignItems: "center", gap: 3, cursor: "pointer" } },
+                  React.createElement("input", { type: "checkbox", checked: entry.flair !== false, onChange: (e) => setCellField(equipCell, { flair: e.target.checked ? undefined : false }) }), "Flair"
+                )
+              ),
+              // Live battle stats for this placement: level/asc/kit/flair plus
+              // the current gear slots, exactly what startFight will produce.
+              (() => {
+                const stats = isPlayer
+                  ? computeCombatStats(def, ocForBattle(entry, owned?.[entry.id] || { id: entry.id, level: 1, ascensions: 0, abilityLevels: { basic: 0, special: 0, unique: 0 } }, ov), equipmentLevels, equipmentAscensions)
+                  : calcStats(def, { level: ov.lvl, ascensions: ov.asc });
+                const gd = gearDelta(def, { ...(isPlayer ? owned?.[entry.id] || {} : {}), level: ov.lvl, ascensions: ov.asc }, equipped);
+                const fmt = (v) => (Number.isInteger(v) ? v : Math.round(v * 100) / 100);
+                return React.createElement("div", { style: { display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", borderTop: "1px solid #e8e8f2", paddingTop: 6 } },
+                  [["hp", "❤️ HP"], ["atk", "⚔️ ATK"], ["def", "🛡️ DEF"], ["spd", "👟 SPD"], ["abilitySpeed", "⚡ Haste"]].map(([k, label]) => {
+                    // HP shown at battle scale (x4, state.js's HP_SCALE) so it
+                    // matches the in-fight unit info panel.
+                    const scale = k === "hp" ? 4 : 1;
+                    const base = (stats[k] || 0) * scale, bonus = (gd[k] || 0) * scale;
+                    return React.createElement("div", { key: k, style: { fontSize: 10, fontWeight: 700, color: "#333", background: "#fff", border: "1px solid #e0e0e0", borderRadius: 8, padding: "3px 7px", display: "flex", alignItems: "center", gap: 3 } },
+                      React.createElement("span", { style: { color: "#888" } }, label),
+                      React.createElement("span", null, fmt(Math.round(base + bonus))),
+                      bonus > 0 && React.createElement("span", { style: { color: "#16a34a", fontWeight: 800 } }, "+" + fmt(Math.round(bonus)))
+                    );
+                  })
+                );
+              })()
+            );
+          })(),
           React.createElement("div", { style: { display: "flex", gap: 6, justifyContent: "center", alignItems: "flex-start" } },
             equipped.map((slot, i) => {
               const it = slot && EQUIPMENT_DEFS.find((d) => d.id === slot.id);

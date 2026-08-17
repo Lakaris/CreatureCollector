@@ -47,6 +47,7 @@ function hasDebuff(u) {
     (u.burnTicks || 0) > 0 || (u.poisonTicks || 0) > 0 || (u.rootTicks || 0) > 0 ||
     (u.dotTicks || 0) > 0 || (u.weakTicks || 0) > 0 || (u.healImmuneTicks || 0) > 0 ||
     (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 || (u.defShredTicks || 0) > 0 ||
+    (u.tauntTicks || 0) > 0 ||
     ((u.atkModTicks || 0) > 0 && (u.atkModPct || 0) < 0)
   );
 }
@@ -64,6 +65,8 @@ function clearDebuffs(u) {
   u.shockTicks = 0;
   u.defShredTicks = 0;
   u.defShredStacks = 0;
+  u.tauntTicks = 0;
+  u.tauntSourceUid = null;
   if ((u.atkModPct || 0) < 0) { u.atkModPct = 0; u.atkModTicks = 0; }
 }
 

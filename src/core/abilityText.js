@@ -113,6 +113,8 @@ export const ABILITY_TAG_DEFS = {
   cleanse: { label: "Cleanse", description: "Removes all debuffs" },
   line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge" },
   speedup: { label: "💨 Speed Up", description: "Temporarily gain +25% Speed" },
+  taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them" },
+  reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature" },
 };
 
 /**
@@ -139,6 +141,11 @@ const IGNISSAUR_PHRASES = {
   special: { phrase: "Deal damage to all enemies" },
 };
 
+const CRYSTALCRAB_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to an enemy and Taunt them" },
+};
+
 const PLAIN_ABILITY_PHRASES = {
   bloomphoenix: BLOOMIBIS_PHRASES,
   lifephoenix: BLOOMIBIS_PHRASES,
@@ -148,6 +155,9 @@ const PLAIN_ABILITY_PHRASES = {
     basic: null,
     special: { phrase: "Teleport beside and deal damage to an enemy" },
   },
+  crystalcrab: CRYSTALCRAB_PHRASES,
+  gemcrab: CRYSTALCRAB_PHRASES,
+  gemtitan: CRYSTALCRAB_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -245,6 +255,12 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
     }
     if (key === "unique") tags.push("pierce");
+  }
+  const isCrystalcrabLine = getRootDef(creatureId)?.id === "crystalcrab";
+  if (isCrystalcrabLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") tags.push("taunt", "closest");
+    if (key === "unique") tags.push("reflect");
   }
   return tags;
 }

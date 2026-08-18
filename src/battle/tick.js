@@ -19,7 +19,7 @@ import {
   aChebDist, aCardinalDist, aBestStep,
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods } from "./status.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, absorbShield } from "./status.js";
 import { tickMinionSpecials } from "./minions.js";
 import { unitDamage, playerDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
 import { getBossModule } from "./bosses/registry.js";
@@ -327,10 +327,10 @@ export function runBattleTick(state, config) {
           const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
             const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
-            tgt.hp = Math.max(0, tgt.hp - dmg);
+            tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, dmg));
             totalDmg += dmg;
             const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-            if (bonus) { tgt.hp = Math.max(0, tgt.hp - bonus); totalDmg += bonus; }
+            if (bonus) { tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, bonus)); totalDmg += bonus; }
             // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
             // returns a slice of the hit to the attacker. Reflected damage is
             // never itself reflected.
@@ -406,9 +406,9 @@ export function runBattleTick(state, config) {
       const tgtMod = getPlayerAbilityModule(tgt.creatureId);
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
         const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
-        tgt.hp = Math.max(0, tgt.hp - dmg);
+        tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, dmg));
         const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-        if (bonus) tgt.hp = Math.max(0, tgt.hp - bonus);
+        if (bonus) tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, bonus));
         // Reflect passives: a player-side defender's reflect counts toward
         // its damage chart.
         const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;

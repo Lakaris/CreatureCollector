@@ -115,6 +115,9 @@ export const ABILITY_TAG_DEFS = {
   speedup: { label: "💨 Speed Up", description: "Temporarily gain +25% Speed" },
   taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them" },
   reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature" },
+  shield: { label: "Shield", description: "Temporary bonus Health" },
+  nearby: { label: "Nearby", description: "Affects every tile surrounding this creature" },
+  healdown: { label: "💔 Heal Down", description: "Reduces healing" },
 };
 
 /**
@@ -146,6 +149,17 @@ const CRYSTALCRAB_PHRASES = {
   special: { phrase: "Deal damage to an enemy and Taunt them" },
 };
 
+// Blubber Wall's data strings carry two numbers ("Shield 8% HP; burst 50%
+// DEF"); the `shieldBurst` shape moves both into badges -- SHIELD gets the
+// Health % and DMG gets the Defense % -- leaving the phrase fixed per tier.
+const MORUSK_PHRASES = {
+  basic: null,
+  special: {
+    phrase: "Gain a Shield based on this creature's Health. When destroyed, deal damage to nearby enemies based on this creature's Defense",
+    shieldBurst: true,
+  },
+};
+
 const PLAIN_ABILITY_PHRASES = {
   bloomphoenix: BLOOMIBIS_PHRASES,
   lifephoenix: BLOOMIBIS_PHRASES,
@@ -158,6 +172,14 @@ const PLAIN_ABILITY_PHRASES = {
   crystalcrab: CRYSTALCRAB_PHRASES,
   gemcrab: CRYSTALCRAB_PHRASES,
   gemtitan: CRYSTALCRAB_PHRASES,
+  // Pebbit line: only the basic is a plain damage ability; the special's
+  // shield % and the passive's expiry % live in their text.
+  pebbit: { basic: null },
+  bouldrath: { basic: null },
+  granitarch: { basic: null },
+  mountainking: { basic: null },
+  morusk: MORUSK_PHRASES,
+  ivormar: MORUSK_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -180,6 +202,16 @@ export function formatPlainAbilityLevel(creatureId, key, text) {
     const m = LEADING_HEAL_RE.exec(text);
     if (!m) return { label: text, amount: null, healAmt: null };
     return { label: cfg.phrase + text.slice(m[0].length), amount: null, healAmt: Number(m[1]) };
+  }
+  if (cfg && cfg.shieldBurst) {
+    const sh = /Shield\s+(\d+)%\s*HP/i.exec(text);
+    const bd = /(\d+)%\s*DEF/i.exec(text);
+    return {
+      label: cfg.phrase,
+      amount: bd ? bd[1] + "%" : null,
+      healAmt: null,
+      shieldAmt: sh ? sh[1] + "%" : null,
+    };
   }
   const hit = extractLeadingDamage(text);
   if (!hit) return { label: text, amount: null, healAmt: null };
@@ -232,6 +264,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   if (key === "special" && isStarlitLine) tags.push("closest");
   const isBloomibisLine = getRootDef(creatureId)?.id === "bloomphoenix";
   if (key === "basic" && isBloomibisLine) tags.push("closest");
+  if (key === "unique" && isBloomibisLine) tags.push("nearby");
   if (key === "special" && isBloomibisLine) {
     tags.push("weakest");
     // Soothing Hoot only cleanses from its 4th upgrade on; when the caller
@@ -261,6 +294,21 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "basic") tags.push("closest");
     if (key === "special") tags.push("taunt", "closest");
     if (key === "unique") tags.push("reflect");
+  }
+  const isPebbitLine = getRootDef(creatureId)?.id === "pebbit";
+  if (isPebbitLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") tags.push("taunt", "shield", "nearby");
+  }
+  const isMoruskLine = getRootDef(creatureId)?.id === "morusk";
+  if (isMoruskLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      // Tusk Slam only inflicts Healing Recovery Down from its 4th upgrade
+      // on -- same level-gating rule as Bloomibis's Cleanse.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("healdown");
+    }
+    if (key === "special") tags.push("shield", "nearby");
   }
   return tags;
 }

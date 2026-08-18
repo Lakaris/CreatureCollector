@@ -15,6 +15,7 @@
 // aura also grants those allies a +10% ATK buff while they stay in range.
 
 import { aChebDist } from "../geometry.js";
+import { healReceivedMultiplier } from "../status.js";
 
 /** Displayed per-hit damage by basic-ability level; the engine deals stat-based
  * damage scaled by the ratio of the current level's value to the base value. */
@@ -47,8 +48,9 @@ function hasDebuff(u) {
     (u.burnTicks || 0) > 0 || (u.poisonTicks || 0) > 0 || (u.rootTicks || 0) > 0 ||
     (u.dotTicks || 0) > 0 || (u.weakTicks || 0) > 0 || (u.healImmuneTicks || 0) > 0 ||
     (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 || (u.defShredTicks || 0) > 0 ||
-    (u.tauntTicks || 0) > 0 ||
-    ((u.atkModTicks || 0) > 0 && (u.atkModPct || 0) < 0)
+    (u.tauntTicks || 0) > 0 || (u.healDownTicks || 0) > 0 ||
+    ((u.atkModTicks || 0) > 0 && (u.atkModPct || 0) < 0) ||
+    ((u.spdModTicks || 0) > 0 && (u.spdModPct || 0) < 0)
   );
 }
 
@@ -67,7 +69,9 @@ function clearDebuffs(u) {
   u.defShredStacks = 0;
   u.tauntTicks = 0;
   u.tauntSourceUid = null;
+  u.healDownTicks = 0;
   if ((u.atkModPct || 0) < 0) { u.atkModPct = 0; u.atkModTicks = 0; }
+  if ((u.spdModPct || 0) < 0) { u.spdModPct = 0; u.spdModTicks = 0; }
 }
 
 /** The dark boss's heal-block gates every heal this module does. */
@@ -110,7 +114,7 @@ export function makeBloomibisModule(cfg) {
       for (const a of ctx.aliveP) {
         if (aChebDist(unit.row, unit.col, a.row, a.col) > AURA_RANGE) continue;
         if (unit._groveGate && a.hp < a.maxHp && canBeHealed(a)) {
-          a.hp = Math.min(a.maxHp, a.hp + healPerSec);
+          a.hp = Math.min(a.maxHp, a.hp + Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
         }
         if (idx >= MAX_IDX) {
           // Reuses the shared atkMod slot: refresh our own buff and upgrade
@@ -146,7 +150,7 @@ export function makeBloomibisModule(cfg) {
       const targets = [...aliveP].sort((a, z) => a.hp - z.hp).slice(0, SPECIAL_TARGETS);
       for (const a of targets) {
         if (cleanses) clearDebuffs(a);
-        if (canBeHealed(a)) a.hp = Math.min(a.maxHp, a.hp + heal);
+        if (canBeHealed(a)) a.hp = Math.min(a.maxHp, a.hp + Math.max(1, Math.round(heal * healReceivedMultiplier(a))));
         newFx.push({ id: now + "hoot" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
 

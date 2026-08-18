@@ -113,4 +113,27 @@ export function tickTimedMods(u) {
     u.tauntTicks--;
     if (!u.tauntTicks) u.tauntSourceUid = null;
   }
+  if ((u.shieldTicks || 0) > 0) {
+    u.shieldTicks--;
+    if (!u.shieldTicks) u.shield = 0;
+  }
+  if ((u.healDownTicks || 0) > 0) u.healDownTicks--;
+}
+
+/** Healing Recovery Down (Morusk's Tusk Slam): healing received is halved. */
+export function healReceivedMultiplier(u) {
+  return (u.healDownTicks || 0) > 0 ? 0.5 : 1;
+}
+
+/**
+ * Creature-side Shield (temporary bonus Health, e.g. Boulder Hunker):
+ * absorbs attack damage before HP is touched. Returns the damage left over
+ * after the shield eats its share. Mirrors the boss `shield` pool the Light
+ * daily boss uses, but timed (shieldTicks) per the standard buff duration.
+ */
+export function absorbShield(u, dmg) {
+  if ((u.shield || 0) <= 0 || dmg <= 0) return dmg;
+  const absorbed = Math.min(u.shield, dmg);
+  u.shield -= absorbed;
+  return dmg - absorbed;
 }

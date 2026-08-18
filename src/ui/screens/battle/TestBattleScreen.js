@@ -424,7 +424,7 @@ function TestBattleScreen({ onBack }) {
             image: CREATURE_MAP[selectedUnit.creatureId]?.image,
             name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
             subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? enemyLevel : (owned?.[selectedUnit.creatureId]?.level || 1)),
-            hp: selectedUnit.hp, maxHp: selectedUnit.maxHp,
+            hp: selectedUnit.hp, maxHp: selectedUnit.maxHp, shield: selectedUnit.shield,
             abilityName: CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
             abilCharge: selectedUnit.abilCharge, abilChargeMax: selectedUnit.abilChargeMax, abilFlashTicks: selectedUnit.abilFlashTicks,
             debuffs: debuffsFor(selectedUnit),

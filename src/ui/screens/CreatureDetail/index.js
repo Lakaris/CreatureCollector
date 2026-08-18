@@ -1030,7 +1030,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         const displayFmt=starlitFmt
           ? {isPercent:false, label:starlitFmt.label, amount:starlitFmt.amount}
           : plainFmt
-            ? {isPercent:false, label:plainFmt.label, amount:plainFmt.amount}
+            ? {isPercent:false, label:plainFmt.label, amount:plainFmt.amount, shieldAmt:plainFmt.shieldAmt}
             : formatAbilityStep(displayText,displayIdx>0?abl.upgrades[displayIdx-1]:null);
         let healAmt=starlitFmt?starlitFmt.healAmt:null;
         if(!starlitFmt){
@@ -1071,6 +1071,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           React.createElement("p",{className:"ability-desc",style:{color:selLocked?"#aaa":"inherit",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8,minHeight:54}},
             React.createElement("span",null,displayFmt.isPercent?displayFmt.text:displayFmt.label),
             React.createElement("span",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",flexShrink:0}},
+              (!selLocked||usesPlainAbilityLevels(def.id,k))&&displayFmt.shieldAmt!=null&&React.createElement("span",{style:{fontWeight:800,color:"#2563EB"}},displayFmt.shieldAmt+" SHIELD"),
               (!selLocked||(isStarlitLine&&(k==="basic"||k==="special"))||usesPlainAbilityLevels(def.id,k))&&displayFmt.amount!=null&&React.createElement("span",{style:{fontWeight:800,color:"#534AB7"}},displayFmt.amount+" DMG"),
               (!selLocked||(isStarlitLine&&(k==="basic"||k==="special"))||usesPlainAbilityLevels(def.id,k))&&healAmt!=null&&React.createElement("span",{style:{fontWeight:800,color:"#2E8B57"}},healAmt+" HEAL")
             )

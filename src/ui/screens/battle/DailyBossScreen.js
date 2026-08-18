@@ -603,7 +603,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           image:CREATURE_MAP[selectedUnit.creatureId]?.image,
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
-          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,shield:selectedUnit.shield,
           abilityName:CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
           abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),

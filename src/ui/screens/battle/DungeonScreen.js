@@ -390,7 +390,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           image:CREATURE_MAP[selectedUnit.creatureId]?.image,
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||(selectedUnit.creatureId==="__vine_minion"?"Vine":selectedUnit.creatureId),
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
-          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,
+          hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,shield:selectedUnit.shield,
           abilityName:CREATURE_MAP[selectedUnit.creatureId]?.abilities?.special?.name,
           abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),

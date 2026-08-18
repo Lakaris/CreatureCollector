@@ -17,12 +17,17 @@ export const DEBUFF_DEFS = [
   { key: "defShredTicks", icon: "🛡️", label: "DEF Shred" },
   { key: "spdModTicks", icon: "💨", label: "Speed Up" },
   { key: "tauntTicks", icon: "🎯", label: "Taunted" },
+  { key: "healDownTicks", icon: "💔", label: "Healing Down" },
 ];
 
 /** Build the debuffs list UnitInfoPanel expects from a unit's raw tick fields. */
 export function debuffsFor(u) {
   if (!u) return [];
-  return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
+  return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0).map((d) =>
+    // The shared spdMod slot is a buff or a debuff depending on sign
+    // (Breezekit's Speed Up vs Morusk's Permafrost Hide chill).
+    d.key === "spdModTicks" && (u.spdModPct || 0) < 0 ? { ...d, icon: "🐌", label: "Speed Down" } : d
+  );
 }
 
 function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {

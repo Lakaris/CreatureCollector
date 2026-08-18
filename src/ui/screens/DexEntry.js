@@ -156,6 +156,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
               const fmt=starlitFmt||plainFmt||(isFirst?formatAbilityDisplay(u):null);
               const step=fmt?null:formatUpgradeStep(u,abl.upgrades[i-1]);
               const numBits=[
+                fmt&&fmt.shieldAmt!=null?fmt.shieldAmt+" shield":null,
                 fmt&&fmt.amount!=null?fmt.amount+" dmg":null,
                 fmt&&fmt.healAmt!=null?fmt.healAmt+" heal":null,
               ].filter(Boolean).join(" · ");

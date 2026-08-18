@@ -31,19 +31,19 @@ export const CREATURES=[
      special:{name:"Root Trap",charge:14,upgrades:["Slows foes 20%","Slows foes 30%","Slows foes 40%","Slows foes 50%","Roots foes in place for 2s instead of slowing"]},
      unique:{name:"Ancient Bark",upgrades:["Passive: after taking damage, gains +8 DEF for 3s","After taking damage, gains +14 DEF for 3s","After taking damage, gains +20 DEF for 4s","After taking damage, gains +28 DEF for 4s; effect stacks twice","After taking damage, gains +36 DEF for 5s; stacks three times and also reduces incoming damage by 10%"]}
    },role:"Tank",attackType:"Ranged",evolutionOf:"leafling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"verdantlord"},
-  {id:"pebbit",name:"Pebbit",emoji:"🪨",type:"Earth",rarity:"common",description:"A round little rock rabbit. Surprisingly difficult to step on.",
+  {id:"pebbit",name:"Pebbit",emoji:"🐸",type:"Earth",rarity:"common",description:"A round little rock frog with a pebble-smooth hide. Surprisingly difficult to step on.",
    stats:{hp:60,atk:20,def:60,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Rock Toss",upgrades:["Deals 9 damage","Deals 13 damage","Deals 18 damage","Deals 24 damage","Stuns target for 0.5s on hit"]},
-     special:{name:"Stone Shell",charge:18,upgrades:["+15 DEF for 3s","+22 DEF for 3s","+30 DEF for 3s","+38 DEF for 4s","Also reflects 20% of damage taken during buff"]},
-     unique:{name:"Stone Skin",upgrades:["Passive: reduces all damage taken by 2","Reduces all damage taken by 4","Reduces all damage taken by 6","Reduces all damage taken by 8; also reduces crit damage by 20%","Reduces all damage taken by 12; also reduces crit damage by 35% and has a 10% chance to fully negate a hit"]}
+     basic:{name:"Pebble Spit",upgrades:["9 dmg","10 dmg","11 dmg","12 dmg","13 dmg"]},
+     special:{name:"Boulder Hunker",charge:18,upgrades:["Taunt all nearby enemies and gain a Shield equal to 3% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 6% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 9% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 12% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 15% of this creature's Defense"]},
+     unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"bouldrath"},
-  {id:"bouldrath",name:"Bouldrath",emoji:"⛰️",type:"Earth",rarity:"common",description:"A pebbit that reached mountain scale. Geologists are baffled.",
+  {id:"bouldrath",name:"Bouldroad",emoji:"🐸",type:"Earth",rarity:"common",description:"Pebbit grown into a stout toad that hauls a boulder on its back. It refuses to explain why.",
    stats:{hp:110,atk:40,def:100,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Rock Toss",upgrades:["Deals 9 damage","Deals 13 damage","Deals 18 damage","Deals 24 damage","Stuns target for 0.5s on hit"]},
-     special:{name:"Stone Shell",charge:18,upgrades:["+15 DEF for 3s","+22 DEF for 3s","+30 DEF for 3s","+38 DEF for 4s","Also reflects 20% of damage taken during buff"]},
-     unique:{name:"Titan Resilience",upgrades:["Passive: reduces all damage taken by 10","Reduces all damage taken by 16","Reduces all damage taken by 22; immune to knockback","Reduces all damage taken by 28; immune to knockback and stun","Reduces all damage taken by 35; immune to all crowd control; reflects 15% of blocked damage"]}
+     basic:{name:"Pebble Spit",upgrades:["9 dmg","10 dmg","11 dmg","12 dmg","13 dmg"]},
+     special:{name:"Boulder Hunker",charge:18,upgrades:["Taunt all nearby enemies and gain a Shield equal to 3% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 6% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 9% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 12% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 15% of this creature's Defense"]},
+     unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"pebbit",shardsToAscend:10,ascensionsToEvolve:30,evolutionId:"granitarch"},
   {id:"breezekit",name:"Breezekit",emoji:"💨",image:"images/breezekit.png",type:"Wind",rarity:"common",description:"Always in motion, this breezy critter can outrun most predators easily.",
    stats:{hp:38,atk:30,def:22,spd:1,abilitySpeed:1},
@@ -91,19 +91,19 @@ export const CREATURES=[
      unique:{name:"Primordial Roots",upgrades:["Passive: reduce all incoming dmg to allies by 5","Reduce by 8","Reduce by 11","Reduce by 15","Reduce by 20; allies gain +10% max HP"]}
    },role:"Tank",attackType:"Ranged",evolutionOf:"verdantlord",shardsToAscend:18,ascensionsToEvolve:null},
   // Earth line 1 extensions
-  {id:"granitarch",name:"Granitarch",emoji:"🗿",type:"Earth",rarity:"common",description:"A Bouldrath that hardened over centuries underground. Geologists weep at the sight.",
+  {id:"granitarch",name:"Granitoad",emoji:"🗿",type:"Earth",rarity:"common",description:"A granite-plated toad stacked with boulders. Its croak registers on seismographs two towns over.",
    stats:{hp:155,atk:58,def:138,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Granite Slam",upgrades:["22 dmg","30 dmg","38 dmg","48 dmg","Sends shockwave knocking back nearby foes"]},
-     special:{name:"Stone Fortress",charge:10,upgrades:["DEF +40 for 5s","DEF +58 for 5s","DEF +76 for 6s","DEF +95 for 6s","Also reflects 20% of damage absorbed during fortress"]},
-     unique:{name:"Granite Core",upgrades:["Passive: reduce all damage taken by 14","Reduce by 20","Reduce by 26; immune to knockback and stun","Reduce by 33; immune to CC","Reduce by 42; CC immunity; reflect 20% of damage blocked"]}
+     basic:{name:"Pebble Spit",upgrades:["9 dmg","10 dmg","11 dmg","12 dmg","13 dmg"]},
+     special:{name:"Boulder Hunker",charge:18,upgrades:["Taunt all nearby enemies and gain a Shield equal to 3% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 6% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 9% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 12% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 15% of this creature's Defense"]},
+     unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"bouldrath",shardsToAscend:14,ascensionsToEvolve:45,evolutionId:"mountainking"},
-  {id:"mountainking",name:"Mountainking",emoji:"🏔️",type:"Earth",rarity:"common",description:"Living mountain. The peak on its back has a permanent snow cap and its own weather system.",
+  {id:"mountainking",name:"Toadalith",emoji:"🏔️",type:"Earth",rarity:"common",description:"A toad the size of a hill beneath a peak of stacked boulders. Maps list it as terrain; it prefers 'ambush.'",
    stats:{hp:205,atk:78,def:182,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Granite Slam",upgrades:["22 dmg","30 dmg","38 dmg","48 dmg","Sends shockwave knocking back nearby foes"]},
-     special:{name:"Stone Fortress",charge:10,upgrades:["DEF +40 for 5s","DEF +58 for 5s","DEF +76 for 6s","DEF +95 for 6s","Also reflects 20% of damage absorbed during fortress"]},
-     unique:{name:"Unshakable Peak",upgrades:["Passive: reduce all dmg taken by 22; allies behind Mountainking take -10% dmg","Reduce 30; -15% for allies","Reduce 38; -20% for allies","Reduce 48; -25% for allies; immune to all CC","Reduce 58; -30% for allies; CC immune; revive once at 25% HP"]}
+     basic:{name:"Pebble Spit",upgrades:["9 dmg","10 dmg","11 dmg","12 dmg","13 dmg"]},
+     special:{name:"Boulder Hunker",charge:18,upgrades:["Taunt all nearby enemies and gain a Shield equal to 3% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 6% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 9% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 12% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 15% of this creature's Defense"]},
+     unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"granitarch",shardsToAscend:18,ascensionsToEvolve:null},
   // Wind line 1 extensions
   {id:"tempesthawk",name:"Tempesthawk",emoji:"🦅",type:"Wind",rarity:"common",description:"A Galestride that grew wings of compressed air. Its wingbeats create gales felt miles away.",
@@ -1377,25 +1377,25 @@ export const CREATURES=[
      unique:{name:"Dragon Current",upgrades:["Passive: 42% dodge; each dodge teleport+counter 80 dmg+paralyze 2s; immune to paralysis; arc 100% all on every hit","Dodge 50%; counter 100","Dodge 58%; counter 125","Dodge 67%; counter 155","Dodge 76%; counter 190; Zapdragon revives once as a ball lightning that bounces between all enemies 10x for 100 dmg"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"arcbolt",shardsToAscend:20,ascensionsToEvolve:null},
   // Electric line 3
-  {id:"shockcrab",name:"Shockcrab",emoji:"🦀",type:"Electric",rarity:"epic",description:"A crab that stores charge in its shell like a living capacitor. Marine electricians keep their distance.",
+  {id:"shockcrab",name:"Shockstinger",emoji:"🦂",type:"Electric",rarity:"epic",description:"A scorpion that stores charge in its tail like a living capacitor. Desert electricians keep their distance.",
    stats:{hp:105,atk:55,def:115,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Volt Pinch",upgrades:["14 dmg+shock 12/s 2s+paralyze 15% 0.5s","18 dmg","23 dmg","30 dmg","Shock 18/s 3s; paralyze 22% 1s; stun on paralyze 0.5s"]},
-     special:{name:"Capacitor Shell",charge:12,upgrades:["Store 5 charges; each charge +12 dmg to next attack+8 HP regen/s","6 charges; +15 dmg; 11/s","7 charges; +19 dmg; 14/s","8 charges; +24 dmg; 18/s","10 charges; +30 dmg; 22/s; release triggers paralyze all nearby 1.5s+60 burst dmg"]},
-     unique:{name:"Super Capacitor",upgrades:["Passive: charges max 10; each charge +15 regen; release burst 100 dmg+paralyze all 1.5s; gain 1 charge/4s passively","Burst 125; charge/3s","Burst 155; charge/3s","Burst 190; charge/2s","Burst 230; charge/2s; burst paralyzes 2s; Shockcrab immune to all electric dmg; revives once at full charge"]}
+     basic:{name:"Volt Sting",upgrades:["14 dmg+shock 12/s 2s+paralyze 15% 0.5s","18 dmg","23 dmg","30 dmg","Shock 18/s 3s; paralyze 22% 1s; stun on paralyze 0.5s"]},
+     special:{name:"Capacitor Carapace",charge:12,upgrades:["Store 5 charges; each charge +12 dmg to next attack+8 HP regen/s","6 charges; +15 dmg; 11/s","7 charges; +19 dmg; 14/s","8 charges; +24 dmg; 18/s","10 charges; +30 dmg; 22/s; release triggers paralyze all nearby 1.5s+60 burst dmg"]},
+     unique:{name:"Super Capacitor",upgrades:["Passive: charges max 10; each charge +15 regen; release burst 100 dmg+paralyze all 1.5s; gain 1 charge/4s passively","Burst 125; charge/3s","Burst 155; charge/3s","Burst 190; charge/2s","Burst 230; charge/2s; burst paralyzes 2s; Shockstinger immune to all electric dmg; revives once at full charge"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"voltcrusher"},
-  {id:"voltcrusher",name:"Voltcrusher",emoji:"🦀",type:"Electric",rarity:"epic",description:"Shockcrab's charges have built to dangerous levels. Every inch of shell is a live wire. The navy has sent a letter.",
+  {id:"voltcrusher",name:"Voltlasher",emoji:"🦂",type:"Electric",rarity:"epic",description:"Shockstinger's charges have built to dangerous levels. Every segment of its tail is a live wire. The power company has sent a letter.",
    stats:{hp:144,atk:76,def:157,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Volt Pinch",upgrades:["14 dmg+shock 12/s 2s+paralyze 15% 0.5s","18 dmg","23 dmg","30 dmg","Shock 18/s 3s; paralyze 22% 1s; stun on paralyze 0.5s"]},
-     special:{name:"Capacitor Shell",charge:12,upgrades:["Store 5 charges; each +12 dmg to next attack+8 HP regen/s","6 charges; +15; 11/s","7 charges; +19; 14/s","8 charges; +24; 18/s","10 charges; +30; 22/s; release paralyzes all nearby 1.5s+70 burst dmg"]},
-     unique:{name:"Volt Capacitor",upgrades:["Passive: charges max 12; each charge +18 regen; release burst 160 dmg+paralyze all 2s; gain 1 charge/3s","Burst 195; paralyze 2.5s","Burst 235; paralyze 2.5s","Burst 280; paralyze 3s","Burst 330; paralyze 3s; Voltcrusher immune to all electric dmg; burst stuns 1s; revives once at half charge"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"shockcrab",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"galvaniccrab"},  {id:"galvaniccrab",name:"Galvaniccrab",emoji:"🦀",type:"Electric",rarity:"epic",description:"Shockcrab's final form. A superconducting fortress crab that generates its own power grid. The navy has questions.",
+     basic:{name:"Volt Sting",upgrades:["14 dmg+shock 12/s 2s+paralyze 15% 0.5s","18 dmg","23 dmg","30 dmg","Shock 18/s 3s; paralyze 22% 1s; stun on paralyze 0.5s"]},
+     special:{name:"Capacitor Carapace",charge:12,upgrades:["Store 5 charges; each +12 dmg to next attack+8 HP regen/s","6 charges; +15; 11/s","7 charges; +19; 14/s","8 charges; +24; 18/s","10 charges; +30; 22/s; release paralyzes all nearby 1.5s+70 burst dmg"]},
+     unique:{name:"Volt Capacitor",upgrades:["Passive: charges max 12; each charge +18 regen; release burst 160 dmg+paralyze all 2s; gain 1 charge/3s","Burst 195; paralyze 2.5s","Burst 235; paralyze 2.5s","Burst 280; paralyze 3s","Burst 330; paralyze 3s; Voltlasher immune to all electric dmg; burst stuns 1s; revives once at half charge"]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"shockcrab",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"galvaniccrab"},  {id:"galvaniccrab",name:"Galvascorpion",emoji:"🦂",type:"Electric",rarity:"epic",description:"Shockstinger's final form. A superconducting armored scorpion that generates its own power grid. The power company has questions.",
    stats:{hp:170,atk:90,def:185,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Arc Pinch",upgrades:["22 dmg+shock 20/s 3s; paralyze 28% 1.5s+arc 2 nearby","28 dmg","36 dmg","46 dmg","Paralyze 38% 2s+stun 0.5s; arc all nearby; strip 1 buff"]},
+     basic:{name:"Arc Sting",upgrades:["22 dmg+shock 20/s 3s; paralyze 28% 1.5s+arc 2 nearby","28 dmg","36 dmg","46 dmg","Paralyze 38% 2s+stun 0.5s; arc all nearby; strip 1 buff"]},
      special:{name:"Supercapacitor",charge:22,upgrades:["12 charges max; release: 180 dmg burst+paralyze all 2s+EMP 3s","Release 220 dmg","Release 265 dmg","Release 315 dmg","Release 375 dmg+paralyze 3s+EMP 4s; release auto-charges 12 new charges; allies gain 25 HP/s 5s"]},
-     unique:{name:"Galvanic Core",upgrades:["Passive: charges max 14; release 280 dmg+paralyze 2.5s; regen 20/s at max charge; electric aura paralyzes 20% each action","-; paralyze 28%","-; paralyze 36%","-; paralyze 46%","Paralyze 58%; Galvaniccrab immune to all dmg while releasing charges; revives twice each time EMP stunning all enemies 4s"]}
+     unique:{name:"Galvanic Core",upgrades:["Passive: charges max 14; release 280 dmg+paralyze 2.5s; regen 20/s at max charge; electric aura paralyzes 20% each action","-; paralyze 28%","-; paralyze 36%","-; paralyze 46%","Paralyze 58%; Galvascorpion immune to all dmg while releasing charges; revives twice each time EMP stunning all enemies 4s"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"voltcrusher",shardsToAscend:20,ascensionsToEvolve:null},
   // Light line 1
   {id:"solardrake",name:"Solardrake",emoji:"🦎",type:"Light",rarity:"epic",description:"A drake that basks directly in the sun's core and considers it 'mild.' Its scales emit light that heals.",
@@ -1626,16 +1626,16 @@ export const CREATURES=[
   {id:"morusk",name:"Morusk",emoji:"🦭",type:"Water",rarity:"legendary",description:"A walrus whose tusks have grown to the size of siege weapons. Ships have mistaken it for an island on three separate recorded occasions.",
    stats:{hp:145,atk:80,def:140,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Tusk Slam",upgrades:["22 dmg; stun 1.5s; -20% ATK 3s; knock back 2","28 dmg","36 dmg","46 dmg","Stun 2s; -30% ATK 4s; knock back 4; stunned foes take +40% dmg"]},
-     special:{name:"Blubber Wall",charge:12,upgrades:["Self+1 ally absorb 120 dmg; -25% dmg taken 4s; taunt nearby foes","Absorb 150; -32%","Absorb 188; -40%","Absorb 235; -50%","Absorb 295; -60%; reflect 25% dmg back; taunt all; remove 2 ally debuffs"]},
-     unique:{name:"Permafrost Hide",upgrades:["Passive: -30 all dmg; frozen+slowed foes deal -20% dmg; counter 18 dmg on each hit taken","Reduce 38; -26%; counter 24","Reduce 48; -33%; counter 32","Reduce 60; -42%; counter 42","Reduce 76; -54%; counter 56; Morusk immune to freeze+slow; allies in range gain -18 dmg reduction"]}
+     basic:{name:"Tusk Slam",upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg and inflict Healing Recovery Down"]},
+     special:{name:"Blubber Wall",charge:12,upgrades:["Shield 8% HP; burst 50% DEF","Shield 10% HP; burst 50% DEF","Shield 10% HP; burst 65% DEF","Shield 12% HP; burst 65% DEF","Shield 12% HP; burst 80% DEF"]},
+     unique:{name:"Permafrost Hide",upgrades:["Dealing damage temporarily lowers the enemy's Speed by 2%","Dealing damage temporarily lowers the enemy's Speed by 4%","Dealing damage temporarily lowers the enemy's Speed by 6%","Dealing damage temporarily lowers the enemy's Speed by 8%","Dealing damage temporarily lowers the enemy's Speed by 10%"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ivormar"},
   {id:"ivormar",name:"Ivormar",emoji:"🦭",type:"Water",rarity:"legendary",description:"Morusk at its true scale. Oceanographers have been charting it as unexplored territory for three decades. It finds this mildly flattering.",
    stats:{hp:174,atk:96,def:168,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Siege Tusk",upgrades:["36 dmg; stun 2.5s; -35% ATK 4s; knock back 5; strip 1 buff","46 dmg","58 dmg","72 dmg","Stun 3.5s; -50% ATK 5s; strip all buffs; stunned foes take +50% dmg from all sources"]},
-     special:{name:"Ivory Fortress",charge:18,upgrades:["Self+2 allies absorb 240 dmg; -50% dmg taken 5s; taunt all; remove 3 debuffs","Absorb 300; -62%","Absorb 375; -76%","Absorb 470; -92%","Absorb 588; -112%; reflect 45% dmg; taunt all; grant regen 40/s 5s to allies; CC immune for duration"]},
-     unique:{name:"Ivory Colossus",upgrades:["Passive: -48 all dmg; frozen+slowed foes -35% dmg; counter 45; immune to all water+ice; allies -12 dmg in range","Reduce 60; -44%; counter 58; allies -16","Reduce 76; -55%; counter 74; allies -20","Reduce 96; -68%; counter 94; allies -26","Reduce 120; -84%; counter 118; allies -32; Ivormar revives once; revival freezes all 4s+restores all allies to 60% HP"]}
+     basic:{name:"Tusk Slam",upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg and inflict Healing Recovery Down"]},
+     special:{name:"Blubber Wall",charge:12,upgrades:["Shield 8% HP; burst 50% DEF","Shield 10% HP; burst 50% DEF","Shield 10% HP; burst 65% DEF","Shield 12% HP; burst 65% DEF","Shield 12% HP; burst 80% DEF"]},
+     unique:{name:"Permafrost Hide",upgrades:["Dealing damage temporarily lowers the enemy's Speed by 2%","Dealing damage temporarily lowers the enemy's Speed by 4%","Dealing damage temporarily lowers the enemy's Speed by 6%","Dealing damage temporarily lowers the enemy's Speed by 8%","Dealing damage temporarily lowers the enemy's Speed by 10%"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"morusk",shardsToAscend:30,ascensionsToEvolve:null},
 
   // Nature line 1

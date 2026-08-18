@@ -10,8 +10,8 @@ export const SKIN_SETS=[
   {id:"leaf_blossom",name:"Blossom",tier:"common",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🌱"},canoparch:{emoji:"🌲"}}},
   {id:"leaf_autumn",name:"Autumn",tier:"rare",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🍂"},canoparch:{emoji:"🍁"}}},
   {id:"leaf_ancient",name:"Ancient",tier:"legendary",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"☘️"},canoparch:{emoji:"🌾"}}},
-  // Pebbit / Bouldrath
-  {id:"rock_sandy",name:"Sandy",tier:"common",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🐰"},bouldrath:{emoji:"🦛"}}},
+  // Pebbit / Bouldroad
+  {id:"rock_sandy",name:"Sandy",tier:"common",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🦎"},bouldrath:{emoji:"🐢"}}},
   {id:"rock_crystal",name:"Crystal",tier:"epic",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"💎"},bouldrath:{emoji:"🗿"}}},
   {id:"rock_volcanic",name:"Volcanic",tier:"legendary",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🌋"},bouldrath:{emoji:"🏔️"}}},
   // Breezekit / Galestride

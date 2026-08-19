@@ -15,7 +15,6 @@ export const PLOT_CROPS=[
   {key:"melonLight",   label:"Light Melon",   emoji:"✨", yield:1, upgradeEvery:5},
   {key:"melonDark",    label:"Dark Melon",    emoji:"🌑", yield:1, upgradeEvery:5},
   {key:"ascensionMelonCommon",label:"Common Ascension Melon",emoji:"🍈⚪", yield:4, upgradeEvery:5},
-  {key:"ascensionMelonRare",label:"Rare Ascension Melon",emoji:"🍈🔵", yield:3, upgradeEvery:5},
   {key:"ascensionMelonEpic",label:"Epic Ascension Melon",emoji:"🍈🟣", yield:2, upgradeEvery:5},
   {key:"ascensionMelon",label:"Legendary Ascension Melon",emoji:"🍈", yield:1, upgradeEvery:5},
 ];

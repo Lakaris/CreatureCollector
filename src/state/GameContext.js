@@ -57,6 +57,19 @@ function loadSave() {
     for (const k of SET_FIELDS) {
       if (Array.isArray(parsed[k])) parsed[k] = new Set(parsed[k]);
     }
+    // The Rare creature tier (and its Rare Ascension Melon) was removed:
+    // migrate any leftover melon balance to Epic 1:1, and re-point planted
+    // Rare-melon farm plots at the Epic crop so harvesting doesn't crash.
+    if (parsed.currencies?.ascensionMelonRare) {
+      parsed.currencies.ascensionMelonEpic =
+        (parsed.currencies.ascensionMelonEpic || 0) + parsed.currencies.ascensionMelonRare;
+    }
+    if (parsed.currencies) delete parsed.currencies.ascensionMelonRare;
+    if (Array.isArray(parsed.farmCrops)) {
+      parsed.farmCrops = parsed.farmCrops.map((c) =>
+        c && c.cropKey === "ascensionMelonRare" ? { ...c, cropKey: "ascensionMelonEpic" } : c
+      );
+    }
     return parsed;
   } catch {
     return null;
@@ -151,6 +164,11 @@ export function GameProvider({ children }) {
   // structure rises up" guided hand-off to the Dungeon. One-shot, like
   // postTutorialPopupPending above.
   const [pendingDungeonReveal, setPendingDungeonReveal] = useState(() => initialSave?.pendingDungeonReveal ?? false);
+  // One-shot: the "exceptionally powerful creature" warning shown the first
+  // time the player is about to fight Labyrinth floor 10 (the Boss floor that
+  // drops the first Ancient Fertilizer). Set once the player dismisses it, so
+  // retries after a loss go straight into the fight.
+  const [labyrinthFloor10WarningSeen, setLabyrinthFloor10WarningSeen] = useState(() => initialSave?.labyrinthFloor10WarningSeen ?? false);
   const [harvestPopup, setHarvestPopup] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
   const [devTimeOffset, setDevTimeOffset] = useState(0);
@@ -401,7 +419,7 @@ export function GameProvider({ children }) {
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,
-    labyrinthDepth, labyrinthBestDepth,
+    labyrinthDepth, labyrinthBestDepth, labyrinthFloor10WarningSeen,
     arenaPlanGrid, dungeonPlanGrid, labyrinthPlanGrid, dailyBossPlanGrid,
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked, purchasedOneTimeBundles,
     dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, dungeonStarterPackPurchased, newFeaturePillsSeen,
@@ -534,6 +552,7 @@ export function GameProvider({ children }) {
     arenaLevels, setArenaLevels, arenaProgress, setArenaProgress,
     // labyrinth
     labyrinthDepth, setLabyrinthDepth, labyrinthBestDepth, setLabyrinthBestDepth,
+    labyrinthFloor10WarningSeen, setLabyrinthFloor10WarningSeen,
     // battle planning grids
     arenaPlanGrid, setArenaPlanGrid,
     dungeonPlanGrid, setDungeonPlanGrid,

@@ -76,6 +76,42 @@ export function aBestStep(r, c, tr, tc, isBlocked, avoidR, avoidC) {
   return bestStep || [r, c];
 }
 
+// ── Multi-cell units ─────────────────────────────────────────────────────
+// Units carry an optional `size` (default 1); Labyrinth Boss creatures are
+// 2x2. `row`/`col` is always the body's top-left anchor. These helpers make
+// distance and occupancy body-aware while collapsing to the plain metrics
+// for 1x1 units.
+
+/** Every "r,c" cell of a unit's body. */
+export function cellsOf(u) {
+  const s = u.size || 1;
+  const out = [];
+  for (let dr = 0; dr < s; dr++) for (let dc = 0; dc < s; dc++) out.push(u.row + dr + "," + (u.col + dc));
+  return out;
+}
+
+/** Chebyshev distance between two units' BODIES (0 when they touch/overlap). */
+export function unitDist(a, b) {
+  const as = a.size || 1, bs = b.size || 1;
+  const rd = Math.max(0, b.row - (a.row + as - 1), a.row - (b.row + bs - 1));
+  const cd = Math.max(0, b.col - (a.col + as - 1), a.col - (b.col + bs - 1));
+  return Math.max(rd, cd);
+}
+
+/** Body-aware cardinal distance: the straight-line gap when any of the two
+ * bodies' rows (or columns) line up; Infinity when nothing is aligned. */
+export function unitCardinalDist(a, b) {
+  const as = a.size || 1, bs = b.size || 1;
+  const rowsOverlap = a.row <= b.row + bs - 1 && b.row <= a.row + as - 1;
+  const colsOverlap = a.col <= b.col + bs - 1 && b.col <= a.col + as - 1;
+  const rd = Math.max(0, b.row - (a.row + as - 1), a.row - (b.row + bs - 1));
+  const cd = Math.max(0, b.col - (a.col + as - 1), a.col - (b.col + bs - 1));
+  if (rowsOverlap && colsOverlap) return 0;
+  if (rowsOverlap) return cd;
+  if (colsOverlap) return rd;
+  return Infinity;
+}
+
 /** Ease-in-out curve for movement interpolation. */
 export function aEase(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;

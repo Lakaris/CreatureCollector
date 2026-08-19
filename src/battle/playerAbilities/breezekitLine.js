@@ -1,10 +1,10 @@
-// Breezekit: Gust Swipe / Zephyr Step / Slipstream.
+// Breezekit line: Gust Swipe / Zephyr Step / Slipstream.
 //
 // Gust Swipe is a piercing melee strike at the closest foe: the swipe travels
 // in a straight (or diagonal) line and also hits whatever stands directly
 // behind the target (the Slipstream "Pierce" tag). At max level every hit
-// shreds the victim's DEF by a stacking 0.5% (see defShredMultiplier in
-// battle/status.js; the timer refreshes per hit, stacks clear on expiry).
+// inflicts DEF Down (-10% DEF): one stack per Breezekit, refreshed per hit,
+// stacking with other sources per applyStatMod in battle/status.js.
 //
 // Zephyr Step teleports Breezekit onto an open tile beside the enemy with the
 // lowest current HP (the "Weakest" tag) and strikes it. It never lands on top
@@ -16,9 +16,10 @@
 // at max level extends its attack reach (and pierce depth) by one tile.
 
 import { unitDamage, playerDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
-import { speedPenalty } from "../status.js";
+import { speedPenalty, applyStatMod } from "../status.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
 import { BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * ratio of the current level's value to the basic's base value. */
@@ -27,6 +28,10 @@ const SPECIAL_DMG_BY_LEVEL = [18, 20, 22, 25, 25];
 /** Slipstream: +damage% on everything Breezekit does, by unique level. */
 const PIERCE_BONUS_PCT_BY_LEVEL = [5, 10, 15, 20, 20];
 const SPEED_UP_PCT = 25;
+/** Gust Swipe lvl 5: Defense Down (one stack per Breezekit). The real total
+ * comes from the shared stacking table in battle/status.js; this is the
+ * 1-stack value, used for the sign and for cap comparisons. */
+const DEF_DOWN_PCT = 15;
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -45,10 +50,11 @@ function reachOf(unit) {
   return abilityIdx(unit, "unique") >= MAX_IDX ? 2 : 1;
 }
 
-/** Gust Swipe lvl 5: stacking 0.5% DEF shred; the shared timer refreshes per hit. */
-function applyDefShred(target) {
-  target.defShredStacks = (target.defShredStacks || 0) + 1;
-  target.defShredTicks = STATUS_TICKS;
+/** Gust Swipe lvl 5: one DEF Down stack per Breezekit, refreshed per hit.
+ * Bosses are skipped -- they have no DEF stat for the shred to act on. */
+function applyDefShred(unit, target) {
+  if (!target || target.uid == null) return;
+  applyStatMod(target, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
 }
 
 /** The 8 cells around a minion, or the ring around the boss's 2x2 body. */
@@ -128,7 +134,7 @@ export function makeBreezekitModule(cfg) {
         const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, aliveP) * mult));
         damageBoss(boss, dmg);
         totalDmg += dmg;
-        if (shreds) applyDefShred(boss);
+        if (shreds) applyDefShred(unit, boss);
         newFx.push({ id: now + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       } else {
         // Walk the swipe line: the target's cell plus `reach` cells behind it.
@@ -139,16 +145,16 @@ export function makeBreezekitModule(cfg) {
           const victim = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
           if (victim) {
             const dmg = Math.max(1, Math.round(unitDamage(unit, victim) * mult));
-            victim.hp = Math.max(0, victim.hp - dmg);
+            damageUnit(victim, dmg);
             totalDmg += dmg;
-            if (shreds) applyDefShred(victim);
+            if (shreds) applyDefShred(unit, victim);
             newFx.push({ id: now + unit.uid + "gs" + k, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
           }
           if (!hitBossOnLine && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
             const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, aliveP) * mult));
             damageBoss(boss, dmg);
             totalDmg += dmg;
-            if (shreds) applyDefShred(boss);
+            if (shreds) applyDefShred(unit, boss);
             hitBossOnLine = true;
           }
         }
@@ -206,12 +212,11 @@ export function makeBreezekitModule(cfg) {
 
         const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
         if (cand.isBossCandidate) damageBoss(cand.boss, dmg);
-        else cand.unit.hp = Math.max(0, cand.unit.hp - dmg);
+        else damageUnit(cand.unit, dmg);
         ctx.addDamageDealt(dmg);
 
         if (idx >= MAX_IDX) {
-          unit.spdModPct = SPEED_UP_PCT;
-          unit.spdModTicks = STATUS_TICKS;
+          applyStatMod(unit, { kind: "spd", pct: SPEED_UP_PCT, src: unit.uid, ticks: STATUS_TICKS });
         }
 
         const tr = cand.isBossCandidate ? cand.boss.row + 0.5 : cand.unit.row;
@@ -224,7 +229,13 @@ export function makeBreezekitModule(cfg) {
   };
 }
 
-export const breezekit = makeBreezekitModule({
+const CFG = {
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialDmgByLevel: SPECIAL_DMG_BY_LEVEL,
-});
+};
+export const breezekit = makeBreezekitModule(CFG);
+// The evolutions intentionally mirror Breezekit exactly for now -- same names,
+// text, and numbers (see data/creatures.js); only base stats differ.
+export const galestride = makeBreezekitModule(CFG);
+export const tempesthawk = makeBreezekitModule(CFG);
+export const stormlord = makeBreezekitModule(CFG);

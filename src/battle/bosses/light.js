@@ -4,6 +4,7 @@
 // damage scaling) and Shield, and Radiant Strike hits harder while shielded.
 
 import { MELEE_RANGE, BOSS_SIZE } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 export default {
   key: "light",
@@ -22,7 +23,7 @@ export default {
     boss.powerStacks = (boss.powerStacks || 0) + 1;
 
     for (const u of aliveP) {
-      u.hp = Math.max(0, u.hp - ctx.dmg(0.12 * powerMult));
+      damageUnit(u, ctx.dmg(0.12 * powerMult));
       newFx.push({ id: now + "hrad" + u.uid, row: u.row, col: u.col, t: now, isPillar: true });
     }
     boss.specialCd = 20;
@@ -56,7 +57,7 @@ export default {
       newFx.push({ id: now + "lgt" + r + "," + c, row: r, col: c, t: now, isPillar: true });
     }
     for (const tgt of hits) {
-      tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.15 * powerMult * shieldBonus));
+      damageUnit(tgt, ctx.dmg(0.15 * powerMult * shieldBonus));
     }
     boss.atkCd = 9;
   },

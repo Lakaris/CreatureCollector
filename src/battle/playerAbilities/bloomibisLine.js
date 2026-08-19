@@ -15,7 +15,7 @@
 // aura also grants those allies a +10% ATK buff while they stay in range.
 
 import { aChebDist } from "../geometry.js";
-import { healReceivedMultiplier } from "../status.js";
+import { healReceivedMultiplier, applyStatMod, hasNegativeStatMods, dispelDebuffs } from "../status.js";
 
 /** Displayed per-hit damage by basic-ability level; the engine deals stat-based
  * damage scaled by the ratio of the current level's value to the base value. */
@@ -47,32 +47,16 @@ function hasDebuff(u) {
   return (
     (u.burnTicks || 0) > 0 || (u.poisonTicks || 0) > 0 || (u.rootTicks || 0) > 0 ||
     (u.dotTicks || 0) > 0 || (u.weakTicks || 0) > 0 || (u.healImmuneTicks || 0) > 0 ||
-    (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 || (u.defShredTicks || 0) > 0 ||
-    (u.tauntTicks || 0) > 0 || (u.healDownTicks || 0) > 0 ||
-    ((u.atkModTicks || 0) > 0 && (u.atkModPct || 0) < 0) ||
-    ((u.spdModTicks || 0) > 0 && (u.spdModPct || 0) < 0)
+    (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 ||
+    (u.tauntTicks || 0) > 0 ||
+    (u.stunTicks || 0) > 0 || (u.markedTicks || 0) > 0 ||
+    hasNegativeStatMods(u)
   );
 }
 
-function clearDebuffs(u) {
-  u.burnTicks = 0;
-  u.burnStacks = 0;
-  u.burnSourceAtk = 0;
-  u.poisonTicks = 0;
-  u.rootTicks = 0;
-  u.dotTicks = 0;
-  u.weakTicks = 0;
-  u.healImmuneTicks = 0;
-  u.slowTicks = 0;
-  u.shockTicks = 0;
-  u.defShredTicks = 0;
-  u.defShredStacks = 0;
-  u.tauntTicks = 0;
-  u.tauntSourceUid = null;
-  u.healDownTicks = 0;
-  if ((u.atkModPct || 0) < 0) { u.atkModPct = 0; u.atkModTicks = 0; }
-  if ((u.spdModPct || 0) < 0) { u.spdModPct = 0; u.spdModTicks = 0; }
-}
+// Cleanse == the shared dispel: every dispellable debuff (Restrained
+// excepted, undispellable by design) plus negative stat-mod stacks.
+const clearDebuffs = dispelDebuffs;
 
 /** The dark boss's heal-block gates every heal this module does. */
 function canBeHealed(u) {
@@ -117,14 +101,10 @@ export function makeBloomibisModule(cfg) {
           a.hp = Math.min(a.maxHp, a.hp + Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
         }
         if (idx >= MAX_IDX) {
-          // Reuses the shared atkMod slot: refresh our own buff and upgrade
-          // weaker ones, but never touch an active debuff or a stronger buff
-          // (e.g. Starlit's Radiant Exchange at +15%).
-          const pct = a.atkModPct || 0;
-          if ((a.atkModTicks || 0) <= 0 || (pct > 0 && pct <= AURA_ATK_PCT)) {
-            a.atkModPct = AURA_ATK_PCT;
-            a.atkModTicks = AURA_ATK_TICKS;
-          }
+          // One ATK Up stack per Bloomibis, refreshed every tick while the
+          // ally stays in the aura; stacks freely with other sources (e.g.
+          // Starlit's Radiant Exchange) under the per-source system.
+          applyStatMod(a, { kind: "atk", pct: AURA_ATK_PCT, src: unit.uid, ticks: AURA_ATK_TICKS });
         }
       }
     },

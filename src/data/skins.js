@@ -139,7 +139,7 @@ export const SKIN_SETS=[
   {id:"hornet_frost",name:"Frosted",tier:"rare",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"❄️"},infernoswarm:{emoji:"🌨️"}}},
   {id:"hornet_void",name:"Void",tier:"epic",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"🌑"},infernoswarm:{emoji:"💀"}}},
   {id:"hornet_solar",name:"Solar",tier:"legendary",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"☀️"},infernoswarm:{emoji:"🌟"}}},
-  // coralleviathan / tidelord
+  // coralleviathan / tidelord (Nessling / Nessarch)
   {id:"coral_lava",name:"Magma",tier:"rare",chain:["coralleviathan","tidelord"],appearances:{coralleviathan:{emoji:"🌋"},tidelord:{emoji:"🔥"}}},
   {id:"coral_shadow",name:"Abyssal",tier:"epic",chain:["coralleviathan","tidelord"],appearances:{coralleviathan:{emoji:"🌑"},tidelord:{emoji:"💀"}}},
   {id:"coral_ancient",name:"Ancient",tier:"legendary",chain:["coralleviathan","tidelord"],appearances:{coralleviathan:{emoji:"🏛️"},tidelord:{emoji:"🌌"}}},
@@ -308,7 +308,7 @@ export const SKIN_SETS=[
   {id:"dphoenix_ember",name:"Ember",tier:"rare",chain:["darkphoenix","oblivionphoenix"],appearances:{darkphoenix:{emoji:"🔥"},oblivionphoenix:{emoji:"🌋"}}},
   {id:"dphoenix_crystal",name:"Crystal",tier:"epic",chain:["darkphoenix","oblivionphoenix"],appearances:{darkphoenix:{emoji:"💎"},oblivionphoenix:{emoji:"🔮"}}},
   {id:"dphoenix_ancient",name:"Ancient",tier:"legendary",chain:["darkphoenix","oblivionphoenix"],appearances:{darkphoenix:{emoji:"🏛️"},oblivionphoenix:{emoji:"🌌"}}},
-  // abyssgolem / nihilgolem
+  // abyssgolem / nihilgolem (Loptrix / Ragnavix)
   {id:"agolem_ember",name:"Ember",tier:"rare",chain:["abyssgolem","nihilgolem"],appearances:{abyssgolem:{emoji:"🔥"},nihilgolem:{emoji:"🌋"}}},
   {id:"agolem_crystal",name:"Crystal",tier:"epic",chain:["abyssgolem","nihilgolem"],appearances:{abyssgolem:{emoji:"💎"},nihilgolem:{emoji:"🔮"}}},
   {id:"agolem_ancient",name:"Ancient",tier:"legendary",chain:["abyssgolem","nihilgolem"],appearances:{abyssgolem:{emoji:"🏛️"},nihilgolem:{emoji:"🌌"}}},

@@ -8,6 +8,7 @@ import { getRootDef } from "../../core/creatures.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies } from "../geometry.js";
 import { STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 /** Hits per attack, indexed by ability level (0-based, level 1 = index 0). */
 const HITS_BY_LEVEL = [2, 2, 3, 3, 4];
@@ -144,7 +145,7 @@ export function makeBlazehornetModule(defBonusByLevel) {
 
           const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * dmgMult));
           const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
-          if (minion) minion.hp = Math.max(0, minion.hp - dmg);
+          if (minion) damageUnit(minion, dmg);
           if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
             damageBoss(boss, dmg);
             hitBoss = true;

@@ -4,12 +4,11 @@
 import React, { useState, useRef, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { makeOwnedCreature, getChain } from "../../core/creatures.js";
+import { makeOwnedCreature, getChain, MAX_ABILITY_LEVEL } from "../../core/creatures.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
-import { tickSpecialCharge, specialChargeReady, consumeSpecialCharge, specialTargetInRange } from "../../battle/tick.js";
-import { MELEE_RANGE, RANGED_RANGE, COOLDOWN_TICKS_AT_SPD_1 } from "../../battle/constants.js";
-import { aChebDist, aCardinalDist, aBestStep, aEase } from "../../battle/geometry.js";
+import { runBattleTick } from "../../battle/tick.js";
+import { aEase } from "../../battle/geometry.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { equipBonus, equipBonusStr } from "../../core/equipment.js";
 import CreatureAbilitySummary from "./CreatureAbilitySummary.js";
@@ -237,57 +236,15 @@ function TutorialOverlay() {
     battleRafRef.current = requestAnimationFrame(frame);
   }
 
-  // Ported from ArenaScreen's own inline tick (Arena fights -- this one
-  // included -- don't run player abilities, just basic melee/ranged attacks
-  // and movement; that's the real simulation actual Arena stages use).
-  function runBattleTick() {
+  // The same engine every other battle screen runs (Arena/Dungeon/Labyrinth/
+  // Daily Boss): ability modules, statuses, shields, and targeting all behave
+  // here exactly as they do in a real fight. The tutorial's guaranteed win
+  // comes purely from the HP/ATK tuning in startBattle(), not from a
+  // simplified simulation.
+  function battleTick() {
     const s = battleStateRef.current;
     if (!s) return;
-    s.tick++;
-    const now = Date.now();
-    const damageDealt = s.damageDealt || (s.damageDealt = {});
-    const aliveP = s.playerUnits.filter((u) => u.hp > 0);
-    const aliveE = s.enemyUnits.filter((u) => u.hp > 0);
-    if (!aliveP.length || !aliveE.length) return;
-    const allOcc = new Set([...aliveP, ...aliveE].map((u) => u.row + "," + u.col));
-    const newFx = [];
-    function actUnit(u, foes) {
-      u.atkCd = Math.max(0, u.atkCd - 1);
-      // Special-ability charge, same as the real Arena tick: no specials are
-      // implemented here, so a full bar flashes the "!" marker and recharges
-      // -- holding at full until a foe (or ally, for Supports) is in range.
-      tickSpecialCharge(u);
-      if (specialChargeReady(u) && specialTargetInRange(u, u.uid[0] === "p" ? aliveP : aliveE, foes, null)) consumeSpecialCharge(u);
-      const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
-      const byCheb = [...foes].sort((a, b) => aChebDist(u.row, u.col, a.row, a.col) - aChebDist(u.row, u.col, b.row, b.col));
-      let atkTgt = null, moveTgt = byCheb[0];
-      if (u.isRanged) {
-        const inRange = foes.filter((f) => aCardinalDist(u.row, u.col, f.row, f.col) <= RANGED_RANGE);
-        if (inRange.length) atkTgt = inRange.sort((a, b) => aCardinalDist(u.row, u.col, a.row, a.col) - aCardinalDist(u.row, u.col, b.row, b.col))[0];
-      }
-      const tgt = atkTgt || moveTgt;
-      if (!tgt) return;
-      const dist = atkTgt ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col) : aChebDist(u.row, u.col, tgt.row, tgt.col);
-      if (dist <= range && u.atkCd <= 0) {
-        const rawDmg = u.atk * (0.8 + Math.random() * 0.4);
-        const dmg = Math.max(1, Math.round(Math.max(1, rawDmg - (tgt.def || 20) * 0.35)));
-        tgt.hp = Math.max(0, tgt.hp - dmg);
-        if (u.uid[0] === "p") damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + dmg;
-        u.atkCd = Math.max(3, Math.round(COOLDOWN_TICKS_AT_SPD_1 / u.spd));
-        newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: u.uid[0] === "e" });
-      } else if (dist > range) {
-        const blk = (r2, c2) => allOcc.has(r2 + "," + c2) || r2 < 0 || r2 >= TUTORIAL_GRID_ROWS || c2 < 0 || c2 >= TUTORIAL_GRID_COLS;
-        const [nr, nc] = aBestStep(u.row, u.col, tgt.row, tgt.col, blk);
-        if (nr !== u.row || nc !== u.col) {
-          allOcc.delete(u.row + "," + u.col);
-          u.prevRow = u.row; u.prevCol = u.col; u.lastMoveTime = now;
-          u.row = nr; u.col = nc;
-          allOcc.add(nr + "," + nc);
-        }
-      }
-    }
-    for (const u of aliveP) actUnit(u, aliveE);
-    for (const u of aliveE) actUnit(u, aliveP);
+    const { newFx, now } = runBattleTick(s, { gridRows: TUTORIAL_GRID_ROWS, gridCols: TUTORIAL_GRID_COLS });
     if (newFx.length) setBattleAtkEffects((prev) => [...prev.filter((e) => now - e.t < 700), ...newFx]);
     setBattleSnap({
       playerUnits: s.playerUnits.map((u) => ({ ...u })),
@@ -329,7 +286,7 @@ function TutorialOverlay() {
     setBattleOutcome(null);
     setPhase("battle");
     startBattleRenderLoop();
-    battleTickRef.current = setInterval(runBattleTick, BATTLE_TICK_MS);
+    battleTickRef.current = setInterval(battleTick, BATTLE_TICK_MS);
   }
 
   useEffect(() => () => stopBattleLoops(), []);
@@ -858,7 +815,10 @@ function TutorialOverlay() {
                           { key: k, style: { marginBottom: 10 } },
                           React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 } }, k === "unique" ? "Passive" : k === "basic" ? "Basic" : "Special"),
                           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
-                          React.createElement("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, abl.upgrades ? abl.upgrades[0] : "")
+                          // The enemy fights with a maxed kit like every other
+                          // enemy (see makeArenaBattle); the player's starter
+                          // is level 1, so it shows the base tier.
+                          React.createElement("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, abl.upgrades ? abl.upgrades[sidePanel.type === "enemy" ? Math.min(MAX_ABILITY_LEVEL, abl.upgrades.length - 1) : 0] : "")
                         );
                       })
                     )
@@ -1011,6 +971,15 @@ function TutorialOverlay() {
               ),
               battleAtkEffects.map((e) => {
                 const color = e.isEnemy ? "#ef4444" : "#a78bfa";
+                // Ability-module effects (heals, ground pillars) can reach the
+                // tutorial now that it runs the shared engine -- drawn the same
+                // way the battle screens draw them.
+                if (e.isHeal) {
+                  return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * TUTORIAL_TILE, top: e.row * TUTORIAL_TILE, width: TUTORIAL_TILE, height: TUTORIAL_TILE, borderRadius: "50%", background: "rgba(34,197,94,0.4)", boxShadow: "inset 0 0 8px rgba(22,163,74,0.9)", animation: "splashWave 0.7s ease-out forwards", pointerEvents: "none", zIndex: 21 } });
+                }
+                if (e.isPillar) {
+                  return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * TUTORIAL_TILE, top: e.row * TUTORIAL_TILE, width: TUTORIAL_TILE, height: TUTORIAL_TILE, background: "rgba(251,146,60,0.6)", boxShadow: "inset 0 0 8px rgba(239,68,68,0.8)", animation: "pillarFlame 0.7s ease-out forwards", pointerEvents: "none", zIndex: 20 } });
+                }
                 if (e.isRanged) {
                   const dRow = e.row - e.fromRow, dCol = e.col - e.fromCol;
                   const dist = Math.sqrt(dRow * dRow + dCol * dCol) || 1;

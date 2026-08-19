@@ -7,7 +7,7 @@
 
 import { BOSS_SIZE } from "../constants.js";
 import { distToBoss, bossOccupies, aStepToward } from "../geometry.js";
-import { atkModMultiplier } from "../status.js";
+import { statModMultiplier, isIntangible } from "../status.js";
 
 /** Standard damage roll: attack * random spread * ability multiplier, min 1. */
 export function rollDamage(atk, mult, base = 0.8, spread = 0.4) {
@@ -23,20 +23,21 @@ export function makeBossContext({ boss, aliveP, aliveE, allOcc, newFx, now, grid
   const ctx = {
     boss, aliveP, aliveE, allOcc, newFx, now, gridRows, gridCols,
     /** Damage roll against this boss's attack stat (reduced while the boss is ATK-debuffed, e.g. Starlit's Radiant Exchange). */
-    dmg: (mult, base, spread) => rollDamage(boss.atk * atkModMultiplier(boss), mult, base, spread),
+    dmg: (mult, base, spread) => rollDamage(boss.atk * statModMultiplier(boss, "atk"), mult, base, spread),
     /** Chebyshev distance from a cell to the boss body. */
     distToBoss: (r, c) => distToBoss(boss, r, c),
     /** True when the cell is inside the boss body. */
     bossOcc: (r, c) => bossOccupies(boss, r, c),
-    /** Players within `range` of the boss, nearest first. */
+    /** Players within `range` of the boss, nearest first. Intangible units
+     * (Deep Submerge) can not be targeted, so they never appear here. */
     targetsWithin(range) {
       return ctx.aliveP
-        .filter((u) => distToBoss(boss, u.row, u.col) <= range)
+        .filter((u) => !isIntangible(u) && distToBoss(boss, u.row, u.col) <= range)
         .sort((a, z) => distToBoss(boss, a.row, a.col) - distToBoss(boss, z.row, z.col));
     },
-    /** All players sorted nearest-first. */
+    /** All targetable players sorted nearest-first. */
     byDistance() {
-      return [...ctx.aliveP].sort(
+      return ctx.aliveP.filter((u) => !isIntangible(u)).sort(
         (a, z) => distToBoss(boss, a.row, a.col) - distToBoss(boss, z.row, z.col)
       );
     },

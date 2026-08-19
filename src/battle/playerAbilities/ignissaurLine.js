@@ -18,6 +18,7 @@
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies, aCardinalDist } from "../geometry.js";
 import { BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * ratio of the current level's value to the basic's base value. */
@@ -119,7 +120,7 @@ export function makeIgnissaurModule(cfg) {
         const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
         if (minion) {
           const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * ratio * stokedMult(unit, minion)));
-          minion.hp = Math.max(0, minion.hp - dmg);
+          damageUnit(minion, dmg);
           totalDmg += dmg;
           if (burns) applyBurn(unit, minion);
         }

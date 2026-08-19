@@ -171,7 +171,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",melonRainbow:"🍈 Rainbow Melon",ascensionMelon:"🍈 Legendary Ascension Melon",ascensionMelonCommon:"🍈⚪ Common Ascension Melon",ascensionMelonRare:"🍈🔵 Rare Ascension Melon",ascensionMelonEpic:"🍈🟣 Epic Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",melonRainbow:"🍈 Rainbow Melon",ascensionMelon:"🍈 Legendary Ascension Melon",ascensionMelonCommon:"🍈⚪ Common Ascension Melon",ascensionMelonEpic:"🍈🟣 Epic Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -195,7 +195,6 @@ export const REWARD_DESC={
   melonDark:"Used to upgrade a Dark creature's abilities.",
   ascensionMelon:"Used to ascend your Legendary Creatures to a higher form.",
   ascensionMelonCommon:"Used to ascend your Common Creatures to a higher form.",
-  ascensionMelonRare:"Used to ascend your Rare Creatures to a higher form.",
   ascensionMelonEpic:"Used to ascend your Epic Creatures to a higher form.",
   legendaryEgg:"Used to hatch powerful Creatures.",
   legendaryEggs:"Used to hatch powerful Legendary Creatures.",

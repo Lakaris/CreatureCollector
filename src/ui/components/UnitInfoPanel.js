@@ -4,6 +4,7 @@
 
 import React from "../../react.js";
 import CreatureIcon from "./CreatureIcon.js";
+import { statModStacks } from "../../battle/status.js";
 
 export const DEBUFF_DEFS = [
   { key: "burnTicks", icon: "🔥", label: "Burn" },
@@ -14,20 +15,38 @@ export const DEBUFF_DEFS = [
   { key: "slowTicks", icon: "🐌", label: "Slowed" },
   { key: "shockTicks", icon: "⚡", label: "Shocked" },
   { key: "healImmuneTicks", icon: "🚫", label: "Heal Block" },
-  { key: "defShredTicks", icon: "🛡️", label: "DEF Shred" },
-  { key: "spdModTicks", icon: "💨", label: "Speed Up" },
   { key: "tauntTicks", icon: "🎯", label: "Taunted" },
-  { key: "healDownTicks", icon: "💔", label: "Healing Down" },
+  { key: "stunTicks", icon: "💫", label: "Stunned" },
+  { key: "restrainedStacks", icon: "⛓️", label: "Restrained" },
+  { key: "intangibleTicks", icon: "🌊", label: "Intangible" },
+  { key: "markedTicks", icon: "🔻", label: "Marked" },
 ];
 
-/** Build the debuffs list UnitInfoPanel expects from a unit's raw tick fields. */
+/** Stackable stat modifiers (battle/status.js statMods): shown with a ×n
+ * stack count, one possible stack per source, capped at 5. */
+// Labels match the ability-card pills in core/abilityText.js exactly, so the
+// same effect reads the same everywhere.
+const STAT_MOD_ROWS = [
+  { kind: "atk", negative: false, icon: "💪", label: "Attack Up" },
+  { kind: "atk", negative: true, icon: "📉", label: "Attack Down" },
+  { kind: "spd", negative: false, icon: "💨", label: "Speed Up" },
+  { kind: "spd", negative: true, icon: "🐌", label: "Speed Down" },
+  { kind: "def", negative: false, icon: "🛡️", label: "Defense Up" },
+  { kind: "def", negative: true, icon: "🛡️", label: "Defense Down" },
+  { kind: "heal", negative: true, icon: "💔", label: "Healing Down" },
+  { kind: "haste", negative: false, icon: "⚡", label: "Haste Up" },
+  { kind: "haste", negative: true, icon: "⏳", label: "Haste Down" },
+];
+
+/** Build the status list UnitInfoPanel expects from a unit's raw tick fields. */
 export function debuffsFor(u) {
   if (!u) return [];
-  return DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0).map((d) =>
-    // The shared spdMod slot is a buff or a debuff depending on sign
-    // (Breezekit's Speed Up vs Morusk's Permafrost Hide chill).
-    d.key === "spdModTicks" && (u.spdModPct || 0) < 0 ? { ...d, icon: "🐌", label: "Speed Down" } : d
-  );
+  const rows = DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
+  for (const r of STAT_MOD_ROWS) {
+    const n = statModStacks(u, r.kind, r.negative);
+    if (n > 0) rows.push({ key: r.kind + (r.negative ? "-" : "+"), icon: r.icon, label: r.label + (n > 1 ? " ×" + n : "") });
+  }
+  return rows;
 }
 
 function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {

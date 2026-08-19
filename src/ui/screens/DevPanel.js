@@ -30,13 +30,13 @@ function DevPanel(){
   setArenaPlanGrid, setDungeonPlanGrid, setLabyrinthPlanGrid, setDailyBossPlanGrid,
   setDungeonBossLevels, setPassRechargeCount, setLastDungeonPassGain, setLastPassRechargeReset,
   setDailyBossData, setDailyBossLevel, setNewFeaturePillsSeen,
-  setPostTutorialPopupPending, setShowQuestsArrow, setPendingDungeonReveal,
+  setPostTutorialPopupPending, setShowQuestsArrow, setPendingDungeonReveal, setLabyrinthFloor10WarningSeen,
   setUsername, setProfileEmoji, setProfileAvatarId, setProfileFrame, setProfileTitle,
   setEverOwnedCreatureIds,
   setBattlepassLastReset, setBattlepassClaimed, setBattlepassPaidClaimed, setBattlepassPremium, setBattlepassPoints,
   setCollectedTreasures, setCompletedTreasureSets,
   } = useGame();
-  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",ascensionMelonCommon:"5",ascensionMelonRare:"5",ascensionMelonEpic:"5",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",
+  const [vals,setVals]=useState({gems:"1000",food:"200",candy:"50",eggs:"5",legendaryEggs:"1",melonFire:"5",melonWater:"5",melonNature:"5",melonEarth:"5",melonWind:"5",melonElectric:"5",melonLight:"5",melonDark:"5",melonRainbow:"2",ascensionMelon:"1",ascensionMelonCommon:"5",ascensionMelonEpic:"5",shardId:"emberpup",shardAmt:"5",skinShards:"100",flairBanana:"5",mythicalFlairBanana:"5",ancientFlairBanana:"5",labyrinthFloor:"1000",farmFieldLevel:"20",
     ...Object.fromEntries(QUEST_SET_CATEGORIES.map(t=>["questSet_"+t.id,"1"]))});
   const [devTab,setDevTab]=useState("general");
   const [equipSubTab,setEquipSubTab]=useState("common");
@@ -66,7 +66,7 @@ function DevPanel(){
     setOwned(all);
   }
   function skipTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(true);setTab("home");setLabyrinthBestDepth(d=>Math.max(d||1,21));setPlotsUnlocked(true);setDungeonsUnlocked(true);setDailyBossUnlocked(true);setArenaUnlocked(true);setTreasureUnlocked(true);}
-  function triggerTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(false);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);setTab("home");}
+  function triggerTutorial(){setTutorialRestricted(false);setTutorialStep(null);setTutorialSeen(false);setTutorialPhase("text");setTutorialLine(0);setTutorialPostLine(0);setTutorialPickedCreatureId(null);setTutorialPlayerCell(null);setLabyrinthFloor10WarningSeen(false);setTab("home");}
   // Jumps straight to the post-Set-1 "Dungeon reveal" hand-off (arrow at
   // Play, then at the Dungeon card) without replaying the intro narrative or
   // Progression Set 1 itself -- assumes Set 1 just completed, so it also
@@ -127,7 +127,7 @@ function DevPanel(){
     setPostTutorialPopupPending(false);setShowQuestsArrow(false);setPendingDungeonReveal(false);
     setTab("home");setGameMode(null);
     setArenaPlanGrid({});setDungeonPlanGrid({});setLabyrinthPlanGrid({});setDailyBossPlanGrid({});
-    setLabyrinthDepth(1);setLabyrinthBestDepth(1);
+    setLabyrinthDepth(1);setLabyrinthBestDepth(1);setLabyrinthFloor10WarningSeen(false);
     setNewPlayerGiftDay(0);setNewPlayerGiftLastClaimed(null);setNewPlayerGiftDoubled(false);
     setNewPlayerGiftClaimed(Array(10).fill(false));setNewPlayerGiftPaidClaimed(Array(10).fill(false));
     setDailyDay(0);setDailyLastClaimed(null);setDailyClaimed(Array(30).fill(false));setDailyClaimedCycle(0);setDailyMissionsDate(null);

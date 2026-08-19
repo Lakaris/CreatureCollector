@@ -5,6 +5,7 @@
 // Also spawns vine minions at the start of the fight (see battle/minions.js).
 
 import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 export default {
   key: "nature",
@@ -17,7 +18,7 @@ export default {
     if (!adj.length) return;
 
     adj.forEach((u, i) => {
-      u.hp = Math.max(0, u.hp - ctx.dmg(0.15, 0.7, 0.3));
+      damageUnit(u, ctx.dmg(0.15, 0.7, 0.3));
       // Shove one row down the grid, if that tile is free.
       const newRow = Math.min(gridRows - 1, u.row + 1);
       const key = newRow + "," + u.col;
@@ -48,7 +49,7 @@ export default {
       boss.lifeStacks = 0;
     }
     const stackMult = 1 + boss.lifeStacks * 0.25;
-    tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.1 * stackMult));
+    damageUnit(tgt, ctx.dmg(0.1 * stackMult));
     boss.atkCd = 10;
     newFx.push({ id: now + 99991, row: tgt.row, col: tgt.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
   },

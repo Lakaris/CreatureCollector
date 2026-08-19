@@ -1,9 +1,13 @@
 // Rarity tiers, stat identity, and display colors shared across collection and gacha UI.
 
+// Creature rarities: three tiers (the Rare tier was removed; its old 32%
+// hatch weight folded mostly into Common, with a small bump to Epic since
+// the former Rare lines were split between those two pools). Skin tiers,
+// flair rarities, treasures, and equipment keep their own separate
+// rarity tables -- those still include a "rare" tier on purpose.
 export const RARITY_CONFIG={
-  common:{label:"Common",rate:60,color:"badge-common"},
-  rare:{label:"Rare",rate:32,color:"badge-rare"},
-  epic:{label:"Epic",rate:7.5,color:"badge-epic"},
+  common:{label:"Common",rate:90,color:"badge-common"},
+  epic:{label:"Epic",rate:9.5,color:"badge-epic"},
   legendary:{label:"Legendary",rate:0.5,color:"badge-legendary"},
 };
 export const SKIN_TIER_CONFIG={
@@ -17,9 +21,9 @@ export const SKIN_FAIL_SHARDS=3;
 // alone, so the max-level power ratio between two creatures equals their
 // base-stat ratio. Rarity's edge lives entirely in the base statlines
 // (legendaries start at ~epic-stage-2 strength and finish ~5-10% above other
-// finals). The old values (rare 1.15 / epic 1.3 / legendary 1.5) compounded
-// over 500 levels into a ~45% endgame gap on top of that base edge.
-export const RARITY_STAT_MULT={common:1,rare:1,epic:1,legendary:1};
+// finals). The old values (epic 1.3 / legendary 1.5) compounded over 500
+// levels into a ~45% endgame gap on top of that base edge.
+export const RARITY_STAT_MULT={common:1,epic:1,legendary:1};
 export const STAT_CYCLE=["hp","atk","def","spd","abilitySpeed"];
 /** HP/ATK/DEF only, excluding Speed and Haste. Shared by the level-up stat rotation and the ascension popup. */
 export const CORE_STAT_CYCLE=["hp","atk","def"];

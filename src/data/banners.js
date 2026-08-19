@@ -27,9 +27,8 @@ export const BANNERS=[
     color:"#E6F0FB",border:"#A8CEEE",titleColor:"#1A3A5C",
     featured:"stormwyvern",
     rates:[
-      {type:"rarity",rarity:"common",rate:60},
-      {type:"rarity",rarity:"rare",rate:32},
-      {type:"rarity",rarity:"epic",rate:7.5},
+      {type:"rarity",rarity:"common",rate:90},
+      {type:"rarity",rarity:"epic",rate:9.5},
       {type:"creature",id:"stormwyvern",rate:0.25},
       {type:"rarity_excl",rarity:"legendary",exclude:"stormwyvern",rate:0.25},
     ],

@@ -18,8 +18,10 @@ import { MELEE_RANGE, RANGED_RANGE, BOSS_SIZE } from "./constants.js";
 import {
   aChebDist, aCardinalDist, aBestStep,
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
+  cellsOf, unitDist, unitCardinalDist,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, absorbShield } from "./status.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier } from "./status.js";
+import { damageUnit } from "./hp.js";
 import { tickMinionSpecials } from "./minions.js";
 import { unitDamage, playerDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
 import { getBossModule } from "./bosses/registry.js";
@@ -93,7 +95,10 @@ export function tickSpecialCharge(u) {
     u.abilCharge = 0;
     return;
   }
-  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1));
+  // Stunned units don't work towards their special (see Overload Sting).
+  if (isStunned(u)) return;
+  // Haste Down/Up stacks scale the charge rate (statModMultiplier "haste").
+  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1) * statModMultiplier(u, "haste"));
 }
 
 export function specialChargeReady(u) {
@@ -115,12 +120,12 @@ export function specialChargeReady(u) {
 export function specialTargetInRange(u, allies, enemies, boss) {
   const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
   for (const e of enemies) {
-    if (aChebDist(u.row, u.col, e.row, e.col) <= range) return true;
+    if (unitDist(u, e) <= range) return true;
   }
   if (boss && boss.hp > 0 && distToBoss(boss, u.row, u.col) <= range) return true;
   if (CREATURE_MAP[u.creatureId]?.role === "Support") {
     for (const a of allies) {
-      if (a !== u && a.hp > 0 && aChebDist(u.row, u.col, a.row, a.col) <= range) return true;
+      if (a !== u && a.hp > 0 && unitDist(u, a) <= range) return true;
     }
   }
   return false;
@@ -140,7 +145,10 @@ export function consumeSpecialCharge(u) {
   u.abilFlashTicks = ABILITY_FLASH_TICKS;
 }
 
-/** Move a unit one BFS step toward (tr,tc), keeping the occupancy set in sync. */
+/** Move a unit one BFS step toward (tr,tc), keeping the occupancy set in sync.
+ * Multi-cell units (Labyrinth Boss creatures, size 2) path with their whole
+ * body: a step is legal only when every body cell at the new anchor is free
+ * (their own current cells excepted). */
 function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
   // If the unit moved on the immediately-previous tick, forbid stepping
   // straight back onto the cell it came from -- stateless BFS re-planning
@@ -148,15 +156,30 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
   // pacing left-right against a full front line). After one stationary tick
   // the restriction lifts, so backing out of a genuine dead end still works.
   const avoid = tick != null && u._lastStepTick === tick - 1;
-  const [nr, nc] = aBestStep(u.row, u.col, tr, tc, blocked, avoid ? u.prevRow : undefined, avoid ? u.prevCol : undefined);
+  const size = u.size || 1;
+  let bodyBlocked = blocked;
+  if (size > 1) {
+    const own = new Set(cellsOf(u));
+    bodyBlocked = (r, c) => {
+      for (let dr = 0; dr < size; dr++) {
+        for (let dc = 0; dc < size; dc++) {
+          const key = r + dr + "," + (c + dc);
+          if (own.has(key)) continue;
+          if (blocked(r + dr, c + dc)) return true;
+        }
+      }
+      return false;
+    };
+  }
+  const [nr, nc] = aBestStep(u.row, u.col, tr, tc, bodyBlocked, avoid ? u.prevRow : undefined, avoid ? u.prevCol : undefined);
   if (nr === u.row && nc === u.col) return false;
-  allOcc.delete(u.row + "," + u.col);
+  for (const cell of cellsOf(u)) allOcc.delete(cell);
   u.prevRow = u.row;
   u.prevCol = u.col;
   u.lastMoveTime = now;
   u.row = nr;
   u.col = nc;
-  allOcc.add(nr + "," + nc);
+  for (const cell of cellsOf(u)) allOcc.add(cell);
   u._lastStepTick = tick;
   return true;
 }
@@ -164,7 +187,37 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
 /** The foe this unit is Taunt-forced onto (e.g. by Taunting Snap), or null. */
 function tauntedFoe(u, foes) {
   if ((u.tauntTicks || 0) <= 0 || !u.tauntSourceUid) return null;
-  return foes.find((f) => f.uid === u.tauntSourceUid && f.hp > 0) || null;
+  return foes.find((f) => f.uid === u.tauntSourceUid && f.hp > 0 && !isIntangible(f)) || null;
+}
+
+/**
+ * Marked (Loptrix's Scapegoat): the nearest marked foe ALREADY within this
+ * unit's attack range, or null. Marked redirects targeting only -- it never
+ * pulls anyone: units out of range keep doing whatever they were doing.
+ */
+function markedFoeInRange(u, foes) {
+  const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+  let best = null, bestD = Infinity;
+  for (const f of foes) {
+    if ((f.markedTicks || 0) <= 0 || f.hp <= 0 || isIntangible(f)) continue;
+    const d = unitDist(u, f);
+    if (d <= range && d < bestD) { bestD = d; best = f; }
+  }
+  return best;
+}
+
+/**
+ * Retaliation: a RANGED creature that takes an attack hit from a MELEE enemy
+ * switches targets onto that attacker (set in the attack loops via
+ * `_retaliateUid`) until the attacker dies or becomes untargetable. Softer
+ * than Taunt -- Taunt still wins when both apply -- and refreshed by every
+ * new melee hit, so the most recent attacker holds the focus.
+ */
+function retaliationFoe(u, foes) {
+  if (!u.isRanged || u._retaliateUid == null) return null;
+  const f = foes.find((f) => f.uid === u._retaliateUid && f.hp > 0 && !isIntangible(f));
+  if (!f) { u._retaliateUid = null; return null; }
+  return f;
 }
 
 /**
@@ -183,26 +236,43 @@ function tauntedFoe(u, foes) {
  * the two approach routes.
  */
 function selectTarget(u, foes) {
-  const forced = tauntedFoe(u, foes);
+  // Intangible foes (Deep Submerge) can not be targeted: anyone aiming at
+  // one re-picks from the rest, chase hysteresis included.
+  foes = foes.filter((f) => !isIntangible(f));
+  const forced = tauntedFoe(u, foes) || retaliationFoe(u, foes);
   if (forced) foes = [forced];
   let nearest = null, nearestD = Infinity;
   for (const f of foes) {
-    const d = aChebDist(u.row, u.col, f.row, f.col);
+    const d = unitDist(u, f);
     if (d < nearestD) { nearestD = d; nearest = f; }
   }
   if (u._chaseUid != null) {
     const cur = foes.find((f) => f.uid === u._chaseUid);
-    if (cur && aChebDist(u.row, u.col, cur.row, cur.col) <= nearestD) nearest = cur;
+    if (cur && unitDist(u, cur) <= nearestD) nearest = cur;
   }
   u._chaseUid = nearest ? nearest.uid : null;
+  // Marked preference: switch the ATTACK onto a marked foe already in range
+  // (Taunt/retaliation collapsed the list above and still win). Movement is
+  // deliberately left pointing at the normal chase target -- since the
+  // marked foe is in range no step happens now, and when the mark ends the
+  // unit resumes its old plan.
+  if (!forced) {
+    const mk = markedFoeInRange(u, foes);
+    if (mk) {
+      return {
+        atkTgt: u.isRanged && unitCardinalDist(u, mk) <= RANGED_RANGE ? mk : null,
+        moveTgt: mk,
+      };
+    }
+  }
   let atkTgt = null;
   if (u.isRanged) {
     const inLine = foes.filter(
-      (f) => aCardinalDist(u.row, u.col, f.row, f.col) <= RANGED_RANGE
+      (f) => unitCardinalDist(u, f) <= RANGED_RANGE
     );
     if (inLine.length) {
       atkTgt = inLine.sort(
-        (a, z) => aCardinalDist(u.row, u.col, a.row, a.col) - aCardinalDist(u.row, u.col, z.row, z.col)
+        (a, z) => unitCardinalDist(u, a) - unitCardinalDist(u, z)
       )[0];
     }
   }
@@ -227,7 +297,8 @@ export function runBattleTick(state, config) {
   const newFx = [];
   if (!aliveP.length) return { newFx, now, acted: false };
 
-  const allOcc = new Set([...aliveP, ...aliveE].map((u) => u.row + "," + u.col));
+  const allOcc = new Set();
+  for (const u of [...aliveP, ...aliveE]) for (const cell of cellsOf(u)) allOcc.add(cell);
   const bossAlive = !!(boss && boss.hp > 0);
   const damageDealt = state.damageDealt || (state.damageDealt = {});
 
@@ -242,6 +313,10 @@ export function runBattleTick(state, config) {
     u.atkCd = Math.max(0, u.atkCd - 1);
     tickSpecialCharge(u);
     tickTimedMods(u);
+    // Stunned units can't attack: hold the cooldown above zero so every
+    // attack branch below (including custom basicAttack hooks, which check
+    // atkCd themselves) stays closed. Movement and passives still run.
+    if (isStunned(u)) u.atkCd = Math.max(u.atkCd, 1);
 
     const canMove = !isRooted(u);
     const penalty = speedPenalty(u);
@@ -269,7 +344,10 @@ export function runBattleTick(state, config) {
     // Either way, a full bar HOLDS until there's actually something in range
     // to use it on (specialTargetInRange, or the module's own specialInRange),
     // then fires the moment a target closes in.
-    if (specialChargeReady(u)) {
+    // Chargeless specials (no `charge` in data, e.g. Overload Sting) skip the
+    // bar entirely: they fire whenever their module's own gate passes.
+    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange);
+    if (specialChargeReady(u) || chargelessReady) {
       const rangeBoss = bossAlive ? boss : null;
       const inRange = abilMod?.specialInRange
         ? abilMod.specialInRange(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols })
@@ -295,9 +373,11 @@ export function runBattleTick(state, config) {
     }
 
     // Boss takes priority when in range -- hold position even while on
-    // cooldown. A Taunted unit ignores the boss: it is forced onto the
-    // minion that taunted it (the minion-fight branch below).
-    if (distB <= range && bossAlive && !tauntedFoe(u, aliveE)) {
+    // cooldown. A Taunted unit ignores the boss (it is forced onto the
+    // minion that taunted it); so does a ranged unit retaliating against a
+    // melee attacker, or any unit with a Marked foe already in reach (the
+    // minion-fight branch below).
+    if (distB <= range && bossAlive && !tauntedFoe(u, aliveE) && !retaliationFoe(u, aliveE) && !markedFoeInRange(u, aliveE)) {
       if (u.atkCd <= 0) {
         let totalDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
@@ -319,27 +399,27 @@ export function runBattleTick(state, config) {
       const { atkTgt, moveTgt } = selectTarget(u, aliveE);
       const tgt = atkTgt || moveTgt;
       if (tgt) {
-        const dist = atkTgt
-          ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col)
-          : aChebDist(u.row, u.col, tgt.row, tgt.col);
+        const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
         if (dist <= range && u.atkCd <= 0) {
           let totalDmg = 0;
           const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
             const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
-            tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, dmg));
-            totalDmg += dmg;
+            totalDmg += damageUnit(tgt, dmg);
             const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-            if (bonus) { tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, bonus)); totalDmg += bonus; }
+            if (bonus) totalDmg += damageUnit(tgt, bonus);
             // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
             // returns a slice of the hit to the attacker. Reflected damage is
             // never itself reflected.
             const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
-            if (reflect) u.hp = Math.max(0, u.hp - reflect);
+            if (reflect) damageUnit(u, reflect);
           }
           damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
+          // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
+          if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
           u.atkCd = attackCooldown(u, penalty);
-          newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
+          // 2x2 targets (Labyrinth Boss creatures) get the hit flash at their body center.
+          newFx.push({ id: now + u.uid, row: tgt.row + ((tgt.size || 1) - 1) / 2, col: tgt.col + ((tgt.size || 1) - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
         } else if (canMove && dist > range) {
           stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
         }
@@ -364,6 +444,7 @@ export function runBattleTick(state, config) {
     u.atkCd = Math.max(0, u.atkCd - 1);
     tickSpecialCharge(u);
     tickTimedMods(u);
+    if (isStunned(u)) u.atkCd = Math.max(u.atkCd, 1);
 
     const canMove = !isRooted(u);
     const penalty = speedPenalty(u);
@@ -376,7 +457,8 @@ export function runBattleTick(state, config) {
 
     if (abilMod?.onTick) abilMod.onTick(u, enemyCtx());
 
-    if (specialChargeReady(u)) {
+    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange);
+    if (specialChargeReady(u) || chargelessReady) {
       const inRange = abilMod?.specialInRange
         ? abilMod.specialInRange(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols })
         : specialTargetInRange(u, aliveE, aliveP, null);
@@ -399,26 +481,26 @@ export function runBattleTick(state, config) {
     const tgt = atkTgt || moveTgt;
     if (!tgt) continue;
 
-    const dist = atkTgt
-      ? aCardinalDist(u.row, u.col, atkTgt.row, atkTgt.col)
-      : aChebDist(u.row, u.col, tgt.row, tgt.col);
+    const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
     if (dist <= range && u.atkCd <= 0) {
       const tgtMod = getPlayerAbilityModule(tgt.creatureId);
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
         const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
-        tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, dmg));
+        damageUnit(tgt, dmg);
         const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-        if (bonus) tgt.hp = Math.max(0, tgt.hp - absorbShield(tgt, bonus));
+        if (bonus) damageUnit(tgt, bonus);
         // Reflect passives: a player-side defender's reflect counts toward
         // its damage chart.
         const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
         if (reflect) {
-          u.hp = Math.max(0, u.hp - reflect);
+          damageUnit(u, reflect);
           damageDealt[tgt.creatureId] = (damageDealt[tgt.creatureId] || 0) + reflect;
         }
       }
+      // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
+      if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
       u.atkCd = attackCooldown(u, penalty);
-      newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: true });
+      newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row + ((u.size || 1) - 1) / 2, fromCol: u.col + ((u.size || 1) - 1) / 2, isEnemy: true });
     } else if (canMove && dist > range) {
       stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
     }
@@ -435,7 +517,7 @@ export function runBattleTick(state, config) {
   for (const u of aliveE) {
     if ((u.burnTicks || 0) > 0) {
       const dmg = Math.max(1, Math.round((u.burnSourceAtk || 10) * PLAYER_BURN_RATE));
-      u.hp = Math.max(0, u.hp - dmg);
+      damageUnit(u, dmg);
       u.burnTicks--;
       newFx.push({ id: now + "pbrn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
@@ -455,7 +537,7 @@ export function runBattleTick(state, config) {
       for (const u of victims) {
         if (trail.cells.has(u.row + "," + u.col)) {
           const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
-          u.hp = Math.max(0, u.hp - dmg);
+          damageUnit(u, dmg);
           newFx.push({ id: now + "trail" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
         }
       }

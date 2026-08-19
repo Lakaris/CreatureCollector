@@ -1,9 +1,9 @@
 // Morusk line: Tusk Slam / Blubber Wall / Permafrost Hide.
 //
 // Tusk Slam keeps the engine's default melee attack flow (closest enemy) with
-// per-level damage scaling; at max level every landed hit also inflicts
-// Healing Recovery Down (healing received halved -- see healReceivedMultiplier
-// in battle/status.js) for the standard debuff duration.
+// per-level damage scaling; at max level every landed hit also inflicts a
+// Healing Down stack (-20% healing received per stack -- see
+// healReceivedMultiplier in battle/status.js) for the standard duration.
 //
 // Blubber Wall shields Morusk for a % of its max Health (see absorbShield;
 // refresh-on-recast per the STATUS_TICKS policy). If the shield is BROKEN by
@@ -23,7 +23,8 @@
 import { aChebDist, distToBoss } from "../geometry.js";
 import { damageBoss } from "../damage.js";
 import { STATUS_TICKS } from "../constants.js";
-import { absorbShield } from "../status.js";
+import { damageUnit } from "../hp.js";
+import { applyStatMod } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * ratio of the current level's value to the basic's base value. */
@@ -34,8 +35,14 @@ const SHIELD_PCT_BY_LEVEL = [8, 10, 10, 12, 12];
 const BURST_PCT_BY_LEVEL = [50, 50, 65, 65, 80];
 /** "Nearby" = every surrounding tile. */
 const BURST_RANGE = 1;
-/** Permafrost Hide: Speed reduction % applied on dealing damage, by unique level. */
-const SLOW_PCT_BY_LEVEL = [2, 4, 6, 8, 10];
+/** Permafrost Hide: Speed Down applied on dealing damage, by unique level.
+ * Maxed lands on the standard 5% per stack that the Speed Down tag
+ * advertises (5/10/15/20/25 across 5 sources); lower ranks chill less. */
+const SLOW_PCT_BY_LEVEL = [1, 2, 3, 4, 5];
+/** Tusk Slam max level: Healing Down per stack (one stack per Morusk).
+ * 20% matches the Healing Down tag's advertised stacking table, where 5 stacks
+ * shut healing off entirely (see ABILITY_TAG_DEFS in core/abilityText.js). */
+const HEAL_DOWN_PCT = 20;
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -48,17 +55,14 @@ function abilityIdx(unit, key) {
 export function makeMoruskModule(cfg) {
   const { basicDmgByLevel, shieldPctByLevel, burstPctByLevel, slowPctByLevel } = cfg;
 
-  /** Permafrost Hide's chill; skips bosses (no uid -- their cadence ignores spdMod). */
+  /** Permafrost Hide's chill: one Speed Down stack per Morusk, refreshed per
+   * hit; stacks with other sources. Skips bosses (no uid -- their cadence
+   * ignores unit speed mods). */
   function applyChill(unit, target) {
     if (!target || target.uid == null) return;
     const pct = slowPctByLevel[abilityIdx(unit, "unique")];
     if (!pct) return;
-    const active = (target.spdModTicks || 0) > 0;
-    // Never weaken a stronger slow someone else applied; anything else
-    // (nothing, a weaker slow, or a Speed Up buff) gets overwritten.
-    if (active && (target.spdModPct || 0) < -pct) return;
-    target.spdModPct = -pct;
-    target.spdModTicks = STATUS_TICKS;
+    applyStatMod(target, { kind: "spd", pct: -pct, src: unit.uid, ticks: STATUS_TICKS });
   }
 
   return {
@@ -72,7 +76,7 @@ export function makeMoruskModule(cfg) {
     onHit(unit, target) {
       applyChill(unit, target);
       if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
-        target.healDownTicks = STATUS_TICKS;
+        applyStatMod(target, { kind: "heal", pct: -HEAL_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
     },
@@ -101,7 +105,7 @@ export function makeMoruskModule(cfg) {
       const { aliveE, boss, newFx, now } = ctx;
       for (const e of aliveE) {
         if (aChebDist(unit.row, unit.col, e.row, e.col) > BURST_RANGE) continue;
-        e.hp = Math.max(0, e.hp - absorbShield(e, dmg));
+        damageUnit(e, dmg);
         ctx.addDamageDealt(dmg);
         applyChill(unit, e);
         newFx.push({ id: now + "bw" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });

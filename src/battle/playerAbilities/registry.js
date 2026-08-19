@@ -11,12 +11,15 @@ import { blazehornet, infernohive, infernoswarm } from "./blazehornetLine.js";
 import { sacredwasp, divinedrone, holyswarm } from "./starlitLine.js";
 import { bloomphoenix, lifephoenix } from "./bloomibisLine.js";
 import { ignisdragon, pyredragon } from "./ignissaurLine.js";
-import { breezekit } from "./breezekitLine.js";
+import { breezekit, galestride, tempesthawk, stormlord } from "./breezekitLine.js";
 import { crystalcrab, gemcrab, gemtitan } from "./crystalcrabLine.js";
 import { pebbit, bouldrath, granitarch, mountainking } from "./pebbitLine.js";
 import { morusk, ivormar } from "./moruskLine.js";
+import { shockcrab, voltcrusher, galvaniccrab } from "./shockstingerLine.js";
+import { coralleviathan, tidecrush, tidelord } from "./nesslingLine.js";
+import { abyssgolem, nihilgolem } from "./loptrixLine.js";
 
-export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar };
+export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem };
 
 /** Look up a player creature's ability module. Returns undefined if unimplemented. */
 export function getPlayerAbilityModule(creatureId) {

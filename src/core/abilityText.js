@@ -102,6 +102,23 @@ export function formatAbilityStep(text, prevText) {
   return { isPercent: false, ...formatAbilityDisplay(text) };
 }
 
+/**
+ * Targeting-selector tags (how the ability picks its target). These render
+ * as their own pills on ability cards; every other tag is an effect and gets
+ * folded into a single "Effects" pill whose popup lists them all -- long
+ * effect lists (e.g. Deep Submerge's final tier) were pushing the ability
+ * name and text around, especially on small screens.
+ */
+export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest"]);
+
+/** Split an ability's tags into standalone targeting pills and collapsed effects. */
+export function splitAbilityTags(tags) {
+  return {
+    targeting: tags.filter((t) => TARGETING_TAGS.has(t)),
+    effects: tags.filter((t) => !TARGETING_TAGS.has(t)),
+  };
+}
+
 /** Small mechanic tags shown on ability cards (e.g. Blazehornet's Charging Pierce); click opens a definition popup. */
 export const ABILITY_TAG_DEFS = {
   pierce: { label: "Pierce", description: "Deal damage to all enemies this attack passes through." },
@@ -112,12 +129,22 @@ export const ABILITY_TAG_DEFS = {
   weakest: { label: "Weakest", description: "Targets the creature with the lowest current Health" },
   cleanse: { label: "Cleanse", description: "Removes all debuffs" },
   line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge" },
-  speedup: { label: "💨 Speed Up", description: "Temporarily gain +25% Speed" },
+  speedup: { label: "💨 Speed Up", description: "Increases the creature's Speed", stacking: [25, 50, 75, 100, 125] },
   taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them" },
+  // Marked never pulls allies toward the target: only allies who already
+  // have it within attack range switch onto it -- no forced movement.
+  marked: { label: "Marked", description: "All allies within range targets this creature" },
   reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature" },
   shield: { label: "Shield", description: "Temporary bonus Health" },
   nearby: { label: "Nearby", description: "Affects every tile surrounding this creature" },
-  healdown: { label: "💔 Heal Down", description: "Reduces healing" },
+  healdown: { label: "💔 Healing Down", description: "Reduces the creature's healing received", stacking: [20, 40, 60, 80, 100] },
+  stun: { label: "Stun", description: "For a small period of time, this creature can not attack and does not work towards their Special ability" },
+  restrained: { label: "Restrained", undispellable: true, description: "Interacts with this creature's abilities. Never expires." },
+  hastedown: { label: "Haste Down", description: "Reduces the creature's Haste", stacking: [5, 10, 15, 20, 25] },
+  speeddown: { label: "🐌 Speed Down", description: "Reduces the creature's Speed", stacking: [5, 10, 15, 20, 25] },
+  attackdown: { label: "Attack Down", description: "Reduces the creature's Attack", stacking: [15, 20, 25, 30, 40] },
+  defensedown: { label: "Defense Down", description: "Reduces the creature's Defense", stacking: [15, 20, 25, 30, 40] },
+  intangible: { label: "Intangible", undispellable: true, description: "Can not be targeted or damaged. Enemies targeting this creature change targets." },
 };
 
 /**
@@ -144,6 +171,11 @@ const IGNISSAUR_PHRASES = {
   special: { phrase: "Deal damage to all enemies" },
 };
 
+const BREEZEKIT_PHRASES = {
+  basic: null,
+  special: { phrase: "Teleport beside and deal damage to an enemy" },
+};
+
 const CRYSTALCRAB_PHRASES = {
   basic: null,
   special: { phrase: "Deal damage to an enemy and Taunt them" },
@@ -160,15 +192,40 @@ const MORUSK_PHRASES = {
   },
 };
 
+// Deep Submerge carries two numbers ("Heal 40 HP; 30 dmg"); `healDamage`
+// moves both into badges -- HEAL for the self-heal, DMG for the front-row
+// strike -- leaving the phrase fixed per tier.
+const NESSLING_PHRASES = {
+  basic: null,
+  special: {
+    // The phrase stops at the strike; each tier's own text supplies the
+    // ending, so the final tier can read "...and inflict Attack Down and
+    // Taunt." instead of tacking a clause onto the base sentence.
+    phrase: "Briefly become Intangible and Heal. Afterwards deal damage to the front row of enemies",
+    healDamage: true,
+  },
+};
+
+// Loptrix line: the passive's charge/teleport text renders raw per tier.
+const LOPTRIX_PHRASES = {
+  basic: null,
+  special: { phrase: "Teleport to an enemy. Deal damage and inflict Marked on them" },
+};
+
+const SHOCKSTINGER_PHRASES = {
+  basic: null,
+  special: { phrase: "This ability has no cooldown but can only be used if a Restrained enemy with 20+ stacks is within range. Deal damage and Stun them. Remove all stacks of Restrained" },
+};
+
 const PLAIN_ABILITY_PHRASES = {
   bloomphoenix: BLOOMIBIS_PHRASES,
   lifephoenix: BLOOMIBIS_PHRASES,
   ignisdragon: IGNISSAUR_PHRASES,
   pyredragon: IGNISSAUR_PHRASES,
-  breezekit: {
-    basic: null,
-    special: { phrase: "Teleport beside and deal damage to an enemy" },
-  },
+  breezekit: BREEZEKIT_PHRASES,
+  galestride: BREEZEKIT_PHRASES,
+  tempesthawk: BREEZEKIT_PHRASES,
+  stormlord: BREEZEKIT_PHRASES,
   crystalcrab: CRYSTALCRAB_PHRASES,
   gemcrab: CRYSTALCRAB_PHRASES,
   gemtitan: CRYSTALCRAB_PHRASES,
@@ -180,6 +237,14 @@ const PLAIN_ABILITY_PHRASES = {
   mountainking: { basic: null },
   morusk: MORUSK_PHRASES,
   ivormar: MORUSK_PHRASES,
+  shockcrab: SHOCKSTINGER_PHRASES,
+  voltcrusher: SHOCKSTINGER_PHRASES,
+  galvaniccrab: SHOCKSTINGER_PHRASES,
+  coralleviathan: NESSLING_PHRASES,
+  tidecrush: NESSLING_PHRASES,
+  tidelord: NESSLING_PHRASES,
+  abyssgolem: LOPTRIX_PHRASES,
+  nihilgolem: LOPTRIX_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -202,6 +267,16 @@ export function formatPlainAbilityLevel(creatureId, key, text) {
     const m = LEADING_HEAL_RE.exec(text);
     if (!m) return { label: text, amount: null, healAmt: null };
     return { label: cfg.phrase + text.slice(m[0].length), amount: null, healAmt: Number(m[1]) };
+  }
+  if (cfg && cfg.healDamage) {
+    const h = /Heal\s+(\d+)\s*HP/i.exec(text);
+    const d = /(\d+)\s*dmg\b/i.exec(text);
+    const rest = d ? text.slice(d.index + d[0].length) : "";
+    return {
+      label: cfg.phrase + rest,
+      amount: d ? Number(d[1]) : null,
+      healAmt: h ? Number(h[1]) : null,
+    };
   }
   if (cfg && cfg.shieldBurst) {
     const sh = /Shield\s+(\d+)%\s*HP/i.exec(text);
@@ -280,9 +355,13 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // level-gating rule as Bloomibis's Cleanse above.
     if (abilityLevel == null || abilityLevel >= 4) tags.push("burn");
   }
-  // Breezekit only (its evolutions keep their old kits for now).
-  if (creatureId === "breezekit") {
-    if (key === "basic") tags.push("closest");
+  if (getRootDef(creatureId)?.id === "breezekit") {
+    if (key === "basic") {
+      tags.push("closest");
+      // Gust Swipe only shreds DEF from its 4th upgrade on -- same
+      // level-gating rule as its Speed Up below.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
     if (key === "special") {
       tags.push("weakest");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
@@ -300,15 +379,50 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "basic") tags.push("closest");
     if (key === "special") tags.push("taunt", "shield", "nearby");
   }
+  const isShockstingerLine = getRootDef(creatureId)?.id === "shockcrab";
+  if (isShockstingerLine) {
+    if (key === "basic") tags.push("closest", "restrained");
+    if (key === "special") {
+      tags.push("closest", "stun", "restrained");
+      // Overload Sting only grants Speed Up from its 4th upgrade on -- same
+      // level-gating rule as Breezekit's Zephyr Step.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
+    }
+    if (key === "unique") tags.push("restrained");
+  }
+  const isNesslingLine = getRootDef(creatureId)?.id === "coralleviathan";
+  if (isNesslingLine) {
+    if (key === "basic") {
+      tags.push("farthest");
+      // Loch Spout only inflicts Haste Down from its 4th upgrade on -- same
+      // level-gating rule as Bloomibis's Cleanse.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("hastedown");
+    }
+    if (key === "special") {
+      tags.push("intangible", "closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
+    }
+  }
+  const isLoptrixLine = getRootDef(creatureId)?.id === "abyssgolem";
+  if (isLoptrixLine) {
+    if (key === "basic") {
+      tags.push("weakest");
+      // Mocking Nip only inflicts Defense Down from its 4th upgrade on;
+      // same level-gating rule as the other final-tier effects.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
+    if (key === "special") tags.push("weakest", "marked");
+  }
   const isMoruskLine = getRootDef(creatureId)?.id === "morusk";
   if (isMoruskLine) {
     if (key === "basic") {
       tags.push("closest");
-      // Tusk Slam only inflicts Healing Recovery Down from its 4th upgrade
+      // Tusk Slam only inflicts Healing Down from its 4th upgrade
       // on -- same level-gating rule as Bloomibis's Cleanse.
       if (abilityLevel == null || abilityLevel >= 4) tags.push("healdown");
     }
     if (key === "special") tags.push("shield", "nearby");
+    if (key === "unique") tags.push("speeddown");
   }
   return tags;
 }

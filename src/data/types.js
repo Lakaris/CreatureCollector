@@ -11,9 +11,10 @@ export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,e
 MELON_TYPES.push({type:null,emoji:"🌈",key:"melonRainbow",label:"Rainbow Melon",fieldRate:0.005,fieldAmount:1});
 // Ascension melons are rarity-gated: ascending a creature spends the melon
 // matching its rarity. The legendary one keeps the pre-rename "ascensionMelon"
-// key so existing saves' balances carry over.
+// key so existing saves' balances carry over. (The Rare Ascension Melon was
+// removed with the Rare creature tier; old balances migrate to Epic in
+// GameContext's loadSave.)
 MELON_TYPES.push({type:null,rarity:"common",   emoji:"🍈⚪",key:"ascensionMelonCommon",label:"Common Ascension Melon",   fieldRate:0.003,fieldAmount:4});
-MELON_TYPES.push({type:null,rarity:"rare",     emoji:"🍈🔵",key:"ascensionMelonRare",  label:"Rare Ascension Melon",    fieldRate:0.003,fieldAmount:3});
 MELON_TYPES.push({type:null,rarity:"epic",     emoji:"🍈🟣",key:"ascensionMelonEpic",  label:"Epic Ascension Melon",    fieldRate:0.003,fieldAmount:2});
 MELON_TYPES.push({type:null,rarity:"legendary",emoji:"🍈",  key:"ascensionMelon",      label:"Legendary Ascension Melon",fieldRate:0.003,fieldAmount:1});
 

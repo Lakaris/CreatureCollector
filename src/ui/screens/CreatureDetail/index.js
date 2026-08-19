@@ -9,7 +9,8 @@ import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_I
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../../core/equipment.js";
-import { formatAbilityStep, extractHeal, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
+import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
+import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
 import AscStars from "../../../ui/components/AscStars.js";
 import StatBar from "../../../ui/components/StatBar.js";
@@ -455,13 +456,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     );
   })();
 
-  const abilityTagPopupEl=abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-      React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[abilityTagPopup].label),
-      React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[abilityTagPopup].description),
-      React.createElement("button",{onClick:()=>setAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
-    )
-  );
+  const abilityTagPopupEl=abilityTagPopup&&React.createElement(AbilityTagPopup,{popup:abilityTagPopup,onClose:()=>setAbilityTagPopup(null)});
 
   if(equipDetailPage){
     const pi=EQUIPMENT_MAP[equipDetailPage];
@@ -1051,15 +1046,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
                 React.createElement("span",{className:"ability-name"},abl.name),
                 React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
-                  k==="special"&&React.createElement("button",{
+                  // Specials without a charge cost (e.g. Overload Sting, gated
+                  // purely by Restrained stacks) show no energy pill.
+                  k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{
                     onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                     style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
                   },"⚡ "+getSpecialChargeAt(def,displayIdx)),
-                  ...abilityTags.map(tag=>React.createElement("button",{
-                    key:tag,
-                    onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},
-                    style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
-                  },ABILITY_TAG_DEFS[tag].label))
+                  React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setAbilityTagPopup})
                 )
               ),
               React.createElement(PipRow,{filled:unlocked,total:5,isMax,

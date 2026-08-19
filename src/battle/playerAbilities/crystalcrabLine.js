@@ -18,6 +18,7 @@
 import { attackRoll, damageBoss } from "../damage.js";
 import { aChebDist, distToBoss } from "../geometry.js";
 import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * ratio of the current level's value to the basic's base value. */
@@ -77,7 +78,7 @@ export function makeCrystalcrabModule(cfg) {
       if (!best) return;
 
       const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
-      best.hp = Math.max(0, best.hp - dmg);
+      damageUnit(best, dmg);
       ctx.addDamageDealt(dmg);
       best.tauntTicks = STATUS_TICKS;
       best.tauntSourceUid = unit.uid;

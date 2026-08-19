@@ -3,6 +3,7 @@
 
 import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { randomOf } from "../../core/random.js";
+import { damageUnit } from "../hp.js";
 
 /** Every tile in one cardinal line out from the boss body to the grid edge. */
 function lineTiles(boss, dr, dc, gridRows, gridCols) {
@@ -46,7 +47,7 @@ export default {
     const tgt = aliveP.find((u) => u.uid === uid) || randomOf(aliveP);
     if (tgt) {
       const fromR = boss.row + 0.5, fromC = boss.col + 0.5;
-      tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.08));
+      damageUnit(tgt, ctx.dmg(0.08));
       tgt.shockTicks = STATUS_TICKS;
 
       // Extend the bolt past its target to the grid edge.
@@ -104,7 +105,7 @@ export default {
       newFx.push({ id: now + "shk" + tr + "," + tc, row: tr, col: tc, t: now, isShock: true });
     }
     for (const t of aliveP.filter((u) => tiles.some(([r, c]) => u.row === r && u.col === c))) {
-      t.hp = Math.max(0, t.hp - ctx.dmg(0.1));
+      damageUnit(t, ctx.dmg(0.1));
       t.shockTicks = STATUS_TICKS;
       newFx.push({ id: now + "vs" + t.uid, row: t.row, col: t.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     }

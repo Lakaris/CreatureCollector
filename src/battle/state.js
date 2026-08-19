@@ -2,7 +2,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
-import { calcStats, getSpecialCharge, getSpecialChargeAt } from "../core/creatures.js";
+import { calcStats, getSpecialCharge, getSpecialChargeAt, MAX_ABILITY_LEVEL } from "../core/creatures.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
@@ -18,15 +18,14 @@ function cooldownFor(spd) {
 }
 
 /**
- * Enemy creatures have no owned record to feed abilities with melons, so their
- * ability level is derived from `enemyLevel` where a screen provides one
- * (Arena's 1..500 curve maps evenly onto the 5 tiers -- a level-500 enemy
- * fights with a maxed kit, matching how its stats already mirror a maxed
- * player creature). Screens without an enemy level keep base-tier abilities.
+ * Enemy creatures have no owned record to feed abilities with melons, so every
+ * enemy everywhere (Arena, Dungeon, Labyrinth) fights with a fully upgraded
+ * kit: the last entry of each ability's `upgrades` table, and the matching
+ * special charge cost. Difficulty is expressed through stats -- enemy level,
+ * bossLevel scaling, and the Labyrinth's difficultyOverride -- not through
+ * holding abilities back.
  */
-function enemyAbilityLevel(enemyLevel) {
-  return enemyLevel ? Math.min(5, Math.floor(enemyLevel / 100)) : 0;
-}
+const ENEMY_ABILITY_LEVEL = MAX_ABILITY_LEVEL;
 
 /**
  * Build the unit lists for a battle.
@@ -119,19 +118,24 @@ export function makeArenaBattle(
     const lvlStats = enemyLevel
       ? calcStats(edef, { level: enemyLevel, ascensions: 0 })
       : null;
-    const spd = (lvlStats || edef?.stats)?.spd || 1;
+    // Labyrinth Boss creatures (every 10th floor): 2x2 body, +25% to every
+    // stat -- HP/ATK/DEF plus Speed and Haste -- on top of the floor's
+    // normal difficulty scaling.
+    const gm = edef?.__giant ? 1.25 : 1;
+    const spd = ((lvlStats || edef?.stats)?.spd || 1) * gm;
     const hp = Math.round(
-      ((lvlStats?.hp ?? edef?.stats?.hp ?? 60) * HP_SCALE) * (lvlStats ? 1 : 1 + hpMult)
+      ((lvlStats?.hp ?? edef?.stats?.hp ?? 60) * HP_SCALE) * (lvlStats ? 1 : 1 + hpMult) * gm
     );
     const atk = Math.round(
-      (lvlStats?.atk ?? edef?.stats?.atk ?? 30) * (lvlStats ? 1 : 1 + atkMult)
+      (lvlStats?.atk ?? edef?.stats?.atk ?? 30) * (lvlStats ? 1 : 1 + atkMult) * gm
     );
     const def = Math.round(
-      (lvlStats?.def ?? edef?.stats?.def ?? 20) * (lvlStats ? 1 : 1 + defMult)
+      (lvlStats?.def ?? edef?.stats?.def ?? 20) * (lvlStats ? 1 : 1 + defMult) * gm
     );
     return {
       uid: "e" + i,
       creatureId: edef.id,
+      size: edef?.__giant ? 2 : 1,
       row,
       col,
       prevRow: row,
@@ -144,10 +148,10 @@ export function makeArenaBattle(
       spd,
       isRanged: edef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
-      abilitySpeed: (lvlStats || edef?.stats)?.abilitySpeed || 1,
+      abilitySpeed: (((lvlStats || edef?.stats)?.abilitySpeed || 1) * gm),
       abilCharge: 0,
-      abilChargeMax: getSpecialChargeAt(edef, enemyAbilityLevel(enemyLevel)),
-      abilityLevels: (() => { const lvl = enemyAbilityLevel(enemyLevel); return { basic: lvl, special: lvl, unique: lvl }; })(),
+      abilChargeMax: getSpecialChargeAt(edef, ENEMY_ABILITY_LEVEL),
+      abilityLevels: { basic: ENEMY_ABILITY_LEVEL, special: ENEMY_ABILITY_LEVEL, unique: ENEMY_ABILITY_LEVEL },
     };
   });
 

@@ -2,6 +2,7 @@
 // Chases the nearest player and burns whatever it touches.
 
 import { MELEE_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 /** The cross of tiles sharing either of the boss's two rows or two columns. */
 function inCross(boss, r, c) {
@@ -29,7 +30,7 @@ export default {
       }
     }
     for (const u of aliveP.filter((u) => inCross(boss, u.row, u.col))) {
-      u.hp = Math.max(0, u.hp - ctx.dmg(0.2, 0.7, 0.3));
+      damageUnit(u, ctx.dmg(0.2, 0.7, 0.3));
       u.burnTicks = STATUS_TICKS;
     }
     boss.specialCd = 20;
@@ -41,7 +42,7 @@ export default {
 
     if (adj.length > 0 && boss.atkCd <= 0) {
       const tgt = adj[0];
-      tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.12));
+      damageUnit(tgt, ctx.dmg(0.12));
       tgt.burnTicks = STATUS_TICKS;
       boss.atkCd = 12;
       newFx.push({ id: now + 99991, row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });

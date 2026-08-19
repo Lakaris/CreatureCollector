@@ -4,6 +4,7 @@
 // not to whichever boss happened to summon it.
 
 import { CREATURE_MAP } from "../data/creatures.js";
+import { damageUnit } from "./hp.js";
 
 /** Vine minions: Entangle hits all 8 surrounding tiles every 15 ticks. */
 export function tickMinionSpecials(aliveE, aliveP, newFx, now) {
@@ -17,7 +18,7 @@ export function tickMinionSpecials(aliveE, aliveP, newFx, now) {
     );
     for (const p of adj) {
       const dmg = Math.max(1, Math.round(u.atk * (0.7 + Math.random() * 0.3) * 0.5));
-      p.hp = Math.max(0, p.hp - dmg);
+      damageUnit(p, dmg);
       newFx.push({ id: now + "ve" + u.uid + p.uid, row: p.row, col: p.col, t: now, isRanged: false, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     u.specialCd = 15;

@@ -18,6 +18,7 @@
 
 import { aChebDist } from "../geometry.js";
 import { STATUS_TICKS } from "../constants.js";
+import { tickStatMods } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * ratio of the current level's value to the basic's base value. */
@@ -49,11 +50,13 @@ function bonusExpiryTick(u) {
   if ((u.healImmuneTicks || 0) > 0) u.healImmuneTicks--;
   if ((u.slowTicks || 0) > 0) u.slowTicks--;
   if ((u.shockTicks || 0) > 0) u.shockTicks--;
-  if ((u.defShredTicks || 0) > 0 && !--u.defShredTicks) u.defShredStacks = 0;
   if ((u.tauntTicks || 0) > 0 && !--u.tauntTicks) u.tauntSourceUid = null;
-  if ((u.healDownTicks || 0) > 0) u.healDownTicks--;
-  if ((u.atkModTicks || 0) > 0 && (u.atkModPct || 0) < 0 && !--u.atkModTicks) u.atkModPct = 0;
-  if ((u.spdModTicks || 0) > 0 && (u.spdModPct || 0) < 0 && !--u.spdModTicks) u.spdModPct = 0;
+  if ((u.stunTicks || 0) > 0) u.stunTicks--;
+  if ((u.markedTicks || 0) > 0) u.markedTicks--;
+  // Negative stat-mod stacks (ATK/Speed/DEF Down, Healing Down) age one
+  // extra tick; buff stacks are untouched. Restrained has no timer (it
+  // never expires on its own), so Stone Skin's faster expiry can't touch it.
+  tickStatMods(u, true);
 }
 
 export function makePebbitModule(cfg) {

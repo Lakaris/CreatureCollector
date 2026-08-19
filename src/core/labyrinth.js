@@ -131,14 +131,9 @@ export function getEnemyEvolutionMixForDepth(depth) {
   return { base, mid, final };
 }
 
-/** Ability levels run 0-5 (matching the player creature cap in CreatureDetail).
- * Enemy ability level climbs one step every 200 floors and is fully maxed
- * (5) by floor 1000, staying maxed the rest of the way to floor 5000 --
- * abilities ramp up much faster than evolution stage does. */
-export const MAX_ENEMY_ABILITY_LEVEL = 5;
-export function getEnemyAbilityLevelForDepth(depth) {
-  return Math.min(MAX_ENEMY_ABILITY_LEVEL, Math.floor(depth / 200));
-}
+// Enemy ability level used to ramp with depth here; it no longer does --
+// every enemy in the game fights with a maxed kit (MAX_ABILITY_LEVEL, see
+// battle/state.js), so depth only scales stats.
 
 export const LABYRINTH_REWARD_DISPLAY = {
   gems: ["💎", "Gem", "Gems"],

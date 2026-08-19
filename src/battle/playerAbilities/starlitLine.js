@@ -6,15 +6,17 @@
 // crosses get healed.
 //
 // Special (Radiant Exchange) targets the CLOSEST enemy in range and bursts a
-// 3x3 area centered on it: everything enemy in that blast takes damage and a
-// flat ATK debuff; the whole party gets an ATK buff at the same time. Neither
-// stacks -- a fresh cast just refreshes the timer and magnitude.
+// 3x3 area centered on it: everything enemy in that blast takes damage and an
+// ATK Down stack; the whole party gets an ATK Up stack at the same time.
+// Per-source stacking (see applyStatMod in battle/status.js): one Starlit
+// maintains one stack, refreshed per cast; several Starlits stack.
 
 import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { aCardinalDist, distToBoss } from "../geometry.js";
 import { attackCooldown, damageBoss } from "../damage.js";
-import { speedPenalty } from "../status.js";
+import { speedPenalty, applyStatMod, healReceivedMultiplier } from "../status.js";
 import { getRootDef } from "../../core/creatures.js";
+import { damageUnit } from "../hp.js";
 
 const BLAZEHORNET_ROOT_ID = "blazehornet";
 
@@ -143,7 +145,7 @@ export function makeStarlitModule(cfg) {
 
       for (const e of aliveE) {
         if (onBeam(unit, best.tr, best.tc, e)) {
-          e.hp = Math.max(0, e.hp - dmg);
+          damageUnit(e, dmg);
           totalDmg += dmg;
         }
       }
@@ -152,7 +154,7 @@ export function makeStarlitModule(cfg) {
         totalDmg += dmg;
       }
       for (const a of aliveP) {
-        if (onBeam(unit, best.tr, best.tc, a)) a.hp = Math.min(a.maxHp, a.hp + heal);
+        if (onBeam(unit, best.tr, best.tc, a)) a.hp = Math.min(a.maxHp, a.hp + Math.round(heal * healReceivedMultiplier(a)));
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);
@@ -201,9 +203,8 @@ export function makeStarlitModule(cfg) {
 
       for (const e of aliveE) {
         if (Math.abs(e.row - centerR) <= 1 && Math.abs(e.col - centerC) <= 1) {
-          e.hp = Math.max(0, e.hp - dmg);
-          e.atkModTicks = atkModTicks;
-          e.atkModPct = -atkModPct;
+          damageUnit(e, dmg);
+          applyStatMod(e, { kind: "atk", pct: -atkModPct, src: unit.uid, ticks: atkModTicks });
           totalDmg += dmg;
         }
       }
@@ -216,8 +217,7 @@ export function makeStarlitModule(cfg) {
         }
         if (overlaps) {
           damageBoss(boss, dmg);
-          boss.atkModTicks = atkModTicks;
-          boss.atkModPct = -atkModPct;
+          applyStatMod(boss, { kind: "atk", pct: -atkModPct, src: unit.uid, ticks: atkModTicks });
           totalDmg += dmg;
         }
       }
@@ -225,9 +225,8 @@ export function makeStarlitModule(cfg) {
       // Whole-party buff -- not limited to the blast, this is the "exchange" half of Radiant Exchange.
       // At max level this also recovers HP, matching Radiant Exchange's final upgrade text.
       for (const a of aliveP) {
-        a.atkModTicks = atkModTicks;
-        a.atkModPct = atkModPct;
-        if (heal) a.hp = Math.min(a.maxHp, a.hp + heal);
+        applyStatMod(a, { kind: "atk", pct: atkModPct, src: unit.uid, ticks: atkModTicks });
+        if (heal) a.hp = Math.min(a.maxHp, a.hp + Math.round(heal * healReceivedMultiplier(a)));
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);

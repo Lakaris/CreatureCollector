@@ -7,6 +7,7 @@
 
 import { MELEE_RANGE } from "../constants.js";
 import { aStepToward } from "../geometry.js";
+import { damageUnit } from "../hp.js";
 
 /** Bonus damage multiplier when a knockback/pull is blocked by something. */
 const COLLISION_MULT = 0.5;
@@ -36,7 +37,7 @@ function knockAway(u, ctx) {
   const stepC = stepR === 0 ? Math.sign(dc) || 1 : 0;
   const nr = u.row + stepR, nc = u.col + stepC;
   if (isBlockedCell(nr, nc, gridRows, gridCols, allOcc, ctx)) {
-    u.hp = Math.max(0, u.hp - ctx.dmg(COLLISION_MULT));
+    damageUnit(u, ctx.dmg(COLLISION_MULT));
     pushCollisionFx(u, nr, nc, ctx);
     return;
   }
@@ -71,7 +72,7 @@ function pullToward(u, tiles, ctx) {
   }
   pushGustFx(u, fromR, fromC, ctx);
   if (blockedAt) {
-    u.hp = Math.max(0, u.hp - ctx.dmg(COLLISION_MULT));
+    damageUnit(u, ctx.dmg(COLLISION_MULT));
     pushCollisionFx(u, blockedAt[0], blockedAt[1], ctx);
   }
 }
@@ -84,7 +85,7 @@ export default {
     if (boss.specialCd > 0 || !aliveP.length) return;
 
     for (const u of aliveP) {
-      u.hp = Math.max(0, u.hp - ctx.dmg(0.16, 0.7, 0.3));
+      damageUnit(u, ctx.dmg(0.16, 0.7, 0.3));
       newFx.push({ id: now + "cychit" + u.uid, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
       pullToward(u, 2, ctx); // pushes its own gust-trail / collision-burst fx
     }
@@ -102,7 +103,7 @@ export default {
     }
 
     const tgt = adj[0];
-    tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.14));
+    damageUnit(tgt, ctx.dmg(0.14));
     newFx.push({ id: now + "gsthit" + tgt.uid, row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     knockAway(tgt, ctx); // pushes its own gust-trail / collision-burst fx
     boss.atkCd = 11;

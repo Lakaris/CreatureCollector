@@ -7,6 +7,7 @@
 // Rising Fury (passive attack growth over time).
 
 import { MELEE_RANGE } from "../constants.js";
+import { damageUnit } from "../hp.js";
 
 const NOVA_RANGE = 2;
 const FURY_INTERVAL_TICKS = 15;
@@ -20,7 +21,7 @@ export default {
     if (boss.specialCd > 0) return;
     const targets = ctx.targetsWithin(NOVA_RANGE);
     for (const u of targets) {
-      u.hp = Math.max(0, u.hp - ctx.dmg(0.18));
+      damageUnit(u, ctx.dmg(0.18));
       // Knock back 1 tile directly away from the boss's center.
       const dr = Math.sign(u.row - (boss.row + 0.5)) || 1;
       const dc = Math.sign(u.col - (boss.col + 0.5)) || 0;
@@ -45,7 +46,7 @@ export default {
     const adj = ctx.targetsWithin(MELEE_RANGE);
     if (adj.length > 0 && boss.atkCd <= 0) {
       const tgt = adj[0];
-      tgt.hp = Math.max(0, tgt.hp - ctx.dmg(0.12));
+      damageUnit(tgt, ctx.dmg(0.12));
       boss.atkCd = 12;
       newFx.push({ id: now + "dstrike", row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     } else if (adj.length === 0 && boss.moveCd <= 0 && ctx.aliveP.length) {

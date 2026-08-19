@@ -7,6 +7,10 @@ import { RARITY_STAT_MULT, LEVEL_STAT_CYCLE } from "../data/rarity.js";
 
 export const MAX_LEVEL = 500;
 export const MAX_ASCENSION = 50;
+/** Ability levels run 0-5 (the player cap enforced in CreatureDetail); every
+ * ability's `upgrades` table has 5 entries, so both 4 and 5 read as the last
+ * upgrade. Enemy creatures always fight at this level -- see makeArenaBattle. */
+export const MAX_ABILITY_LEVEL = 5;
 
 /** Walk `evolutionOf` back to the base form of a chain. */
 export function getRootDef(creatureId) {
@@ -36,20 +40,20 @@ export function getEvolutionStage(creatureId) {
   return n;
 }
 
-/** Fallback special-ability charge for defs that don't declare one (see data/creatures.js). */
-export const DEFAULT_SPECIAL_CHARGE = 15;
-
 /**
  * Ticks of battle time needed to fully charge this creature's special ability.
  * Every battle tick adds the creature's Haste (abilitySpeed, base 1) to the
  * charge; the ability triggers when the charge reaches this number, then the
  * bar resets and charges again. Values are placeholders in data/creatures.js
  * until abilities are implemented for real.
+ *
+ * Returns 0 for specials with no `charge` in their data: those are chargeless
+ * -- no energy cost, no ⚡ pill, no charge bar -- and fire off their own
+ * condition instead (e.g. Overload Sting's 20-stack Restrained gate).
  */
 export function getSpecialCharge(defOrId) {
   const def = typeof defOrId === "string" ? CREATURE_MAP[defOrId] : defOrId;
-  if (!def?.abilities?.special) return 0; // no special ability, nothing to charge
-  return def.abilities.special.charge || DEFAULT_SPECIAL_CHARGE;
+  return def?.abilities?.special?.charge || 0;
 }
 
 /**

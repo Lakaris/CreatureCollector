@@ -6,7 +6,8 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getChain, getSkinsForCreature, getSpecialCharge, getSpecialChargeAt } from "../../core/creatures.js";
-import { formatAbilityDisplay, formatUpgradeStep, ABILITY_TAG_DEFS, getAbilityTags, formatStarlitAbilityLevel, formatPlainAbilityLevel } from "../../core/abilityText.js";
+import { formatAbilityDisplay, formatUpgradeStep, getAbilityTags, formatStarlitAbilityLevel, formatPlainAbilityLevel } from "../../core/abilityText.js";
+import { AbilityTagPills, AbilityTagPopup } from "../../ui/components/AbilityTagPills.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
 
@@ -40,13 +41,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
   });
 
   return React.createElement("div",swipeHandlers,
-    abilityTagPopup&&React.createElement("div",{onClick:()=>setAbilityTagPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:260,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},ABILITY_TAG_DEFS[abilityTagPopup].label),
-        React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},ABILITY_TAG_DEFS[abilityTagPopup].description),
-        React.createElement("button",{onClick:()=>setAbilityTagPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
-      )
-    ),
+    abilityTagPopup&&React.createElement(AbilityTagPopup,{popup:abilityTagPopup,onClose:()=>setAbilityTagPopup(null)}),
     skinPreview&&React.createElement("div",{className:"modal-overlay",onClick:()=>setSkinPreview(null)},
       React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
         React.createElement("div",{style:{fontSize:16,fontWeight:600,color:"#000",marginBottom:4}},skinPreview.name),
@@ -134,17 +129,15 @@ function DexEntry({def,onBack,onNavigate,navList}){
             React.createElement("div",{style:{flex:1,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
               React.createElement("span",{className:"ability-name"},abl.name),
               React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
-                k==="special"&&React.createElement("button",{
+                // Specials without a charge cost (e.g. Overload Sting, gated
+                // purely by Restrained stacks) show no energy pill.
+                k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{
                   onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                   style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
                 // The dex shows the whole kit, so a cost that drops at the
                 // final upgrade reads as "10→9".
                 },(()=>{const base=getSpecialCharge(def);const maxed=getSpecialChargeAt(def,4);return "⚡ "+(maxed===base?base:base+"→"+maxed);})()),
-                ...abilityTags.map(tag=>React.createElement("button",{
-                  key:tag,
-                  onClick:(e)=>{e.stopPropagation();setAbilityTagPopup(tag);},
-                  style:{fontSize:9,fontWeight:800,color:"#534AB7",background:"#EEEDFE",border:"1px solid rgba(83,74,183,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
-                },ABILITY_TAG_DEFS[tag].label))
+                React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setAbilityTagPopup})
               )
             )
           ),

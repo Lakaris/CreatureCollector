@@ -5,8 +5,9 @@ import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG, CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { getDisplayEmoji } from "../../core/creatures.js";
+import { getDisplayArt } from "../../core/creatures.js";
 import AscStars from "../../ui/components/AscStars.js";
+import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import CreatureDetail from "../../ui/screens/CreatureDetail/index.js";
 import DexScreen from "../../ui/screens/DexScreen.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
@@ -192,31 +193,39 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
         )
       :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")?{marginTop:34}:undefined},
           filtered.map(({owned:o,def:d},idx)=>{
-            const displayEmoji=getDisplayEmoji(d,o,unlockedSkins);
+            const art=getDisplayArt(d,o,unlockedSkins);
             const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")&&idx===0;
             return React.createElement("div",{key:o.id,className:"creature-card","data-guide-target":(flairGuideStep==="collection"&&idx===0)?"collection":(candyGuideStep==="candyCollection"&&idx===0)?"candyCollection":undefined,onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");if(flairGuideStep==="collection"&&idx===0)setFlairGuideStep("flair");if(candyGuideStep==="candyCollection"&&idx===0)setCandyGuideStep("candySkins");},style:{position:"relative",paddingTop:30}},
+              // Art spans the entire card, scaled uniformly (objectFit
+              // contain -- as large as fits without distortion or cropping).
+              // Rendered first so the absolutely-positioned badges and name
+              // overlay, which come later in DOM order, paint on top of it.
+              // NOTE: a sprite poster here would stretch to the card's aspect
+              // ratio; square-box it when animated collection art first lands.
+              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"100%"}}),
               showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
-              React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
-              d.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji),
-              d.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[d.role].emoji),
+              // Badge column, top-left: Type, then Role, then Range.
+              React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},
+                React.createElement("span",{style:{fontSize:14,lineHeight:1}},(TYPE_EMOJI[d.type]||d.type)),
+                d.role&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ROLE_CONFIG[d.role].emoji),
+                d.attackType&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[d.attackType].emoji)
+              ),
+              // Level, top-right: plain text (no pill), with a white halo so
+              // it stays legible when full-card art reaches the corner.
+              React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:12,fontWeight:700,color:"#666",lineHeight:1,pointerEvents:"none",textShadow:"0 0 3px #fff, 0 0 3px #fff"}},"Lv "+o.level),
               o.ascensions>0&&React.createElement("div",{style:{position:"absolute",top:5,left:0,right:0,textAlign:"center",lineHeight:1}},React.createElement(AscStars,{n:o.ascensions})),
-              d.image
-                ?React.createElement("div",{style:{position:"relative",height:72,borderRadius:8,overflow:"hidden"}},
-                    React.createElement("img",{src:d.image,style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 75%",display:"block"}}),
-                    React.createElement("div",{style:{position:"absolute",left:0,right:0,bottom:0,padding:"10px 4px 4px",background:"linear-gradient(to top,rgba(255,255,255,0.92),rgba(255,255,255,0))"}},
-                      React.createElement("div",{className:"creature-name",style:{marginBottom:2}},d.name),
-                      React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",flexWrap:"wrap",alignItems:"center"}},
-                        React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
-                      )
-                    )
-                  )
-                :[
-                    React.createElement("div",{key:"e",className:"creature-emoji"},displayEmoji),
-                    React.createElement("div",{key:"n",className:"creature-name"},d.name),
-                    React.createElement("div",{key:"l",style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
-                      React.createElement("span",{className:"lv-badge"},"Lv "+o.level)
-                    )
-                  ]
+              // No creature name or bottom badge on collection cards -- the
+              // art/emoji identifies the creature, and the level sits as
+              // plain text in the top-right corner. (The Dex keeps names;
+              // its cards are taller as a result.) Both branches occupy the
+              // same 72px block so every card is the same height whether it
+              // has art or not: full-card art is the absolute layer above
+              // (the block is just its height spacer), while emoji center
+              // inside the block.
+              art.kind!=="emoji"
+                ?React.createElement("div",{style:{height:72}})
+                :React.createElement("div",{style:{height:72,display:"flex",alignItems:"center",justifyContent:"center"}},
+                    React.createElement(CreatureIcon,{def:d,ownedData:o,unlockedSkins,still:true,size:26}))
             );
           })
         )

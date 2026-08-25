@@ -16,7 +16,8 @@
 // GameProvider for the full list of what's persisted.
 
 import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "../react.js";
-import { DUNGEON_BOSSES, ARENA_TABS } from "../data/bosses.js";
+import { DUNGEON_BOSSES, ARENA_TABS, ARENA_TAB_TYPE } from "../data/bosses.js";
+import { CREATURE_MAP } from "../data/creatures.js";
 import { isPastEasternNoon, easternNoonDayKey } from "../core/dates.js";
 import { DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, DUNGEON_PASS_OVERFLOW_MULT } from "../battle/constants.js";
 
@@ -47,6 +48,28 @@ const SET_FIELDS = [
   "dailyMissionsDone", "collectedTreasures", "completedTreasureSets",
   "purchasedOneTimeBundles",
 ];
+
+/**
+ * Dungeon and Arena deployments used to be ONE flat grid ("r,c" -> creatureId)
+ * shared by every boss / arena tab; they're now keyed by that first
+ * ("fire" -> {"r,c": id}). Saves written before the change are detected by
+ * their comma-bearing top-level keys and seeded onto every key in `keys`,
+ * which is exactly what the old shared grid looked like from the player's
+ * side. `allow` (optional) drops creatures the destination key wouldn't
+ * accept -- the type arenas only take their own type, so a shared team that
+ * happened to hold an Earth creature mustn't migrate one into the Fire arena.
+ */
+function nestPlanGridByKey(saved, keys, allow) {
+  if (!saved || typeof saved !== "object") return {};
+  const isLegacyFlat = Object.keys(saved).some((k) => k.includes(","));
+  if (!isLegacyFlat) return saved;
+  return Object.fromEntries(keys.map((k) => [
+    k,
+    allow
+      ? Object.fromEntries(Object.entries(saved).filter(([, id]) => allow(k, id)))
+      : { ...saved },
+  ]));
+}
 
 function loadSave() {
   try {
@@ -220,8 +243,22 @@ export function GameProvider({ children }) {
   // screen state) so a deployment survives backing out of the planning phase
   // or closing the app entirely -- previously each screen wiped its grid the
   // moment the player tapped the back arrow.
-  const [arenaPlanGrid, setArenaPlanGrid] = useState(() => initialSave?.arenaPlanGrid ?? {});
-  const [dungeonPlanGrid, setDungeonPlanGrid] = useState(() => initialSave?.dungeonPlanGrid ?? {});
+  // The Arena and Dungeon ones are nested a level deeper -- arena tab id /
+  // boss key -> grid -- so each keeps its own team (a Fire deployment
+  // shouldn't follow you onto the Water boss).
+  const [arenaPlanGrid, setArenaPlanGrid] = useState(() =>
+    nestPlanGridByKey(
+      initialSave?.arenaPlanGrid,
+      ARENA_TABS.map((t) => t.id),
+      (tabId, creatureId) => {
+        const reqType = ARENA_TAB_TYPE[tabId];
+        return !reqType || CREATURE_MAP[creatureId]?.type === reqType;
+      }
+    )
+  );
+  const [dungeonPlanGrid, setDungeonPlanGrid] = useState(() =>
+    nestPlanGridByKey(initialSave?.dungeonPlanGrid, DUNGEON_BOSSES.map((b) => b.key))
+  );
   const [labyrinthPlanGrid, setLabyrinthPlanGrid] = useState(() => initialSave?.labyrinthPlanGrid ?? {});
   const [dailyBossPlanGrid, setDailyBossPlanGrid] = useState(() => initialSave?.dailyBossPlanGrid ?? {});
 

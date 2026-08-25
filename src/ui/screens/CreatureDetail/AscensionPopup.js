@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "../../../react.js";
 import { CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../../data/rarity.js";
 import { calcStats } from "../../../core/creatures.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 
-function AscensionPopup({def,displayEmoji,ascPopup,ownedData,onClose}){
+function AscensionPopup({def,unlockedSkins,ascPopup,ownedData,onClose}){
   const statsBefore=calcStats(def,{...ownedData,ascensions:ascPopup-1});
   const statsAfter=calcStats(def,{...ownedData,ascensions:ascPopup});
   const[showNew,setShowNew]=useState(false);
@@ -18,7 +19,7 @@ function AscensionPopup({def,displayEmoji,ascPopup,ownedData,onClose}){
       onClick:e=>e.stopPropagation(),
       style:{background:"#fff",borderRadius:20,padding:"28px 24px",textAlign:"center",maxWidth:300,width:"90%",boxShadow:"0 8px 32px rgba(0,0,0,0.2)"}
     },
-      React.createElement("div",{style:{fontSize:60,marginBottom:6}},displayEmoji),
+      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:60,style:{margin:"0 auto 6px"}}),
       React.createElement("div",{style:{fontSize:20,fontWeight:700,marginBottom:4}},def.name),
       React.createElement("div",{style:{marginBottom:16}},
         React.createElement("span",{style:{fontSize:26,fontWeight:700,color:"#EF9F27",letterSpacing:3}},ascPopup<5?"★".repeat(ascPopup):ascPopup+"★"),

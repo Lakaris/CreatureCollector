@@ -552,7 +552,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       onClick:()=>{setTutorialRestricted(false);setTutorialStep(null);},
       style:{position:"fixed",left:16,right:16,bottom:96,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:15,cursor:"pointer"}
     },
-      React.createElement("div",{style:{fontSize:14,lineHeight:1.5,color:"#333"}},"You sprinkle the fertilizer and suddenly your field looks healthier than ever! Crops are produced at a faster rate now."),
+      React.createElement("div",{style:{fontSize:14,lineHeight:1.5,color:"#333"}},"You sprinkle the fertilizer and suddenly your field looks healthier than ever!"),
       React.createElement("div",{style:{fontSize:11,color:"#aaa",textAlign:"right",marginTop:8}},"Tap to close")
     )
   );

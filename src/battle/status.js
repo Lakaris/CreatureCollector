@@ -21,7 +21,7 @@ function dotDamage(boss, rate) {
 export function tickStatusEffects(aliveP, boss, newFx, now) {
   for (const u of aliveP) {
     // Burn — fire boss's Burning Touch (boss-ATK scaled), or an enemy
-    // Blazehornet's Burning Bond, which stores its own source ATK on the
+    // Emberstar's Burning Bond, which stores its own source ATK on the
     // target (the fire boss never sets burnSourceAtk).
     if ((u.burnTicks || 0) > 0) {
       const dmg = u.burnSourceAtk
@@ -39,10 +39,16 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
       newFx.push({ id: now + "psn" + u.uid, row: u.row, col: u.col, t: now, isPoison: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     if ((u.rootTicks || 0) > 0) u.rootTicks--;
-    // Shadow DoT + weaken + heal-block — dark boss.
+    // Damage Over Time + weaken + heal-block — dark boss's Shadow DoT, or an
+    // enemy Doomshade's Spectral Rake, which stores its own source ATK on the
+    // target like Burning Bond does (the dark boss never sets dotSourceAtk).
     if ((u.dotTicks || 0) > 0) {
-      damageUnit(u, dotDamage(boss, DOT_RATES.dot));
+      const dotDmg = u.dotSourceAtk
+        ? Math.max(1, Math.round(u.dotSourceAtk * 0.035))
+        : dotDamage(boss, DOT_RATES.dot);
+      damageUnit(u, dotDmg);
       u.dotTicks--;
+      if (!u.dotTicks) u.dotSourceAtk = 0;
       newFx.push({ id: now + "dot" + u.uid, row: u.row, col: u.col, t: now, isDark: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     if ((u.weakTicks || 0) > 0) u.weakTicks--;
@@ -194,6 +200,67 @@ export function tickTimedMods(u) {
   if ((u.stunTicks || 0) > 0) u.stunTicks--;
   if ((u.intangibleTicks || 0) > 0) u.intangibleTicks--;
   if ((u.markedTicks || 0) > 0) u.markedTicks--;
+  if ((u.frostbiteTicks || 0) > 0) {
+    u.frostbiteTicks--;
+    if (!u.frostbiteTicks) u.frostbiteStacks = 0;
+  }
+  if ((u.immortalTicks || 0) > 0) u.immortalTicks--;
+  if ((u.dartShredTicks || 0) > 0) {
+    u.dartShredTicks--;
+    if (!u.dartShredTicks) u.dartShredPct = 0;
+  }
+  // Heal Over Time: restore hotAmount per tick. Heal Block and Healing Down
+  // apply at each tick, like any other heal (5 Healing Down stacks = 0).
+  if ((u.hotTicks || 0) > 0) {
+    u.hotTicks--;
+    if ((u.healImmuneTicks || 0) <= 0 && u.hp > 0) {
+      const amt = Math.round((u.hotAmount || 1) * healReceivedMultiplier(u));
+      if (amt > 0) u.hp = Math.min(u.maxHp, u.hp + amt);
+    }
+    if (!u.hotTicks) u.hotAmount = 0;
+  }
+}
+
+/**
+ * Plume Dart's ramping Defense shred (Quetzalis line): every landed dart
+ * shaves another slice off the victim's DEF, up to the cap. One shared
+ * refreshing timer, all progress lost on expiry -- a grind, distinct from
+ * the per-source Defense Down stat mod (both multiply in unitDamage).
+ */
+export const DART_SHRED_CAP_PCT = 50;
+export function applyDartShred(u, pct) {
+  u.dartShredPct = Math.min(DART_SHRED_CAP_PCT, (u.dartShredPct || 0) + pct);
+  u.dartShredTicks = 6;
+}
+export function dartShredMultiplier(u) {
+  if ((u.dartShredTicks || 0) <= 0) return 1;
+  return Math.max(0, 1 - (u.dartShredPct || 0) / 100);
+}
+
+/**
+ * Frostbite (Cryo Bomb at max level): Water creatures deal 5% more damage
+ * to the carrier per stack. Stacks like Burn -- +1 per application with one
+ * shared refreshing timer -- capped at 5 (+25%).
+ */
+export const FROSTBITE_STACK_CAP = 5;
+export function applyFrostbite(u) {
+  u.frostbiteStacks = Math.min(FROSTBITE_STACK_CAP, (u.frostbiteStacks || 0) + 1);
+  u.frostbiteTicks = 6;
+}
+export function frostbiteMultiplier(attackerIsWater, defender) {
+  if (!attackerIsWater || (defender.frostbiteTicks || 0) <= 0) return 1;
+  return 1 + (defender.frostbiteStacks || 0) * 0.05;
+}
+
+/**
+ * Heal Over Time (e.g. Shared Flame at max level): a BUFF -- untouched by
+ * dispelDebuffs -- restoring `perTick` Health per tick, ticked in
+ * tickTimedMods above. One shared timer; reapplying keeps the stronger
+ * per-tick amount and the longer remaining duration, never stacks.
+ */
+export function applyHealOverTime(u, perTick, ticks = 6) {
+  u.hotAmount = Math.max(u.hotAmount || 0, perTick);
+  u.hotTicks = Math.max(u.hotTicks || 0, ticks);
 }
 
 /**
@@ -209,6 +276,7 @@ export function dispelDebuffs(u) {
   u.poisonTicks = 0;
   u.rootTicks = 0;
   u.dotTicks = 0;
+  u.dotSourceAtk = 0;
   u.weakTicks = 0;
   u.healImmuneTicks = 0;
   u.slowTicks = 0;
@@ -217,6 +285,10 @@ export function dispelDebuffs(u) {
   u.tauntSourceUid = null;
   u.stunTicks = 0;
   u.markedTicks = 0;
+  u.frostbiteTicks = 0;
+  u.frostbiteStacks = 0;
+  u.dartShredTicks = 0;
+  u.dartShredPct = 0;
   clearNegativeStatMods(u);
 }
 

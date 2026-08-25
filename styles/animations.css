@@ -1,4 +1,4 @@
-/* Keyframes. The atk*/melee/boss/element ones drive battle FX. */
+/* Keyframes. The atk-, melee-, boss- and element- ones drive battle FX. */
 @keyframes revealPop{from{opacity:0;transform:scale(.8) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes eggShake{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(7deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
 @keyframes fadeIn{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -21,3 +21,8 @@
 @keyframes earthEmpSlam{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.1)}20%{opacity:1}70%{opacity:0.6}100%{opacity:0;transform:translate(-50%,-50%) scale(5)}}
 @keyframes windGust{0%{opacity:0;transform:scaleX(0.2)}30%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
 @keyframes windCollision{0%{opacity:1;transform:translate(-50%,-50%) scale(0.2) rotate(0deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(25deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(45deg)}}
+/* Creature sprite-strip playback, driven by CreatureIcon. The element sizes its
+   background to frames*100% wide, so walking background-position-x from 0% to
+   100% steps cell by cell at any icon size -- this one keyframe serves every
+   creature, frame count, and render size. Pair it with steps(n,jump-none). */
+@keyframes spritePlay{from{background-position-x:0%}to{background-position-x:100%}}

@@ -16,6 +16,7 @@ import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { LABYRINTH_REWARD_DISPLAY as REWARD_DISPLAY, getDepthReward, MAX_LABYRINTH_DEPTH, getEnemyLevelForDepth, getEnemyEvolutionMixForDepth, getDifficultyMultipliers } from "../../../core/labyrinth.js";
 import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
@@ -273,7 +274,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       for (const u of [...s.playerUnits, ...s.enemyUnits]) {
         const refs = unitDomRefs.current.get(u.uid); if (!refs) continue;
         const { el, hpEl } = refs;
-        if (u.hp <= 0) { el.style.opacity = "0"; continue; }
+        // Defeated units keep their DOM node (only summons are pruned), so a
+        // creature with defeat art lingers at its death tile while it plays.
+        if (u.hp <= 0) { el.style.opacity = String(battleUnitOpacity(u, now, CREATURE_MAP[u.creatureId])); continue; }
         el.style.opacity = "1";
         const t = aEase(Math.min(1, (now - u.lastMoveTime) / moveAnimRef.current));
         el.style.left = ((u.prevCol + (u.col - u.prevCol) * t) * ARENA_TILE) + "px";
@@ -302,8 +305,17 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     if (tl <= 0) { stopLoops(); onFight && onFight(); setTimeout(() => setBattleOutcome("lost"), 600); return; }
     const anyP = s.playerUnits.some((u) => u.hp > 0);
     const anyE = s.enemyUnits.some((u) => u.hp > 0);
+    // Winners hold a victory pose for a beat before the outcome overlay;
+    // one more snapshot so React renders the stamped state.
+    const victorySnap = () => setBSnap({
+      playerUnits: s.playerUnits.map((u) => ({ ...u })),
+      enemyUnits: s.enemyUnits.map((u) => ({ ...u })),
+      damageDealt: { ...s.damageDealt },
+    });
     if (!anyE) {
       stopLoops();
+      const stamped = stampVictors(s.playerUnits, now);
+      victorySnap();
       wonDepthRef.current = depth;
       const reward = getDepthReward(depth);
       applyRewards(setCurrencies, reward);
@@ -315,11 +327,13 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         setLabyrinthDepth((d) => Math.min(MAX_LABYRINTH_DEPTH, (d || 1) + 1));
         setLabyrinthBestDepth((b) => Math.min(MAX_LABYRINTH_DEPTH, Math.max(b || 1, (depth || 1) + 1)));
         setBattleOutcome("won");
-      }, 1200);
+      }, stamped ? VICTORY_LINGER_MS : 1200);
     } else if (!anyP) {
       stopLoops();
+      const stamped = stampVictors(s.enemyUnits, now);
+      victorySnap();
       onFight && onFight();
-      setTimeout(() => setBattleOutcome("lost"), 600);
+      setTimeout(() => setBattleOutcome("lost"), stamped ? VICTORY_LINGER_MS : 600);
     }
   }
   // Floor 10 is the first Boss floor: the very first time the player reaches
@@ -396,7 +410,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   }, [battleOutcome]);
   React.useEffect(() => () => { stopLoops(); clearContinueTimer(); }, []);
 
-  const abilityLabels = { basic: "Basic", special: "Special", unique: "Unique" };
+  const abilityLabels = { basic: "Basic", special: "Special", unique:"Passive" };
 
   if (battleOutcome) {
     const won = battleOutcome === "won";
@@ -497,13 +511,13 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               else unitDomRefs.current.delete(u.uid);
             },
             onClick: u.hp > 0 ? () => setBattleSelectedUid(u.uid) : undefined,
-            style: { position: "absolute", width: ARENA_TILE * (u.size || 1), height: ARENA_TILE * (u.size || 1), display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: u.hp > 0 ? 1 : 0, zIndex: (u.size || 1) > 1 ? 6 : 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default", borderRadius: (u.size || 1) > 1 ? 10 : 0, boxShadow: (u.size || 1) > 1 ? "inset 0 0 0 2px rgba(245,158,11,0.75), 0 0 10px rgba(245,158,11,0.45)" : "none" },
+            style: { position: "absolute", width: ARENA_TILE * (u.size || 1), height: ARENA_TILE * (u.size || 1), display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: battleUnitOpacity(u, Date.now(), CREATURE_MAP[u.creatureId]), zIndex: (u.size || 1) > 1 ? 6 : 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default", borderRadius: (u.size || 1) > 1 ? 10 : 0, boxShadow: (u.size || 1) > 1 ? "inset 0 0 0 2px rgba(245,158,11,0.75), 0 0 10px rgba(245,158,11,0.45)" : "none" },
           },
             React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
-              React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: (u.size || 1) > 1 ? 46 : 20 }),
-              (u.size || 1) > 1 && React.createElement("div", { style: { position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", fontSize: 13, lineHeight: 1, pointerEvents: "none" } }, "👑"),
-              (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: -4, right: -6, fontSize: 10, lineHeight: 1 } }, "🔥"),
-              (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
+              React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: ARENA_TILE * (u.size || 1), state: battleArtState(u, Date.now(), moveAnimRef.current) }),
+              (u.size || 1) > 1 && React.createElement("div", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 13, lineHeight: 1, pointerEvents: "none" } }, "👑"),
+              (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 10, lineHeight: 1 } }, "🔥"),
+              (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
             ),
             React.createElement("div", { style: { position: "absolute", bottom: 3, left: 3, right: 3, height: 3, background: "#ddd", borderRadius: 2, overflow: "hidden" } },
               React.createElement("div", { className: "hp-fill", style: { height: "100%", width: (u.hp / u.maxHp * 100) + "%", background: u.uid[0] === "e" ? "#ef4444" : (u.burnTicks||0)>0 ? "#f97316" : "#22c55e", borderRadius: 2 } })
@@ -516,8 +530,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           )),
         ),
         React.createElement("div", { className: "battle-side-panel" }, selectedUnit ? React.createElement(UnitInfoPanel, {
-          emoji: CREATURE_MAP[selectedUnit.creatureId]?.emoji || "❓",
-          image: CREATURE_MAP[selectedUnit.creatureId]?.image,
+          def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
           subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? level : (owned?.[selectedUnit.creatureId]?.level || 1)),
           hp: selectedUnit.hp, maxHp: selectedUnit.maxHp, shield: selectedUnit.shield,
@@ -612,13 +625,13 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                 if (d.__giant) {
                   return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", pointerEvents: "none" } },
                     React.createElement("div", { style: { position: "absolute", top: 0, left: 0, width: ARENA_TILE * 2, height: ARENA_TILE * 2, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, borderRadius: 10, boxShadow: "inset 0 0 0 2px rgba(245,158,11,0.75)" } },
-                      React.createElement(CreatureIcon, { def: d, size: 54 }),
+                      React.createElement(CreatureIcon, { def: d, size: ARENA_TILE * 2 }),
                       React.createElement("span", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 12, lineHeight: 1 } }, "👑"),
                       React.createElement("span", { style: { position: "absolute", top: 3, left: 4, fontSize: 9, lineHeight: 1 } }, TYPE_EMOJI[d.type] || ""),
                       React.createElement("span", { style: { position: "absolute", top: 3, right: 4, fontSize: 9, lineHeight: 1 } }, d.attackType === "Ranged" ? "🏹" : "⚔️")
                     ));
                 }
-                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: 26 }));
+                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: ARENA_TILE }));
               })());
             })).flat()
           )

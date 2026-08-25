@@ -7,6 +7,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { makeOwnedCreature, getChain, MAX_ABILITY_LEVEL } from "../../core/creatures.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
+import { mitigatedDamage } from "../../battle/damage.js";
 import { runBattleTick } from "../../battle/tick.js";
 import { aEase } from "../../battle/geometry.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
@@ -37,8 +38,8 @@ const TUTORIAL_ITEM_ID = "com_hp_atk";
 
 // Index of the line after which the egg-choice screen appears.
 const EGG_CHOICE_AFTER_LINE = 1;
-// Fire / Water / Nature starter eggs: Emberpup, Puddlet (heron), Vixling (woodland fox).
-const STARTER_CHOICES = ["emberpup", "sproutlet", "ashpup"];
+// Fire / Water / Nature starter eggs: Emberpup, Waddlepop (penguin), Vixling (woodland fox).
+const STARTER_CHOICES = ["emberpup", "frosthydra", "ashpup"];
 
 /** Full evolution chain, base to final, for a starter id -- shown as a preview above the egg row. */
 function chainDefsFor(starterId) {
@@ -272,7 +273,7 @@ function TutorialOverlay() {
     const playerAtk = state.playerUnits[0]?.atk || 30;
     const HITS_TO_DEFEAT = 2;
     for (const u of state.enemyUnits) {
-      const estHitDmg = Math.max(1, Math.round(playerAtk - (u.def || 0) * 0.35));
+      const estHitDmg = Math.max(1, Math.round(mitigatedDamage(playerAtk, u.def || 0)));
       u.maxHp = u.hp = Math.max(30, estHitDmg * HITS_TO_DEFEAT);
       u.atk = Math.max(1, Math.round(u.atk * 0.1));
     }
@@ -413,7 +414,7 @@ function TutorialOverlay() {
                     React.createElement(
                       "div",
                       { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2 } },
-                      React.createElement("span", { style: { fontSize: 40, lineHeight: 1 } }, d.emoji),
+                      React.createElement(CreatureIcon, { def: d, size: 40 }),
                       React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: "#222" } }, d.name)
                     )
                   )
@@ -518,7 +519,7 @@ function TutorialOverlay() {
             textAlign: "center",
           },
         },
-        React.createElement("div", { style: { fontSize: 88, lineHeight: 1 } }, pickedDef.emoji),
+        React.createElement(CreatureIcon, { def: pickedDef, size: 88, style: { margin: "0 auto" } }),
         React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "#222" } }, pickedDef.name),
         React.createElement(
           "div",
@@ -752,7 +753,7 @@ function TutorialOverlay() {
                           },
                           React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 9, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""),
                           React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 9, lineHeight: 1, pointerEvents: "none" } }, attackIcon(d)),
-                          React.createElement(CreatureIcon, { def: d, size: 32 })
+                          React.createElement(CreatureIcon, { def: d, size: TUTORIAL_TILE })
                         )
                     );
                   })
@@ -1032,7 +1033,7 @@ function TutorialOverlay() {
                     },
                     style: { position: "absolute", width: TUTORIAL_TILE, height: TUTORIAL_TILE, display: "flex", alignItems: "center", justifyContent: "center", opacity: u.hp > 0 ? 1 : 0, zIndex: 5 },
                   },
-                  React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: 32 }),
+                  React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: TUTORIAL_TILE }),
                   (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 13, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!"),
                   React.createElement(
                     "div",

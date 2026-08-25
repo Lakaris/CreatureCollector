@@ -1,14 +1,18 @@
 // Flair tab: feed bananas to unlock titles, auras, backgrounds, and items.
 
-import React, { useState, useEffect } from "../../../react.js";
+import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import AscStars from "../../../ui/components/AscStars.js";
+import StatBar from "../../../ui/components/StatBar.js";
+import { STAT_CYCLE } from "../../../data/rarity.js";
 
-function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep}){
+function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep}){
   const { setOwned, currencies, setCurrencies, lastFreeBananaDate, setLastFreeBananaDate } = useGame();
   const freeBananaAvailable = lastFreeBananaDate !== easternNoonDayKey();
   const [flairTab,setFlairTab]=useState("feed");
@@ -67,11 +71,49 @@ function FlairSection({displayEmoji,def,onBack,onBananaUsed,ownedData,flairGuide
     }
   }
   const selCount=currencies[selectedBanana.id]||0;
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:10,display:"flex",flexDirection:"column",overflow:"hidden"}},
-    React.createElement(ScreenHeader,{title:def.name,onBack,edgeToEdge:false}),
-    React.createElement("div",{style:{textAlign:"center",padding:"12px 0 12px",flexShrink:0,position:"relative"}},
-      React.createElement("span",{style:{fontSize:64,lineHeight:1,display:"block",marginBottom:6}},displayEmoji),
-      React.createElement("div",{style:{fontSize:18,fontWeight:600,color:"#000"}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
+
+  // Flash any stat that just went up (a fed flair's buff landing), so the
+  // player sees the gain the moment it happens. Clearing the set afterwards
+  // is what lets the same stat re-flash on the next unlock -- toggling the
+  // animation style off and on restarts it.
+  const [statFlash,setStatFlash]=useState(()=>new Set());
+  const prevStatsRef=useRef(statsWithEquip);
+  useEffect(()=>{
+    const prev=prevStatsRef.current;
+    prevStatsRef.current=statsWithEquip;
+    const changed=STAT_CYCLE.filter(s=>statsWithEquip[s]>prev[s]);
+    if(!changed.length)return;
+    setStatFlash(new Set(changed));
+    const t=setTimeout(()=>setStatFlash(new Set()),1600);
+    return()=>clearTimeout(t);
+  },[STAT_CYCLE.map(s=>statsWithEquip[s]).join(",")]);
+  // overflowY auto + a stable scrollbar gutter keep this overlay's content
+  // exactly as wide as the creature page's (which scrolls, so its content
+  // sits a scrollbar-width narrower than the viewport) -- without both, the
+  // header card and art shift sideways when entering/leaving this page.
+  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:10,display:"flex",flexDirection:"column",overflowY:"auto",overflowX:"hidden",scrollbarGutter:"stable"}},
+    // Header title carries the equipped flair title, matching the creature
+    // page -- and it updates live when a title is equipped on this page.
+    // The invisible 26px right-slot spacer keeps this header exactly as tall
+    // as the creature page's, whose Flair Effects/Evolutions buttons are
+    // taller than a bare title line.
+    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,edgeToEdge:false,right:React.createElement("div",{style:{width:1,height:26}})}),
+    // Header card mirrors the creature page's exactly: one white card
+    // wrapping both the transparent 130px art (same position -- 12px gap
+    // below the header + 12px card padding on both pages) and the stat row,
+    // with no name text (the name is in the ScreenHeader). Keep in sync with
+    // CreatureDetail/index.js. Stats come from index.js's statsWithEquip so
+    // flair buffs land here live.
+    React.createElement("div",{className:"card",style:{margin:"0 16px 12px",flexShrink:0}},
+      React.createElement("div",{style:{textAlign:"center",marginBottom:14}},
+        ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
+        React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{margin:"0 auto"}})
+      ),
+      React.createElement("div",{style:{display:"flex",gap:4}},
+        // Same click behavior as the creature page's stat row: opens the
+        // stat-info popup (base/equipment/flair breakdown).
+        STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:statFlash.has(s),onClick:onStatClick}))
+      )
     ),
     React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12,padding:"0 16px",flexShrink:0}},
       flairTabs.map(t=>React.createElement("button",{key:t.id,

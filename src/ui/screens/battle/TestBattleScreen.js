@@ -20,6 +20,7 @@ import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
@@ -145,6 +146,12 @@ function TestBattleScreen({ onBack }) {
   const [battleSelectedUid, setBattleSelectedUid] = useState(null);
   const [speed, setSpeed] = useState(1);
   const speedRef = useRef(1);
+  // Debug pause: freezes the simulation at the current tick (the interval is
+  // simply not running). pausedRef distinguishes "paused by the button" from
+  // "interval stopped because the battle ended", so Resume can't restart a
+  // decided fight during the victory linger.
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
   const moveAnimRef = useRef(Math.round(500 * 0.84));
   const bRef = useRef(null);
   const tickRef = useRef(null);
@@ -190,7 +197,9 @@ function TestBattleScreen({ onBack }) {
       for (const u of [...s.playerUnits, ...s.enemyUnits]) {
         const refs = unitDomRefs.current.get(u.uid); if (!refs) continue;
         const { el, hpEl } = refs;
-        if (u.hp <= 0) { el.style.opacity = "0"; continue; }
+        // Defeated units keep their DOM node (only summons are pruned), so a
+        // creature with defeat art lingers at its death tile while it plays.
+        if (u.hp <= 0) { el.style.opacity = String(battleUnitOpacity(u, now, CREATURE_MAP[u.creatureId])); continue; }
         el.style.opacity = "1";
         const t = aEase(Math.min(1, (now - u.lastMoveTime) / moveAnimRef.current));
         el.style.left = ((u.prevCol + (u.col - u.prevCol) * t) * TILE) + "px";
@@ -213,7 +222,18 @@ function TestBattleScreen({ onBack }) {
     });
     const anyP = s.playerUnits.some((u) => u.hp > 0);
     const anyE = s.enemyUnits.some((u) => u.hp > 0);
-    if (!anyE || !anyP) { stopLoops(); setOutcome(!anyE ? "won" : "lost"); }
+    if (!anyE || !anyP) {
+      stopLoops();
+      // Winners hold a victory pose for a beat before the outcome overlay;
+      // one more snapshot so React renders the stamped state.
+      const stamped = stampVictors(!anyE ? s.playerUnits : s.enemyUnits, now);
+      setBSnap({
+        playerUnits: s.playerUnits.map((u) => ({ ...u })),
+        enemyUnits: s.enemyUnits.map((u) => ({ ...u })),
+        damageDealt: { ...s.damageDealt },
+      });
+      setTimeout(() => setOutcome(!anyE ? "won" : "lost"), stamped ? VICTORY_LINGER_MS : 600);
+    }
   }
 
   /** Per-placement gear: the stat contribution of a cell's 4 equipped items
@@ -310,9 +330,13 @@ function TestBattleScreen({ onBack }) {
         u.hp = hp; u.maxHp = hp;
         u.atk = stats.atk || 30; u.def = stats.def || 20;
         u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1;
-        u.abilityLevels = { ...ov.kit };
-        u.abilChargeMax = getSpecialChargeAt(def, ov.kit.special || 0);
       }
+      // Kit always follows the sandbox's Enemy Lv tier (or the per-placement
+      // override) -- makeArenaBattle defaults every enemy to a MAX kit, which
+      // is right for Arena/Dungeon/Labyrinth but would make sandbox enemies
+      // silently stronger than the planning cards claim.
+      u.abilityLevels = { ...ov.kit };
+      u.abilChargeMax = getSpecialChargeAt(def, ov.kit.special || 0);
       applyGear(u, def, { level: ov.lvl, ascensions: ov.asc }, entry?.equipped);
     });
     setAtkEffects([]);
@@ -320,6 +344,7 @@ function TestBattleScreen({ onBack }) {
     setBattleSelectedUid(null);
     setBSnap({ playerUnits: bRef.current.playerUnits.map((u) => ({ ...u })), enemyUnits: bRef.current.enemyUnits.map((u) => ({ ...u })), damageDealt: {} });
     setBattling(true);
+    pausedRef.current = false; setPaused(false);
     startRenderLoop();
     tickRef.current = setInterval(runTick, Math.round(500 / speedRef.current));
   }
@@ -328,10 +353,21 @@ function TestBattleScreen({ onBack }) {
     const next = speedRef.current === 1 ? 2 : 1;
     speedRef.current = next; moveAnimRef.current = Math.round(500 / next * 0.84);
     setSpeed(next);
+    // While paused there is no interval; Resume picks up the new speed.
     if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = setInterval(runTick, Math.round(500 / next)); }
   }
 
-  function backToPlanning() { stopLoops(); setBattling(false); setOutcome(null); setBSnap(null); setAtkEffects([]); setBattleSelectedUid(null); }
+  function togglePause() {
+    if (pausedRef.current) {
+      pausedRef.current = false; setPaused(false);
+      tickRef.current = setInterval(runTick, Math.round(500 / speedRef.current));
+    } else if (tickRef.current) { // only pausable while the battle is actually ticking
+      clearInterval(tickRef.current); tickRef.current = null;
+      pausedRef.current = true; setPaused(true);
+    }
+  }
+
+  function backToPlanning() { stopLoops(); pausedRef.current = false; setPaused(false); setBattling(false); setOutcome(null); setBSnap(null); setAtkEffects([]); setBattleSelectedUid(null); }
 
   const header = React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 16px", flexShrink: 0 } },
     React.createElement("button", { onClick: () => { stopLoops(); onBack && onBack(); }, style: { background: "none", border: "none", fontSize: 18, cursor: "pointer", padding: 0, lineHeight: 1 } }, "←"),
@@ -349,6 +385,7 @@ function TestBattleScreen({ onBack }) {
       React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", padding: "12px", overflow: "hidden", gap: 6 } },
         React.createElement("div", { style: { display: "flex", gap: 8 } },
           React.createElement("button", { onClick: cycleSpeed, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, speed + "x ⚡"),
+          React.createElement("button", { onClick: togglePause, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: paused ? "#16a34a" : "#fff", color: paused ? "#fff" : "#b45309", border: paused ? "none" : "1.5px solid #b45309", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, paused ? "▶ Resume" : "⏸ Pause"),
           React.createElement("button", { onClick: startFight, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#fff", color: "#534AB7", border: "1.5px solid #534AB7", borderRadius: 8, cursor: "pointer" } }, "↺ Restart"),
           React.createElement("button", { onClick: backToPlanning, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#fff", color: "#666", border: "1.5px solid #ccc", borderRadius: 8, cursor: "pointer" } }, "✎ Edit Teams")
         ),
@@ -402,12 +439,12 @@ function TestBattleScreen({ onBack }) {
                 else unitDomRefs.current.delete(u.uid);
               },
               onClick: u.hp > 0 ? () => setBattleSelectedUid(u.uid) : undefined,
-              style: { position: "absolute", width: TILE, height: TILE, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: u.hp > 0 ? 1 : 0, zIndex: 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default" },
+              style: { position: "absolute", width: TILE, height: TILE, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: battleUnitOpacity(u, Date.now(), CREATURE_MAP[u.creatureId]), zIndex: 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default" },
             },
               React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
-                React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: 20 }),
-                (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: -4, right: -6, fontSize: 10, lineHeight: 1 } }, "🔥"),
-                (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
+                React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: TILE, state: battleArtState(u, Date.now(), moveAnimRef.current) }),
+                (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 10, lineHeight: 1 } }, "🔥"),
+                (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
               ),
               React.createElement("div", { style: { position: "absolute", bottom: 3, left: 3, right: 3, height: 3, background: "#ddd", borderRadius: 2, overflow: "hidden" } },
                 React.createElement("div", { className: "hp-fill", style: { height: "100%", width: (u.hp / u.maxHp * 100) + "%", background: u.uid[0] === "e" ? "#ef4444" : (u.burnTicks || 0) > 0 ? "#f97316" : "#22c55e", borderRadius: 2 } })
@@ -420,8 +457,7 @@ function TestBattleScreen({ onBack }) {
             ))
           ),
           React.createElement("div", { className: "battle-side-panel" }, selectedUnit ? React.createElement(UnitInfoPanel, {
-            emoji: CREATURE_MAP[selectedUnit.creatureId]?.emoji || "❓",
-            image: CREATURE_MAP[selectedUnit.creatureId]?.image,
+            def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
             name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
             subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? enemyLevel : (owned?.[selectedUnit.creatureId]?.level || 1)),
             hp: selectedUnit.hp, maxHp: selectedUnit.maxHp, shield: selectedUnit.shield,
@@ -483,12 +519,14 @@ function TestBattleScreen({ onBack }) {
             onTouchEnd: cancelHold,
             style: { position: "absolute", left: c * TILE, top: r * TILE, width: TILE, height: TILE, borderTop: r === 0 ? "0" : "1px solid #e5e5e5", borderLeft: c === 0 ? "0" : "1px solid #e5e5e5", boxSizing: "border-box", cursor: p ? "grab" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", userSelect: "none", background: p ? (p.side === "player" ? "rgba(83,74,183,0.12)" : "rgba(239,68,68,0.12)") : "transparent" }
           },
+            // Full-tile art: every decoration pins INSIDE the tile bounds so
+            // nothing bleeds into a neighboring cell.
             def && React.createElement("div", { style: { position: "relative", lineHeight: 1, pointerEvents: "none" } },
-              React.createElement(CreatureIcon, { def, size: 22 }),
-              React.createElement("div", { style: { position: "absolute", bottom: -6, left: "50%", transform: "translateX(-50%)", width: 14, height: 3, borderRadius: 2, background: p.side === "player" ? "#534AB7" : "#ef4444" } }),
-              gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: -7, right: -9, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount),
-              p.abil && React.createElement("div", { style: { position: "absolute", top: -7, left: -9, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : "✦"),
-              ((p.level || 0) >= 1 || p.asc != null) && React.createElement("div", { style: { position: "absolute", bottom: -9, right: -10, fontSize: 7, fontWeight: 800, color: "#fff", background: "#3b82f6", borderRadius: 6, padding: "1px 3px", lineHeight: 1.3, whiteSpace: "nowrap" } }, ((p.level || 0) >= 1 ? "L" + p.level : "") + (p.asc != null ? "★" + p.asc : ""))
+              React.createElement(CreatureIcon, { def, size: TILE }),
+              React.createElement("div", { style: { position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 14, height: 3, borderRadius: 2, background: p.side === "player" ? "#534AB7" : "#ef4444" } }),
+              gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount),
+              p.abil && React.createElement("div", { style: { position: "absolute", top: 1, left: 1, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : "✦"),
+              ((p.level || 0) >= 1 || p.asc != null) && React.createElement("div", { style: { position: "absolute", bottom: 1, right: 1, fontSize: 7, fontWeight: 800, color: "#fff", background: "#3b82f6", borderRadius: 6, padding: "1px 3px", lineHeight: 1.3, whiteSpace: "nowrap" } }, ((p.level || 0) >= 1 ? "L" + p.level : "") + (p.asc != null ? "★" + p.asc : ""))
             )
           );
         })).flat()

@@ -53,6 +53,8 @@ function bonusExpiryTick(u) {
   if ((u.tauntTicks || 0) > 0 && !--u.tauntTicks) u.tauntSourceUid = null;
   if ((u.stunTicks || 0) > 0) u.stunTicks--;
   if ((u.markedTicks || 0) > 0) u.markedTicks--;
+  if ((u.frostbiteTicks || 0) > 0 && !--u.frostbiteTicks) u.frostbiteStacks = 0;
+  if ((u.dartShredTicks || 0) > 0 && !--u.dartShredTicks) u.dartShredPct = 0;
   // Negative stat-mod stacks (ATK/Speed/DEF Down, Healing Down) age one
   // extra tick; buff stacks are untouched. Restrained has no timer (it
   // never expires on its own), so Stone Skin's faster expiry can't touch it.

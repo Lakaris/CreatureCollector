@@ -1,7 +1,8 @@
 // Damage formulas.
 
-import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier } from "./status.js";
+import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
+import { CREATURE_MAP } from "../data/creatures.js";
 
 /** Base attack roll: ±20% spread around the attacker's power. */
 export function attackRoll(atk) {
@@ -9,13 +10,29 @@ export function attackRoll(atk) {
 }
 
 /**
+ * DEF mitigation: the hit is scaled by atk/(atk+def) rather than subtracting
+ * a flat slice of DEF. Ratio mitigation can never zero out a hit -- the old
+ * `raw - def*0.35` clamped tanky matchups to 1 damage per swing, stalling
+ * them past the battle timer -- and it is level-invariant: HP/ATK/DEF all
+ * grow by the same factor per level, so hits-to-kill between two same-level
+ * units depends only on their base statlines.
+ */
+export function mitigatedDamage(atk, def) {
+  if (atk <= 0) return 0;
+  return atk * (atk / (atk + Math.max(0, def)));
+}
+
+/**
  * Unit-vs-unit damage, mitigated by the defender's DEF.
  * Used for player-vs-minion and minion-vs-player alike.
  */
 export function unitDamage(attacker, defender) {
-  const raw = attackRoll(attacker.atk) * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk");
-  const def = (defender.def || 20) * statModMultiplier(defender, "def");
-  return Math.max(1, Math.round(Math.max(1, raw - def * 0.35)));
+  // Frostbite: Water attackers hit the carrier harder (5% per stack).
+  const water = CREATURE_MAP[attacker.creatureId]?.type === "Water";
+  const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk");
+  const def = (defender.def || 20) * statModMultiplier(defender, "def") * dartShredMultiplier(defender);
+  const roll = 0.8 + Math.random() * 0.4;
+  return Math.max(1, Math.round(mitigatedDamage(atk, def) * roll * frostbiteMultiplier(water, defender)));
 }
 
 /**

@@ -6,10 +6,10 @@ export const SKIN_SETS=[
   {id:"pup_arctic",name:"Arctic",tier:"rare",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🐩"},emberhound:{emoji:"🐺"}}},
   {id:"pup_shadow",name:"Shadow",tier:"epic",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🐕‍🦺"},emberhound:{emoji:"🦝"}}},
   {id:"pup_golden",name:"Golden",tier:"legendary",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🦊"},emberhound:{emoji:"🦁"}}},
-  // Leafling / Canoparch
-  {id:"leaf_blossom",name:"Blossom",tier:"common",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🌱"},canoparch:{emoji:"🌲"}}},
+  // leafling / canoparch (Sprighorn / Thickethorn)
+  {id:"leaf_blossom",name:"Blossom",tier:"common",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🌱"},canoparch:{emoji:"🌸"}}},
   {id:"leaf_autumn",name:"Autumn",tier:"rare",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🍂"},canoparch:{emoji:"🍁"}}},
-  {id:"leaf_ancient",name:"Ancient",tier:"legendary",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"☘️"},canoparch:{emoji:"🌾"}}},
+  {id:"leaf_ancient",name:"Ancient",tier:"legendary",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🦴"},canoparch:{emoji:"🗿"}}},
   // Pebbit / Bouldroad
   {id:"rock_sandy",name:"Sandy",tier:"common",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🦎"},bouldrath:{emoji:"🐢"}}},
   {id:"rock_crystal",name:"Crystal",tier:"epic",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"💎"},bouldrath:{emoji:"🗿"}}},
@@ -135,7 +135,7 @@ export const SKIN_SETS=[
   {id:"salama_glacial",name:"Glacial",tier:"rare",chain:["salamagma","lavawyrm"],appearances:{salamagma:{emoji:"❄️"},lavawyrm:{emoji:"🧊"}}},
   {id:"salama_obsidian",name:"Obsidian",tier:"epic",chain:["salamagma","lavawyrm"],appearances:{salamagma:{emoji:"🌑"},lavawyrm:{emoji:"💀"}}},
   {id:"salama_eternal",name:"Eternal",tier:"legendary",chain:["salamagma","lavawyrm"],appearances:{salamagma:{emoji:"🏛️"},lavawyrm:{emoji:"🌌"}}},
-  // blazehornet / infernoswarm
+  // blazehornet / infernoswarm (Emberstar / Blastar)
   {id:"hornet_frost",name:"Frosted",tier:"rare",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"❄️"},infernoswarm:{emoji:"🌨️"}}},
   {id:"hornet_void",name:"Void",tier:"epic",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"🌑"},infernoswarm:{emoji:"💀"}}},
   {id:"hornet_solar",name:"Solar",tier:"legendary",chain:["blazehornet","infernoswarm"],appearances:{blazehornet:{emoji:"☀️"},infernoswarm:{emoji:"🌟"}}},
@@ -175,7 +175,7 @@ export const SKIN_SETS=[
   {id:"hog_crystal",name:"Crystal",tier:"rare",chain:["seismichog","tectohog"],appearances:{seismichog:{emoji:"💎"},tectohog:{emoji:"✨"}}},
   {id:"hog_void",name:"Void",tier:"epic",chain:["seismichog","tectohog"],appearances:{seismichog:{emoji:"🌑"},tectohog:{emoji:"💀"}}},
   {id:"hog_ancient",name:"Ancient",tier:"legendary",chain:["seismichog","tectohog"],appearances:{seismichog:{emoji:"🏛️"},tectohog:{emoji:"🌌"}}},
-  // galeserpent / cyclonwyrm
+  // galeserpent / cyclonwyrm (Coatlet / Quetzalis)
   {id:"gserpent_ember",name:"Ember",tier:"rare",chain:["galeserpent","cyclonwyrm"],appearances:{galeserpent:{emoji:"🔥"},cyclonwyrm:{emoji:"🌋"}}},
   {id:"gserpent_void",name:"Void",tier:"epic",chain:["galeserpent","cyclonwyrm"],appearances:{galeserpent:{emoji:"🌑"},cyclonwyrm:{emoji:"💀"}}},
   {id:"gserpent_lightning",name:"Lightning",tier:"legendary",chain:["galeserpent","cyclonwyrm"],appearances:{galeserpent:{emoji:"⚡"},cyclonwyrm:{emoji:"🌩️"}}},
@@ -248,7 +248,7 @@ export const SKIN_SETS=[
   {id:"mtitan_frost",name:"Frosted",tier:"rare",chain:["magmatitan","infernocolossus"],appearances:{magmatitan:{emoji:"❄️"},infernocolossus:{emoji:"🧊"}}},
   {id:"mtitan_void",name:"Void",tier:"epic",chain:["magmatitan","infernocolossus"],appearances:{magmatitan:{emoji:"🌑"},infernocolossus:{emoji:"💀"}}},
   {id:"mtitan_cosmic",name:"Cosmic",tier:"legendary",chain:["magmatitan","infernocolossus"],appearances:{magmatitan:{emoji:"🌌"},infernocolossus:{emoji:"🌠"}}},
-  // frosthydra / glacialhydra
+  // frosthydra / glacialhydra (Waddlepop / Frostillery)
   {id:"fhydra_ember",name:"Ember",tier:"rare",chain:["frosthydra","glacialhydra"],appearances:{frosthydra:{emoji:"🔥"},glacialhydra:{emoji:"🌋"}}},
   {id:"fhydra_void",name:"Void",tier:"epic",chain:["frosthydra","glacialhydra"],appearances:{frosthydra:{emoji:"🌑"},glacialhydra:{emoji:"💀"}}},
   {id:"fhydra_solar",name:"Solar",tier:"legendary",chain:["frosthydra","glacialhydra"],appearances:{frosthydra:{emoji:"☀️"},glacialhydra:{emoji:"🌟"}}},

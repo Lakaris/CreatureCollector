@@ -1,4 +1,4 @@
-// Blazehornet line: Twin Sting / Charging Pierce / Burning Bond family.
+// Emberstar line: Twin Barb / Charging Pierce / Burning Bond family.
 //
 // Mirrors the boss-module pattern (src/battle/bosses/*.js): one small factory
 // producing a module per evolution stage, sharing logic but parameterized by
@@ -17,7 +17,7 @@ const DMG_MULT_BY_LEVEL = [1, 1.05, 1.05, 1.15, 1.15];
 
 const BURN_DURATION_TICKS = STATUS_TICKS;
 const BURN_STACK_CAP = 10;
-/** Bonus flat damage per 5 Burn stacks on the target, as a fraction of Blazehornet's ATK (unique lvl 5 only). */
+/** Bonus flat damage per 5 Burn stacks on the target, as a fraction of Emberstar's ATK (unique lvl 5 only). */
 const BURN_BONUS_ATK_FRACTION = 0.08;
 
 const STARLIT_ROOT_ID = "sacredwasp";
@@ -38,10 +38,10 @@ function abilityIdx(unit, key) {
 }
 
 /**
- * @param {number[]} defBonusByLevel  +DEF% granted to both Blazehornet and the
+ * @param {number[]} defBonusByLevel  +DEF% granted to both Emberstar and the
  *   allied Starlit, indexed by unique-ability level (0-based).
  */
-export function makeBlazehornetModule(defBonusByLevel) {
+export function makeEmberstarModule(defBonusByLevel) {
   return {
     /** Once per battle: if an allied Starlit-line creature is deployed, both gain +DEF. */
     onBattleStart(unit, allUnits) {
@@ -56,7 +56,7 @@ export function makeBlazehornetModule(defBonusByLevel) {
       ally.def = Math.round(ally.def * (1 + pct / 100));
     },
 
-    /** Twin Sting: attack N times per swing, scaling with basic-ability level. */
+    /** Twin Barb: attack N times per swing, scaling with basic-ability level. */
     hitsForAttack(unit) {
       return HITS_BY_LEVEL[abilityIdx(unit, "basic")];
     },
@@ -167,6 +167,7 @@ export function makeBlazehornetModule(defBonusByLevel) {
   };
 }
 
-export const blazehornet = makeBlazehornetModule([10, 20, 30, 40, 40]);
-export const infernohive = makeBlazehornetModule([15, 25, 35, 45, 45]);
-export const infernoswarm = makeBlazehornetModule([20, 30, 40, 50, 50]);
+// Ids stay on the original line ids (Emberstar / Magmastar / Blastar).
+export const blazehornet = makeEmberstarModule([10, 20, 30, 40, 40]);
+export const infernohive = makeEmberstarModule([15, 25, 35, 45, 45]);
+export const infernoswarm = makeEmberstarModule([20, 30, 40, 50, 50]);

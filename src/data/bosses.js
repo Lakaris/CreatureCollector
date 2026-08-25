@@ -74,3 +74,10 @@ export const ARENA_TABS=[
   {id:"dark",label:"Dark",emoji:"🌑"},
 ];
 
+// Arena tab id -> creature type it restricts deployment to ("all" has no
+// restriction and is absent). "ice" is the arena tab id for the Water-type
+// arena (ARENA_TABS labels it "Water" but keeps the legacy id). Lives here
+// beside ARENA_TABS because GameContext needs it too, for the per-tab
+// deployment migration.
+export const ARENA_TAB_TYPE={fire:"Fire",nature:"Nature",earth:"Earth",electric:"Electric",ice:"Water",light:"Light",dark:"Dark"};
+

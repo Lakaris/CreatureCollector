@@ -119,7 +119,7 @@ export function splitAbilityTags(tags) {
   };
 }
 
-/** Small mechanic tags shown on ability cards (e.g. Blazehornet's Charging Pierce); click opens a definition popup. */
+/** Small mechanic tags shown on ability cards (e.g. Emberstar's Charging Pierce); click opens a definition popup. */
 export const ABILITY_TAG_DEFS = {
   pierce: { label: "Pierce", description: "Deal damage to all enemies this attack passes through." },
   closest: { label: "Closest", description: "Targets the closest enemy in range" },
@@ -129,14 +129,38 @@ export const ABILITY_TAG_DEFS = {
   weakest: { label: "Weakest", description: "Targets the creature with the lowest current Health" },
   cleanse: { label: "Cleanse", description: "Removes all debuffs" },
   line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge" },
+  horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row" },
   speedup: { label: "💨 Speed Up", description: "Increases the creature's Speed", stacking: [25, 50, 75, 100, 125] },
   taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them" },
   // Marked never pulls allies toward the target: only allies who already
   // have it within attack range switch onto it -- no forced movement.
   marked: { label: "Marked", description: "All allies within range targets this creature" },
+  splash: { label: "Splash", description: "Affects all tiles surrounding the targeted creature" },
+  frostbite: { label: "❄️ Frostbite", description: "Water creatures deal 5% more damage to this creature", stacking: [5, 10, 15, 20, 25] },
+  hazard: { label: "Hazard", description: "Deal damage if a creature moves while on a tile with a Hazard on it." },
+  immortal: { label: "Immortal", description: "Health can not be reduced below 1" },
+  healovertime: { label: "Heal Over Time", description: "Restores Health over time" },
+  revive: { label: "Revive", description: "Returns to battle after being defeated" },
+  damageovertime: { label: "Damage Over Time", description: "Deals damage over time" },
+  // Summoned creatures carry their own type line and kit, rendered as a
+  // miniature ability card by AbilityTagPopup.
+  //
+  // Implementation note for Ghostly Step: the Wisp teleports to an EMPTY
+  // tile beside its target -- never onto an occupied one.
+  wisp: {
+    label: "Wisp",
+    description: "A spectral ally that fights on its own.",
+    profile: "Dark / Tank / Melee",
+    kit: [
+      { key: "Basic", text: "Taunt an enemy." },
+      { key: "Special", text: "Teleport beside a random enemy." },
+      { key: "Passive", text: "Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health. Goes away when the Summoner is defeated." },
+    ],
+  },
+  attackup: { label: "Attack Up", description: "Increases the creature's Attack", stacking: [15, 30, 45, 60, 75] },
   reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature" },
   shield: { label: "Shield", description: "Temporary bonus Health" },
-  nearby: { label: "Nearby", description: "Affects every tile surrounding this creature" },
+  nearby: { label: "Nearby", description: "Affects this creature and every tile surrounding it" },
   healdown: { label: "💔 Healing Down", description: "Reduces the creature's healing received", stacking: [20, 40, 60, 80, 100] },
   stun: { label: "Stun", description: "For a small period of time, this creature can not attack and does not work towards their Special ability" },
   restrained: { label: "Restrained", undispellable: true, description: "Interacts with this creature's abilities. Never expires." },
@@ -206,6 +230,42 @@ const NESSLING_PHRASES = {
   },
 };
 
+// Doomshade line: only the basic gets a plain phrase (generic damage) --
+// Grave Lantern and Lantern Keeper spell out their own per-tier sentences,
+// which carry numbers the badge shapes can't express, so they render raw.
+const DOOMSHADE_PHRASES = {
+  basic: null,
+};
+
+// Emberchirp line: the basic pairs a self-heal with its damage (dual
+// HEAL+DMG badges via the healDamage shape); the special is a heal phrase
+// whose final tier carries its own extension text; the passive renders raw.
+const EMBERCHIRP_PHRASES = {
+  basic: { phrase: "Deal damage to an enemy and recover Health", healDamage: true },
+  special: { phrase: "Deal damage to itself and heal all nearby allies excluding itself", heal: true },
+};
+
+// Quetzalis line: plain damage phrases; the basic's per-tier text carries
+// its ramping shred clause, and the passive's ramp % renders raw.
+const QUETZALIS_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to a row of enemies" },
+};
+
+// Jadebun line: heal-phrase abilities; the special's per-tier text carries
+// the conditional buffs (and the final tier its own "and shield them."
+// ending), so the shared phrase stops at "Heal an ally".
+const JADEBUN_PHRASES = {
+  basic: { phrase: "Heal an ally", heal: true },
+  special: { phrase: "Heal an ally", heal: true },
+};
+
+// Waddlepop line: the passive's ramp % renders raw per tier.
+const WADDLEPOP_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to enemies and leaves ice spikes on the ground" },
+};
+
 // Loptrix line: the passive's charge/teleport text renders raw per tier.
 const LOPTRIX_PHRASES = {
   basic: null,
@@ -245,6 +305,23 @@ const PLAIN_ABILITY_PHRASES = {
   tidelord: NESSLING_PHRASES,
   abyssgolem: LOPTRIX_PHRASES,
   nihilgolem: LOPTRIX_PHRASES,
+  frosthydra: WADDLEPOP_PHRASES,
+  glacialhydra: WADDLEPOP_PHRASES,
+  bombardguin: WADDLEPOP_PHRASES,
+  cryogeddon: WADDLEPOP_PHRASES,
+  glowpup: JADEBUN_PHRASES,
+  radiantkit: JADEBUN_PHRASES,
+  dawnbeast: JADEBUN_PHRASES,
+  solarcrown: JADEBUN_PHRASES,
+  galeserpent: QUETZALIS_PHRASES,
+  vortexserpent: QUETZALIS_PHRASES,
+  cyclonwyrm: QUETZALIS_PHRASES,
+  doomgrub: DOOMSHADE_PHRASES,
+  nihilwyrm: DOOMSHADE_PHRASES,
+  emberchirp: EMBERCHIRP_PHRASES,
+  pyrefinch: EMBERCHIRP_PHRASES,
+  cauterix: EMBERCHIRP_PHRASES,
+  hearthenix: EMBERCHIRP_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -329,12 +406,12 @@ export function getAbilityStatBonus(creatureId, abilityLevels) {
  * Ignissaur's Burn).
  */
 export function getAbilityTags(creatureId, key, abilityLevel) {
-  const isBlazehornetLine = getRootDef(creatureId)?.id === "blazehornet";
+  const isEmberstarLine = getRootDef(creatureId)?.id === "blazehornet";
   const isStarlitLine = isStarlitAbilityLine(creatureId);
   const tags = [];
-  if (key === "special" && isBlazehornetLine) tags.push("pierce", "closest");
-  if (key === "basic" && isBlazehornetLine) tags.push("closest");
-  if (key === "unique" && isBlazehornetLine) tags.push("burn");
+  if (key === "special" && isEmberstarLine) tags.push("pierce", "closest");
+  if (key === "basic" && isEmberstarLine) tags.push("closest");
+  if (key === "unique" && isEmberstarLine) tags.push("burn");
   if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
   if (key === "special" && isStarlitLine) tags.push("closest");
   const isBloomibisLine = getRootDef(creatureId)?.id === "bloomphoenix";
@@ -401,6 +478,56 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") {
       tags.push("intangible", "closest");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
+    }
+  }
+  const isDoomshadeLine = getRootDef(creatureId)?.id === "doomgrub";
+  if (isDoomshadeLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      // Spectral Rake only inflicts the DoT from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("damageovertime");
+    }
+    if (key === "special") tags.push("closest");
+    // The Wisp tag carries what a Wisp actually does; the abilities just summon them.
+    if (key === "unique") tags.push("wisp");
+  }
+  const isEmberchirpLine = getRootDef(creatureId)?.id === "emberchirp";
+  if (isEmberchirpLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") tags.push("nearby", "healovertime");
+    if (key === "unique") tags.push("revive");
+  }
+  const isQuetzalisLine = getRootDef(creatureId)?.id === "galeserpent";
+  if (isQuetzalisLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") {
+      tags.push("closest", "horizontalrow");
+      // The gale only inflicts Defense Down from its 4th upgrade on -- same
+      // level-gating rule as the other final-tier effects.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
+  }
+  const isJadebunLine = getRootDef(creatureId)?.id === "glowpup";
+  if (isJadebunLine) {
+    if (key === "basic") tags.push("weakest");
+    if (key === "special") {
+      tags.push("weakest", "immortal", "attackup");
+      // The elixir only shields from its 4th upgrade on -- same level-gating
+      // rule as the other final-tier effects.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");
+    }
+  }
+  const isWaddlepopLine = getRootDef(creatureId)?.id === "frosthydra";
+  if (isWaddlepopLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      // Ice Lob only chills -- inflicting Speed Down -- from its 4th upgrade
+      // on; same level-gating rule as the other final-tier effects.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("speeddown");
+    }
+    if (key === "special") {
+      tags.push("closest", "splash", "speeddown", "hazard");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
   }
   const isLoptrixLine = getRootDef(creatureId)?.id === "abyssgolem";

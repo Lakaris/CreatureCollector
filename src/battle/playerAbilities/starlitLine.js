@@ -18,7 +18,7 @@ import { speedPenalty, applyStatMod, healReceivedMultiplier } from "../status.js
 import { getRootDef } from "../../core/creatures.js";
 import { damageUnit } from "../hp.js";
 
-const BLAZEHORNET_ROOT_ID = "blazehornet";
+const EMBERSTAR_ROOT_ID = "blazehornet";
 
 function abilityIdx(unit, key, table) {
   const lvl = (unit.abilityLevels && unit.abilityLevels[key]) || 0;
@@ -90,14 +90,14 @@ function nearestFoe(unit, aliveE, boss) {
  * @param {number[]} [cfg.specialHealByLevel] Heal to the whole party on cast, by special-ability level (unlocks at max level).
  * @param {number} cfg.atkModPct  ATK buff (allies) / debuff (enemies) magnitude, as a percent.
  * @param {number} cfg.atkModTicks ATK buff/debuff duration, in battle ticks.
- * @param {number[]} cfg.atkSynergyByLevel +ATK% granted to both Starlit and an allied Blazehornet, by unique-ability level.
+ * @param {number[]} cfg.atkSynergyByLevel +ATK% granted to both Starlit and an allied Emberstar, by unique-ability level.
  * @param {number[]} cfg.selfSpeedByLevel  +Speed% granted to Starlit itself, by unique-ability level.
  * @param {number} [cfg.rangeBonus=0] Flat tile-range bonus (Starlit Wings' own +2 tile range).
  */
 export function makeStarlitModule(cfg) {
   const { basicDmgByLevel, basicHealByLevel, specialDmgByLevel, specialHealByLevel, atkModPct, atkModTicks, atkSynergyByLevel, selfSpeedByLevel, rangeBonus = 0 } = cfg;
   return {
-    /** Starlit Wings: +range and +Speed% always; +ATK% to both if an allied Blazehornet is deployed. */
+    /** Starlit Wings: +range and +Speed% always; +ATK% to both if an allied Emberstar is deployed. */
     onBattleStart(unit, allUnits) {
       const idx = abilityIdx(unit, "unique", atkSynergyByLevel);
 
@@ -106,7 +106,7 @@ export function makeStarlitModule(cfg) {
 
       const atkPct = atkSynergyByLevel[idx];
       if (!atkPct) return;
-      const ally = allUnits.find((o) => o !== unit && getRootDef(o.creatureId)?.id === BLAZEHORNET_ROOT_ID);
+      const ally = allUnits.find((o) => o !== unit && getRootDef(o.creatureId)?.id === EMBERSTAR_ROOT_ID);
       if (!ally) return;
       unit.atk = Math.round(unit.atk * (1 + atkPct / 100));
       ally.atk = Math.round(ally.atk * (1 + atkPct / 100));

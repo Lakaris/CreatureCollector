@@ -38,6 +38,26 @@ export function damageUnit(target, dmg, { pierceShield = false } = {}) {
   // source routes through here, so the immunity is engine-wide by design.
   if ((target.intangibleTicks || 0) > 0) return 0;
   const toHealth = pierceShield ? dmg : absorbShield(target, dmg);
-  target.hp = Math.max(0, target.hp - toHealth);
+  // Immortal (Silver Draught): Health can not be reduced below 1 -- the
+  // clamp beats everything, shield-piercing damage included.
+  const floor = (target.immortalTicks || 0) > 0 ? 1 : 0;
+  target.hp = Math.max(floor, target.hp - toHealth);
+  // Revive (Rekindle): a unit carrying the one-shot flag (set by its module
+  // at battle start) returns at full Health the first time it would die.
+  // Consuming it here means every damage source routes through it. Statuses
+  // are deliberately kept -- a reborn phoenix doesn't mind still burning.
+  if (target.hp <= 0 && target._reviveReady) {
+    target._reviveReady = false;
+    target.hp = target.maxHp;
+  }
+  // Time of death, for defeat animations (ui/components/battleArtState.js).
+  // Stamped here because every damage source routes through this function, and
+  // only after the revive check so a reborn unit is not marked dead. Cleared
+  // by that same revive path, so a second death re-stamps.
+  if (target.hp <= 0) {
+    if (!target.deathTime) target.deathTime = Date.now();
+  } else if (target.deathTime) {
+    target.deathTime = 0;
+  }
   return dmg;
 }

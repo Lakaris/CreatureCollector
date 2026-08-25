@@ -84,6 +84,10 @@ export function makeArenaBattle(
       prevRow: row,
       prevCol: col,
       lastMoveTime: now - animMs,
+      // Stamped by the engine for animation states: tick.js on every swing,
+      // hp.js when Health first hits 0 (see ui/components/battleArtState.js).
+      lastAttackTime: 0,
+      deathTime: 0,
       hp,
       maxHp: hp,
       atk: stats.atk || 30,
@@ -101,7 +105,7 @@ export function makeArenaBattle(
     };
   });
 
-  // Battle-start passives (e.g. Blazehornet's Starlit DEF synergy) run once,
+  // Battle-start passives (e.g. Emberstar's Starlit DEF synergy) run once,
   // after every unit exists, so ally-presence checks see the full roster.
   for (const u of playerUnits) {
     const mod = getPlayerAbilityModule(u.creatureId);
@@ -141,6 +145,10 @@ export function makeArenaBattle(
       prevRow: row,
       prevCol: col,
       lastMoveTime: now - animMs,
+      // Stamped by the engine for animation states: tick.js on every swing,
+      // hp.js when Health first hits 0 (see ui/components/battleArtState.js).
+      lastAttackTime: 0,
+      deathTime: 0,
       hp,
       maxHp: hp,
       atk,

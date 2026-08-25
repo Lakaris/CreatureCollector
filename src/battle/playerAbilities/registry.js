@@ -7,7 +7,7 @@
 // in the UI but not read by the battle engine. Creatures get a module added
 // here as their abilities are mechanically implemented.
 
-import { blazehornet, infernohive, infernoswarm } from "./blazehornetLine.js";
+import { blazehornet, infernohive, infernoswarm } from "./emberstarLine.js";
 import { sacredwasp, divinedrone, holyswarm } from "./starlitLine.js";
 import { bloomphoenix, lifephoenix } from "./bloomibisLine.js";
 import { ignisdragon, pyredragon } from "./ignissaurLine.js";
@@ -18,8 +18,13 @@ import { morusk, ivormar } from "./moruskLine.js";
 import { shockcrab, voltcrusher, galvaniccrab } from "./shockstingerLine.js";
 import { coralleviathan, tidecrush, tidelord } from "./nesslingLine.js";
 import { abyssgolem, nihilgolem } from "./loptrixLine.js";
+import { frosthydra, glacialhydra, bombardguin, cryogeddon } from "./waddlepopLine.js";
+import { glowpup, radiantkit, dawnbeast, solarcrown } from "./jadebunLine.js";
+import { galeserpent, vortexserpent, cyclonwyrm } from "./quetzalisLine.js";
+import { emberchirp, pyrefinch, cauterix, hearthenix } from "./emberchirpLine.js";
+import { doomgrub, nihilwyrm, wispModule } from "./doomshadeLine.js";
 
-export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem };
+export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem, frosthydra, glacialhydra, bombardguin, cryogeddon, glowpup, radiantkit, dawnbeast, solarcrown, galeserpent, vortexserpent, cyclonwyrm, emberchirp, pyrefinch, cauterix, hearthenix, doomgrub, nihilwyrm, "__wisp": wispModule };
 
 /** Look up a player creature's ability module. Returns undefined if unimplemented. */
 export function getPlayerAbilityModule(creatureId) {

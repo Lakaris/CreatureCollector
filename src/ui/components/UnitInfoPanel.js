@@ -9,7 +9,7 @@ import { statModStacks } from "../../battle/status.js";
 export const DEBUFF_DEFS = [
   { key: "burnTicks", icon: "🔥", label: "Burn" },
   { key: "poisonTicks", icon: "🐍", label: "Poison" },
-  { key: "dotTicks", icon: "🟣", label: "Shadow DoT" },
+  { key: "dotTicks", icon: "🟣", label: "Damage Over Time" },
   { key: "rootTicks", icon: "🌱", label: "Rooted" },
   { key: "weakTicks", icon: "⬇️", label: "Weakened" },
   { key: "slowTicks", icon: "🐌", label: "Slowed" },
@@ -20,6 +20,10 @@ export const DEBUFF_DEFS = [
   { key: "restrainedStacks", icon: "⛓️", label: "Restrained" },
   { key: "intangibleTicks", icon: "🌊", label: "Intangible" },
   { key: "markedTicks", icon: "🔻", label: "Marked" },
+  { key: "frostbiteTicks", icon: "❄️", label: "Frostbite" },
+  { key: "immortalTicks", icon: "🌕", label: "Immortal" },
+  { key: "dartShredTicks", icon: "🪶", label: "Defense Shredded" },
+  { key: "hotTicks", icon: "💗", label: "Heal Over Time" },
 ];
 
 /** Stackable stat modifiers (battle/status.js statMods): shown with a ×n
@@ -49,14 +53,16 @@ export function debuffsFor(u) {
   return rows;
 }
 
-function UnitInfoPanel({ emoji, image, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {
+// `def` is the real creature definition (not a synthetic {emoji} object), so
+// CreatureIcon can resolve the creature's art by id -- see data/creatureArt.js.
+function UnitInfoPanel({ def, name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   const chargePct = abilChargeMax > 0 ? Math.max(0, Math.min(100, ((abilCharge || 0) / abilChargeMax) * 100)) : 0;
   return React.createElement("div", {
     style: { width: 150, flexShrink: 0, background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", boxSizing: "border-box" },
   },
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
-      React.createElement(CreatureIcon, { def: { emoji, image }, size: 20, style: { flexShrink: 0 } }),
+      React.createElement(CreatureIcon, { def, size: 20, style: { flexShrink: 0 } }),
       React.createElement("div", { style: { flex: 1, minWidth: 0 } },
         React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, name),
         subtitle && React.createElement("div", { style: { fontSize: 9, color: "#888", fontWeight: 600 } }, subtitle)

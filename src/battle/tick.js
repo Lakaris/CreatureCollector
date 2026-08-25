@@ -30,7 +30,9 @@ import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
 /** Rate applied to a player-inflicted Burn's stored source ATK, per tick. */
 const PLAYER_BURN_RATE = 0.035;
-/** Rate applied to a fire trail's stored source ATK, per tick (e.g. Blazehornet's Charging Pierce lvl 5). */
+/** Same rate for a player-inflicted Damage Over Time (Spectral Rake). */
+const PLAYER_DOT_RATE = 0.035;
+/** Rate applied to a fire trail's stored source ATK, per tick (e.g. Emberstar's Charging Pierce lvl 5). */
 const FIRE_TRAIL_RATE = 0.03;
 
 /**
@@ -63,8 +65,22 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       unit.col = nc;
       allOcc.add(nr + "," + nc);
     },
+    /** Add a freshly-summoned unit (e.g. Doomshade's Wisp) to the acting
+     * unit's own side. It joins the battle on the NEXT tick -- it is not in
+     * this tick's alive lists -- but occupies its tile immediately so nothing
+     * paths onto it. Summons carry `_summonOf` (the summoner's uid); the
+     * end-of-tick pruning pass removes them once defeated or orphaned. */
+    addSummon(su) {
+      (isEnemySide ? state.enemyUnits : state.playerUnits).push(su);
+      for (const cell of cellsOf(su)) allOcc.add(cell);
+    },
     addFireTrail(cells, ticks, sourceAtk) {
       (state.fireTrails || (state.fireTrails = [])).push({ cells: new Set(cells), ticksLeft: ticks, sourceAtk, enemySide: isEnemySide });
+    },
+    /** Ground Hazard (e.g. Cryo Bomb's ice spikes): damages a foe that MOVES
+     * while standing on one of the cells. `dmg` is per trigger. */
+    addHazard(cells, ticks, dmg) {
+      (state.iceHazards || (state.iceHazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, enemySide: isEnemySide });
     },
     /** Take one BFS step toward (tr,tc); no-ops when rooted. */
     stepToward(tr, tc) {
@@ -114,7 +130,7 @@ export function specialChargeReady(u) {
  *
  * This is the default for creatures whose special isn't implemented yet;
  * implemented abilities can override it per-module via `specialInRange(u,
- * {aliveE, aliveP, boss})` (e.g. Blazehornet's dash is an engage tool that
+ * {aliveE, aliveP, boss})` (e.g. Emberstar's dash is an engage tool that
  * deliberately fires from anywhere).
  */
 export function specialTargetInRange(u, allies, enemies, boss) {
@@ -324,6 +340,9 @@ export function runBattleTick(state, config) {
     const distB = bossAlive ? distToBoss(boss, u.row, u.col) : Infinity;
 
     const abilMod = getPlayerAbilityModule(u.creatureId);
+    // Multi-hit basics (e.g. Twin Barb) SPLIT one swing's damage across their
+    // hits -- each hit still triggers onHit (so Burn stacks per hit), but a
+    // swing's total stays ~1x unitDamage like every other creature's basic.
     const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
     // Recomputed per hit with the target in hand -- some passives scale off
     // the target's state (e.g. Ignissaur's Stoked Flames reads Burn stacks).
@@ -338,7 +357,7 @@ export function runBattleTick(state, config) {
 
     // Special abilities run off the charge bar (see tickSpecialCharge),
     // independent of the basic-attack loop below. Implemented specials (e.g.
-    // Blazehornet's Charging Pierce) can move the unit, so they run first and
+    // Emberstar's Charging Pierce) can move the unit, so they run first and
     // everything after sees the new position. Creatures whose special isn't
     // implemented yet just flash the ready marker and start recharging.
     // Either way, a full bar HOLDS until there's actually something in range
@@ -381,7 +400,7 @@ export function runBattleTick(state, config) {
       if (u.atkCd <= 0) {
         let totalDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
-          const dmgToBoss = Math.max(1, Math.round(playerDamageToBoss(u, boss, aliveP) * dmgMultVs(boss)));
+          const dmgToBoss = Math.max(1, Math.round(playerDamageToBoss(u, boss, aliveP) * dmgMultVs(boss) / hits));
           damageBoss(boss, dmgToBoss);
           totalDmg += dmgToBoss;
           const bonus = abilMod?.onHit ? abilMod.onHit(u, boss) : 0;
@@ -389,6 +408,7 @@ export function runBattleTick(state, config) {
         }
         damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
         u.atkCd = attackCooldown(u, penalty);
+        u.lastAttackTime = now;
         newFx.push({ id: now + u.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
       }
       continue;
@@ -404,7 +424,7 @@ export function runBattleTick(state, config) {
           let totalDmg = 0;
           const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
-            const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
+            const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt) / hits));
             totalDmg += damageUnit(tgt, dmg);
             const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
             if (bonus) totalDmg += damageUnit(tgt, bonus);
@@ -418,6 +438,7 @@ export function runBattleTick(state, config) {
           // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
           if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
           u.atkCd = attackCooldown(u, penalty);
+          u.lastAttackTime = now;
           // 2x2 targets (Labyrinth Boss creatures) get the hit flash at their body center.
           newFx.push({ id: now + u.uid, row: tgt.row + ((tgt.size || 1) - 1) / 2, col: tgt.col + ((tgt.size || 1) - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
         } else if (canMove && dist > range) {
@@ -485,7 +506,7 @@ export function runBattleTick(state, config) {
     if (dist <= range && u.atkCd <= 0) {
       const tgtMod = getPlayerAbilityModule(tgt.creatureId);
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
-        const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt)));
+        const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt) / hits));
         damageUnit(tgt, dmg);
         const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
         if (bonus) damageUnit(tgt, bonus);
@@ -500,6 +521,7 @@ export function runBattleTick(state, config) {
       // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
       if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
       u.atkCd = attackCooldown(u, penalty);
+      u.lastAttackTime = now;
       newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row + ((u.size || 1) - 1) / 2, fromCol: u.col + ((u.size || 1) - 1) / 2, isEnemy: true });
     } else if (canMove && dist > range) {
       stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
@@ -512,7 +534,7 @@ export function runBattleTick(state, config) {
   // ── 4. Status effects ────────────────────────────────────────────────────
   tickStatusEffects(aliveP, boss, newFx, now);
 
-  // Player-inflicted Burn (e.g. Blazehornet's Burning Bond) on minions/boss.
+  // Player-inflicted Burn (e.g. Emberstar's Burning Bond) on minions/boss.
   // Separate from tickStatusEffects above, which only handles boss->player DoT.
   for (const u of aliveE) {
     if ((u.burnTicks || 0) > 0) {
@@ -521,6 +543,15 @@ export function runBattleTick(state, config) {
       u.burnTicks--;
       newFx.push({ id: now + "pbrn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
+    // Player-inflicted Damage Over Time (Spectral Rake) on minions. Enemy
+    // Doomshades' DoT on players ticks in tickStatusEffects instead.
+    if ((u.dotTicks || 0) > 0 && u.dotSourceAtk) {
+      const dmg = Math.max(1, Math.round(u.dotSourceAtk * PLAYER_DOT_RATE));
+      damageUnit(u, dmg);
+      u.dotTicks--;
+      if (!u.dotTicks) u.dotSourceAtk = 0;
+      newFx.push({ id: now + "pdot" + u.uid, row: u.row, col: u.col, t: now, isDark: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
+    }
   }
   if (bossAlive && (boss.burnTicks || 0) > 0) {
     const dmg = Math.max(1, Math.round((boss.burnSourceAtk || 10) * PLAYER_BURN_RATE));
@@ -528,8 +559,15 @@ export function runBattleTick(state, config) {
     boss.burnTicks--;
     newFx.push({ id: now + "pbrn" + "boss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
   }
+  if (bossAlive && (boss.dotTicks || 0) > 0 && boss.dotSourceAtk) {
+    const dmg = Math.max(1, Math.round(boss.dotSourceAtk * PLAYER_DOT_RATE));
+    damageBoss(boss, dmg);
+    boss.dotTicks--;
+    if (!boss.dotTicks) boss.dotSourceAtk = 0;
+    newFx.push({ id: now + "pdot" + "boss", row: boss.row, col: boss.col, t: now, isDark: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
+  }
 
-  // Fire trails left behind by abilities (e.g. Blazehornet's Charging Pierce
+  // Fire trails left behind by abilities (e.g. Emberstar's Charging Pierce
   // lvl 5) damage anything from the OTHER side standing on them, then expire.
   if (state.fireTrails && state.fireTrails.length) {
     state.fireTrails = state.fireTrails.filter((trail) => {
@@ -558,6 +596,44 @@ export function runBattleTick(state, config) {
       return trail.ticksLeft > 0;
     });
   }
+
+  // Ground Hazards (e.g. Cryo Bomb's ice spikes): a foe that MOVED this tick
+  // while standing on a hazard cell takes the hazard's damage -- the check
+  // reads the cell the unit stepped FROM. Teleports don't trigger hazards
+  // (blinks clear the spikes entirely). One trigger per unit per tick even
+  // when hazards overlap.
+  if (state.iceHazards && state.iceHazards.length) {
+    const triggered = new Set();
+    state.iceHazards = state.iceHazards.filter((hz) => {
+      const victims = hz.enemySide ? aliveP : aliveE;
+      for (const u of victims) {
+        if (triggered.has(u.uid)) continue;
+        if (u._lastStepTick === state.tick && hz.cells.has(u.prevRow + "," + u.prevCol)) {
+          triggered.add(u.uid);
+          damageUnit(u, hz.dmg);
+          newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
+        }
+      }
+      hz.ticksLeft--;
+      return hz.ticksLeft > 0;
+    });
+  }
+
+  // ── Summons ──────────────────────────────────────────────────────────────
+  // Summoned units (`_summonOf`, e.g. Doomshade's Wisps) leave no body: a
+  // defeated summon is removed from the battle outright, and every summon
+  // vanishes when its own summoner is defeated ("goes away" -- no death
+  // effect). This runs after all combat so same-tick death effects (Grave
+  // Grudge fires from the onDamaged hook the moment the killing hit lands)
+  // are already resolved; the occupancy set rebuilds next tick.
+  const pruneSummons = (arr) =>
+    arr.filter((u) => {
+      if (u._summonOf == null) return true;
+      if (u.hp <= 0) return false;
+      return arr.some((s) => s.uid === u._summonOf && s.hp > 0);
+    });
+  if (state.playerUnits.some((u) => u._summonOf != null)) state.playerUnits = pruneSummons(state.playerUnits);
+  if (state.enemyUnits.some((u) => u._summonOf != null)) state.enemyUnits = pruneSummons(state.enemyUnits);
 
   // ── 5. Boss ──────────────────────────────────────────────────────────────
   if (bossAlive) {

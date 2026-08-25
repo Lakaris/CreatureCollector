@@ -3,6 +3,7 @@
 
 import { CREATURE_MAP } from "../data/creatures.js";
 import { SKIN_SETS } from "../data/skins.js";
+import { CREATURE_ART, DEFAULT_FPS, artLoops } from "../data/creatureArt.js";
 import { RARITY_STAT_MULT, LEVEL_STAT_CYCLE } from "../data/rarity.js";
 
 export const MAX_LEVEL = 500;
@@ -120,15 +121,61 @@ export function calcStats(def, ownedData) {
   return s;
 }
 
-/** Resolve the emoji to show, honoring an equipped-and-unlocked skin. */
-export function getDisplayEmoji(def, ownedData, unlockedSkins) {
-  if (!ownedData || !ownedData.activeSkin) return def.emoji;
+/** The appearance record of the equipped-and-unlocked skin, or null for none. */
+function activeSkinAppearance(def, ownedData, unlockedSkins) {
+  if (!def || !ownedData || !ownedData.activeSkin) return null;
   const { setId, variantId } = ownedData.activeSkin;
-  if (!unlockedSkins.includes(setId)) return def.emoji;
+  if (!unlockedSkins || !unlockedSkins.includes(setId)) return null;
   const skinSet = SKIN_SETS.find((s) => s.id === setId);
-  if (!skinSet) return def.emoji;
-  const vid = variantId || def.id;
-  return (skinSet.appearances[vid] && skinSet.appearances[vid].emoji) || def.emoji;
+  if (!skinSet) return null;
+  return skinSet.appearances[variantId || def.id] || null;
+}
+
+/**
+ * Resolve what to draw for a creature in a given animation state. This is the
+ * single appearance path -- CreatureIcon is its only caller, and every creature
+ * in the roster goes through it, art or not.
+ *
+ * Returns one of:
+ *   {kind:"sprite", src, frames, fps, loop, blend, pixelated}  animated strip
+ *   {kind:"image",  src, blend, pixelated}                     still image
+ *   {kind:"emoji",  emoji}                                     the fallback
+ *
+ * Fallback chain: the requested state, then `idle`, then emoji. So a creature
+ * with no art at all renders exactly as it always has, and one with only an
+ * idle sprite uses it for every battle state rather than popping to emoji
+ * mid-fight.
+ *
+ * An equipped skin overrides the base creature outright -- its own art if it
+ * has any, otherwise its emoji. Falling through to the base creature's art
+ * would ignore the skin the player deliberately equipped.
+ */
+export function getDisplayArt(def, ownedData, unlockedSkins, state = "idle") {
+  if (!def) return { kind: "emoji", emoji: "" };
+  const skin = activeSkinAppearance(def, ownedData, unlockedSkins);
+  const art = skin ? skin.art : CREATURE_ART[def.id];
+  const entry = art ? art[state] || art.idle : null;
+  if (entry && entry.src) {
+    const frames = entry.frames || 1;
+    return {
+      kind: frames > 1 ? "sprite" : "image",
+      src: entry.src,
+      frames,
+      fps: entry.fps || DEFAULT_FPS,
+      loop: artLoops(state, entry),
+      blend: entry.blend || null,
+      pixelated: !!entry.pixelated,
+    };
+  }
+  return { kind: "emoji", emoji: (skin && skin.emoji) || def.emoji };
+}
+
+/** Whether real art exists for this exact state (no idle/emoji fallback). */
+export function hasArtState(def, ownedData, unlockedSkins, state) {
+  if (!def) return false;
+  const skin = activeSkinAppearance(def, ownedData, unlockedSkins);
+  const art = skin ? skin.art : CREATURE_ART[def.id];
+  return !!(art && art[state] && art[state].src);
 }
 
 /** Food cost to level a creature up from `lvl`. The Field's food-rate curve

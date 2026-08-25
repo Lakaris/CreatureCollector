@@ -12,7 +12,7 @@
 // Stoked Flames is a passive damage amplifier: both attacks deal +1%..+5%
 // damage per stack of Burn currently active on the target being hit.
 //
-// Burn numbers mirror Blazehornet's Burning Bond (same duration, stack cap,
+// Burn numbers mirror Emberstar's Burning Bond (same duration, stack cap,
 // and source-ATK-scaled damage-over-time, ticked by the engine).
 
 import { attackRoll, damageBoss } from "../damage.js";
@@ -27,7 +27,7 @@ const SPECIAL_DMG_BY_LEVEL = [55, 62, 70, 80, 80];
 /** Stoked Flames: +damage% per stack of Burn on the target, by unique level. */
 const STOKED_PCT_BY_LEVEL = [1, 2, 3, 4, 5];
 
-/** Burn numbers match Blazehornet's Burning Bond (see blazehornetLine.js). */
+/** Burn numbers match Emberstar's Burning Bond (see emberstarLine.js). */
 const BURN_DURATION_TICKS = STATUS_TICKS;
 const BURN_STACK_CAP = 10;
 

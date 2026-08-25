@@ -11,7 +11,7 @@ import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { getDisplayEmoji } from "../../core/creatures.js";
+import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import { equipBonus, equipBonusStr } from "../../core/equipment.js";
 import AscStars from "../../ui/components/AscStars.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
@@ -99,7 +99,6 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
       : React.createElement("div", { className: "creature-grid" },
           entries.map((o) => {
             const d = CREATURE_MAP[o.id];
-            const displayEmoji = getDisplayEmoji(d, o, unlockedSkins);
             const hasOpenSlot = (o.equipped || [null, null, null, null]).some((s) => !s);
             return React.createElement("div", {
               key: o.id,
@@ -111,7 +110,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
               d.attackType && React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[d.attackType].emoji),
               d.role && React.createElement("span", { style: { position: "absolute", top: 20, right: 5, fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[d.role].emoji),
               o.ascensions > 0 && React.createElement("div", { style: { position: "absolute", top: 5, left: 0, right: 0, textAlign: "center", lineHeight: 1 } }, React.createElement(AscStars, { n: o.ascensions })),
-              React.createElement("div", { className: "creature-emoji" }, displayEmoji),
+              React.createElement(CreatureIcon, { def: d, ownedData: o, unlockedSkins, size: 26, className: "creature-emoji", style: { lineHeight: 1.2, margin: "0 auto 3px" } }),
               React.createElement("div", { className: "creature-name" }, d.name),
               React.createElement("div", { style: { display: "flex", gap: 4, justifyContent: "center", marginBottom: 4, flexWrap: "wrap", alignItems: "center" } },
                 React.createElement("span", { className: "lv-badge" }, "Lv " + o.level)

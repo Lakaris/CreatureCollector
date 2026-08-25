@@ -4,7 +4,7 @@ import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { QUEST_DEFS, NEW_PLAYER_GIFT_REWARDS } from "../../data/quests.js";
-import { getDisplayEmoji } from "../../core/creatures.js";
+import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
 import QuestsScreen from "../../ui/screens/QuestsScreen.js";
 import DailyScreen from "../../ui/screens/DailyScreen.js";
@@ -38,7 +38,6 @@ function HomeScreen(){
   const ownedList=Object.values(owned);
   const ownedData=featuredCreatureId?owned[featuredCreatureId]:ownedList[0];
   const def=ownedData?CREATURE_MAP[ownedData.id]:null;
-  const emoji=def?getDisplayEmoji(def,ownedData,unlockedSkins||[]):"🐣";
   const title=ownedData&&ownedData.equippedTitle?ownedData.equippedTitle:null;
   const aura=ownedData&&ownedData.equippedAura?ownedData.equippedAura:null;
   const bg=ownedData&&ownedData.equippedBackground?ownedData.equippedBackground:null;
@@ -79,14 +78,13 @@ function HomeScreen(){
         ownedList.map(o=>{
           const d=CREATURE_MAP[o.id];
           if(!d)return null;
-          const em=getDisplayEmoji(d,o,unlockedSkins||[]);
           const selected=o.id===(featuredCreatureId||ownedList[0]?.id);
           return React.createElement("button",{
             key:o.id,
             onClick:()=>{setFeaturedCreatureId(o.id);setPicking(false);},
             style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 4px",borderRadius:10,border:selected?"2px solid #7c4dff":"2px solid #e8e8e8",background:selected?"#f3eeff":"#fafafa",cursor:"pointer"}
           },
-            React.createElement("div",{style:{fontSize:36,lineHeight:1}},em),
+            React.createElement(CreatureIcon,{def:d,ownedData:o,unlockedSkins:unlockedSkins||[],size:36}),
             React.createElement("div",{style:{fontSize:10,fontWeight:600,color:"#333",textAlign:"center",lineHeight:1.2}},d.name)
           );
         })
@@ -118,7 +116,7 @@ function HomeScreen(){
       // else; it just sticks around until Quests itself is tapped.
       !tutorialRestricted&&showQuestsArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:-30,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬆️")
     ),
-    React.createElement("div",{style:{fontSize:120,lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))",position:"relative"}},emoji),
+    React.createElement("div",{style:{lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))",position:"relative"}},def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
     title&&React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",marginTop:2}},title),
     def&&React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginTop:title?0:4}},def.name),
     def&&React.createElement("div",{style:{fontSize:13,color:"#888"}},def.type),

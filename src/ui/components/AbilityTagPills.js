@@ -71,6 +71,34 @@ function stackingLine(def) {
   }, "Stacking effect: " + def.stacking.map((n) => n + "%").join(" / "));
 }
 
+/** True when a tag renders anything below its description (stacking totals or
+ * a summon's kit), which the single-tag view uses to place its bottom gap. */
+function hasExtras(def) {
+  return !!(def.stacking || def.profile || def.kit);
+}
+
+/**
+ * Summoned-creature tags (Wisp) carry their own type line and three-ability
+ * kit, shown as a miniature ability card under the tag's description so the
+ * summon's behavior lives in one place instead of in every summoning ability.
+ */
+function summonKit(def) {
+  if (!def.profile && !def.kit) return null;
+  return React.createElement(React.Fragment, null,
+    def.profile && React.createElement("div", {
+      style: { fontSize: 11, fontWeight: 700, color: "#888", marginTop: 4 },
+    }, def.profile),
+    def.kit && React.createElement("div", null,
+      def.kit.map((a) => React.createElement("div", { key: a.key, style: { marginTop: 6 } },
+        React.createElement("div", {
+          style: { fontSize: 9, fontWeight: 800, color: "#999", textTransform: "uppercase", letterSpacing: 0.5 },
+        }, a.key),
+        React.createElement("div", { style: { fontSize: 12, color: "#555", lineHeight: 1.4 } }, a.text)
+      ))
+    )
+  );
+}
+
 /** Full-screen definition popup: one tag, or the Effects pill's list. */
 export function AbilityTagPopup({ popup, onClose }) {
   if (!popup) return null;
@@ -90,14 +118,17 @@ export function AbilityTagPopup({ popup, onClose }) {
               React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: EFFECTS_COLOR, marginBottom: 2 } },
                 ABILITY_TAG_DEFS[tag].label, undispellableBadge(ABILITY_TAG_DEFS[tag])),
               React.createElement("div", { style: { fontSize: 12, color: "#555", lineHeight: 1.4 } }, ABILITY_TAG_DEFS[tag].description),
-              stackingLine(ABILITY_TAG_DEFS[tag])
+              stackingLine(ABILITY_TAG_DEFS[tag]),
+              summonKit(ABILITY_TAG_DEFS[tag])
             ))
           )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 8 } },
               ABILITY_TAG_DEFS[popup].label, undispellableBadge(ABILITY_TAG_DEFS[popup])),
-            React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.4, marginBottom: ABILITY_TAG_DEFS[popup].stacking ? 4 : 16 } }, ABILITY_TAG_DEFS[popup].description),
-            ABILITY_TAG_DEFS[popup].stacking && React.createElement("div", { style: { marginBottom: 16 } }, stackingLine(ABILITY_TAG_DEFS[popup]))
+            React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.4, marginBottom: hasExtras(ABILITY_TAG_DEFS[popup]) ? 4 : 16 } }, ABILITY_TAG_DEFS[popup].description),
+            ABILITY_TAG_DEFS[popup].stacking && React.createElement("div", null, stackingLine(ABILITY_TAG_DEFS[popup])),
+            summonKit(ABILITY_TAG_DEFS[popup]),
+            hasExtras(ABILITY_TAG_DEFS[popup]) && React.createElement("div", { style: { height: 16 } })
           ),
       React.createElement("button", {
         onClick: onClose,

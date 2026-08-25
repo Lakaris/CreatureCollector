@@ -10,6 +10,7 @@ import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js
 import { getEvolutionStage } from "../../core/creatures.js";
 import DexEntry from "../../ui/screens/DexEntry.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
+import CreatureIcon from "../../ui/components/CreatureIcon.js";
 
 const STAGE_LABELS={1:"1st",2:"2nd",3:"3rd",4:"4th"};
 
@@ -123,14 +124,17 @@ function DexScreen({onBack}){
               React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
               def.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[def.attackType].emoji),
               def.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[def.role].emoji),
-              React.createElement("div",{className:"creature-emoji"},def.emoji),
-              React.createElement("div",{className:"creature-name"},def.name),
-              // Fills the same slot Collection's Lv badge occupies -- a green
-              // checkmark if collected, otherwise the badge stays invisible
-              // (not unrendered) so every dex card keeps the exact same
-              // height as a collection card, collected or not.
+              // Collected status is the creature itself: full color when
+              // owned, slightly greyed out when not (purely visual -- the
+              // card stays clickable either way).
+              React.createElement(CreatureIcon,{def,still:true,size:26,className:"creature-emoji",style:{lineHeight:1.2,margin:"0 auto 3px",...(isCollected?null:{filter:"grayscale(1)",opacity:0.45})}}),
+              React.createElement("div",{className:"creature-name",style:isCollected?undefined:{color:"#999"}},def.name),
+              // Invisible stand-in for Collection's Lv badge row, keeping
+              // every dex card the same height whether collected or not.
+              // (Collection cards themselves are shorter now -- they dropped
+              // the creature name; the Dex keeps names for identification.)
               React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
-                React.createElement("span",{className:"lv-badge",style:{visibility:isCollected?"visible":"hidden"}},"✓")
+                React.createElement("span",{className:"lv-badge",style:{visibility:"hidden"}},"·")
               )
             );
           })

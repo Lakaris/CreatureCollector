@@ -15,6 +15,7 @@ import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/contex
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
@@ -22,8 +23,12 @@ import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/Ability
 import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 
+// Shared empty grid so a boss with no deployment yields a stable identity
+// instead of a fresh {} every render.
+const EMPTY_GRID={};
+
 function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
-  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrid, setDungeonPlanGrid: setDPlanGrid, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, dungeonStarterPackPurchased } = useGame();
+  const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrids, setDungeonPlanGrid: setDPlanGrids, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, dungeonStarterPackPurchased } = useGame();
   const PASS_COST=1;
   const dungeonPassDailyCap=DUNGEON_PASS_DAILY_CAP+(dungeonStarterPackPurchased?DUNGEON_PASS_DAILY_CAP_BONUS:0);
   const rechargeCost=100*Math.pow(2,passRechargeCount);
@@ -31,6 +36,21 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   // active, every button on the boss-select screen is inert except Fight --
   // tapping it is what finally clears the tutorial (see the Fight button below).
   const dungeonEnterActive=tutorialRestricted&&tutorialStep==="dungeonEnter";
+  // Which boss tab is open. Declared up here (rather than beside the rest of
+  // the boss-select state further down) because the deployment grid is stored
+  // per boss and everything below reads through it.
+  const [selected,setSelected]=useState("fire");
+  // dPlanGrids is boss key -> {"r,c": creatureId}; dPlanGrid/setDPlanGrid are
+  // the current boss's slice, so the rest of the screen keeps working with a
+  // plain flat grid and each boss remembers its own team.
+  const dPlanGrid=dPlanGrids?.[selected]||EMPTY_GRID;
+  function setDPlanGrid(updater){
+    setDPlanGrids(prev=>{
+      const cur=prev?.[selected]||EMPTY_GRID;
+      const next=typeof updater==="function"?updater(cur):updater;
+      return {...prev,[selected]:next};
+    });
+  }
   // battle state
   const [dPlanning,setDPlanning]=useState(false);
   const [dPlanHighlight,setDPlanHighlight]=useState(null);
@@ -95,7 +115,9 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       for(const u of[...s.playerUnits,...s.enemyUnits]){
         const refs=dUnitRefs.current.get(u.uid);if(!refs)continue;
         const{el,hpEl}=refs;
-        if(u.hp<=0){el.style.opacity="0";continue;}
+        // Defeated units keep their DOM node (only summons are pruned), so a
+        // creature with defeat art lingers at its death tile while it plays.
+        if(u.hp<=0){el.style.opacity=String(battleUnitOpacity(u,now,CREATURE_MAP[u.creatureId]));continue;}
         el.style.opacity="1";
         const t=aEase(Math.min(1,(now-u.lastMoveTime)/dAnimRef.current));
         el.style.left=((u.prevCol+(u.col-u.prevCol)*t)*DUNGEON_TILE)+"px";
@@ -130,8 +152,13 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const anyP=s.playerUnits.some(u=>u.hp>0);
     const bossAlive=b&&b.hp>0;
     const anyE=s.enemyUnits.some(u=>u.hp>0);
+    // Winners hold a victory pose for a beat before the outcome overlay;
+    // one more snapshot so React renders the stamped state.
+    const victorySnap=()=>setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
     if(!bossAlive&&!anyE){
       stopDLoops();
+      const stamped=stampVictors(s.playerUnits,now);
+      victorySnap();
       const bossLevel=dungeonBossLevels?.[selected]||1;
       dWonBossRef.current={boss:dBRef.current._boss,bossLevel};
       setDungeonBossLevels(p=>({...p,[selected]:Math.min(10,(p[selected]||1)+1)}));
@@ -139,10 +166,12 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       setCurrencies(c=>({...c,dungeonPass:(c.dungeonPass||0)-1}));
       setEquipmentCopies(prev=>{const n={...prev};for(const item of rolled)n[item.id]=(n[item.id]||0)+1;return n;});
       onClear&&onClear(1);
-      setTimeout(()=>setDBattleOutcome("won"),600);
+      setTimeout(()=>setDBattleOutcome("won"),stamped?VICTORY_LINGER_MS:600);
     } else if(!anyP){
       stopDLoops();
-      setTimeout(()=>setDBattleOutcome("lost"),600);
+      const stamped=stampVictors(s.enemyUnits,now);
+      victorySnap();
+      setTimeout(()=>setDBattleOutcome("lost"),stamped?VICTORY_LINGER_MS:600);
     }
   }
   function dRestartFight(){
@@ -234,7 +263,6 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     document.removeEventListener('mouseup',dEndHoldDoc);
     document.removeEventListener('touchend',dEndHoldDoc);
   }
-  const [selected,setSelected]=useState("fire");
   // Jumps straight to a boss tab when navigated here from e.g. the "Defeat
   // the Level 1 Wind Boss" quest; consumed once then cleared, same pattern
   // as FarmScreen's farmDeepLink.
@@ -291,7 +319,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?"Dungeon Cleared!":"Defeat!"),
       React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?"Equipment rewards collected!":""),
-      React.createElement("button",{onClick:()=>{stopDLoops();setDBattling(false);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDPlanGrid({});setDBattleSelected(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
+      React.createElement("button",{onClick:()=>{stopDLoops();setDBattling(false);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDBattleSelected(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
   }
   if(dBattling){
@@ -367,13 +395,13 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
               React.createElement("div",{style:{position:"absolute",left:e.col*DUNGEON_TILE+DUNGEON_TILE/2,top:e.row*DUNGEON_TILE+DUNGEON_TILE/2,width:DUNGEON_TILE*0.85,height:DUNGEON_TILE*0.85,borderRadius:"50%",background:color,animation:"atkImpact 0.55s ease-out forwards",pointerEvents:"none",zIndex:20,transform:"translate(-50%,-50%)"}},null)
             );
           }),
-          allUnits.map(u=>{const isBurned=(u.burnTicks||0)>0;const isDotted=u.uid[0]==="p"&&(u.dotTicks||0)>0;const isWeak=u.uid[0]==="p"&&(u.weakTicks||0)>0;return React.createElement("div",{key:"du"+u.uid,ref:el=>{if(el){const hpEl=el.querySelector(".hp-fill");dUnitRefs.current.set(u.uid,{el,hpEl});el.style.left=(u.col*DUNGEON_TILE)+"px";el.style.top=(u.row*DUNGEON_TILE)+"px";}else dUnitRefs.current.delete(u.uid);},onClick:u.hp>0?()=>setDBattleSelected({type:"unit",uid:u.uid}):undefined,style:{position:"absolute",width:DUNGEON_TILE,height:DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",opacity:u.hp>0?1:0,zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default"}},
+          allUnits.map(u=>{const isBurned=(u.burnTicks||0)>0;const isDotted=u.uid[0]==="p"&&(u.dotTicks||0)>0;const isWeak=u.uid[0]==="p"&&(u.weakTicks||0)>0;return React.createElement("div",{key:"du"+u.uid,ref:el=>{if(el){const hpEl=el.querySelector(".hp-fill");dUnitRefs.current.set(u.uid,{el,hpEl});el.style.left=(u.col*DUNGEON_TILE)+"px";el.style.top=(u.row*DUNGEON_TILE)+"px";}else dUnitRefs.current.delete(u.uid);},onClick:u.hp>0?()=>setDBattleSelected({type:"unit",uid:u.uid}):undefined,style:{position:"absolute",width:DUNGEON_TILE,height:DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",opacity:battleUnitOpacity(u,Date.now(),CREATURE_MAP[u.creatureId]),zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default"}},
             React.createElement("div",{style:{position:"relative",lineHeight:1}},
-              React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
-              isBurned&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥"),
-              isDotted&&React.createElement("div",{style:{position:"absolute",top:-4,left:-6,fontSize:10,lineHeight:1}},"🟣"),
-              isWeak&&React.createElement("div",{style:{position:"absolute",bottom:-4,right:-6,fontSize:10,lineHeight:1}},"⬇️"),
-              (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-9,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
+              React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:DUNGEON_TILE,state:battleArtState(u,Date.now(),dAnimRef.current)}),
+              isBurned&&React.createElement("div",{style:{position:"absolute",top:1,right:1,fontSize:10,lineHeight:1}},"🔥"),
+              isDotted&&React.createElement("div",{style:{position:"absolute",top:1,left:1,fontSize:10,lineHeight:1}},"🟣"),
+              isWeak&&React.createElement("div",{style:{position:"absolute",bottom:7,right:1,fontSize:10,lineHeight:1}},"⬇️"),
+              (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:1,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
             ),
             React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
               React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:u.uid[0]==="e"?"#ef4444":isBurned?"#f97316":isDotted?"#7c3aed":"#22c55e",borderRadius:2}})
@@ -387,8 +415,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           );})
         ),
         React.createElement("div",{className:"battle-side-panel"},selectedUnit?React.createElement(UnitInfoPanel,{
-          emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||(selectedUnit.creatureId==="__vine_minion"?"🌱":"❓"),
-          image:CREATURE_MAP[selectedUnit.creatureId]?.image,
+          def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:selectedUnit.creatureId==="__vine_minion"?"🌱":"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||(selectedUnit.creatureId==="__vine_minion"?"Vine":selectedUnit.creatureId),
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,shield:selectedUnit.shield,
@@ -445,7 +472,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
                 onMouseDown:onHS,onMouseUp:onHE,
                 onTouchStart:onHS?(e)=>{e.preventDefault();onHS();if(isPlayerZone&&creatureId)dTouchDrag.start(e,{fromCell:key,cellId:creatureId});}:undefined,onTouchEnd:onHE,
                 style:{width:DUNGEON_TILE,height:DUNGEON_TILE,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none"}
-              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:26}));})());
+              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:DUNGEON_TILE}));})());
             })).flat()
           ),
           React.createElement("div",{style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*DUNGEON_TILE,top:1*DUNGEON_TILE,width:2*DUNGEON_TILE,height:2*DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,pointerEvents:"none",zIndex:10}},
@@ -470,7 +497,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}},boss?.name),
             React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:700,marginBottom:dBossMinimized?0:12}},"Lv. "+bossLevel),
             !dBossMinimized&&boss?.abilities&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
-              [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Unique",boss.abilities.unique]].map(([key,label,ab])=>ab&&
+              [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>ab&&
                 React.createElement("div",{key:label,onClick:()=>setDPlanHighlight(p=>p===key?null:key),style:{background:dPlanHighlight===key?"rgba(239,68,68,0.10)":"transparent",borderRadius:8,padding:"8px 10px",margin:"0 -10px",border:dPlanHighlight===key?"1.5px solid rgba(239,68,68,0.5)":"1px solid transparent",cursor:"pointer"}},
                   React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},label),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},ab.name),
@@ -483,7 +510,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             const def=CREATURE_MAP[dGridInfoCreature];
             const oc=owned&&owned[dGridInfoCreature];
             if(!def)return null;
-            const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
+            const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
             return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
               React.createElement("button",{onClick:()=>setDCreatureMinimized(p=>{const next=!p;if(!next)expandDPanel("creature");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dCreatureMinimized?"＋":"－"),
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:dCreatureMinimized?0:12}},

@@ -16,6 +16,7 @@ import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
@@ -177,7 +178,9 @@ function DailyBossScreen({onBack,onViewCreature}){
         const refs=unitDomRefs.current.get(u.uid);
         if(!refs)continue;
         const{el,hpEl}=refs;
-        if(u.hp<=0){el.style.opacity="0";continue;}
+        // Defeated units keep their DOM node (only summons are pruned), so a
+        // creature with defeat art lingers at its death tile while it plays.
+        if(u.hp<=0){el.style.opacity=String(battleUnitOpacity(u,now,CREATURE_MAP[u.creatureId]));continue;}
         el.style.opacity="1";
         const t=easeInOut(Math.min(1,(now-u.lastMoveTime)/moveAnimMsRef.current));
         const dr=u.prevRow+(u.row-u.prevRow)*t;
@@ -216,10 +219,14 @@ function DailyBossScreen({onBack,onViewCreature}){
     // Per-effect expiry windows, matching Dungeon -- boss kits now emit the same
     // shock/splash/dark/slam effects here that they always did there.
     if(newFx.length)setAtkEffects(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:e.isDark?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
-    // snapshot only for log + unit lifecycle (not positions — RAF handles those)
-    setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col,
-        burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,dotTicks:u.dotTicks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks})),
+    // snapshot only for log + unit lifecycle (not positions — RAF handles those).
+    // The art-state timestamps (lastAttackTime etc.) MUST be copied along or
+    // battleArtState only ever sees "idle"/no-defeat here.
+    const takeSnap=()=>setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col,
+        burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,dotTicks:u.dotTicks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks,
+        lastAttackTime:u.lastAttackTime,lastMoveTime:u.lastMoveTime,deathTime:u.deathTime,victoryTime:u.victoryTime,abilFlashTicks:u.abilFlashTicks,abilCharge:u.abilCharge,abilChargeMax:u.abilChargeMax,shield:u.shield})),
       boss:{...s.boss},log:[...s.log],damageDealt:{...s.damageDealt}});
+    takeSnap();
     const bGameElapsed=(Date.now()-battleStartRef.current)*speedRef.current;
     const bTL=Math.min(60,Math.ceil(Math.max(0,60000-bGameElapsed)/1000));
     setBossTimeLeft(bTL);
@@ -236,13 +243,17 @@ function DailyBossScreen({onBack,onViewCreature}){
     const anyAlive=s.playerUnits.some(u=>u.hp>0);
     if(s.boss.hp<=0){
       stopLoops();
+      // Survivors hold a victory pose for a beat before the outcome overlay;
+      // one more snapshot so React renders the stamped state.
+      const stamped=stampVictors(s.playerUnits,now);
+      takeSnap();
       // Beating the tier always grants a reward set (on top of the once-a-day
       // guaranteed set below) -- winning also satisfies that daily guarantee
       // when it hasn't been claimed yet today.
       const winRewards=rollDungeonRewards(5,boss.type,level);
       setDailyBossData(prev=>({...prev,date:today,fights:0,wins:0,rewardsCollectedDate:today}));
       setRewards(winRewards);
-      setTimeout(()=>setPhase("won"),600);
+      setTimeout(()=>setPhase("won"),stamped?VICTORY_LINGER_MS:600);
     } else if(!anyAlive){
       stopLoops();
       setDailyBossData(prev=>({...prev,date:today,fights:(isToday?(prev.fights||0):0)+1,wins:(isToday?(prev.wins||0):0)}));
@@ -283,7 +294,9 @@ function DailyBossScreen({onBack,onViewCreature}){
       setRewards(consolation);
     }
     bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
-    setPhase("lost"); setPlanGrid({}); setBattleLog([]); setLogStep(0);
+    // Deliberately leaves planGrid alone -- the deployment persists through a
+    // forfeit (and app close) so the next attempt starts from the same team.
+    setPhase("lost"); setBattleLog([]); setLogStep(0);
     setConfirmForfeitOpen(false);
   }
   useEffect(()=>()=>stopLoops(),[]);
@@ -578,15 +591,15 @@ function DailyBossScreen({onBack,onViewCreature}){
                 position:"absolute",
                 width:TILE,height:TILE,
                 display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
-                opacity:u.hp>0?1:0,
+                opacity:battleUnitOpacity(u,Date.now(),CREATURE_MAP[u.creatureId]),
                 zIndex:5,pointerEvents:u.hp>0?"auto":"none",cursor:u.hp>0?"pointer":"default",
                 // NO left/top — RAF manages those
               }
             },
               React.createElement("div",{style:{position:"relative",lineHeight:1}},
-                React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:20}),
-                (u.burnTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-4,right:-6,fontSize:10,lineHeight:1}},"🔥"),
-                (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:-9,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
+                React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:TILE,state:battleArtState(u,Date.now(),moveAnimMsRef.current)}),
+                (u.burnTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:1,right:1,fontSize:10,lineHeight:1}},"🔥"),
+                (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:1,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
               ),
               React.createElement("div",{style:{position:"absolute",bottom:3,left:3,right:3,height:3,background:"#ddd",borderRadius:2,overflow:"hidden"}},
                 React.createElement("div",{className:"hp-fill",style:{height:"100%",width:(u.hp/u.maxHp*100)+"%",background:(u.burnTicks||0)>0?"#f97316":"#22c55e",borderRadius:2}})
@@ -600,8 +613,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           )
         ),
         React.createElement("div",{className:"battle-side-panel"},selectedUnit?React.createElement(UnitInfoPanel,{
-          emoji:CREATURE_MAP[selectedUnit.creatureId]?.emoji||"❓",
-          image:CREATURE_MAP[selectedUnit.creatureId]?.image,
+          def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
           hp:selectedUnit.hp,maxHp:selectedUnit.maxHp,shield:selectedUnit.shield,
@@ -696,7 +708,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 userSelect:"none",
               }
             },
-            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:26})):"");
+            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:TILE})):"");
           })
         ).flat()
       )
@@ -705,7 +717,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       React.createElement("div",{ref:rightPanelRef,style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8,overflow:"hidden"}},
         // boss panel (always top 50%)
         (()=>{
-          const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
+          const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
           const bossStats=getBossStats(boss,level);
           // Every Daily Boss runs the same generic kit (see battle/bosses/daily.js),
           // just re-flavored by element -- not the dungeon's unique per-boss kits.
@@ -735,7 +747,7 @@ function DailyBossScreen({onBack,onViewCreature}){
         // creature panel (bottom 50%, shown when a creature is held)
         (()=>{
           if(!gridInfoCreature)return React.createElement("div",{style:{flex:"0 0 50%"}});
-          const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
+          const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
           const def=CREATURE_MAP[gridInfoCreature];
           const oc=owned&&owned[gridInfoCreature];
           if(!def)return React.createElement("div",{style:{flex:"0 0 50%"}});
@@ -849,7 +861,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   ),
   touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
   bossPopupOpen&&isNarrowScreen&&(()=>{
-    const abilityLabels={basic:"Basic",special:"Special",unique:"Unique"};
+    const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
     const dailyAbilities={
       basic:{name:boss.type+" Strike",description:"Deals "+boss.type+" damage to the nearest enemy"},
       special:{name:boss.type+" Nova",description:"Deals "+boss.type+" damage around itself, pushing nearby enemies back 1 tile"},

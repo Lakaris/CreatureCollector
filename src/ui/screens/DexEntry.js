@@ -9,6 +9,7 @@ import { getChain, getSkinsForCreature, getSpecialCharge, getSpecialChargeAt } f
 import { formatAbilityDisplay, formatUpgradeStep, getAbilityTags, formatStarlitAbilityLevel, formatPlainAbilityLevel } from "../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../ui/components/AbilityTagPills.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
+import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
 
 function DexEntry({def,onBack,onNavigate,navList}){
@@ -49,7 +50,9 @@ function DexEntry({def,onBack,onNavigate,navList}){
         React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:20,marginBottom:16,flexWrap:"wrap"}},
           chain.filter(cid=>skinPreview.appearances[cid]).map(cid=>
             React.createElement("div",{key:cid,style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4}},
-              React.createElement("span",{style:{fontSize:52,lineHeight:1}},skinPreview.appearances[cid].emoji),
+              // Preview the skin itself, not whatever the player has equipped: a
+              // synthetic owned record aims the resolver at this one set.
+              React.createElement(CreatureIcon,{def:CREATURE_MAP[cid],ownedData:{activeSkin:{setId:skinPreview.id,variantId:cid}},unlockedSkins:[skinPreview.id],still:true,size:52}),
               React.createElement("span",{style:{fontSize:11,color:"#666"}},CREATURE_MAP[cid].name)
             )
           )
@@ -62,7 +65,9 @@ function DexEntry({def,onBack,onNavigate,navList}){
     React.createElement(ScreenHeader,{title:def.name,onBack}),
     React.createElement("div",{className:"card",style:{marginBottom:12}},
       React.createElement("div",{style:{textAlign:"center",marginBottom:12}},
-        React.createElement("span",{style:{fontSize:100,lineHeight:1,display:"block",marginBottom:10}},def.emoji),
+        // Same 130px portrait as the creature page (Collection's art works
+        // out to about this size too), with the card growing to fit.
+        React.createElement(CreatureIcon,{def,still:true,size:130,style:{margin:"0 auto 10px"}}),
         React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:3}},def.name),
         React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:8}},TYPE_EMOJI[def.type]||def.type," ",def.type),
         React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",justifyContent:"center"}},
@@ -90,7 +95,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
               border:d.id===def.id?"1px solid #CECBF6":"1px solid transparent"},
             onClick:d.id!==def.id?()=>onNavigate(d):undefined
           },
-            React.createElement("span",{style:{fontSize:30,lineHeight:1}},d.emoji),
+            React.createElement(CreatureIcon,{def:d,still:true,size:30}),
             React.createElement("span",{style:{fontSize:10,color:d.id===def.id?"#534AB7":"#666",fontWeight:500}},d.name),
             d.ascensionsToEvolve&&React.createElement("span",{style:{fontSize:10,color:"#aaa"}},"×"+d.ascensionsToEvolve+" asc.")
           )
@@ -119,7 +124,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
         return React.createElement("div",{key:k,className:"ability-card"},
           React.createElement("div",{className:"ability-header"},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
-              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k),
+              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k==="unique"?"Passive":k),
               React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}},
                 abl.icon
                   ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})

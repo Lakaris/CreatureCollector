@@ -7,12 +7,13 @@ import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABE
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
-import { getRootDef, getChain, makeOwnedCreature, calcStats, getDisplayEmoji, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
+import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
 import AscStars from "../../../ui/components/AscStars.js";
+import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import StatBar from "../../../ui/components/StatBar.js";
 import PipRow from "../../../ui/components/PipRow.js";
 import Notify from "../../../ui/components/Notify.js";
@@ -131,7 +132,6 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const isMaxLevel=ownedData.level>=MAX_LEVEL;
   const cost=energyCost(ownedData.level);
   const hasFood=!isMaxLevel&&currencies.food>=cost;
-  const displayEmoji=getDisplayEmoji(def,ownedData,unlockedSkins);
   const [showFlairEffects,setShowFlairEffects]=useState(false);
   const [showEquipPage,setShowEquipPage]=useState(false);
   const [equipDetailPage,setEquipDetailPage]=useState(null);
@@ -544,7 +544,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       },"Evolutions")}),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
-          React.createElement("span",{style:{fontSize:52,lineHeight:1}},displayEmoji),
+          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:52,style:{flexShrink:0}}),
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#000"}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
             React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#666",marginBottom:6}},"Lv "+ownedData.level),
@@ -790,12 +790,24 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   return React.createElement("div",swipeHandlers,
     statInfoPopupEl,
     abilityTagPopupEl,
-    ascPopup&&React.createElement(AscensionPopup,{def,displayEmoji,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
-    React.createElement(ScreenHeader,{title:def.name,onBack,backDisabled:equipTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
-      disabled:equipTutorialLock,
-      onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
-      style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(equipTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:equipTutorialLock?"#f5f5f5":"#f0effe",color:equipTutorialLock?"#bbb":"#534AB7",cursor:equipTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
-    },"Evolutions")}),
+    ascPopup&&React.createElement(AscensionPopup,{def,unlockedSkins,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
+    // The header title carries the equipped flair title ("Blastar the
+    // Mighty") -- it's the only place the title shows on this page. The
+    // right slot holds Flair Effects (when any flair is unlocked) then
+    // Evolutions. Equal-width grid tracks + stretch keep the two buttons the
+    // exact same size (the ✨ emoji would otherwise make Flair Effects taller
+    // and its longer label wider).
+    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{display:"grid",gridAutoFlow:"column",gridAutoColumns:"1fr",gap:6,alignItems:"stretch"}},
+      flairBuffs.length>0&&React.createElement("button",{
+        onClick:()=>setShowFlairEffects(true),
+        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
+      },"✨ Flair Effects"),
+      chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+        disabled:equipTutorialLock,
+        onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
+        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(equipTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:equipTutorialLock?"#f5f5f5":"#f0effe",color:equipTutorialLock?"#bbb":"#534AB7",cursor:equipTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
+      },"Evolutions")
+    )}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
@@ -838,16 +850,16 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         ),
         React.createElement("div",{style:{textAlign:"center"}},
           ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
-          def.image
-            ?React.createElement("div",{style:{width:100,height:100,margin:"0 auto 8px",borderRadius:16,overflow:"hidden",background:"#fff"}},
-                React.createElement("img",{src:def.image,style:{width:"100%",height:"100%",objectFit:"contain",display:"block",mixBlendMode:"multiply"}}))
-            :React.createElement("span",{style:{fontSize:100,lineHeight:1,display:"block",marginBottom:8}},displayEmoji),
-          React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:6}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
-          React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",justifyContent:"center"}},
-            React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#666"}},"Lv "+ownedData.level)
-          )
+          // No name or level under the portrait -- the name is already in the
+          // ScreenHeader and the level sits top-right -- so the art gets the
+          // freed space (130px, up from 100). Art renders transparent, no
+          // backing plate; legacy multiply-blend art reads fine on any light
+          // background.
+          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{margin:"0 auto"}})
         ),
-        flairBuffs.length>0&&React.createElement("button",{onClick:()=>setShowFlairEffects(true),style:{position:"absolute",top:0,right:0,padding:"4px 10px",fontSize:11,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer"}},"✨ Flair Effects")
+        // Top-right: level. (Flair Effects lives in the ScreenHeader's right
+        // slot, beside Evolutions.)
+        React.createElement("span",{style:{position:"absolute",top:0,right:0,fontSize:17,fontWeight:700,color:"#666"}},"Lv "+ownedData.level)
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},
         STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))
@@ -1035,7 +1047,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         return React.createElement("div",{key:k,className:"ability-card"},
           React.createElement("div",{className:"ability-header",style:{alignItems:"center"}},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}},
-              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k),
+              React.createElement("span",{style:{fontSize:8,fontWeight:800,color:"#555",background:"#e8e8e8",borderRadius:20,padding:"2px 7px",textTransform:"uppercase",letterSpacing:.4,whiteSpace:"nowrap"}},k==="unique"?"Passive":k),
               React.createElement("div",{style:{width:40,height:40,borderRadius:8,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}},
                 abl.icon
                   ? React.createElement("img",{src:abl.icon,style:{width:"100%",height:"100%",objectFit:"cover"}})
@@ -1072,7 +1084,11 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         );
       })
     ),
-    tab==="flair"&&React.createElement(FlairSection,{displayEmoji,def,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep}),
+    // statsWithEquip recomputes here whenever a feed adds to unlockedFlair,
+    // so the flair page's stat row updates (and flashes) live. onStatClick
+    // opens this page's stat-info popup (fixed, zIndex 300), which renders
+    // above the flair overlay (zIndex 10) even while it's up.
+    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,statsWithEquip,onStatClick:setStatInfoPopup,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep}),
     tab==="skins"&&React.createElement(SkinSection,{
       ownedData,def,currencies,setCurrencies,setOwned,
       unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,

@@ -16,8 +16,12 @@ import React from "../../react.js";
  *   info panel) once a drag is confirmed, so the two gestures don't fight.
  * onCancelDrop(fromCell): called when a cell-origin drag is released outside any
  *   grid cell -- mirrors the existing "drop outside the grid unequips it" behavior.
+ * onDragMove(x, y): optional; fired with the finger's client coords while a drag
+ *   is active. Screens use it to edge-autoscroll their planning column, since
+ *   an active drag preventDefaults the native scroll away.
+ * onDragEnd(): optional; fired when the drag gesture ends for any reason.
  */
-export default function useTouchDragPlacement({ cellSelector, applyDrop, onCancelHold, onCancelDrop }) {
+export default function useTouchDragPlacement({ cellSelector, applyDrop, onCancelHold, onCancelDrop, onDragMove, onDragEnd }) {
   const dragRef = React.useRef({ id: null, fromCell: null, cellId: null, startX: 0, startY: 0, active: false });
   const [ghost, setGhost] = React.useState(null); // {id, x, y} while actively dragging
 
@@ -47,10 +51,12 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
       ts.active = true;
       onCancelHold && onCancelHold();
       setGhost({ id: ts.id || ts.cellId, x: t.clientX, y: t.clientY });
+      onDragMove && onDragMove(t.clientX, t.clientY);
       return;
     }
     e.preventDefault();
     setGhost(g => (g ? { ...g, x: t.clientX, y: t.clientY } : g));
+    onDragMove && onDragMove(t.clientX, t.clientY);
   }
 
   function end(e) {
@@ -72,6 +78,7 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
     }
     dragRef.current = { id: null, fromCell: null, cellId: null, startX: 0, startY: 0, active: false };
     setGhost(null);
+    onDragEnd && onDragEnd();
   }
 
   /** id: creature id when dragging from the tray. fromCell/cellId: cell key + its creature id when dragging from the grid. */

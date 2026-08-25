@@ -23,8 +23,15 @@
 .btn-sm{padding:5px 12px;font-size:12px;width:auto;margin-bottom:0}
 .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;color:#666;font-size:15px;margin-bottom:12px;padding:8px 12px 8px 4px;margin-left:-4px}
 
-/* Creature grid + cards */
+/* Creature grid + cards.
+   Four across only works while each card stays wide enough for what sits in
+   it -- the ascension bar's five stars need roughly 85px, and below that the
+   card starts squeezing its own contents rather than the grid getting denser.
+   So on a narrow phone drop a column instead: 3 up from ~310px wide, 2 below
+   that. Shared by Collection, the Dex, and the equipment picker. */
 .creature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+@media (max-width:374px){.creature-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:290px){.creature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .creature-card{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:10px;padding:8px 6px;cursor:pointer;transition:all .15s;overflow:visible}
 .creature-card:hover{border-color:rgba(0,0,0,0.2)}
 .creature-emoji{font-size:26px;text-align:center;margin-bottom:3px;line-height:1.2}

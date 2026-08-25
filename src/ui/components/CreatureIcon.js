@@ -18,20 +18,34 @@
 //   unlockedSkins  ids of skin sets the player owns
 //   className      extra class, applied whichever kind renders
 //   style          extra styles, merged last
+//   contain        keep an emoji's ink inside the size box (see below). Image
+//                  art already fits its box, so this only affects emoji.
 
 import React from "../../react.js";
 import { getDisplayArt } from "../../core/creatures.js";
 
-function CreatureIcon({ def, size, style, className, state, still, ownedData, unlockedSkins }) {
+// An emoji drawn at font-size = size does NOT fit in a size-tall box. The
+// emoji font reports a taller box than the line (ascent 50 + descent 12
+// against a 46px line at that size), which drags the baseline down, and the
+// glyph's own ink runs about 1.09em -- so the art ends up hanging 3-5px below
+// its box. Anywhere with padding around it that goes unnoticed; on a battle
+// grid, where the icon is exactly one tile, it spills into the tile below.
+//
+// Sizing the glyph to 0.82em of the box and lifting it 5% puts the ink inside
+// with a even margin top and bottom. The numbers are measured against the
+// emoji font, not derived, so they're approximate on other platforms -- but
+// they err small, which clips nothing.
+const EMOJI_FIT = 0.82;
+
+function CreatureIcon({ def, size, style, className, state, still, ownedData, unlockedSkins, contain }) {
   if (!def) return null;
   const art = getDisplayArt(def, ownedData, unlockedSkins, state);
 
   if (art.kind === "emoji") {
-    return React.createElement(
-      "span",
-      { className, style: { fontSize: size, lineHeight: 1, display: "block", ...style } },
-      art.emoji
-    );
+    const box = contain
+      ? { width: size, height: size, fontSize: Math.round(size * EMOJI_FIT), lineHeight: size + "px", textAlign: "center", display: "block", transform: "translateY(-5%)" }
+      : { fontSize: size, lineHeight: 1, display: "block" };
+    return React.createElement("span", { className, style: { ...box, ...style } }, art.emoji);
   }
 
   const base = {

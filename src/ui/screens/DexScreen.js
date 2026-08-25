@@ -7,7 +7,7 @@ import { ALL_DEX_FORMS, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { getEvolutionStage } from "../../core/creatures.js";
+import { getEvolutionStage, getDisplayArt } from "../../core/creatures.js";
 import DexEntry from "../../ui/screens/DexEntry.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
@@ -120,22 +120,33 @@ function DexScreen({onBack}){
           visibleForms.map(def=>{
             const isCollected=!!owned[def.id];
             const rarCfg=EQUIP_RARITY_CONFIG[def.rarity];
-            return React.createElement("div",{key:def.id,className:"creature-card",onClick:()=>{setSelected(def);const c=document.querySelector('.app-content');if(c)c.scrollTop=0;},style:{position:"relative",paddingTop:30,background:rarCfg.bg,border:"1px solid "+rarCfg.color+"44"}},
-              React.createElement("span",{style:{position:"absolute",top:5,left:5,fontSize:14,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
-              def.attackType&&React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[def.attackType].emoji),
-              def.role&&React.createElement("span",{style:{position:"absolute",top:20,right:5,fontSize:13,lineHeight:1}},ROLE_CONFIG[def.role].emoji),
-              // Collected status is the creature itself: full color when
-              // owned, slightly greyed out when not (purely visual -- the
-              // card stays clickable either way).
-              React.createElement(CreatureIcon,{def,still:true,size:26,className:"creature-emoji",style:{lineHeight:1.2,margin:"0 auto 3px",...(isCollected?null:{filter:"grayscale(1)",opacity:0.45})}}),
-              React.createElement("div",{className:"creature-name",style:isCollected?undefined:{color:"#999"}},def.name),
-              // Invisible stand-in for Collection's Lv badge row, keeping
-              // every dex card the same height whether collected or not.
-              // (Collection cards themselves are shorter now -- they dropped
-              // the creature name; the Dex keeps names for identification.)
-              React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",marginBottom:4,flexWrap:"wrap",alignItems:"center"}},
-                React.createElement("span",{className:"lv-badge",style:{visibility:"hidden"}},"·")
-              )
+            const art=getDisplayArt(def);
+            // Collected status is the creature itself: full color when
+            // owned, slightly greyed out when not (purely visual -- the
+            // card stays clickable either way).
+            const collectedFx=isCollected?null:{filter:"grayscale(1)",opacity:0.45};
+            // NAME_BAR_H must match the name bar's fixed height below; the
+            // art layer stops that far above the card's bottom edge so the
+            // bar never covers the creature.
+            const NAME_BAR_H=20;
+            return React.createElement("div",{key:def.id,className:"creature-card",onClick:()=>{setSelected(def);const c=document.querySelector('.app-content');if(c)c.scrollTop=0;},style:{position:"relative",paddingTop:30,paddingBottom:NAME_BAR_H,background:rarCfg.bg,border:"1px solid "+rarCfg.color+"44",overflow:"hidden"}},
+              // Same layout as Collection cards: art spans the whole card
+              // (minus the name bar), badges stack top-left, emoji-only
+              // creatures center in the 72px block instead.
+              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"calc(100% - "+NAME_BAR_H+"px)",...collectedFx}}),
+              // Badge column, top-left: Type, then Role, then Range.
+              React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},
+                React.createElement("span",{style:{fontSize:14,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
+                def.role&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ROLE_CONFIG[def.role].emoji),
+                def.attackType&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[def.attackType].emoji)
+              ),
+              art.kind!=="emoji"
+                ?React.createElement("div",{style:{height:72}})
+                :React.createElement("div",{style:{height:72,display:"flex",alignItems:"center",justifyContent:"center"}},
+                    React.createElement(CreatureIcon,{def,still:true,size:26,style:collectedFx})),
+              // Name bar pinned to the card's bottom edge, on its own solid
+              // strip so it never sits on top of the art.
+              React.createElement("div",{className:"creature-name",style:{position:"absolute",left:0,right:0,bottom:0,height:NAME_BAR_H,lineHeight:NAME_BAR_H+"px",padding:"0 3px",margin:0,background:"rgba(255,255,255,0.92)",borderTop:"0.5px solid rgba(0,0,0,0.08)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",...(isCollected?null:{color:"#999"})}},def.name)
             );
           })
         )

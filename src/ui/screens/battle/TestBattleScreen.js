@@ -89,11 +89,39 @@ function TestBattleScreen({ onBack }) {
     holdRef.current.timer = setTimeout(() => { holdRef.current.fired = true; setEquipSlotSel(0); setEquipSearch(""); setEquipCell(key); }, 500);
   }
   function cancelHold() { if (holdRef.current.timer) { clearTimeout(holdRef.current.timer); holdRef.current.timer = null; } }
+  // ── Drag edge auto-scroll ─────────────────────────────────────────────────
+  // The planning column is its own scroll container, and neither drag path
+  // scrolls it on its own: native HTML5 drag doesn't reliably autoscroll a
+  // nested container, and the touch-drag reimplementation preventDefaults the
+  // native scroll away. So a creature picked up from the roster at the bottom
+  // could never reach a grid scrolled out of view. While any drag is active we
+  // track the pointer and scroll the column whenever it sits near its top or
+  // bottom edge; speed ramps up the deeper into the edge zone the pointer is.
+  const planScrollRef = useRef(null);
+  const dragPointerYRef = useRef(null);
+  const autoScrollRafRef = useRef(null);
+  function autoScrollTick() {
+    const el = planScrollRef.current, y = dragPointerYRef.current;
+    if (!el || y == null) { autoScrollRafRef.current = null; return; }
+    const r = el.getBoundingClientRect();
+    const ZONE = 80, MAX_PX_PER_FRAME = 16;
+    if (y < r.top + ZONE) el.scrollTop -= Math.ceil(((r.top + ZONE - y) / ZONE) * MAX_PX_PER_FRAME);
+    else if (y > r.bottom - ZONE) el.scrollTop += Math.ceil(((y - (r.bottom - ZONE)) / ZONE) * MAX_PX_PER_FRAME);
+    autoScrollRafRef.current = requestAnimationFrame(autoScrollTick);
+  }
+  /** y = pointer clientY while a drag is active; null when the drag ends. */
+  function trackDragPointer(y) {
+    dragPointerYRef.current = y;
+    if (y != null && autoScrollRafRef.current == null) autoScrollRafRef.current = requestAnimationFrame(autoScrollTick);
+  }
+
   const touchDrag = useTouchDragPlacement({
     cellSelector: "[data-cell]",
     applyDrop,
     onCancelHold: cancelHold,
     onCancelDrop: (fromCell) => setTestGrid((prev) => { const n = { ...prev }; delete n[fromCell]; return n; }),
+    onDragMove: (x, y) => trackDragPointer(y),
+    onDragEnd: () => trackDragPointer(null),
   });
   function handleCellDrop(r, c) {
     applyDrop(r, c, { id: dragId, fromCell: dragCell });
@@ -162,7 +190,7 @@ function TestBattleScreen({ onBack }) {
     if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = null; }
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
   }
-  useEffect(() => () => stopLoops(), []);
+  useEffect(() => () => { stopLoops(); if (autoScrollRafRef.current != null) cancelAnimationFrame(autoScrollRafRef.current); }, []);
 
   const playerCount = Object.values(testGrid).filter((p) => p.side === "player").length;
   const enemyCount = Object.values(testGrid).filter((p) => p.side === "enemy").length;
@@ -442,7 +470,7 @@ function TestBattleScreen({ onBack }) {
               style: { position: "absolute", width: TILE, height: TILE, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: battleUnitOpacity(u, Date.now(), CREATURE_MAP[u.creatureId]), zIndex: 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default" },
             },
               React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
-                React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: TILE, state: battleArtState(u, Date.now(), moveAnimRef.current) }),
+                React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: TILE, contain: true, state: battleArtState(u, Date.now(), moveAnimRef.current) }),
                 (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 10, lineHeight: 1 } }, "🔥"),
                 (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
               ),
@@ -482,7 +510,15 @@ function TestBattleScreen({ onBack }) {
   // ── Planning phase ───────────────────────────────────────────────────────
   return React.createElement("div", { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5", zIndex: 200 } },
     header,
-    React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } },
+    React.createElement("div", {
+      ref: planScrollRef,
+      // Native HTML5 drags report their position through dragover (which
+      // bubbles here from everything inside); dropping anywhere stops the
+      // autoscroll, and the drag sources' onDragEnd covers cancelled drags.
+      onDragOver: (e) => { e.preventDefault(); trackDragPointer(e.clientY); },
+      onDrop: () => trackDragPointer(null),
+      style: { flex: 1, overflowY: "auto", padding: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 },
+    },
       React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "center" } },
         React.createElement("div", { style: { display: "flex", borderRadius: 8, overflow: "hidden", border: "1.5px solid #534AB7" } },
           React.createElement("button", { onClick: () => setSide("player"), style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", background: side === "player" ? "#534AB7" : "#fff", color: side === "player" ? "#fff" : "#534AB7" } }, "Place Player"),
@@ -510,6 +546,7 @@ function TestBattleScreen({ onBack }) {
             onClick: () => { if (holdRef.current.fired) { holdRef.current.fired = false; return; } cellTap(r, c); },
             draggable: !!p,
             onDragStart: p ? (e) => { cancelHold(); e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
+            onDragEnd: p ? () => trackDragPointer(null) : undefined,
             onDragOver: (e) => e.preventDefault(),
             onDrop: (e) => { e.preventDefault(); handleCellDrop(r, c); },
             onMouseDown: p ? () => beginHold(key) : undefined,
@@ -522,7 +559,7 @@ function TestBattleScreen({ onBack }) {
             // Full-tile art: every decoration pins INSIDE the tile bounds so
             // nothing bleeds into a neighboring cell.
             def && React.createElement("div", { style: { position: "relative", lineHeight: 1, pointerEvents: "none" } },
-              React.createElement(CreatureIcon, { def, size: TILE }),
+              React.createElement(CreatureIcon, { def, size: TILE, contain: true }),
               React.createElement("div", { style: { position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 14, height: 3, borderRadius: 2, background: p.side === "player" ? "#534AB7" : "#ef4444" } }),
               gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount),
               p.abil && React.createElement("div", { style: { position: "absolute", top: 1, left: 1, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : "✦"),
@@ -557,6 +594,7 @@ function TestBattleScreen({ onBack }) {
           onClick: () => setSelectedId(c.id === selectedId ? null : c.id),
           draggable: true,
           onDragStart: (e) => { e.dataTransfer.effectAllowed = "move"; setDragId(c.id); setDragCell(null); },
+          onDragEnd: () => trackDragPointer(null),
           onTouchStart: (e) => { e.preventDefault(); touchDrag.start(e, { id: c.id }); },
           style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, width: 64, padding: "6px 2px", borderRadius: 10, cursor: "grab", userSelect: "none", background: selectedId === c.id ? "#EEEDFE" : "#fff", border: "2px solid " + (selectedId === c.id ? "#534AB7" : "#eee") }
         },

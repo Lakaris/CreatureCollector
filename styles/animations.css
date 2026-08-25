@@ -11,16 +11,26 @@
 @keyframes pointerBounceXLeft{0%,100%{transform:translate(0,-50%)}50%{transform:translate(-10px,-50%)}}
 @keyframes holdRing{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 @keyframes statLevelUp{0%{background:#e8f5e9;outline-color:#2e7d32;color:#2e7d32}80%{background:#e8f5e9;outline-color:#2e7d32;color:#2e7d32}100%{background:transparent;outline-color:transparent;color:inherit}}
-@keyframes atkImpact{0%{opacity:1;transform:translate(-50%,-50%) scale(0.3)}40%{opacity:0.9;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
-@keyframes pillarFlame{0%{opacity:0.9}60%{opacity:0.75}100%{opacity:0}}
-@keyframes shockLine{0%{opacity:0}10%{opacity:1}50%{opacity:0.7}100%{opacity:0}}
-@keyframes splashWave{0%{opacity:0;transform:scale(0.4)}12%{opacity:1;transform:scale(1)}70%{opacity:0.7}100%{opacity:0;transform:scale(1.1)}}
+/* Battle FX sit on zIndex 19-21, directly over the creature art on zIndex 5,
+   and several of them are discs or full tiles as big as the unit itself (the
+   impact disc is a solid fill, not a translucent one). Their peak opacity is
+   therefore what decides whether a hit reads as a flash over the creature or
+   as a coloured blob hiding it -- a multi-target ability like Blastar's drops
+   one on every struck cell at once. Peaks are deliberately kept under ~0.55 so
+   the art stays legible through them; raise the colour's own alpha at the call
+   site before raising these. */
+@keyframes atkImpact{0%{opacity:0.5;transform:translate(-50%,-50%) scale(0.3)}40%{opacity:0.45;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+@keyframes pillarFlame{0%{opacity:0.55}60%{opacity:0.42}100%{opacity:0}}
+@keyframes shockLine{0%{opacity:0}10%{opacity:0.75}50%{opacity:0.5}100%{opacity:0}}
+@keyframes splashWave{0%{opacity:0;transform:scale(0.4)}12%{opacity:0.7;transform:scale(1)}70%{opacity:0.5}100%{opacity:0;transform:scale(1.1)}}
+/* The projectile is a 7px dot travelling between tiles rather than something
+   sitting on a creature, so it keeps its full opacity. */
 @keyframes atkProjectile{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
-@keyframes meleeSwing{0%{opacity:0.85;transform:translate(-50%,-50%) scale(0.5)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
-@keyframes bossShockwave{0%{opacity:0.85;transform:translate(-50%,-50%) scale(0.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(4)}}
-@keyframes earthEmpSlam{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.1)}20%{opacity:1}70%{opacity:0.6}100%{opacity:0;transform:translate(-50%,-50%) scale(5)}}
-@keyframes windGust{0%{opacity:0;transform:scaleX(0.2)}30%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
-@keyframes windCollision{0%{opacity:1;transform:translate(-50%,-50%) scale(0.2) rotate(0deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(25deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(45deg)}}
+@keyframes meleeSwing{0%{opacity:0.55;transform:translate(-50%,-50%) scale(0.5)}35%{opacity:0.65;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
+@keyframes bossShockwave{0%{opacity:0.6;transform:translate(-50%,-50%) scale(0.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(4)}}
+@keyframes earthEmpSlam{0%{opacity:0.55;transform:translate(-50%,-50%) scale(0.1)}20%{opacity:0.65}70%{opacity:0.4}100%{opacity:0;transform:translate(-50%,-50%) scale(5)}}
+@keyframes windGust{0%{opacity:0;transform:scaleX(0.2)}30%{opacity:0.7;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
+@keyframes windCollision{0%{opacity:0.7;transform:translate(-50%,-50%) scale(0.2) rotate(0deg)}50%{opacity:0.7;transform:translate(-50%,-50%) scale(1.25) rotate(25deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(45deg)}}
 /* Creature sprite-strip playback, driven by CreatureIcon. The element sizes its
    background to frames*100% wide, so walking background-position-x from 0% to
    100% steps cell by cell at any icon size -- this one keyframe serves every

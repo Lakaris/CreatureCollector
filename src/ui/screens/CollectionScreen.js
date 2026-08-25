@@ -4,14 +4,19 @@ import React, { useState, useMemo, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG, CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../data/rarity.js";
+import { EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { getDisplayArt } from "../../core/creatures.js";
-import AscStars from "../../ui/components/AscStars.js";
+import AscStars, { ascStarTier } from "../../ui/components/AscStars.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import CreatureDetail from "../../ui/screens/CreatureDetail/index.js";
 import DexScreen from "../../ui/screens/DexScreen.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import NavBar from "../../ui/components/NavBar.js";
+
+// Height of the ascension bar pinned to the bottom of every card. Tall enough
+// that a ringed star (the widest/tallest thing in it) clears both edges.
+const ASC_BAR_H=26;
 
 function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsumed}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, tutorialStep, setTutorialStep, tutorialRestricted, tab, setTab, flairGuideStep, setFlairGuideStep, candyGuideStep, setCandyGuideStep } = useGame();
@@ -194,15 +199,21 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
       :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")?{marginTop:34}:undefined},
           filtered.map(({owned:o,def:d},idx)=>{
             const art=getDisplayArt(d,o,unlockedSkins);
+            // Same rarity tint the Dex cards use.
+            const rarCfg=EQUIP_RARITY_CONFIG[d.rarity];
+            // 15px is the tallest star the 20px bar fits, and a five-star row
+            // plus its "+" marker comes to about 80% of the bar's width, so it
+            // sits centred with a margin at both ends on any card size.
+            const asc=ascStarTier(o.ascensions);
             const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")&&idx===0;
-            return React.createElement("div",{key:o.id,className:"creature-card","data-guide-target":(flairGuideStep==="collection"&&idx===0)?"collection":(candyGuideStep==="candyCollection"&&idx===0)?"candyCollection":undefined,onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");if(flairGuideStep==="collection"&&idx===0)setFlairGuideStep("flair");if(candyGuideStep==="candyCollection"&&idx===0)setCandyGuideStep("candySkins");},style:{position:"relative",paddingTop:30}},
+            return React.createElement("div",{key:o.id,className:"creature-card","data-guide-target":(flairGuideStep==="collection"&&idx===0)?"collection":(candyGuideStep==="candyCollection"&&idx===0)?"candyCollection":undefined,onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");if(flairGuideStep==="collection"&&idx===0)setFlairGuideStep("flair");if(candyGuideStep==="candyCollection"&&idx===0)setCandyGuideStep("candySkins");},style:{position:"relative",paddingTop:30,background:rarCfg.bg,border:"1px solid "+rarCfg.color+"44"}},
               // Art spans the entire card, scaled uniformly (objectFit
               // contain -- as large as fits without distortion or cropping).
               // Rendered first so the absolutely-positioned badges and name
               // overlay, which come later in DOM order, paint on top of it.
               // NOTE: a sprite poster here would stretch to the card's aspect
               // ratio; square-box it when animated collection art first lands.
-              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"100%"}}),
+              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"calc(100% - "+ASC_BAR_H+"px)"}}),
               showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               // Badge column, top-left: Type, then Role, then Range.
               React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},
@@ -213,7 +224,20 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
               // Level, top-right: plain text (no pill), with a white halo so
               // it stays legible when full-card art reaches the corner.
               React.createElement("span",{style:{position:"absolute",top:5,right:5,fontSize:12,fontWeight:700,color:"#666",lineHeight:1,pointerEvents:"none",textShadow:"0 0 3px #fff, 0 0 3px #fff"}},"Lv "+o.level),
-              o.ascensions>0&&React.createElement("div",{style:{position:"absolute",top:5,left:0,right:0,textAlign:"center",lineHeight:1}},React.createElement(AscStars,{n:o.ascensions})),
+              // Ascension stars sit in a bottom bar like the Dex's name bar
+              // (trial layout). Rounded to match the card's corners since the
+              // card keeps overflow:visible for the tutorial pointer above.
+              // The bar is always drawn, empty at zero ascensions, so every
+              // card is the same shape whether or not it has stars. Flex
+              // centring (rather than a line-height) is what holds a ringed
+              // star clear of the bottom edge -- on a text baseline the tall
+              // ring hangs below the strip and gets clipped.
+              React.createElement("div",{style:{position:"absolute",left:0,right:0,bottom:0,height:ASC_BAR_H,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.92)",borderTop:"0.5px solid rgba(0,0,0,0.08)",borderRadius:"0 0 9px 9px",overflow:"hidden",containerType:"inline-size"}},React.createElement(AscStars,{n:asc.count,max:5,doubled:asc.doubled,colors:asc.colors,slotted:true,
+                // 16px normally, but a card narrower than the grid's
+                // breakpoints allow for (a phone sized just above one) would
+                // clip a five-star row, so the stars fall back to a share of
+                // the bar's own width rather than being cut off.
+                style:{fontSize:"min(16px,17.5cqw)",gap:1,...asc.style}})),
               // No creature name or bottom badge on collection cards -- the
               // art/emoji identifies the creature, and the level sits as
               // plain text in the top-right corner. (The Dex keeps names;

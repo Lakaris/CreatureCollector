@@ -514,7 +514,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             style: { position: "absolute", width: ARENA_TILE * (u.size || 1), height: ARENA_TILE * (u.size || 1), display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", opacity: battleUnitOpacity(u, Date.now(), CREATURE_MAP[u.creatureId]), zIndex: (u.size || 1) > 1 ? 6 : 5, pointerEvents: u.hp > 0 ? "auto" : "none", cursor: u.hp > 0 ? "pointer" : "default", borderRadius: (u.size || 1) > 1 ? 10 : 0, boxShadow: (u.size || 1) > 1 ? "inset 0 0 0 2px rgba(245,158,11,0.75), 0 0 10px rgba(245,158,11,0.45)" : "none" },
           },
             React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
-              React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: ARENA_TILE * (u.size || 1), state: battleArtState(u, Date.now(), moveAnimRef.current) }),
+              React.createElement(CreatureIcon, { def: CREATURE_MAP[u.creatureId] || { emoji: "❓" }, size: ARENA_TILE * (u.size || 1), contain: true, state: battleArtState(u, Date.now(), moveAnimRef.current) }),
               (u.size || 1) > 1 && React.createElement("div", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 13, lineHeight: 1, pointerEvents: "none" } }, "👑"),
               (u.burnTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 10, lineHeight: 1 } }, "🔥"),
               (u.abilFlashTicks || 0) > 0 && React.createElement("div", { style: { position: "absolute", top: 1, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 900, color: "#3b82f6", textShadow: "0 0 3px #fff, 0 0 3px #fff", lineHeight: 1, pointerEvents: "none" } }, "!")
@@ -625,13 +625,13 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                 if (d.__giant) {
                   return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", pointerEvents: "none" } },
                     React.createElement("div", { style: { position: "absolute", top: 0, left: 0, width: ARENA_TILE * 2, height: ARENA_TILE * 2, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, borderRadius: 10, boxShadow: "inset 0 0 0 2px rgba(245,158,11,0.75)" } },
-                      React.createElement(CreatureIcon, { def: d, size: ARENA_TILE * 2 }),
+                      React.createElement(CreatureIcon, { def: d, size: ARENA_TILE * 2, contain: true }),
                       React.createElement("span", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 12, lineHeight: 1 } }, "👑"),
                       React.createElement("span", { style: { position: "absolute", top: 3, left: 4, fontSize: 9, lineHeight: 1 } }, TYPE_EMOJI[d.type] || ""),
                       React.createElement("span", { style: { position: "absolute", top: 3, right: 4, fontSize: 9, lineHeight: 1 } }, d.attackType === "Ranged" ? "🏹" : "⚔️")
                     ));
                 }
-                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: ARENA_TILE }));
+                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: ARENA_TILE, contain: true }));
               })());
             })).flat()
           )
@@ -643,7 +643,6 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
               React.createElement("button", { onClick: () => setEnemyMinimized((p) => { const next = !p; if (!next) expandPanel("enemy"); return next; }), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, enemyMinimized ? "＋" : "－"),
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: enemyMinimized ? 0 : 12 } },
-                React.createElement(CreatureIcon, { def, size: 28 }),
                 React.createElement("div", null,
                   React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111", display: "flex", alignItems: "center", gap: 5 } },
                     def.name,
@@ -680,7 +679,6 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
               React.createElement("button", { onClick: () => setAllyMinimized((p) => { const next = !p; if (!next) expandPanel("ally"); return next; }), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, allyMinimized ? "＋" : "－"),
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: allyMinimized ? 0 : 12 } },
-                React.createElement(CreatureIcon, { def, size: 28 }),
                 React.createElement("div", null,
                   React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, def.name),
                   React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, def.type + " · " + (def.attackType || "Melee") + (oc ? " · Lv." + oc.level : ""))

@@ -21,10 +21,13 @@ import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE } from "../../../battle/constants.js";
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins, dailyBossPlanGrid: planGrid, setDailyBossPlanGrid: setPlanGrid } = useGame();
-  const GRID_ROWS=10,GRID_COLS=6,PLAYER_START_ROW=6,TILE=44,GAP=0;
+  // Same board as the Dungeon -- read from the shared constants rather than
+  // repeating the numbers, so a change to one grid can't leave the other behind.
+  const GRID_ROWS=DUNGEON_GRID_ROWS,GRID_COLS=DUNGEON_GRID_COLS,PLAYER_START_ROW=DUNGEON_PLAYER_START_ROW,TILE=DUNGEON_TILE,GAP=0;
   const today=easternNoonDayKey();
   const boss=DUNGEON_BOSSES[((dailyBossLevel||1)-1)%DUNGEON_BOSSES.length];
   const emoji=TYPE_EMOJI[boss.type]||"👾";
@@ -597,7 +600,7 @@ function DailyBossScreen({onBack,onViewCreature}){
               }
             },
               React.createElement("div",{style:{position:"relative",lineHeight:1}},
-                React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:TILE,state:battleArtState(u,Date.now(),moveAnimMsRef.current)}),
+                React.createElement(CreatureIcon,{def:CREATURE_MAP[u.creatureId]||{emoji:"❓"},size:TILE,contain:true,state:battleArtState(u,Date.now(),moveAnimMsRef.current)}),
                 (u.burnTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:1,right:1,fontSize:10,lineHeight:1}},"🔥"),
                 (u.abilFlashTicks||0)>0&&React.createElement("div",{style:{position:"absolute",top:1,left:"50%",transform:"translateX(-50%)",fontSize:12,fontWeight:900,color:"#3b82f6",textShadow:"0 0 3px #fff, 0 0 3px #fff",lineHeight:1,pointerEvents:"none"}},"!")
               ),
@@ -708,7 +711,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 userSelect:"none",
               }
             },
-            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:TILE})):"");
+            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:TILE,contain:true})):"");
           })
         ).flat()
       )
@@ -754,7 +757,6 @@ function DailyBossScreen({onBack,onViewCreature}){
           return React.createElement("div",{style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
             React.createElement("button",{onClick:()=>setCreatureMinimized(p=>{const next=!p;if(!next)expandDailyPanel("creature");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},creatureMinimized?"＋":"－"),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:creatureMinimized?0:12}},
-              React.createElement(CreatureIcon,{def,size:28}),
               React.createElement("div",null,
                 React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
                 React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))

@@ -85,19 +85,25 @@ function DexEntry({def,onBack,onNavigate,navList}){
 
     chainDefs.length>1&&React.createElement("div",{className:"card",style:{marginBottom:12}},
       React.createElement("div",{className:"section-label"},"Evolution Line"),
-      React.createElement("div",{style:{display:"flex",alignItems:"flex-start",gap:4,flexWrap:"wrap"}},
+      // Never wraps: nodes flex to share the row and ellipsize long names,
+      // while the arrow columns keep their natural width.
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:2,flexWrap:"nowrap"}},
         chainDefs.map((d,i)=>React.createElement(React.Fragment,{key:d.id},
-          i>0&&React.createElement("span",{style:{color:"#aaa",fontSize:16,margin:"0 2px",lineHeight:"30px"}},"→"),
+          // The requirement belongs to the arrow's source creature: evolving
+          // chainDefs[i-1] into d costs chainDefs[i-1].ascensionsToEvolve.
+          i>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",flexShrink:0}},
+            React.createElement("span",{style:{color:"#aaa",fontSize:16,lineHeight:1}},"→"),
+            chainDefs[i-1].ascensionsToEvolve&&React.createElement("span",{style:{fontSize:9,color:"#aaa",whiteSpace:"nowrap"}},"×"+chainDefs[i-1].ascensionsToEvolve+" asc.")
+          ),
           React.createElement("div",{
-            style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"6px 8px",borderRadius:8,
+            style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"4px 0",borderRadius:8,flex:1,minWidth:0,
               background:d.id===def.id?"#EEEDFE":"transparent",
               cursor:d.id!==def.id?"pointer":"default",
               border:d.id===def.id?"1px solid #CECBF6":"1px solid transparent"},
             onClick:d.id!==def.id?()=>onNavigate(d):undefined
           },
-            React.createElement(CreatureIcon,{def:d,still:true,size:30}),
-            React.createElement("span",{style:{fontSize:10,color:d.id===def.id?"#534AB7":"#666",fontWeight:500}},d.name),
-            d.ascensionsToEvolve&&React.createElement("span",{style:{fontSize:10,color:"#aaa"}},"×"+d.ascensionsToEvolve+" asc.")
+            React.createElement(CreatureIcon,{def:d,still:true,size:44}),
+            React.createElement("span",{style:{fontSize:10,color:d.id===def.id?"#534AB7":"#666",fontWeight:500,maxWidth:"100%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},d.name)
           )
         ))
       )

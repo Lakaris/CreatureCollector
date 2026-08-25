@@ -1,18 +1,27 @@
 // Grid dimensions and combat ranges.
 //
 // Dungeon and Daily Boss share a 6x10 grid; Arena uses a smaller 5x8.
-// Tile size is in CSS pixels and must match the grid rendering.
+// Tile size is in CSS pixels and must match the grid rendering. Tiles are
+// square -- one value drives both the column and row track, so the cells stay
+// square whatever it is set to.
+//
+// The ceiling on tile size is the widest grid on the narrowest phone: on a
+// 320px screen the grid's content box measures 280px (below 700px the side
+// panels stack under the grid, so only the grid's own width matters), and six
+// columns have to fit inside it -- 46 is the largest that does. The wrapper
+// clips rather than scrolls, so overshooting silently cuts the last column off
+// the Dungeon and Daily Boss boards instead of showing a scrollbar.
 
 export const ARENA_GRID_COLS = 5;
 export const ARENA_GRID_ROWS = 8;
 export const ARENA_PLAYER_START_ROW = 5;
-export const ARENA_TILE = 44;
+export const ARENA_TILE = 46;
 export const ARENA_MAX_DEPLOYED = 6;
 
 export const DUNGEON_GRID_COLS = 6;
 export const DUNGEON_GRID_ROWS = 10;
 export const DUNGEON_PLAYER_START_ROW = 6;
-export const DUNGEON_TILE = 44;
+export const DUNGEON_TILE = 46;
 export const DUNGEON_MAX_DEPLOYED = 6;
 
 /**

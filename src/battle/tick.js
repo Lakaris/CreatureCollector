@@ -36,6 +36,26 @@ const PLAYER_DOT_RATE = 0.035;
 const FIRE_TRAIL_RATE = 0.03;
 
 /**
+ * Damage-chart buckets. Every point of player damage is credited to exactly one
+ * of a creature's three abilities, so the chart can show where its output
+ * actually came from:
+ *
+ *   basic    the ordinary attack swing, including a custom basicAttack hook
+ *   special  the charged special
+ *   passive  the unique/passive -- on-hit bonuses, per-tick effects, reflects
+ *
+ * Ability modules don't name their own source: the source is decided by which
+ * hook tick.js is currently running (see makePlayerAbilityContext's
+ * `damageSource`), so a module needs no changes to be charted correctly.
+ */
+function creditDamage(state, creatureId, amount, source) {
+  if (!(amount > 0)) return;
+  const dd = state.damageDealt || (state.damageDealt = {});
+  const row = dd[creatureId] || (dd[creatureId] = { basic: 0, special: 0, passive: 0 });
+  row[source] += amount;
+}
+
+/**
  * Context passed to a creature's `special(unit, ctx)` / `basicAttack(unit, ctx)`
  * / `onTick(unit, ctx)` ability hooks. Modules are side-agnostic: `aliveP` is
  * always the acting unit's OWN side and `aliveE` its foes, so the same module
@@ -43,15 +63,14 @@ const FIRE_TRAIL_RATE = 0.03;
  * (with `isEnemySide: true`) for enemy units. Enemy-side hooks never see a
  * boss (it's their ally) and never write to the player damage chart.
  */
-function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep, isEnemySide = false }) {
+function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep, isEnemySide = false, damageSource = "special" }) {
   return {
     aliveE, aliveP, boss, gridRows, gridCols, newFx, now, canMove,
     blocked,
     isEnemySide,
     addDamageDealt(amount) {
       if (isEnemySide) return;
-      const dd = state.damageDealt || (state.damageDealt = {});
-      dd[unit.creatureId] = (dd[unit.creatureId] || 0) + amount;
+      creditDamage(state, unit.creatureId, amount, damageSource);
     },
     nearestOpenCell(r, c) {
       return nearestOpenCell(r, c, blocked, gridRows, gridCols);
@@ -316,7 +335,6 @@ export function runBattleTick(state, config) {
   const allOcc = new Set();
   for (const u of [...aliveP, ...aliveE]) for (const cell of cellsOf(u)) allOcc.add(cell);
   const bossAlive = !!(boss && boss.hp > 0);
-  const damageDealt = state.damageDealt || (state.damageDealt = {});
 
   /** Cells a unit may not path through. */
   const blocked = (r, c) =>
@@ -351,7 +369,7 @@ export function runBattleTick(state, config) {
     // Always-on passives (e.g. Bloomibis's Guardian Grove aura) run every tick,
     // before the special/basic flow, independent of cooldowns and movement.
     if (abilMod?.onTick) {
-      const tickCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+      const tickCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "passive", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
       abilMod.onTick(u, tickCtx);
     }
 
@@ -373,7 +391,7 @@ export function runBattleTick(state, config) {
         : specialTargetInRange(u, aliveP, aliveE, rangeBoss);
       if (abilMod?.special) {
         if (canMove && inRange) {
-          const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+          const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "special", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
           abilMod.special(u, specialCtx);
           consumeSpecialCharge(u);
         }
@@ -386,7 +404,7 @@ export function runBattleTick(state, config) {
     // the default "attack the nearest thing" flow below -- it owns targeting,
     // damage/healing, and chase-movement for this unit's turn.
     if (abilMod?.basicAttack) {
-      const basicCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+      const basicCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "basic", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
       abilMod.basicAttack(u, basicCtx);
       continue;
     }
@@ -398,15 +416,18 @@ export function runBattleTick(state, config) {
     // minion-fight branch below).
     if (distB <= range && bossAlive && !tauntedFoe(u, aliveE) && !retaliationFoe(u, aliveE) && !markedFoeInRange(u, aliveE)) {
       if (u.atkCd <= 0) {
-        let totalDmg = 0;
+        // The swing itself is basic damage; an onHit bonus rides along with it
+        // but belongs to the passive that granted it.
+        let basicDmg = 0, passiveDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
           const dmgToBoss = Math.max(1, Math.round(playerDamageToBoss(u, boss, aliveP) * dmgMultVs(boss) / hits));
           damageBoss(boss, dmgToBoss);
-          totalDmg += dmgToBoss;
+          basicDmg += dmgToBoss;
           const bonus = abilMod?.onHit ? abilMod.onHit(u, boss) : 0;
-          if (bonus) { damageBoss(boss, bonus); totalDmg += bonus; }
+          if (bonus) { damageBoss(boss, bonus); passiveDmg += bonus; }
         }
-        damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
+        creditDamage(state, u.creatureId, basicDmg, "basic");
+        creditDamage(state, u.creatureId, passiveDmg, "passive");
         u.atkCd = attackCooldown(u, penalty);
         u.lastAttackTime = now;
         newFx.push({ id: now + u.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
@@ -421,20 +442,21 @@ export function runBattleTick(state, config) {
       if (tgt) {
         const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
         if (dist <= range && u.atkCd <= 0) {
-          let totalDmg = 0;
+          let basicDmg = 0, passiveDmg = 0;
           const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
             const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt) / hits));
-            totalDmg += damageUnit(tgt, dmg);
+            basicDmg += damageUnit(tgt, dmg);
             const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-            if (bonus) totalDmg += damageUnit(tgt, bonus);
+            if (bonus) passiveDmg += damageUnit(tgt, bonus);
             // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
             // returns a slice of the hit to the attacker. Reflected damage is
             // never itself reflected.
             const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
             if (reflect) damageUnit(u, reflect);
           }
-          damageDealt[u.creatureId] = (damageDealt[u.creatureId] || 0) + totalDmg;
+          creditDamage(state, u.creatureId, basicDmg, "basic");
+          creditDamage(state, u.creatureId, passiveDmg, "passive");
           // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
           if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
           u.atkCd = attackCooldown(u, penalty);
@@ -515,7 +537,7 @@ export function runBattleTick(state, config) {
         const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
         if (reflect) {
           damageUnit(u, reflect);
-          damageDealt[tgt.creatureId] = (damageDealt[tgt.creatureId] || 0) + reflect;
+          creditDamage(state, tgt.creatureId, reflect, "passive");
         }
       }
       // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).

@@ -36,3 +36,32 @@
    100% steps cell by cell at any icon size -- this one keyframe serves every
    creature, frame count, and render size. Pair it with steps(n,jump-none). */
 @keyframes spritePlay{from{background-position-x:0%}to{background-position-x:100%}}
+
+/* ── Soft mount transitions ──────────────────────────────────────────────
+   Screens and overlays fade in instead of popping into place. Opacity only
+   for full screens: animating transform on a container re-anchors any
+   position:fixed descendants (popups, battle overlays) for the duration of
+   the animation, which reads as flicker. Modal boxes get a tiny scale pop --
+   they have no fixed descendants. Durations stay under 200ms so the game
+   still feels snappy, just not abrupt. */
+@keyframes screenFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalPopIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+/* Every direct child of the app shell: tab switches and in-screen full-page
+   swaps (Dex, detail views, the effect filter) all mount here. */
+.app-content>*{animation:screenFadeIn .18s ease-out}
+.modal-overlay{animation:screenFadeIn .15s ease-out}
+.modal-overlay>.modal-box{animation:modalPopIn .18s ease-out}
+.gacha-modal-overlay{animation:screenFadeIn .15s ease-out}
+
+/* Full-screen views (position:fixed containers, marked .screen-fade): the
+   CONTAINER never animates -- its opaque background must land instantly, or
+   whatever sits behind it (the Collection grid, the dark dev panel) shows
+   through for the duration of the fade as a flash. Only the CONTENTS fade.
+
+   The children run a DIFFERENT animation name from .app-content>* on
+   purpose: when a screen swaps between two same-type root divs, React
+   reuses the DOM nodes, and a reused node only restarts its animation if
+   the animation NAME changes. The keyframes are identical. */
+@keyframes screenFadeIn2{from{opacity:0}to{opacity:1}}
+.screen-fade{animation:none}
+.screen-fade>*{animation:screenFadeIn2 .18s ease-out}

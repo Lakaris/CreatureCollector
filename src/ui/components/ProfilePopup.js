@@ -63,7 +63,7 @@ function ProfilePopup({ onClose }) {
     onClick: onClose,
   },
     React.createElement("div", {
-      style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: 360, height: "min(560px, 85vh)", display: "flex", flexDirection: "column", overflow: "hidden" },
+      style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: 360, height: "min(560px, calc(85 * var(--vh)))", display: "flex", flexDirection: "column", overflow: "hidden" },
       onClick: (e) => e.stopPropagation(),
     },
       React.createElement("div", { style: { padding: "20px 20px 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, borderBottom: "1px solid #f0f0f0" } },

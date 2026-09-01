@@ -6,6 +6,101 @@
 
 import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL } from "../data/equipment.js";
 import { STAT_LABELS } from "../data/rarity.js";
+import { CREATURE_MAP } from "../data/creatures.js";
+import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../data/types.js";
+
+// ── Exclusivity ──────────────────────────────────────────────────────────
+//
+// An item restricts who may wear it by carrying the matching field: `element`
+// (Fire only), `role` (Attacker only), `attackType` (Melee only), or
+// `creatureId` (one named species only). Absent field = no restriction on that
+// axis; an item with none is universal. Multiple axes on one item are ANDed,
+// though nothing in the catalog currently uses more than one.
+//
+// Every axis is declared once, here, and every screen reads exclusivity
+// through these helpers. The rule the checks encode was previously copied into
+// roughly ten places -- the equip picker, the creature detail's gear list and
+// its sort and its disabled state, both filter screens, the Dungeon drop
+// preview, three "X exclusive" captions -- so adding this fourth axis by hand
+// would have meant finding all ten and would have left the eleventh, whenever
+// someone adds it, quietly wrong.
+
+/**
+ * The exclusivity axes, in the order they should read to a player.
+ *
+ * `field` is the item property; `of` pulls the creature's counterpart for
+ * comparison; `label` renders the value for a caption; `emoji` and `noun` are
+ * for the roomier chip the Dungeon drop preview shows ("🔥 Fire type exclusive").
+ */
+const EXCLUSIVITY_AXES = [
+  { field: "element", of: (def) => def && def.type, label: (v) => v, emoji: (v) => TYPE_EMOJI[v] || "", noun: "type" },
+  { field: "role", of: (def) => def && def.role, label: (v) => v, emoji: (v) => (ROLE_CONFIG[v] && ROLE_CONFIG[v].emoji) || "", noun: "role" },
+  { field: "attackType", of: (def) => def && def.attackType, label: (v) => v, emoji: (v) => (ATTACK_TYPE_CONFIG[v] && ATTACK_TYPE_CONFIG[v].emoji) || "", noun: "" },
+  // Creature-exclusive gear names a species id; the caption shows its display
+  // name, falling back to the raw id so a stale id is visible rather than blank.
+  {
+    field: "creatureId",
+    of: (def) => def && def.id,
+    label: (v) => (CREATURE_MAP[v] && CREATURE_MAP[v].name) || v,
+    emoji: (v) => (CREATURE_MAP[v] && CREATURE_MAP[v].emoji) || "",
+    noun: "",
+  },
+];
+
+/** True when the item restricts who can equip it on any axis. */
+export function isExclusive(item) {
+  return !!item && EXCLUSIVITY_AXES.some((a) => item[a.field]);
+}
+
+/**
+ * True when `def` (a creature definition) satisfies every restriction the item
+ * carries. Universal items fit everyone; a missing def fits nothing exclusive.
+ */
+export function itemFitsCreature(item, def) {
+  if (!item) return false;
+  return EXCLUSIVITY_AXES.every((a) => !item[a.field] || a.of(def) === item[a.field]);
+}
+
+/**
+ * The item's restrictions as display strings, e.g. ["Fire"] or ["Emberpup"].
+ * Empty for universal gear.
+ */
+export function exclusivityLabels(item) {
+  if (!item) return [];
+  return EXCLUSIVITY_AXES.filter((a) => item[a.field]).map((a) => a.label(item[a.field]));
+}
+
+/** "Fire exclusive" / "Emberpup exclusive"; empty string for universal gear. */
+export function exclusivityCaption(item) {
+  const parts = exclusivityLabels(item);
+  return parts.length ? parts.join(" · ") + " exclusive" : "";
+}
+
+/**
+ * The compact badge for a gear card corner: "🔥 Fire", "🐶 Emberpup". Just the
+ * restriction, no "exclusive" -- the card has no room for it. Empty string for
+ * universal gear.
+ */
+export function exclusivityBadge(item) {
+  if (!item) return "";
+  const axis = EXCLUSIVITY_AXES.find((a) => item[a.field]);
+  if (!axis) return "";
+  const v = item[axis.field];
+  return [axis.emoji(v), axis.label(v)].filter(Boolean).join(" ");
+}
+
+/**
+ * The long form, with the axis's emoji and noun: "🔥 Fire type exclusive",
+ * "⚔️ Attacker role exclusive", "🐶 Emberpup exclusive". Empty string for
+ * universal gear.
+ */
+export function exclusivityChip(item) {
+  if (!item) return "";
+  const axis = EXCLUSIVITY_AXES.find((a) => item[a.field]);
+  if (!axis) return "";
+  const v = item[axis.field];
+  return [axis.emoji(v), axis.label(v), axis.noun, "exclusive"].filter(Boolean).join(" ");
+}
 
 /** Gear Shard cost to take an item from `level` to the next.
  * Uses the same ^1.72 growth as the Field's shard-rate curve (data/farm.js),

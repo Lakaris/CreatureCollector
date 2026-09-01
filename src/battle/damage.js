@@ -1,7 +1,7 @@
 // Damage formulas.
 
 import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier } from "./status.js";
-import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
+import { COOLDOWN_TICKS_AT_SPD_1, BASIC_ATTACK_DMG_MULT } from "./constants.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 
 /** Base attack roll: ±20% spread around the attacker's power. */
@@ -54,6 +54,21 @@ export function playerDamageToBoss(attacker, boss, aliveP) {
   return dmg;
 }
 
+/**
+ * Basic-attack damage: the unit-vs-unit and vs-boss formulas scaled by
+ * BASIC_ATTACK_DMG_MULT, so the faster attack cadence costs proportionally
+ * smaller hits. Every basic attack goes through these -- the default flow in
+ * tick.js and the custom basicAttack hooks alike -- while specials keep
+ * calling unitDamage / playerDamageToBoss / attackRoll directly.
+ */
+export function basicUnitDamage(attacker, defender) {
+  return unitDamage(attacker, defender) * BASIC_ATTACK_DMG_MULT;
+}
+
+export function basicDamageToBoss(attacker, boss, aliveP) {
+  return playerDamageToBoss(attacker, boss, aliveP) * BASIC_ATTACK_DMG_MULT;
+}
+
 /** Apply damage to a boss, letting any shield soak it first. */
 export function damageBoss(boss, dmg) {
   if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - dmg);
@@ -62,5 +77,8 @@ export function damageBoss(boss, dmg) {
 
 /** Ticks until a unit can act again, slowed by Slow/Shock and sped up by Speed buffs. */
 export function attackCooldown(unit, penalty = 1) {
-  return Math.max(3, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit))) * penalty));
+  // Floor of 2 ticks (1s). It was 3, which at the old 12-tick base was a
+  // distant 4x ceiling; against a 4-tick base it would cap Speed at 1.33x
+  // and make the stat nearly worthless.
+  return Math.max(2, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit))) * penalty));
 }

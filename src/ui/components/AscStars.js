@@ -12,8 +12,15 @@ import React from "../../react.js";
 // star would sit low rather than inside the ring. Centring on the box (rather
 // than riding the text baseline) is also what keeps the tall ring off the
 // bottom edge of whatever strip the row sits in.
+//
+// Each glyph is pinned by its OWN centre (left/top 50% + translate(-50%,-50%))
+// rather than stretched edge-to-edge with text-align:center. The ring is 1.28em
+// inside a 1em slot, so under text-align it is overflowing content: Chrome
+// centres that, but WebKit clamps it to the start edge, which slid the ring
+// right of the small star on iOS. Centring each box sidesteps how an engine
+// chooses to align overflow.
 function StarSlot({ringed,style}){
-  const centred={position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",lineHeight:1,textAlign:"center"};
+  const centred={position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",lineHeight:1,whiteSpace:"nowrap"};
   return React.createElement("span",{style:{position:"relative",display:"inline-block",width:"1em",height:"1em",verticalAlign:"middle",...style}},
     ringed&&React.createElement("span",{style:{...centred,fontSize:"1.28em"}},"☆"),
     React.createElement("span",{style:{...centred,fontSize:ringed?"0.72em":"1em"}},"★")

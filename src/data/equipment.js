@@ -1,9 +1,26 @@
 // Equipment catalog. Item identity is per-creature (ownedData.equipped, a 4-slot array
 // of ids), but item LEVEL/ASCENSION are global maps keyed by itemId in app state --
 // upgrading an item upgrades it everywhere it is equipped.
+//
+// EXCLUSIVITY. An item may restrict who can wear it by carrying one of:
+//   element:    "Fire"      -- Fire-type creatures only
+//   role:       "Attacker"  -- Attackers only
+//   attackType: "Melee"     -- Melee creatures only
+//   creatureId: "emberpup"  -- that one species only (a CREATURES id)
+// An item with none of these is universal. The catalog has no creature-exclusive
+// items yet; the axis exists so one can be added by setting the field and
+// nothing else -- every screen already reads it. See core/equipment.js, which
+// owns the checks and the "X exclusive" captions for all four axes.
 
+/**
+ * `color` must stay a SIX-digit hex. Card and slot borders across the app build
+ * a translucent tint by appending an alpha pair to it ("#7F77DD" + "44"), and a
+ * three-digit value silently produces an invalid five-digit colour -- the
+ * browser drops the whole border declaration and the card falls back to the
+ * default hairline, tint gone with no error anywhere.
+ */
 export const EQUIP_RARITY_CONFIG={
-  common:   {label:"Common",    color:"#888",    bg:"#f0f0f0"},
+  common:   {label:"Common",    color:"#888888", bg:"#f0f0f0"},
   rare:     {label:"Rare",      color:"#378ADD", bg:"#ddeeff"},
   epic:     {label:"Epic",      color:"#7F77DD", bg:"#EEEDFE"},
   legendary:{label:"Legendary", color:"#d97706", bg:"#fef3c7"},

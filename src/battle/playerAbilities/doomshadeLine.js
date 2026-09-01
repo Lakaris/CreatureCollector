@@ -4,8 +4,8 @@
 //
 // Spectral Rake keeps the engine's default melee flow (closest enemy) with
 // per-level damage scaling; at max level every landed hit also inflicts
-// Damage Over Time -- dotTicks + dotSourceAtk, ticked beside player Burn in
-// tick.js / status.js at 3.5% of Doomshade's ATK per tick, boss included.
+// Damage Over Time -- stacking dotTicks/dotStacks, ticked beside player Burn
+// in tick.js / status.js off the VICTIM's own max Health, boss included.
 //
 // Grave Lantern summons one Wisp beside Doomshade when fewer than two of ITS
 // OWN Wisps are up -- the charge bar HOLDS at full otherwise -- and at max
@@ -30,11 +30,11 @@
 
 import { attackCooldown } from "../damage.js";
 import { unitDist } from "../geometry.js";
-import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
-import { isIntangible, isStunned, speedPenalty } from "../status.js";
+import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { isIntangible, isStunned, speedPenalty, applyDot } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [12, 15, 19, 24, 24];
 /** Displayed Wisp Health by summoning-ability level (both abilities share the
  * curve), multiplied by the battle HP scale like every creature's Health. */
@@ -92,15 +92,12 @@ export function makeDoomshadeModule(cfg) {
     /** Spectral Rake: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
-    /** Spectral Rake at max level: every landed hit refreshes the DoT. */
+    /** Spectral Rake at max level: every landed hit stacks the DoT. */
     onHit(unit, target) {
-      if (target && abilityIdx(unit, "basic") >= MAX_IDX) {
-        target.dotTicks = STATUS_TICKS;
-        target.dotSourceAtk = unit.atk;
-      }
+      if (target && abilityIdx(unit, "basic") >= MAX_IDX) applyDot(target, 1);
       return 0;
     },
 
@@ -187,7 +184,8 @@ export const wispModule = {
       ? ring[Math.floor(Math.random() * ring.length)]
       : ctx.nearestOpenCell(tgt.row, tgt.col);
     if (!spot) return;
-    ctx.relocate(spot[0], spot[1]);
+    // Ghostly Step is nothing but the teleport: a Rooted Wisp simply stays.
+    if (!ctx.relocate(spot[0], spot[1])) return;
     newFx.push({ id: now + "gs" + unit.uid, row: spot[0], col: spot[1], t: now, isDark: true, fromRow: unit.prevRow, fromCol: unit.prevCol, isEnemy: !!ctx.isEnemySide });
   },
 

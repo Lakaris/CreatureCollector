@@ -22,13 +22,17 @@
 
 import { aChebDist, distToBoss } from "../geometry.js";
 import { damageBoss } from "../damage.js";
-import { STATUS_TICKS } from "../constants.js";
-import { damageUnit } from "../hp.js";
+import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { damageUnit, applyShield } from "../hp.js";
 import { applyStatMod } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
-const BASIC_DMG_BY_LEVEL = [18, 20, 22, 25, 25];
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
+// Tank-priced: opens at exactly the baseline (1.0x) and climbs to 1.42x --
+// Tusk Slam's identity is the chill and the Healing Down riding on it, not
+// the number. The old 18-25 card read as 1.5-2.08x under the real-numbers
+// economy, out-hitting most Attackers from a legendary Tank.
+const BASIC_DMG_BY_LEVEL = [12, 13, 15, 17, 17];
 /** Blubber Wall: Shield as a % of this creature's max Health, by special level. */
 const SHIELD_PCT_BY_LEVEL = [8, 10, 10, 12, 12];
 /** Blubber Wall: burst damage as a % of this creature's DEF, by special level. */
@@ -69,7 +73,7 @@ export function makeMoruskModule(cfg) {
     /** Tusk Slam: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Tusk Slam on-hit: always chill; at max basic level also halve healing received. */
@@ -88,9 +92,9 @@ export function makeMoruskModule(cfg) {
      */
     special(unit) {
       const pct = shieldPctByLevel[abilityIdx(unit, "special")];
-      unit.shield = Math.max(1, Math.round((unit.maxHp * pct) / 100));
-      unit.shieldTicks = STATUS_TICKS;
-      unit._wallArmed = true;
+      // Arm the burst only if this wall is the Shield actually standing --
+      // a bigger Shield from elsewhere is not Morusk's to detonate.
+      unit._wallArmed = applyShield(unit, (unit.maxHp * pct) / 100, STATUS_TICKS);
     },
 
     /** Detect a broken wall (shield emptied while its timer still runs) and burst. */

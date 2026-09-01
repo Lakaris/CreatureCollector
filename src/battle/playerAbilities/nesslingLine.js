@@ -18,14 +18,14 @@
 // Shell's reflect). A tank being focused refills Deep Submerge much faster
 // than the base charge rate alone.
 
-import { unitDamage, playerDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
+import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { RANGED_RANGE, STATUS_TICKS } from "../constants.js";
-import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier } from "../status.js";
+import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [14, 16, 18, 21, 21];
 const SPECIAL_HEAL_BY_LEVEL = [40, 50, 62, 75, 75];
 /** Deep Submerge's surfacing strike: flat displayed 30 at every level. */
@@ -80,21 +80,23 @@ export function makeNesslingModule(cfg) {
         return;
       }
       if (unit.atkCd > 0 || isStunned(unit)) return;
+      // Blinded: the spout misses entirely, cooldown still paid.
+      if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       const idx = abilityIdx(unit, "basic");
-      const mult = basicDmgByLevel[idx] / basicDmgByLevel[0];
+      const mult = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const hastes = idx >= MAX_IDX;
 
       if (best.isBoss) {
         // Bosses take the hit but skip Haste Down: their cast timers don't
         // read unit charge speed (same immunity policy as Taunt/Stun).
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, aliveP) * mult));
+        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
         damageBoss(boss, dmg);
         ctx.addDamageDealt(dmg);
         newFx.push({ id: now + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       } else {
         const tgt = best.unit;
-        const dmg = Math.max(1, Math.round(unitDamage(unit, tgt) * mult));
+        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, tgt) * mult));
         const dealt = damageUnit(tgt, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         if (hastes) applyStatMod(tgt, { kind: "haste", pct: -HASTE_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
@@ -130,7 +132,7 @@ export function makeNesslingModule(cfg) {
 
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
-      const mult = SPECIAL_DMG / BASIC_DMG_BY_LEVEL[0];
+      const mult = SPECIAL_DMG / BASIC_DMG_BASELINE;
       const debuffs = idx >= MAX_IDX;
       // "Front row": the 3x1 line of cells directly ahead, toward the enemy
       // side (player units face +col, enemy-side units -col).

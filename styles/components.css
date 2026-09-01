@@ -40,25 +40,36 @@
 .creature-list{scrollbar-width:none;-ms-overflow-style:none;}
 .creature-list::-webkit-scrollbar{display:none;}
 
+/* Planning-phase info column (beside the board). The board itself never
+   scrolls -- it shrinks to fit (see ui/hooks/useFitTile.js) -- but ability
+   text is as long as it is, so this column keeps its own quiet scroll rather
+   than cutting a passive off mid-sentence. Scrollbar hidden: the cards are
+   collapsible and the column is narrow, so a gutter would cost more than it
+   tells you. */
+.plan-side-panel{overflow-x:hidden;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.plan-side-panel::-webkit-scrollbar{display:none;}
+
 /* Battle screens (Arena/Dungeon/Labyrinth/Daily Boss): the damage chart and
    creature/boss info panel sit beside the grid on wide screens. Below the
    breakpoint there's no room for three columns, so the grid wraps onto its
    own full-width line and the two side panels wrap onto the line under it,
    side by side rather than each getting its own row (which pushed the info
-   panel below the fold). */
-@media (max-width:700px){
-  .battle-row{flex-direction:column !important;align-items:center !important;overflow-x:visible !important;}
-  .battle-grid{order:1;}
-  .battle-side-panel{order:2;}
-}
+   panel below the fold).
+
+   Keyed off data-app-narrow rather than a `max-width` media query: the app is
+   laid out in design pixels and scaled as a whole (src/ui/uiScale.js), so the
+   raw viewport width a media query sees is not the width these layouts
+   actually have to fit into. uiScale.js publishes the flag. */
+:root[data-app-narrow="1"] .battle-row{flex-direction:column !important;align-items:center !important;overflow-x:visible !important;}
+:root[data-app-narrow="1"] .battle-grid{order:1;}
+:root[data-app-narrow="1"] .battle-side-panel{order:2;}
 
 /* Daily Boss planning phase: the boss's persistent info card doesn't fit next
-   to the grid on narrow screens, so it's hidden there -- press-and-hold the
-   boss on the grid opens the same info as a popup instead (see bossPopupOpen
-   in DailyBossScreen.js). */
-@media (max-width:700px){
-  .daily-boss-panel{display:none;}
-}
+   to the grid when the app is narrow, so it's hidden there -- press-and-hold
+   the boss on the grid opens the same info as a popup instead (see
+   bossPopupOpen in DailyBossScreen.js, which reads the same breakpoint through
+   isAppNarrow so the two can never disagree). */
+:root[data-app-narrow="1"] .daily-boss-panel{display:none;}
 
 /* Filters */
 .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}

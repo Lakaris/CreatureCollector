@@ -16,6 +16,7 @@
 
 import { aChebDist } from "../geometry.js";
 import { healReceivedMultiplier, applyStatMod, hasNegativeStatMods, dispelDebuffs } from "../status.js";
+import { BASIC_DMG_BASELINE } from "../constants.js";
 
 /** Displayed per-hit damage by basic-ability level; the engine deals stat-based
  * damage scaled by the ratio of the current level's value to the base value. */
@@ -49,7 +50,7 @@ function hasDebuff(u) {
     (u.dotTicks || 0) > 0 || (u.weakTicks || 0) > 0 || (u.healImmuneTicks || 0) > 0 ||
     (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 ||
     (u.tauntTicks || 0) > 0 ||
-    (u.stunTicks || 0) > 0 || (u.markedTicks || 0) > 0 ||
+    (u.stunTicks || 0) > 0 || (u.markedTicks || 0) > 0 || !!u.blinded ||
     (u.frostbiteTicks || 0) > 0 || (u.dartShredTicks || 0) > 0 ||
     hasNegativeStatMods(u)
   );
@@ -77,7 +78,7 @@ export function makeBloomibisModule(cfg) {
     /** Antler Dart: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Antler Dart lvl 5: every landed hit stacks +5% ATK until the next Soothing Hoot. */

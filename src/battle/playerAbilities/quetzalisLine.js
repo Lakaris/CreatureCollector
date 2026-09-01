@@ -18,12 +18,12 @@
 
 import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
 import { distToBoss } from "../geometry.js";
-import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyStatMod, applyDartShred } from "../status.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [16, 21, 27, 34, 34];
 const SPECIAL_DMG_BY_LEVEL = [55, 68, 84, 102, 102];
 /** Plume Dart: DEF ground off per hit (doubled at max basic level). */
@@ -64,7 +64,7 @@ export function makeQuetzalisModule(cfg) {
     /** Plume Dart: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Plume Dart's grind: shred DEF per landed hit (bosses have none -- skip). */
@@ -83,7 +83,7 @@ export function makeQuetzalisModule(cfg) {
     special(unit, ctx) {
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
-      const mult = specialDmgByLevel[idx] / basicDmgByLevel[0];
+      const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const debuffs = idx >= MAX_IDX;
 
       // Closest targetable foe decides the row; the boss's top row is the

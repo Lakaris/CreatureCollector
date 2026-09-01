@@ -151,7 +151,7 @@ function HarvestPopup() {
   if (!harvestPopup) return null;
   return React.createElement(
     "div",
-    { style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column", zIndex: 9999 } },
+    { className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column", zIndex: 9999 } },
     React.createElement(
       "div",
       { style: { padding: "40px 24px 0", fontSize: 20, fontWeight: 700, color: "#333", textAlign: "center", marginBottom: 20 } },
@@ -375,7 +375,7 @@ function App() {
   if (settingsOpen)
     return React.createElement(
       "div",
-      { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
+      { className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
       React.createElement(SettingsScreen, { onBack: () => setSettingsOpen(false) })
     );
 
@@ -445,7 +445,7 @@ function App() {
   if (tab === "farm")
     return React.createElement(
       "div",
-      { style: { position: "fixed", inset: 0 } },
+      { className: "screen-fade", style: { position: "fixed", inset: 0 } },
       React.createElement(FarmScreen, {
         onBack: null,
         onPlant: () => setPlotsGrown((c) => c + 1),
@@ -469,7 +469,7 @@ function App() {
     const dungeonPointActive = tutorialRestricted && tutorialStep === "dungeonPoint";
     return React.createElement(
       "div",
-      { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
+      { className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5" } },
       playLockedMsg &&
         React.createElement(
           "div",

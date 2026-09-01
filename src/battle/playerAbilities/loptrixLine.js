@@ -20,14 +20,14 @@
 // again until it has recovered above 30% first). At max level the escape
 // also dispels all debuffs on self.
 
-import { unitDamage, playerDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
+import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { BOSS_SIZE, MELEE_RANGE, STATUS_TICKS } from "../constants.js";
-import { speedPenalty, isStunned, isIntangible, applyStatMod, dispelDebuffs } from "../status.js";
+import { BOSS_SIZE, MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { speedPenalty, isStunned, isIntangible, applyStatMod, dispelDebuffs, consumeBlind } from "../status.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [20, 26, 33, 42, 42];
 const SPECIAL_DMG_BY_LEVEL = [40, 50, 62, 78, 95];
 /** Vanishing Act: % of the special charge granted at battle start, by level. */
@@ -107,18 +107,20 @@ export function makeLoptrixModule(cfg) {
         return;
       }
       if (unit.atkCd > 0 || isStunned(unit)) return;
+      // Blinded: the nip misses entirely, cooldown still paid.
+      if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       const idx = abilityIdx(unit, "basic");
-      const mult = basicDmgByLevel[idx] / basicDmgByLevel[0];
+      const mult = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
       if (tgt.isBossCandidate) {
         // Bosses take the nip but skip Defense Down -- they have no DEF stat.
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, tgt.boss, aliveP) * mult));
+        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, tgt.boss, aliveP) * mult));
         damageBoss(tgt.boss, dmg);
         ctx.addDamageDealt(dmg);
         newFx.push({ id: now + unit.uid, row: tgt.boss.row + 0.5, col: tgt.boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       } else {
         const victim = tgt.unit;
-        const dmg = Math.max(1, Math.round(unitDamage(unit, victim) * mult));
+        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
         const dealt = damageUnit(victim, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         if (idx >= MAX_IDX) applyStatMod(victim, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
@@ -153,7 +155,7 @@ export function makeLoptrixModule(cfg) {
     special(unit, ctx) {
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
-      const mult = specialDmgByLevel[idx] / basicDmgByLevel[0];
+      const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
 
       for (const cand of candidatesByHp(aliveE, boss)) {
         const besideAlready = cand.isBossCandidate
@@ -170,7 +172,9 @@ export function makeLoptrixModule(cfg) {
         }
 
         const fromRow = unit.row, fromCol = unit.col;
-        if (dest) ctx.relocate(dest[0], dest[1]);
+        // Rooted: no teleport, so this foe is unreachable -- try the next.
+        // One we are already beside needs no teleport and still gets hit.
+        if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
         const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
         if (cand.isBossCandidate) {
@@ -213,7 +217,8 @@ export function makeLoptrixModule(cfg) {
         if (!openCells.length) continue;
         openCells.sort((a, z) => aChebDist(unit.row, unit.col, a[0], a[1]) - aChebDist(unit.row, unit.col, z[0], z[1]));
         const fromRow = unit.row, fromCol = unit.col;
-        ctx.relocate(openCells[0][0], openCells[0][1]);
+        // Rooted: the escape fails and stays armed for when the Root lapses.
+        if (!ctx.relocate(openCells[0][0], openCells[0][1])) continue;
         unit._vanishReady = false;
         if (abilityIdx(unit, "unique") >= MAX_IDX) dispelDebuffs(unit);
         newFx.push({ id: now + "va" + unit.uid, row: unit.row, col: unit.col, t: now, isRanged: true, fromRow, fromCol, isEnemy: !!ctx.isEnemySide });

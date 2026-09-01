@@ -17,19 +17,19 @@ export const CREATURES=[
      special:{name:"Tail Spin",charge:12,upgrades:["Hits nearby foes for 12 damage","Hits for 17 damage","Hits for 22 damage","Hits for 28 damage","Knocks all nearby foes airborne briefly"]},
      unique:{name:"Blaze Coat",upgrades:["Passive: reduces fire damage taken by 15%; deals 8 fire dmg to attackers","Reduces fire damage by 20%; deals 12 fire dmg to attackers","Reduces fire damage by 25%; deals 16 fire dmg to attackers","Reduces fire damage by 30%; deals 20 fire dmg to attackers and burns them","Reduces fire damage by 40%; deals 28 fire dmg to attackers and ignites the ground around Emberhound briefly"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"emberpup",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"infernoking"},
-  {id:"leafling",name:"Sprighorn",emoji:"🦕",type:"Nature",rarity:"common",description:"A triceratops hatchling whose three horns are still soft green shoots. It practices charging by headbutting flowerpots.",
+  {id:"leafling",name:"Venomcoil",emoji:"🐍",type:"Nature",rarity:"common",description:"A hatchling anaconda barely longer than a bootlace, already beading venom along every scale. It practices constricting on a rolled-up sock.",
    stats:{hp:49,atk:40,def:27,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Sprout Jab",upgrades:["9 dmg","12 dmg","15 dmg","19 dmg","25% chance to Slow 1.5s"]},
-     special:{name:"Tiny Trample",charge:10,upgrades:["Charge; 28 dmg","36 dmg","45 dmg","56 dmg","Knocks the target back 1 tile"]},
-     unique:{name:"Budding Frill",upgrades:["Passive: reduce dmg taken 3","Reduce 5","Reduce 7","Reduce 10","Reduce 13; attackers take 8 thorn dmg"]}
+     basic:{name:"Venom Fang",upgrades:["12 dmg and recover Health equal to 10% of the damage dealt","15 dmg and recover Health equal to 10% of the damage dealt","19 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 30% of the damage dealt"]},
+     special:{name:"Crushing Coil",charge:10,upgrades:["35 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","44 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","55 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 20% Ability Charge"]},
+     unique:{name:"Dripping Scales",upgrades:["Whenever this creature inflicts Restrain, also inflict Poison. Gain 2% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 4% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 6% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 8% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 10% Speed when targeting a Restrained enemy"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"canoparch"},
-  {id:"canoparch",name:"Thickethorn",emoji:"🦏",type:"Nature",rarity:"common",description:"Its shoots have hardened into a hedge of horns. Fences regard it as a natural predator.",
+  {id:"canoparch",name:"Mirewreathe",emoji:"🐍",type:"Nature",rarity:"common",description:"Long enough now to loop something twice and mean it. The swamp it lives in has been quietly relabelled on local maps.",
    stats:{hp:76,atk:63,def:43,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Horn Ram",upgrades:["14 dmg","18 dmg","23 dmg","29 dmg","Knocks back 1 tile"]},
-     special:{name:"Thicket Charge",charge:10,upgrades:["Charge through; 42 dmg to everything in the path","52 dmg","65 dmg","80 dmg","Also Roots each foe hit 1s"]},
-     unique:{name:"Bramble Frill",upgrades:["Passive: attackers take 10 thorn dmg","Thorns 14","Thorns 18","Thorns 24","Thorns 30; thorns also Slow 15% 1.5s"]}
+     basic:{name:"Venom Fang",upgrades:["12 dmg and recover Health equal to 10% of the damage dealt","15 dmg and recover Health equal to 10% of the damage dealt","19 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 30% of the damage dealt"]},
+     special:{name:"Crushing Coil",charge:10,upgrades:["35 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","44 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","55 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 20% Ability Charge"]},
+     unique:{name:"Dripping Scales",upgrades:["Whenever this creature inflicts Restrain, also inflict Poison. Gain 2% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 4% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 6% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 8% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 10% Speed when targeting a Restrained enemy"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"leafling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"verdantlord"},
   {id:"pebbit",name:"Pebbit",emoji:"🐸",type:"Earth",rarity:"common",description:"A round little rock frog with a pebble-smooth hide. Surprisingly difficult to step on.",
    stats:{hp:63,atk:31,def:46,spd:1,abilitySpeed:1},
@@ -45,14 +45,14 @@ export const CREATURES=[
      special:{name:"Boulder Hunker",charge:18,upgrades:["Taunt all nearby enemies and gain a Shield equal to 3% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 6% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 9% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 12% of this creature's Defense","Taunt all nearby enemies and gain a Shield equal to 15% of this creature's Defense"]},
      unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"pebbit",shardsToAscend:10,ascensionsToEvolve:30,evolutionId:"granitarch"},
-  {id:"breezekit",name:"Breezekit",emoji:"💨",type:"Wind",rarity:"common",description:"Always in motion, this breezy critter can outrun most predators easily.",
+  {id:"breezekit",name:"Cirruskit",emoji:"🐈",type:"Wind",rarity:"common",description:"A leopard cub spun from high, thin cloud. It is ninety percent vapour and one hundred percent certain it is stalking something.",
    stats:{hp:38,atk:30,def:22,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gust Swipe",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Defense Down"]},
      special:{name:"Zephyr Step",charge:8,upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg. Gain Speed Up"]},
      unique:{name:"Slipstream",upgrades:["Attacks Pierce enemies and deal 5% more damage","Attacks Pierce enemies and deal 10% more damage","Attacks Pierce enemies and deal 15% more damage","Attacks Pierce enemies and deal 20% more damage","Attacks Pierce enemies and deal 20% more damage. Attacks have +1 Range"]}
    },role:"Support",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"galestride"},
-  {id:"galestride",name:"Galestride",emoji:"🌪️",type:"Wind",rarity:"common",description:"A fully grown Breezekit that leaves mini-tornadoes as footprints.",
+  {id:"galestride",name:"Cumulynx",emoji:"🐆",type:"Wind",rarity:"common",description:"Its coat has thickened into proper cumulus. It naps on updrafts and leaves fog behind wherever it lands.",
    stats:{hp:63,atk:54,def:38,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gust Swipe",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Defense Down"]},
@@ -76,19 +76,19 @@ export const CREATURES=[
    },role:"Attacker",attackType:"Melee",evolutionOf:"infernoking",shardsToAscend:18,ascensionsToEvolve:null},
 
   // Nature line 1 extensions
-  {id:"verdantlord",name:"Verdaceratops",emoji:"🦏",type:"Nature",rarity:"common",description:"A walking hillside with three ancient horns. It charges rarely, and only once per obstacle.",
+  {id:"verdantlord",name:"Toxiconda",emoji:"🐍",type:"Nature",rarity:"common",description:"Fully grown, permanently damp, and venomous end to end. Whatever it has wrapped stopped arguing some time ago.",
    stats:{hp:103,atk:88,def:63,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Horn Ram",upgrades:["20 dmg","26 dmg","33 dmg","42 dmg","Knocks back 2 tiles"]},
-     special:{name:"Seismic Trample",charge:12,upgrades:["Charge; 70 dmg to everything in the path; knockback","86 dmg","106 dmg","130 dmg","Stuns everything hit 0.5s"]},
-     unique:{name:"Ironwood Frill",upgrades:["Passive: reduce dmg taken 8; attackers take 22 thorn dmg","Reduce 12; thorns 30","Reduce 16; thorns 40","Reduce 22; thorns 52","Reduce 28; thorns 66; immune to knockback"]}
+     basic:{name:"Venom Fang",upgrades:["12 dmg and recover Health equal to 10% of the damage dealt","15 dmg and recover Health equal to 10% of the damage dealt","19 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 30% of the damage dealt"]},
+     special:{name:"Crushing Coil",charge:10,upgrades:["35 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","44 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","55 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 20% Ability Charge"]},
+     unique:{name:"Dripping Scales",upgrades:["Whenever this creature inflicts Restrain, also inflict Poison. Gain 2% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 4% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 6% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 8% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 10% Speed when targeting a Restrained enemy"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"canoparch",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"ancientgrove"},
-  {id:"ancientgrove",name:"Gaiatops",emoji:"🏔️",type:"Nature",rarity:"common",description:"The old forest walks on four legs. Its charge has only ever been described in the past tense.",
+  {id:"ancientgrove",name:"Gaiaconda",emoji:"🐍",type:"Nature",rarity:"common",description:"A river with scales. Its coils have their own weather, and everything caught inside them is having a worse day than the forecast suggested.",
    stats:{hp:130,atk:114,def:86,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Gaia Ram",upgrades:["28 dmg","36 dmg","45 dmg","56 dmg","Knocks back 2 tiles and Slows 20%"]},
-     special:{name:"Continental Trample",charge:12,upgrades:["Charge; 100 dmg to everything in the path; knockback+Root 1s","122 dmg","148 dmg","180 dmg","Stuns 1s; leaves thorny ground for 4s (15 dmg/s)"]},
-     unique:{name:"Worldwood Frill",upgrades:["Passive: reduce dmg taken 12; attackers take 35 thorn dmg","Reduce 16; thorns 46","Reduce 22; thorns 58","Reduce 28; thorns 74","Reduce 36; thorns 92; immune to knockback+stun; allies behind take -15% dmg"]}
+     basic:{name:"Venom Fang",upgrades:["12 dmg and recover Health equal to 10% of the damage dealt","15 dmg and recover Health equal to 10% of the damage dealt","19 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 10% of the damage dealt","24 dmg and recover Health equal to 30% of the damage dealt"]},
+     special:{name:"Crushing Coil",charge:10,upgrades:["35 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","44 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","55 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 10% Ability Charge","68 dmg and Restrain them. If the enemy was already Restrained, remove 20% Ability Charge"]},
+     unique:{name:"Dripping Scales",upgrades:["Whenever this creature inflicts Restrain, also inflict Poison. Gain 2% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 4% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 6% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 8% Speed when targeting a Restrained enemy","Whenever this creature inflicts Restrain, also inflict Poison. Gain 10% Speed when targeting a Restrained enemy"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"verdantlord",shardsToAscend:18,ascensionsToEvolve:null},
   // Earth line 1 extensions
   {id:"granitarch",name:"Granitoad",emoji:"🗿",type:"Earth",rarity:"common",description:"A granite-plated toad stacked with boulders. Its croak registers on seismographs two towns over.",
@@ -106,14 +106,14 @@ export const CREATURES=[
      unique:{name:"Stone Skin",upgrades:["Debuffs expire 10% faster","Debuffs expire 20% faster","Debuffs expire 30% faster","Debuffs expire 40% faster","Debuffs expire 50% faster"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"granitarch",shardsToAscend:18,ascensionsToEvolve:null},
   // Wind line 1 extensions
-  {id:"tempesthawk",name:"Tempesthawk",emoji:"🦅",type:"Wind",rarity:"common",description:"A Galestride that grew wings of compressed air. Its wingbeats create gales felt miles away.",
+  {id:"tempesthawk",name:"Nimbupard",emoji:"🐅",type:"Wind",rarity:"common",description:"The cloud has darkened. Weather stations log its naps as 'localized drizzle' and have stopped asking questions.",
    stats:{hp:89,atk:77,def:55,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gust Swipe",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Defense Down"]},
      special:{name:"Zephyr Step",charge:8,upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg. Gain Speed Up"]},
      unique:{name:"Slipstream",upgrades:["Attacks Pierce enemies and deal 5% more damage","Attacks Pierce enemies and deal 10% more damage","Attacks Pierce enemies and deal 15% more damage","Attacks Pierce enemies and deal 20% more damage","Attacks Pierce enemies and deal 20% more damage. Attacks have +1 Range"]}
    },role:"Support",attackType:"Melee",evolutionOf:"galestride",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"stormlord"},
-  {id:"stormlord",name:"Stormlord",emoji:"🌪️",type:"Wind",rarity:"common",description:"The apex of wind. Entire storm systems orbit it like satellites.",
+  {id:"stormlord",name:"Stormpelt",emoji:"🦁",type:"Wind",rarity:"common",description:"The apex of wind, wearing a thunderhead as a pelt. Entire storm systems orbit it like satellites.",
    stats:{hp:116,atk:99,def:72,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Gust Swipe",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Defense Down"]},
@@ -179,33 +179,33 @@ export const CREATURES=[
      unique:{name:"Tidal Grace",upgrades:["Passive: healing done by Tidecrown +20%","+28%","+36%; overheal converts to shield","+45%; overheal shield","+55%; overheal shield; Tidecrown revives one fallen ally at 30% HP once per battle"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"wavecrest",shardsToAscend:18,ascensionsToEvolve:null},
   // Water line 2
-  {id:"frostpup",name:"Tundracub",emoji:"🐻",type:"Water",rarity:"common",description:"A round, fluffy bear cub with patches of ice growing through its fur. Very huggable, slightly dangerous.",
+  {id:"frostpup",name:"Iglet",emoji:"🐢",type:"Water",rarity:"common",description:"A turtle hatchling that packed its own shell out of snow. It is enormously proud of this and will not be told it is doing turtling wrong.",
    stats:{hp:59,atk:29,def:44,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ice Scratch",upgrades:["10 dmg + 10% slow","13 dmg + 12% slow","17 dmg + 15% slow","22 dmg + 18% slow","Slow lasts 3s"]},
-     special:{name:"Frost Coat",charge:14,upgrades:["DEF +20 for 5s","DEF +30","DEF +40","DEF +52","Also freezes next attacker for 0.5s"]},
-     unique:{name:"Permafrost",upgrades:["Passive: reduce all dmg taken by 5","Reduce by 8","Reduce by 11; slow attackers 10%","Reduce by 15; slow attackers 15%","Reduce by 20; slow attackers 20%; every 10s emit a frost pulse freezing all nearby foes 0.5s"]}
+     basic:{name:"Frost Nip",upgrades:["10 dmg","11 dmg","12 dmg","14 dmg","14 dmg and heal 50% of the damage dealt"]},
+     special:{name:"Hunker In",charge:14,upgrades:["Gain 2 stacks of Fortify.","Gain 3 stacks of Fortify.","Gain 4 stacks of Fortify.","Gain 5 stacks of Fortify.","Gain 5 stacks of Fortify. When Fortify is removed, dispel all debuffs on this creature."]},
+     unique:{name:"Windbreak",upgrades:["Nearby allies receive 2% less damage. Doubled while this creature has Fortify.","Nearby allies receive 4% less damage. Doubled while this creature has Fortify.","Nearby allies receive 7% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify. Inflict Frostbite when attacked."]}
    },role:"Tank",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"snowmane"},
-  {id:"snowmane",name:"Frostpaw",emoji:"🦌",type:"Water",rarity:"common",description:"An elegant ice deer with antlers that permanently frost the air around it.",
+  {id:"snowmane",name:"Shellter",emoji:"🧊",type:"Water",rarity:"common",description:"The snow dome has become a proper igloo, doorway and all. It does not let anyone else use the doorway.",
    stats:{hp:95,atk:48,def:72,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ice Scratch",upgrades:["10 dmg + 10% slow","13 dmg + 12% slow","17 dmg + 15% slow","22 dmg + 18% slow","Slow lasts 3s"]},
-     special:{name:"Ice Barrier",charge:12,upgrades:["Shield self 45 HP","Shield 62 HP","Shield 80 HP","Shield 100 HP","Shielded allies are immune to slows"]},
-     unique:{name:"Frost Aura",upgrades:["Passive: nearby enemies slowed 12%","Slowed 18%","Slowed 24%; ATK reduced 8%","Slowed 30%; ATK reduced 12%","Slowed 38%; ATK reduced 16%; frozen briefly every 6s"]}
+     basic:{name:"Frost Nip",upgrades:["10 dmg","11 dmg","12 dmg","14 dmg","14 dmg and heal 50% of the damage dealt"]},
+     special:{name:"Hunker In",charge:14,upgrades:["Gain 2 stacks of Fortify.","Gain 3 stacks of Fortify.","Gain 4 stacks of Fortify.","Gain 5 stacks of Fortify.","Gain 5 stacks of Fortify. When Fortify is removed, dispel all debuffs on this creature."]},
+     unique:{name:"Windbreak",upgrades:["Nearby allies receive 2% less damage. Doubled while this creature has Fortify.","Nearby allies receive 4% less damage. Doubled while this creature has Fortify.","Nearby allies receive 7% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify. Inflict Frostbite when attacked."]}
    },role:"Tank",attackType:"Melee",evolutionOf:"frostpup",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"blizzardback"},
-  {id:"blizzardback",name:"Blizzardback",emoji:"🦣",type:"Water",rarity:"common",description:"A great ice mammoth whose back is covered in a permanent blizzard.",
+  {id:"blizzardback",name:"Frostkeep",emoji:"🏔️",type:"Water",rarity:"common",description:"The igloo is load-bearing ice now. A survey team once mistook it for a research station and knocked politely.",
    stats:{hp:135,atk:67,def:101,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ice Scratch",upgrades:["10 dmg + 10% slow","13 dmg + 12% slow","17 dmg + 15% slow","22 dmg + 18% slow","Slow lasts 3s"]},
-     special:{name:"Blizzard Wall",charge:20,upgrades:["Summon ice wall; enemies hit take 50 dmg","60 dmg","75 dmg","92 dmg","Wall lasts 4s and slows all who touch it 35%"]},
-     unique:{name:"Blizzard Back",upgrades:["Passive: reduce dmg taken 12; emit blizzard slowing nearby foes 20%","Reduce 18; slow 26%","Reduce 24; slow 32%","Reduce 32; slow 40%","Reduce 40; slow 48%; blizzard also reduces enemy Ability Speed by 20%"]}
+     basic:{name:"Frost Nip",upgrades:["10 dmg","11 dmg","12 dmg","14 dmg","14 dmg and heal 50% of the damage dealt"]},
+     special:{name:"Hunker In",charge:14,upgrades:["Gain 2 stacks of Fortify.","Gain 3 stacks of Fortify.","Gain 4 stacks of Fortify.","Gain 5 stacks of Fortify.","Gain 5 stacks of Fortify. When Fortify is removed, dispel all debuffs on this creature."]},
+     unique:{name:"Windbreak",upgrades:["Nearby allies receive 2% less damage. Doubled while this creature has Fortify.","Nearby allies receive 4% less damage. Doubled while this creature has Fortify.","Nearby allies receive 7% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify. Inflict Frostbite when attacked."]}
    },role:"Tank",attackType:"Melee",evolutionOf:"snowmane",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"glaciertusk"},
-  {id:"glaciertusk",name:"Glaciarch",emoji:"🐘",type:"Water",rarity:"common",description:"An ancient ice mammoth the size of a small glacier. Its tusks can impale mountains.",
+  {id:"glaciertusk",name:"Hibernarch",emoji:"🗻",type:"Water",rarity:"common",description:"A turtle carrying a fortress of ancient ice. It has been asleep inside for most of recorded history and has no plans to stop.",
    stats:{hp:177,atk:88,def:133,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ice Scratch",upgrades:["10 dmg + 10% slow","13 dmg + 12% slow","17 dmg + 15% slow","22 dmg + 18% slow","Slow lasts 3s"]},
-     special:{name:"Blizzard Wall",charge:20,upgrades:["Summon ice wall; enemies hit take 50 dmg","60 dmg","75 dmg","92 dmg","Wall lasts 4s; slows all who touch it 35%"]},
-     unique:{name:"Living Glacier",upgrades:["Passive: reduce all dmg taken 20; allies behind Glaciertusk take -12% dmg","Reduce 28; -16%","Reduce 36; -20%","Reduce 46; -26%","Reduce 56; -32%; any freeze effect now lasts +1s longer"]}
+     basic:{name:"Frost Nip",upgrades:["10 dmg","11 dmg","12 dmg","14 dmg","14 dmg and heal 50% of the damage dealt"]},
+     special:{name:"Hunker In",charge:14,upgrades:["Gain 2 stacks of Fortify.","Gain 3 stacks of Fortify.","Gain 4 stacks of Fortify.","Gain 5 stacks of Fortify.","Gain 5 stacks of Fortify. When Fortify is removed, dispel all debuffs on this creature."]},
+     unique:{name:"Windbreak",upgrades:["Nearby allies receive 2% less damage. Doubled while this creature has Fortify.","Nearby allies receive 4% less damage. Doubled while this creature has Fortify.","Nearby allies receive 7% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify. Inflict Frostbite when attacked."]}
    },role:"Tank",attackType:"Melee",evolutionOf:"blizzardback",shardsToAscend:18,ascensionsToEvolve:null},
   // Nature line 2
   {id:"sproutlet",name:"Puddlet",emoji:"🐣",type:"Water",rarity:"epic",description:"A fluffy heron hatchling with more legs than balance. It practices spear-fishing in puddles and mostly stabs its own reflection.",
@@ -287,64 +287,6 @@ export const CREATURES=[
      special:{name:"Cyclone Tail",charge:10,upgrades:["Spin; 55 dmg to all nearby","70 dmg","88 dmg","108 dmg","Cyclone persists 2s pulling enemies in"]},
      unique:{name:"Storm Predator",upgrades:["Passive: wind attacks deal +18% dmg; crit chance +8%","20% dmg; +10% crit","22% dmg; +12% crit","26% dmg; +15% crit","30% dmg; +18% crit; crits unleash a wind burst hitting all nearby enemies for 40 dmg"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"cyclotail",shardsToAscend:18,ascensionsToEvolve:null},
-  // Electric line 1
-  {id:"sparkpup",name:"Sparkit",emoji:"🐭",type:"Electric",rarity:"common",description:"A tiny mouse with oversized ears that act as lightning rods. Startles easily and discharges.",
-   stats:{hp:42,atk:44,def:25,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Static Bite",upgrades:["10 dmg; 15% chance to stun 0.5s","13 dmg; 18%","17 dmg; 22%","22 dmg; 26%","30% chance; stun 0.75s"]},
-     special:{name:"Charge Up",charge:22,upgrades:["Next attack +25% dmg","Next +35%","Next +46%","Next +58%","Next +72%; also gains +15 SPD for 2s"]},
-     unique:{name:"Static Body",upgrades:["Passive: every 5th hit taken zaps attacker 12 dmg","Every 4th; 18 dmg","Every 3rd; 25 dmg","Every 3rd; 35 dmg; stuns 0.25s","Every 2nd; 45 dmg; stuns 0.5s"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"voltkit"},
-  {id:"voltkit",name:"Voltcat",emoji:"🐱",type:"Electric",rarity:"common",description:"Zaprat evolved into a cracking electric cat. Its purr sounds like a tesla coil.",
-   stats:{hp:68,atk:72,def:41,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Static Bite",upgrades:["10 dmg; stun chance 15%","13 dmg; 18%","17 dmg; 22%","22 dmg; 26%","30%; stun 0.75s"]},
-     special:{name:"Volt Pounce",charge:10,upgrades:["Pounce; 48 dmg + stun 0.5s","62 dmg","78 dmg","96 dmg","Also leaves electric field at landing for 2s"]},
-     unique:{name:"Overcharge",upgrades:["Passive: every 6s gain +20% ATK for 2s","Every 5s +26%","Every 4s +32%","Every 3s +40%","Every 3s +50%; while overcharged attacks stun for 0.25s"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"sparkpup",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"thunderpaw"},
-  {id:"thunderpaw",name:"Voltiger",emoji:"🐯",type:"Electric",rarity:"common",description:"A thundering tiger whose stripes are live voltage. Its roar triggers lightning.",
-   stats:{hp:94,atk:99,def:57,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Thunder Claw",upgrades:["16 dmg; 20% stun chance 0.5s","21 dmg","27 dmg","35 dmg","25% stun 1s; arcs to nearby foe 50%"]},
-     special:{name:"Volt Rush",charge:22,upgrades:["Dash; 62 dmg; leaves electric trail","78 dmg","96 dmg","118 dmg","Trail lasts 3s; enemies in trail stunned 0.5s/s"]},
-     unique:{name:"Lightning Coat",upgrades:["Passive: attacks have 18% chance to chain to 1 nearby foe for 50% dmg","22%; 60%","26%; 70%","30%; 80%","35%; 90%; chained hits also stun 0.5s"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"voltkit",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"boltlion"},
-  {id:"boltlion",name:"Boltiger",emoji:"🦁",type:"Electric",rarity:"common",description:"Thundertiger's royal final form. A lion made of living lightning. Every step is a crack of thunder.",
-   stats:{hp:124,atk:132,def:77,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Thunder Claw",upgrades:["16 dmg; 20% stun chance 0.5s","21 dmg","27 dmg","35 dmg","25% stun 1s; arcs 50%"]},
-     special:{name:"Volt Rush",charge:22,upgrades:["Dash; 62 dmg; electric trail","78 dmg","96 dmg","118 dmg","Trail lasts 3s; enemies stunned 0.5s/s"]},
-     unique:{name:"Thunder King",upgrades:["Passive: electric attacks deal +22% dmg; allies gain +8% electric dmg","Electric +28%; allies +12%","Electric +34%; allies +16%","Electric +42%; allies +20%","Electric +50%; allies +26%; Boltlion's crits call an additional lightning strike for 80 dmg"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"thunderpaw",shardsToAscend:18,ascensionsToEvolve:null},
-  // Electric line 2
-  {id:"buzzwig",name:"Buzzwig",emoji:"🐝",type:"Electric",rarity:"common",description:"A fuzzy electric bee that builds nests out of crackling amber. Its sting carries a jolt.",
-   stats:{hp:41,atk:41,def:21,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Sting",upgrades:["11 dmg; 20% poison (4 dmg/s 2s)","14 dmg","18 dmg","24 dmg","Poison + 15% slow 2s"]},
-     special:{name:"Amber Trap",charge:12,upgrades:["Trap; root 1s + 25 dmg if triggered","Root 1.5s + 32 dmg","Root 2s + 40 dmg","Root 2s + 50 dmg","3 traps simultaneously; each root 2s"]},
-     unique:{name:"Electric Pollen",upgrades:["Passive: abilities have 20% chance to apply shock (8 dmg/s 2s)","25% shock","30% shock 3s","35% shock 3s","40% shock 3s; shocked enemies take +12% dmg from all sources"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"zaptail"},
-  {id:"zaptail",name:"Zaptail",emoji:"🦟",type:"Electric",rarity:"common",description:"Buzzwig evolved into a lightning-fast electric dragonfly. It strikes before you see it coming.",
-   stats:{hp:65,atk:67,def:35,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Sting",upgrades:["11 dmg; 20% shock","14 dmg","18 dmg","24 dmg","Shock + slow 15% 2s"]},
-     special:{name:"Zap Dash",charge:10,upgrades:["Dash through enemies; 42 dmg each","54 dmg","68 dmg","84 dmg","Leave electric trail; enemies in trail take 15 dmg/s for 2s"]},
-     unique:{name:"Speed Zapper",upgrades:["Passive: after using any ability gain +20 SPD for 2s","Gain +28 SPD","Gain +36 SPD; also +8% Ability Speed","Gain +45 SPD; +12% Ability Speed","Gain +56 SPD; +16% Ability Speed; SPD bonus also empowers next attack for 15% more dmg"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"buzzwig",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"shockfang"},
-  {id:"shockfang",name:"Shockfang",emoji:"🦎",type:"Electric",rarity:"common",description:"A jagged electric lizard whose fangs deliver voltage directly into the nervous system.",
-   stats:{hp:90,atk:92,def:50,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Fang",upgrades:["18 dmg; paralysis 20% chance (stop 0.5s)","23 dmg; 24%","30 dmg; 28%","38 dmg; 32%","35%; paralysis 1s"]},
-     special:{name:"Electro Burst",charge:16,upgrades:["55 dmg in burst; stun 0.5s","70 dmg","88 dmg","108 dmg","Stun 1s; stun releases 30 dmg shockwave"]},
-     unique:{name:"High Voltage",upgrades:["Passive: critical hits deal +30% bonus electric dmg","Crit +40%","Crit +50%","Crit +62%","Crit +75%; crits also paralyze for 0.5s"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"zaptail",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"stormhorn"},
-  {id:"stormhorn",name:"Stormhorn",emoji:"🦬",type:"Electric",rarity:"common",description:"Shockfang's apex form. A massive electric bison whose horns channel lightning storms.",
-   stats:{hp:120,atk:123,def:67,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Fang",upgrades:["18 dmg; paralysis 20%","23 dmg","30 dmg","38 dmg","35%; paralysis 1s"]},
-     special:{name:"Electro Burst",charge:16,upgrades:["55 dmg; stun 0.5s","70 dmg","88 dmg","108 dmg","Stun 1s; shockwave 30 dmg"]},
-     unique:{name:"Thunder Stampede",upgrades:["Passive: each hit adds a charge (max 5); at 5 charges release 120 dmg electric explosion","Explosion 150 dmg","Explosion 185 dmg","Explosion 225 dmg","Explosion 270 dmg; explosion stuns all hit 1.5s and resets charge counter"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"shockfang",shardsToAscend:18,ascensionsToEvolve:null},
   // Light line 1
   {id:"glowpup",name:"Jadebun",emoji:"🐰",type:"Light",rarity:"common",description:"A rabbit whose fur carries the cool green sheen of polished jade. It gathers moonlit herbs in its cheeks and refuses to explain why.",
    stats:{hp:43,atk:28,def:26,spd:1,abilitySpeed:1},
@@ -374,35 +316,6 @@ export const CREATURES=[
      special:{name:"Silver Draught",charge:18,upgrades:["Heal 24 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 29 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 35 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 42 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 42 HP and shield them. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal"]},
      unique:{name:"Pestle Tempo",upgrades:["When an ally within range is below 50% Health, gain 2% Haste and Speed","When an ally within range is below 50% Health, gain 4% Haste and Speed","When an ally within range is below 50% Health, gain 6% Haste and Speed","When an ally within range is below 50% Health, gain 8% Haste and Speed","When an ally within range is below 50% Health, gain 10% Haste and Speed"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"dawnbeast",shardsToAscend:18,ascensionsToEvolve:null},
-  // Light line 2
-  {id:"shimmerfly",name:"Shimmerfly",emoji:"🦋",type:"Light",rarity:"common",description:"A butterfly made of prismatic light. Its wing dust blinds enemies and heals allies.",
-   stats:{hp:36,atk:23,def:22,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Prism Dust",upgrades:["7 dmg; 20% blind 1s","9 dmg","12 dmg","15 dmg","25% blind 1.5s"]},
-     special:{name:"Wing Heal",charge:18,upgrades:["Heal ally 20 HP","Heal 28 HP","Heal 37 HP","Heal 48 HP","Heal + grant 5% dodge for 3s"]},
-     unique:{name:"Prism Scales",upgrades:["Passive: 12% chance any hit is negated (absorbed by light)","15%","18%","22%","26%; absorbed hits heal Shimmerfly 10 HP"]}
-   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"lumiwing"},
-  {id:"lumiwing",name:"Lumiwing",emoji:"🌟",type:"Light",rarity:"common",description:"Shimmerfly with wings that now emit constant healing pulses.",
-   stats:{hp:59,atk:38,def:37,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Prism Dust",upgrades:["7 dmg; blind 20%","9 dmg","12 dmg","15 dmg","25%; blind 1.5s"]},
-     special:{name:"Luminous Barrier",charge:14,upgrades:["Shield ally 38 HP; 8% dodge","Shield 52; 12%","Shield 68; 16%","Shield 86; 20%","Shield all allies 28 HP; 12% dodge"]},
-     unique:{name:"Light Resonance",upgrades:["Passive: each heal by Lumiwing has a 20% chance to heal a second ally for 50% of the amount","25%; 60%","30%; 70%","35%; 80%","40%; 90%; both allies also gain +5% DEF for 3s"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"shimmerfly",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"brightclaw"},
-  {id:"brightclaw",name:"Brightmoth",emoji:"🕊️",type:"Light",rarity:"common",description:"Lumiwing transformed into a dove of blazing light. Its talons carry purifying fire.",
-   stats:{hp:87,atk:57,def:54,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Light Talon",upgrades:["12 dmg; cleanse 1 ally debuff on hit","16 dmg","21 dmg","27 dmg","Cleanse all debuffs from 1 ally"]},
-     special:{name:"Bright Heal",charge:20,upgrades:["Heal all allies 32 HP; remove 1 debuff each","Heal 44","Heal 58","Heal 74","Heal 92; remove all debuffs; grant immunity to 1 debuff for 4s"]},
-     unique:{name:"Wings of Grace",upgrades:["Passive: every 5s, remove 1 debuff from a random ally","Every 4s","Every 3s; also heal 12 HP","Every 3s; heal 18 HP","Every 2s; heal 25 HP; debuff removal triggers a 15 dmg light burst on enemies"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"lumiwing",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"celestipaw"},
-  {id:"celestipaw",name:"Starmoth",emoji:"✨",type:"Light",rarity:"common",description:"Brightclaw ascended to pure starlight. A luminous lynx whose form transcends the physical, embodying light itself.",
-   stats:{hp:118,atk:77,def:73,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Light Talon",upgrades:["12 dmg; cleanse ally","16 dmg","21 dmg","27 dmg","Cleanse all"]},
-     special:{name:"Celestial Heal",charge:8,upgrades:["Heal all allies 50 HP; remove all debuffs; grant +15% DEF 4s","Heal 66","Heal 84","Heal 105","Heal 128 HP; +20% all stats 5s; grant regen 12 HP/s 4s"]},
-     unique:{name:"Celestial Grace",upgrades:["Passive: all allies take -8% dmg; heal 8 HP/s; Celestipaw's heals cannot be reduced","-10%; 11 HP/s","-12%; 14 HP/s; heals now crit for +50%","-15%; 18 HP/s; heal crits","-18%; 24 HP/s; heal crits; once per battle: when an ally would die Celestipaw sacrifices 40% of its HP to fully revive them at 50% HP"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"brightclaw",shardsToAscend:18,ascensionsToEvolve:null},
   // Dark line 1
   {id:"shadowpup",name:"Duskling",emoji:"🐈‍⬛",type:"Dark",rarity:"common",description:"A small black cat that flickers in and out of shadow. Enjoys knocking things off shelves.",
    stats:{hp:45,atk:45,def:22,spd:1,abilitySpeed:1},
@@ -433,34 +346,50 @@ export const CREATURES=[
      unique:{name:"Void Sovereign",upgrades:["Passive: dark attacks bypass 15% of enemy DEF; kills grant full HP regen for 2s","Bypass 20%","Bypass 26%; regen 3s","Bypass 32%; regen 3s","Bypass 40%; regen 4s; dark attacks also silence for 0.5s; Voidfang is immune to silence"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"nightstalker",shardsToAscend:18,ascensionsToEvolve:null},
   // Dark line 2
-  {id:"murkwing",name:"Murkwing",emoji:"🕷️",type:"Dark",rarity:"common",description:"A shadowy bat that drains energy from those around it. Even torches dim in its presence.",
-   stats:{hp:38,atk:36,def:26,spd:1,abilitySpeed:1},
+  {id:"murkwing",name:"Scrapcaw",emoji:"🐦",type:"Dark",rarity:"epic",description:"The lowest rung of a very organized murder. It carries messages, holds things, and is told almost nothing.",
+   stats:{hp:58,atk:62,def:40,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Drain Bite",upgrades:["9 dmg; heal self 4 HP","12 dmg; heal 5","15 dmg; heal 7","20 dmg; heal 9","Heal 12; also reduce target ATK 8% for 2s"]},
-     special:{name:"Shadow Shriek",charge:12,upgrades:["Shriek; silence all nearby 1s + 25 dmg","Silence 1.5s + 32 dmg","Silence 2s + 40 dmg","Silence 2s + 50 dmg","Silence 2.5s + 62 dmg; also reduce Ability Speed 20%"]},
-     unique:{name:"Life Leech",upgrades:["Passive: 15% of dmg dealt heals Murkwing","18%","22%","26%","30%; excess healing shields up to 30 HP"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"darkpaw"},
-  {id:"darkpaw",name:"Corvoid",emoji:"🐦‍⬛",type:"Dark",rarity:"common",description:"Murkwing evolved into a sleek black raven. Its gaze saps the will to fight.",
-   stats:{hp:62,atk:58,def:42,spd:1,abilitySpeed:1},
+     basic:{name:"Gloom Peck",upgrades:["16 dmg","21 dmg","27 dmg","34 dmg","34 dmg and gain 1% Ability Charge"]},
+     special:{name:"Nightcall",charge:12,upgrades:["40 dmg","50 dmg","62 dmg","78 dmg","78 dmg. Assisting allies deal 20% more damage"]},
+     unique:{name:"Shadow Pact",upgrades:["Gain 5% Attack and 5% Haste for each other Dark ally.","Gain 5% Attack and 10% Haste for each other Dark ally.","Gain 5% Attack and 15% Haste for each other Dark ally.","Gain 5% Attack and 20% Haste for each other Dark ally.","Gain 5% Attack and 25% Haste for each other Dark ally."]}
+   },role:"Attacker",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"darkpaw"},
+  {id:"darkpaw",name:"Corvoid",emoji:"🐦‍⬛",type:"Dark",rarity:"epic",description:"Promoted for loyalty rather than talent. It gets to tell other crows what to do now, and is enormously pleased about this.",
+   stats:{hp:88,atk:95,def:60,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Drain Bite",upgrades:["9 dmg; heal 4","12 dmg; heal 5","15 dmg; heal 7","20 dmg; heal 9","Heal 12; reduce ATK 8% 2s"]},
-     special:{name:"Curse",charge:12,upgrades:["Curse target: -15% ATK and DEF for 4s","-20% for 4s","-25% for 5s","-32% for 5s","-40% for 6s; curse spreads to 1 nearby foe"]},
-     unique:{name:"Shadow Feast",upgrades:["Passive: after killing a foe, heal 30 HP and gain +12% ATK for 5s","Heal 42; +16%","Heal 56; +20%","Heal 72; +25%","Heal 90; +30% ATK + DEF; buff lasts 7s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"murkwing",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"shadowcrest"},
-  {id:"shadowcrest",name:"Shadowcrest",emoji:"🦅",type:"Dark",rarity:"common",description:"Darkraven grown into a dark eagle whose feathers absorb light. Looking at it causes unease.",
-   stats:{hp:86,atk:80,def:62,spd:1,abilitySpeed:1},
+     basic:{name:"Gloom Peck",upgrades:["16 dmg","21 dmg","27 dmg","34 dmg","34 dmg and gain 1% Ability Charge"]},
+     special:{name:"Nightcall",charge:12,upgrades:["40 dmg","50 dmg","62 dmg","78 dmg","78 dmg. Assisting allies deal 20% more damage"]},
+     unique:{name:"Shadow Pact",upgrades:["Gain 5% Attack and 5% Haste for each other Dark ally.","Gain 5% Attack and 10% Haste for each other Dark ally.","Gain 5% Attack and 15% Haste for each other Dark ally.","Gain 5% Attack and 20% Haste for each other Dark ally.","Gain 5% Attack and 25% Haste for each other Dark ally."]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"murkwing",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"abysslord"},
+  {id:"abysslord",name:"Murderking",emoji:"🦅",type:"Dark",rarity:"epic",description:"Every crow within three counties answers its call. It rarely needs to raise a claw itself, though it is unnervingly good at it when it does.",
+   stats:{hp:128,atk:138,def:88,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Void Talon",upgrades:["14 dmg; heal 6; reduce ATK 10% 2s","18 dmg","23 dmg","30 dmg","ATK -14%; heal 10 HP"]},
-     special:{name:"Dark Aura",charge:18,upgrades:["All enemies -15% ATK -10% DEF for 5s","-20% ATK -14% DEF","-26% ATK -18% DEF","-32% ATK -22% DEF","-40% ATK -28% DEF; also -20% SPD"]},
-     unique:{name:"Darkness Drain",upgrades:["Passive: 20% of dmg dealt heals Shadowcrest; overheal shields up to 40 HP","22%; 50 HP shield","26%; 60 HP","30%; 72 HP","35%; 85 HP; shield also reduces incoming dmg by 10%"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"darkpaw",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"abysslord"},
-  {id:"abysslord",name:"Abysslord",emoji:"🌑",type:"Dark",rarity:"common",description:"The void given form. Shadowcrest's final evolution exists on the border between world and nothingness.",
-   stats:{hp:114,atk:108,def:84,spd:1,abilitySpeed:1},
+     basic:{name:"Gloom Peck",upgrades:["16 dmg","21 dmg","27 dmg","34 dmg","34 dmg and gain 1% Ability Charge"]},
+     special:{name:"Nightcall",charge:12,upgrades:["40 dmg","50 dmg","62 dmg","78 dmg","78 dmg. Assisting allies deal 20% more damage"]},
+     unique:{name:"Shadow Pact",upgrades:["Gain 5% Attack and 5% Haste for each other Dark ally.","Gain 5% Attack and 10% Haste for each other Dark ally.","Gain 5% Attack and 15% Haste for each other Dark ally.","Gain 5% Attack and 20% Haste for each other Dark ally.","Gain 5% Attack and 25% Haste for each other Dark ally."]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"darkpaw",shardsToAscend:20,ascensionsToEvolve:null},
+  // Dark line 4: vultures that feed on the battlefield -- the kit below is
+  // placeholder text pending its real LOC; Death Feast is the identity.
+  {id:"bonebeak",name:"Bonebeak",emoji:"🦤",type:"Dark",rarity:"epic",description:"A fledgling vulture with no hunting instinct whatsoever and impeccable timing. It is always already there when something stops moving.",
+   stats:{hp:84,atk:46,def:90,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Void Talon",upgrades:["14 dmg; heal 6; ATK -10%","18 dmg","23 dmg","30 dmg","ATK -14%; heal 10 HP"]},
-     special:{name:"Abyss Aura",charge:14,upgrades:["All enemies -20% ATK -15% DEF -10% SPD for 6s","-26%/-20%/-14%","-32%/-26%/-18%","-40%/-32%/-22%","-50%/-40%/-28% for 7s; also silences all 1.5s"]},
-     unique:{name:"Abyss Sovereign",upgrades:["Passive: 25% of dmg heals Abysslord; kills restore 40 HP to all allies","28% drain; 52 HP","32% drain; 65 HP","36% drain; 80 HP","40% drain; 100 HP; on kill Abysslord gains +15% all stats for 6s; enemies near Abysslord slowly lose HP (5 dmg/s)"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"shadowcrest",shardsToAscend:18,ascensionsToEvolve:null},
+     basic:{name:"Carrion Rip",upgrades:["14 dmg and inflict Damage Over Time","18 dmg and inflict Damage Over Time","23 dmg and inflict Damage Over Time","29 dmg and inflict Damage Over Time","29 dmg and inflict 2 stacks of Damage Over Time"]},
+     special:{name:"Gorge",charge:14,upgrades:["36 dmg","45 dmg","56 dmg","70 dmg","70 dmg. If this attack defeats an enemy, a random enemy gains 2 stacks of Damage Over Time"]},
+     unique:{name:"Death Feast",upgrades:["This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 10% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 15% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 10% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 10% Attack and 10% Defense."]}
+   },role:"Tank",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"gravewing"},
+  {id:"gravewing",name:"Gravewing",emoji:"🦃",type:"Dark",rarity:"epic",description:"It has learned that patience is a hunting strategy. It circles battlefields on principle now, several hours before anything has gone wrong.",
+   stats:{hp:120,atk:66,def:128,spd:1,abilitySpeed:1},
+   abilities:{
+     basic:{name:"Carrion Rip",upgrades:["14 dmg and inflict Damage Over Time","18 dmg and inflict Damage Over Time","23 dmg and inflict Damage Over Time","29 dmg and inflict Damage Over Time","29 dmg and inflict 2 stacks of Damage Over Time"]},
+     special:{name:"Gorge",charge:14,upgrades:["36 dmg","45 dmg","56 dmg","70 dmg","70 dmg. If this attack defeats an enemy, a random enemy gains 2 stacks of Damage Over Time"]},
+     unique:{name:"Death Feast",upgrades:["This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 10% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 15% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 10% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 10% Attack and 10% Defense."]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"bonebeak",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"charnelord"},
+  {id:"charnelord",name:"Charnelord",emoji:"🦅",type:"Dark",rarity:"epic",description:"Every fight it has ever attended has ended, and it has outlived all of them. It does not win battles so much as wait for them to finish.",
+   stats:{hp:158,atk:88,def:168,spd:1,abilitySpeed:1},
+   abilities:{
+     basic:{name:"Carrion Rip",upgrades:["14 dmg and inflict Damage Over Time","18 dmg and inflict Damage Over Time","23 dmg and inflict Damage Over Time","29 dmg and inflict Damage Over Time","29 dmg and inflict 2 stacks of Damage Over Time"]},
+     special:{name:"Gorge",charge:14,upgrades:["36 dmg","45 dmg","56 dmg","70 dmg","70 dmg. If this attack defeats an enemy, a random enemy gains 2 stacks of Damage Over Time"]},
+     unique:{name:"Death Feast",upgrades:["This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 10% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 15% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 5% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 5% Attack and 10% Defense.","This creature prioritizes enemies inflicted with Damage Over Time. Whenever an ally or enemy is defeated, recover 20% Health and gain 10% Attack and 10% Defense."]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"gravewing",shardsToAscend:20,ascensionsToEvolve:null},
   {id:"frostfang",name:"Frostfang",emoji:"🐺",type:"Water",rarity:"epic",description:"A cold-blooded predator whose howl drops the temperature in a wide area.",
    stats:{hp:66,atk:59,def:45,spd:1,abilitySpeed:1},
    abilities:{
@@ -475,14 +404,14 @@ export const CREATURES=[
      special:{name:"Blizzard Howl",charge:8,upgrades:["Chills enemies in radius 3","Chills radius 4","Chills radius 5","Chills radius 6","Fully freezes all chilled enemies in range"]},
      unique:{name:"Permafrost Aura",upgrades:["Passive: nearby enemies are slowed 25% and take +8% ice damage","Nearby enemies slowed 32%; +12% ice damage taken","Nearby enemies slowed 40%; +16% ice damage taken; every 6s they are frozen for 1s","Nearby enemies slowed 48%; +20% ice damage; frozen for 1.5s every 5s","Nearby enemies slowed 55%; +25% ice damage; frozen for 2s every 4s; being unfrozen deals 20 shatter damage"]}
    },role:"Support",attackType:"Melee",evolutionOf:"frostfang",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"frostwyvern"},
-  {id:"voltail",name:"Voltail",emoji:"⚡",type:"Electric",rarity:"common",description:"Its tail acts as a lightning rod, storing energy for devastating strikes.",
+  {id:"voltail",name:"Monovolt",emoji:"🦎",type:"Electric",rarity:"common",description:"A golden hatchling with one head and the unshakeable confidence of something expecting to grow two more. Storms follow it around, mostly out of curiosity.",
    stats:{hp:63,atk:64,def:35,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Static Zap",upgrades:["14 dmg","19 dmg","25 dmg","32 dmg","Arcs to 1 nearby foe for 50% damage"]},
      special:{name:"Charge Up",charge:22,upgrades:["Next ability +20% dmg","Next +30%","Next +40%","Next +55%","Also grants a charge shield absorbing 20 dmg"]},
      unique:{name:"Static Body",upgrades:["Passive: every 5th hit received, zaps the attacker for 15 electric dmg","Every 4th hit zaps for 22 electric dmg","Every 3rd hit zaps for 30 electric dmg","Every 3rd hit zaps for 40 electric dmg and briefly stuns the attacker","Every 2nd hit zaps for 50 electric dmg, stuns the attacker, and arcs to one nearby enemy for 25 dmg"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"stormclaw"},
-  {id:"stormclaw",name:"Stormclaw",emoji:"🌩️",type:"Electric",rarity:"common",description:"A Voltail so overcharged it permanently crackles with uncontained lightning.",
+  {id:"stormclaw",name:"Duovolt",emoji:"🐍",type:"Electric",rarity:"common",description:"The second head arrived last spring. The two of them have not agreed on anything since, which is why it flies in a spiral.",
    stats:{hp:99,atk:103,def:56,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Static Zap",upgrades:["14 dmg","19 dmg","25 dmg","32 dmg","Arcs to 1 nearby foe for 50% damage"]},
@@ -622,57 +551,35 @@ export const CREATURES=[
      unique:{name:"Volcanic Body",upgrades:["Passive: all burn/poison effects +30% stronger; attackers burned 3s","Burn+poison +40%","Burn+poison +50%; attackers poisoned also","Burn+poison +62%","Burn+poison +75%; attackers burned+poisoned; Magmascorp immune to both"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"pyrescorp",shardsToAscend:22,ascensionsToEvolve:null},
 
-  // Nature line 1
-  {id:"venomviper",name:"Venomviper",emoji:"🐍",type:"Nature",rarity:"common",description:"A bright green viper dripping with potent toxin. Beautiful and absolutely terrifying.",
-   stats:{hp:58,atk:55,def:42,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Venom Bite",upgrades:["11 dmg+poison 5 dmg/s 2s","14 dmg","18 dmg","24 dmg","Poison 7 dmg/s 3s; -10% DEF"]},
-     special:{name:"Toxic Spit",charge:10,upgrades:["Ranged; poison 5 dmg/s 4s+slow 20%","Poison 7 dmg/s","Poison 9 dmg/s","Poison 12 dmg/s","Poison spreads to 1 nearby foe"]},
-     unique:{name:"Lethal Toxin",upgrades:["Passive: poison stacks twice on same foe","Poison stacks 3x","Stacks 3x; +10% dmg per stack","Stacks 4x; +12% dmg per stack","Stacks 4x; +15% per stack; at 4 stacks foe is paralyzed 1s"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"toxicserpent"},
-  {id:"toxicserpent",name:"Serpoxin",emoji:"🐍",type:"Nature",rarity:"common",description:"Venomviper grown to enormous size. Its venom cloud alone is enough to wilt entire forests.",
-   stats:{hp:88,atk:82,def:64,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Venom Bite",upgrades:["11 dmg+poison","14 dmg","18 dmg","24 dmg","Poison+DEF-10%"]},
-     special:{name:"Poison Cloud",charge:18,upgrades:["Cloud; 5 dmg/s 4s to all in area","7 dmg/s","9 dmg/s","12 dmg/s 5s","Cloud lingers 6s; also reduces ATK 15%"]},
-     unique:{name:"Virulent Venom",upgrades:["Passive: all poisons deal +20% dmg","Poisons +28%","Poisons +36%; heal 5 HP per poison tick done","Poisons +44%; heal 8 HP","Poisons +55%; heal 12 HP; Nature allies gain 10% of Toxicserpent's poison output as healing"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"venomviper",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"poisonwyrm"},
-  {id:"poisonwyrm",name:"Regicobra",emoji:"🐉",type:"Nature",rarity:"common",description:"A legendary toxic wyrm. Its scales shed clouds of spores that poison entire regions.",
-   stats:{hp:120,atk:112,def:88,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Venom Bite",upgrades:["11 dmg+poison","14 dmg","18 dmg","24 dmg","Poison+DEF-10%"]},
-     special:{name:"Spore Eruption",charge:22,upgrades:["Huge cloud; poison all 8s","Poison stronger","Even stronger","Max poison","Spores also paralyze 1s; spread to 2 nearby foes"]},
-     unique:{name:"Plague Lord",upgrades:["Passive: enemies can't remove poison from Poisonwyrm's stacks; stacks cap raised by 2","Stacks +3","Stacks +4; poison deals +20% dmg","Stacks +5; +28% dmg","Stacks +6; +36% dmg; Poisonwyrm heals 15 HP per poison stack active on any enemy"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"toxicserpent",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"ophidrax"},
-  {id:"ophidrax",name:"Ophidrax",emoji:"🐉",type:"Nature",rarity:"common",description:"Regicobra with an empire. Its venom no longer poisons individuals so much as regions, which it considers efficient.",
-   stats:{hp:156,atk:146,def:114,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Sovereign Bite",upgrades:["14 dmg+poison","18 dmg","23 dmg","30 dmg","Poison+DEF-14%"]},
-     special:{name:"Blight Eruption",charge:22,upgrades:["Vast cloud; poison all 10s","Poison stronger","Even stronger","Max poison","Spores paralyze 1.5s; spread to all nearby foes"]},
-     unique:{name:"Venom Emperor",upgrades:["Passive: poison stacks cap +4; poison deals +25% dmg","Cap +5; +32%","Cap +6; +40%","Cap +7; +50%","Cap +8; +62%; Ophidrax heals 22 HP per poison stack active on any enemy"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"poisonwyrm",shardsToAscend:28,ascensionsToEvolve:null},
   // Nature line 2
-  {id:"mosskrab",name:"Mosskrab",emoji:"🦀",type:"Nature",rarity:"epic",description:"A moss-covered crab that looks like a walking garden. Surprisingly effective healer.",
-   stats:{hp:68,atk:42,def:72,spd:1,abilitySpeed:1},
+  {id:"mosskrab",name:"Frillet",emoji:"🦕",type:"Nature",rarity:"common",description:"A triceratops hatchling whose frill is already wider than the rest of it. It has appointed itself the personal bodyguard of everyone it has ever met.",
+   stats:{hp:58,atk:28,def:48,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Pinch",upgrades:["10 dmg; root 0.5s","13 dmg","17 dmg","22 dmg","Root 1s; heal self 10 HP"]},
-     special:{name:"Moss Heal",charge:20,upgrades:["Heal ally 28 HP+regen 3 HP/s 4s","Heal 38+regen 4","Heal 50+regen 5","Heal 65+regen 7","Heal all allies 30 HP+regen 5 HP/s"]},
-     unique:{name:"Living Moss",upgrades:["Passive: all allies regen 3 HP/s","Regen 5 HP/s","Regen 7 HP/s; Nature moves +8% healing","Regen 9 HP/s; +12%","Regen 12 HP/s; +16%; Mosskrab's heals cannot crit-miss"]}
-   },role:"Tank",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"jadekrab"},
-  {id:"jadekrab",name:"Jadekrab",emoji:"🦀",type:"Nature",rarity:"epic",description:"Mosskrab whose shell has turned to jade crystal. Its carapace deflects even magic.",
-   stats:{hp:102,atk:62,def:108,spd:1,abilitySpeed:1},
+     basic:{name:"Guard Horn",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},
+     special:{name:"Aegis Frill",charge:16,upgrades:["Gain a Shield equal to 25% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 30% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 35% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 3 stacks of Protect"]},
+     unique:{name:"Bulwark Body",upgrades:["Whenever this creature is damaged by an attack, it has a 50% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 60% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 70% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has an 80% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 100% chance to counter, dealing 80% less damage"]}
+   },role:"Tank",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"jadekrab"},
+  {id:"jadekrab",name:"Bulwarden",emoji:"🦏",type:"Nature",rarity:"common",description:"The frill has thickened into proper plate. It stands in front of things now, professionally, and takes the question of who asked it to very personally.",
+   stats:{hp:94,atk:46,def:78,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Pinch",upgrades:["10 dmg; root 0.5s","13 dmg","17 dmg","22 dmg","Root 1s; heal 10 HP"]},
-     special:{name:"Jade Bloom",charge:14,upgrades:["Heal all allies 42 HP+regen 5 HP/s","Heal 56+regen 7","Heal 72+regen 9","Heal 90+regen 12","Remove all debuffs; regen 15 HP/s 4s"]},
-     unique:{name:"Jade Carapace",upgrades:["Passive: reduce all dmg by 18; Nature allies +10% max HP","Reduce 25; +14%","Reduce 32; +18%","Reduce 40; +22%","Reduce 50; +28%; reflect 15% blocked dmg to attacker"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"mosskrab",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"crystalshell"},
-  {id:"crystalshell",name:"Crystalshell",emoji:"🦀",type:"Nature",rarity:"epic",description:"Jadekrab's ultimate form. A mobile fortress of living crystal that heals everything around it.",
-   stats:{hp:138,atk:84,def:146,spd:1,abilitySpeed:1},
+     basic:{name:"Guard Horn",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},
+     special:{name:"Aegis Frill",charge:16,upgrades:["Gain a Shield equal to 25% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 30% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 35% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 3 stacks of Protect"]},
+     unique:{name:"Bulwark Body",upgrades:["Whenever this creature is damaged by an attack, it has a 50% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 60% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 70% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has an 80% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 100% chance to counter, dealing 80% less damage"]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"mosskrab",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"crystalshell"},
+  {id:"crystalshell",name:"Aegiceras",emoji:"🦏",type:"Nature",rarity:"common",description:"Its frill is a tower shield with a heartbeat. Allies have learned to simply stand behind it and wait for the noise to stop.",
+   stats:{hp:133,atk:65,def:109,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Vine Pinch",upgrades:["10 dmg; root 0.5s","13 dmg","17 dmg","22 dmg","Root 1s; heal 10 HP"]},
-     special:{name:"Crystal Bloom",charge:10,upgrades:["Heal all allies 60 HP+regen 8 HP/s+cleanse","Heal 78","Heal 98","Heal 122","Revive 1 fallen ally at 25% HP; cleanse all; regen 12 HP/s"]},
-     unique:{name:"Crystal Sovereign",upgrades:["Passive: all allies -15% dmg taken; +12 HP/s regen","Allies -20%; +15 HP/s","Allies -26%; +19 HP/s","Allies -32%; +24 HP/s","Allies -38%; +30 HP/s; Crystalshell revives once at full HP; death heals all allies 100 HP"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"jadekrab",shardsToAscend:22,ascensionsToEvolve:null},
+     basic:{name:"Guard Horn",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},
+     special:{name:"Aegis Frill",charge:16,upgrades:["Gain a Shield equal to 25% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 30% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 35% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 3 stacks of Protect"]},
+     unique:{name:"Bulwark Body",upgrades:["Whenever this creature is damaged by an attack, it has a 50% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 60% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 70% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has an 80% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 100% chance to counter, dealing 80% less damage"]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"jadekrab",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"rampartops"},
+  {id:"rampartops",name:"Rampartops",emoji:"🏔️",type:"Nature",rarity:"common",description:"A fortress that grazes. It has been the deciding factor in two sieges, neither of which it noticed.",
+   stats:{hp:175,atk:85,def:143,spd:1,abilitySpeed:1},
+   abilities:{
+     basic:{name:"Guard Horn",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},
+     special:{name:"Aegis Frill",charge:16,upgrades:["Gain a Shield equal to 25% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 30% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 35% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 2 stacks of Protect","Gain a Shield equal to 40% of this creature's Defense and all Beside allies gain 3 stacks of Protect"]},
+     unique:{name:"Bulwark Body",upgrades:["Whenever this creature is damaged by an attack, it has a 50% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 60% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 70% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has an 80% chance to counter, dealing 80% less damage","Whenever this creature is damaged by an attack, it has a 100% chance to counter, dealing 80% less damage"]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"crystalshell",shardsToAscend:18,ascensionsToEvolve:null},
   // Nature line 3
   {id:"thornturtle",name:"Thornturtle",emoji:"🐢",type:"Nature",rarity:"epic",description:"A turtle whose shell has grown a thicket of razor thorns. Even looking at it hurts.",
    stats:{hp:81,atk:41,def:62,spd:1,abilitySpeed:1},
@@ -696,49 +603,34 @@ export const CREATURES=[
      unique:{name:"Primordial Shell",upgrades:["Passive: -25 all dmg; thorns 20 dmg; allies -12% dmg","Reduce 34; thorns 28; allies -16%","Reduce 43; thorns 36; allies -20%","Reduce 54; thorns 46; allies -25%","Reduce 65; thorns 56; allies -30%; revive once; death triggers massive thorn explosion"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"jadeshell",shardsToAscend:22,ascensionsToEvolve:null},
   // Earth line 1
-  {id:"ironmole",name:"Ironmole",emoji:"🦔",type:"Earth",rarity:"epic",description:"A mole with iron-reinforced claws that can tunnel through bedrock. Hates sunlight, loves ambush.",
-   stats:{hp:78,atk:48,def:88,spd:1,abilitySpeed:1},
+  {id:"ironmole",name:"Cragling",emoji:"🐵",type:"Earth",rarity:"common",description:"Hatched from a rock on a mountaintop, fully formed and immediately in trouble. It has already been asked to leave three temples.",
+   stats:{hp:46,atk:48,def:26,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Iron Claw",upgrades:["12 dmg; reduce DEF 6% 3s","15 dmg","19 dmg","25 dmg","Reduce DEF 10%+slow 15%"]},
-     special:{name:"Tunnel Ambush",charge:16,upgrades:["Burrow; emerge 3s later+60 dmg","70 dmg","85 dmg","104 dmg","Emerge+stun 1s+crater zone 2s 20 dmg/s"]},
-     unique:{name:"Iron Hide",upgrades:["Passive: -15 all dmg; immune to knockback","Reduce 22; immune to stun also","Reduce 28","Reduce 36; CC immune","Reduce 44; CC immune; reflect 15% of blocked dmg"]}
-   },role:"Tank",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"steelmole"},
-  {id:"steelmole",name:"Steelmole",emoji:"🦔",type:"Earth",rarity:"epic",description:"Ironmole evolved. Its claws are now steel-grade and its hide deflects artillery.",
-   stats:{hp:116,atk:72,def:132,spd:1,abilitySpeed:1},
+     basic:{name:"Staff Strike",upgrades:["20 dmg and gain .5% Ability Charge","20 dmg and gain 1% Ability Charge","20 dmg and gain 1.5% Ability Charge","20 dmg and gain 2% Ability Charge","20 dmg and gain 2.5% Ability Charge"]},
+     special:{name:"Ruyi Reach",charge:10,upgrades:["30 dmg","38 dmg","48 dmg","60 dmg","60 dmg. Momentarily stun all enemies hit"]},
+     unique:{name:"Seventy-Two Forms",upgrades:["Dodge every 10th instance of damage.","Dodge every 9th instance of damage.","Dodge every 8th instance of damage.","Dodge every 7th instance of damage.","Dodge every 6th instance of damage."]}
+   },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"steelmole"},
+  {id:"steelmole",name:"Cragfist",emoji:"🐒",type:"Earth",rarity:"common",description:"It has taken up an iron staff twice its size and refuses to be told this is impractical. So far it has been right.",
+   stats:{hp:72,atk:76,def:41,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Iron Claw",upgrades:["12 dmg; DEF-6%","15 dmg","19 dmg","25 dmg","DEF-10%+slow 15%"]},
-     special:{name:"Steel Drill",charge:20,upgrades:["Drill through foe; 80 dmg+DEF-20% 5s","95 dmg","115 dmg","140 dmg","Drill stuns 1.5s+strip 1 buff"]},
-     unique:{name:"Steel Fortress",upgrades:["Passive: -22 all dmg; reflect 10% dmg blocked","-30 dmg; reflect 14%","-38 dmg; reflect 18%","-48 dmg; reflect 22%","-58 dmg; reflect 28%; CC immune; at 100 reflected dmg trigger a free tunnel ambush"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"ironmole",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"titanmole"},
-  {id:"titanmole",name:"Titanmole",emoji:"🦔",type:"Earth",rarity:"epic",description:"Steelmole's titan form. Its tunnels cause earthquakes. Geologists blame it for every continental shift.",
-   stats:{hp:158,atk:98,def:178,spd:1,abilitySpeed:1},
+     basic:{name:"Staff Strike",upgrades:["20 dmg and gain .5% Ability Charge","20 dmg and gain 1% Ability Charge","20 dmg and gain 1.5% Ability Charge","20 dmg and gain 2% Ability Charge","20 dmg and gain 2.5% Ability Charge"]},
+     special:{name:"Ruyi Reach",charge:10,upgrades:["30 dmg","38 dmg","48 dmg","60 dmg","60 dmg. Momentarily stun all enemies hit"]},
+     unique:{name:"Seventy-Two Forms",upgrades:["Dodge every 10th instance of damage.","Dodge every 9th instance of damage.","Dodge every 8th instance of damage.","Dodge every 7th instance of damage.","Dodge every 6th instance of damage."]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"ironmole",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"titanmole"},
+  {id:"titanmole",name:"Cloudvault",emoji:"🦧",type:"Earth",rarity:"common",description:"Learned to somersault across an entire province in a single bound. Mostly uses this to outrun consequences.",
+   stats:{hp:100,atk:105,def:58,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Iron Claw",upgrades:["12 dmg; DEF-6%","15 dmg","19 dmg","25 dmg","DEF-10%+slow 15%"]},
-     special:{name:"Titan Drill",charge:22,upgrades:["Pierce through all foes in line; 100 dmg+DEF-25%","120 dmg","145 dmg","175 dmg","Pierce+stun 2s+strip all buffs"]},
-     unique:{name:"Titan Core",upgrades:["Passive: -30 all dmg; CC immune; reflect 18% blocked","-40 dmg; reflect 22%","-50 dmg; reflect 28%","-62 dmg; reflect 34%","-75 dmg; reflect 42%; revive once; death causes massive underground collapse 200 dmg all"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"steelmole",shardsToAscend:22,ascensionsToEvolve:null},
-  // Earth line 2
-  {id:"dustcrawler",name:"Pulvicrawl",emoji:"🦂",type:"Earth",rarity:"epic",description:"A fat desert scorpion that hides under sand and ambushes prey. Masters the art of patience.",
-   stats:{hp:71,atk:63,def:48,spd:1,abilitySpeed:1},
+     basic:{name:"Staff Strike",upgrades:["20 dmg and gain .5% Ability Charge","20 dmg and gain 1% Ability Charge","20 dmg and gain 1.5% Ability Charge","20 dmg and gain 2% Ability Charge","20 dmg and gain 2.5% Ability Charge"]},
+     special:{name:"Ruyi Reach",charge:10,upgrades:["30 dmg","38 dmg","48 dmg","60 dmg","60 dmg. Momentarily stun all enemies hit"]},
+     unique:{name:"Seventy-Two Forms",upgrades:["Dodge every 10th instance of damage.","Dodge every 9th instance of damage.","Dodge every 8th instance of damage.","Dodge every 7th instance of damage.","Dodge every 6th instance of damage."]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"steelmole",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"skysage"},
+  {id:"skysage",name:"Skysage",emoji:"🦍",type:"Earth",rarity:"common",description:"It has awarded itself a title, a throne, and a rank equal to heaven. Nobody has yet found a convincing way to take any of them back.",
+   stats:{hp:128,atk:134,def:76,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Sand Sting",upgrades:["12 dmg+blind 0.5s","15 dmg","19 dmg","25 dmg","Blind 1s+slow 15%"]},
-     special:{name:"Sand Burial",charge:10,upgrades:["Bury foe 1.5s; 40 dmg on emerge","50 dmg","62 dmg","76 dmg","Bury 2s; +25% dmg taken while buried"]},
-     unique:{name:"Sand Ambush",upgrades:["Passive: first attack from burrow deals +50% dmg","First attack +65%","First attack +80%","First attack +100%","First attack +120%; stuns 1s; Dustcrawler can burrow freely without cooldown during ultimate"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"sandcrawler"},
-  {id:"sandcrawler",name:"Arenid",emoji:"🦂",type:"Earth",rarity:"epic",description:"Dustcrawler evolved. It moves through sand as fast as other creatures move through air.",
-   stats:{hp:108,atk:95,def:73,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Sand Sting",upgrades:["12 dmg+blind","15 dmg","19 dmg","25 dmg","Blind+slow 15%"]},
-     special:{name:"Desert Burial",charge:8,upgrades:["Bury foe 2s; 60 dmg+stun on emerge","74 dmg","90 dmg","110 dmg","Bury 3s; emerge stun 1.5s+strip 1 buff"]},
-     unique:{name:"Sandstorm Body",upgrades:["Passive: sandstorm aura; nearby foes 15% miss chance","20% miss","25% miss; ambush attacks +70%","30% miss; ambush +90%","35% miss; ambush +110%; crit chance +18% in sandstorm"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"dustcrawler",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"dunekraken"},
-  {id:"dunekraken",name:"Dunekraken",emoji:"🦂",type:"Earth",rarity:"epic",description:"A mythical desert colossus. Dunekraken doesn't burrow through sand — it is the sand.",
-   stats:{hp:147,atk:130,def:99,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Sand Sting",upgrades:["12 dmg+blind","15 dmg","19 dmg","25 dmg","Blind+slow"]},
-     special:{name:"Kraken Burial",charge:14,upgrades:["Bury all nearby 2s+60 dmg each","76 dmg","95 dmg","118 dmg","Bury 3s; strip all buffs; +30% dmg taken while buried"]},
-     unique:{name:"Desert Sovereign",upgrades:["Passive: 30% miss chance aura; ambush attacks +130%","Miss 36%; ambush +160%","Miss 42%; ambush +190%","Miss 48%; ambush +220%","Miss 55%; ambush +250%; Dunekraken is invisible until it attacks; first ambush each fight stuns all enemies 2s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"sandcrawler",shardsToAscend:22,ascensionsToEvolve:null},
+     basic:{name:"Staff Strike",upgrades:["20 dmg and gain .5% Ability Charge","20 dmg and gain 1% Ability Charge","20 dmg and gain 1.5% Ability Charge","20 dmg and gain 2% Ability Charge","20 dmg and gain 2.5% Ability Charge"]},
+     special:{name:"Ruyi Reach",charge:10,upgrades:["30 dmg","38 dmg","48 dmg","60 dmg","60 dmg. Momentarily stun all enemies hit"]},
+     unique:{name:"Seventy-Two Forms",upgrades:["Dodge every 10th instance of damage.","Dodge every 9th instance of damage.","Dodge every 8th instance of damage.","Dodge every 7th instance of damage.","Dodge every 6th instance of damage."]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"titanmole",shardsToAscend:18,ascensionsToEvolve:null},
   // Earth line 3
   {id:"quakebeetle",name:"Quakebeetle",emoji:"🪲",type:"Earth",rarity:"epic",description:"A heavy-shelled beetle whose footsteps register on seismometers. It is unaware of this.",
    stats:{hp:68,atk:42,def:78,spd:1,abilitySpeed:1},
@@ -790,78 +682,20 @@ export const CREATURES=[
      special:{name:"Hurricane Coil",charge:18,upgrades:["Coil all+100 dmg+SPD-55%+silence 2s","120 dmg","145 dmg","175 dmg","Also strip all buffs+stun 2s"]},
      unique:{name:"Eye of the Storm",upgrades:["Passive: immune to ground/wind; +42% dodge; wind dmg +30%","Dodge +48%; +38%","Dodge +55%; +46%","Dodge +62%; +56%","Dodge +70%; +68%; Hurricaneel is invisible at max speed; first hit per second is always a crit"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"stormeel",shardsToAscend:28,ascensionsToEvolve:null},
-  // Wind line 2
-  {id:"squallhawk",name:"Squallhawk",emoji:"🦅",type:"Wind",rarity:"common",description:"A hawk that rides its own personal squall. Technically never touches the ground.",
-   stats:{hp:53,atk:55,def:30,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Talon Strike",upgrades:["13 dmg; knockback","17 dmg","22 dmg","28 dmg","Knockback+slow 20% 2s"]},
-     special:{name:"Dive Bomb",charge:20,upgrades:["Dive; 55 dmg+stun 0.5s","68 dmg","84 dmg","102 dmg","Stun 1s; leave wind vortex 2s"]},
-     unique:{name:"Hunter's Wind",upgrades:["Passive: +18% crit chance; crits also push foe","Crit +24%","Crit +30%; crit slows 20% 2s","Crit +36%; crit slows 25%","Crit +44%; crit slows 30%; crits on slowed foes deal +30% dmg"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"galebeak"},
-  {id:"galebeak",name:"Galebeak",emoji:"🦅",type:"Wind",rarity:"common",description:"Squallhawk grown. Its beak can pierce steel and its talons generate sonic booms.",
-   stats:{hp:80,atk:83,def:45,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Talon Strike",upgrades:["13 dmg+knockback","17 dmg","22 dmg","28 dmg","Knockback+slow 20%"]},
-     special:{name:"Sonic Dive",charge:8,upgrades:["Sonic boom on land; 80 dmg+stun 1s","96 dmg","116 dmg","140 dmg","Stun 1.5s; shockwave hits all nearby 40 dmg"]},
-     unique:{name:"Gale Predator",upgrades:["Passive: +26% crit; crits slow 28% 2s; wind attacks +15%","Crit +32%; +20% wind","Crit +38%; +26% wind","Crit +45%; +32% wind","Crit +54%; +40% wind; on crit a free talon strike automatically fires"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"squallhawk",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"strikewing"},
-  {id:"strikewing",name:"Strikewing",emoji:"🦅",type:"Wind",rarity:"common",description:"An apex aerial predator. Strikewing hits with the force of a lightning bolt and vanishes before you register the pain.",
-   stats:{hp:111,atk:114,def:61,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Thunder Talon",upgrades:["18 dmg+knockback+slow","23 dmg","30 dmg","38 dmg","Knockback+stun 0.5s+slow 30%"]},
-     special:{name:"Apex Dive",charge:12,upgrades:["100 dmg+stun 1.5s; shockwave 60 dmg","120 dmg","145 dmg","175 dmg","Shockwave hits all; stun 2s; all hit lose 1 buff"]},
-     unique:{name:"Apex Predator",upgrades:["Passive: +36% crit; crits on slowed foes +40% dmg; wind attacks ignore 20% DEF","Crit +44%; +50% dmg; ignore 26%","Crit +52%; +60% dmg; ignore 32%","Crit +62%; +72% dmg; ignore 40%","Crit +72%; +85% dmg; ignore 50%; Strikewing cannot be targeted by enemies while flying between attacks"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"galebeak",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"stormraptor"},
-  {id:"stormraptor",name:"Stormraptor",emoji:"🦅",type:"Wind",rarity:"common",description:"Strikewing past its final growth spurt. Its dives register as micro-bursts; its victims register nothing at all.",
-   stats:{hp:143,atk:148,def:80,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Tempest Talon",upgrades:["23 dmg+knockback+slow","29 dmg","37 dmg","47 dmg","Knockback+stun 1s+slow 35%"]},
-     special:{name:"Terminal Dive",charge:12,upgrades:["125 dmg+stun 1.5s; shockwave 80 dmg","150 dmg","180 dmg","218 dmg","Shockwave hits all; stun 2.5s; all hit lose 2 buffs"]},
-     unique:{name:"Stormfront Predator",upgrades:["Passive: +44% crit; crits on slowed foes +50% dmg; wind attacks ignore 26% DEF","Crit +52%; +62% dmg; ignore 32%","Crit +60%; +74% dmg; ignore 40%","Crit +70%; +88% dmg; ignore 50%","Crit +82%; +105% dmg; ignore 62%; Stormraptor cannot be targeted while flying between attacks"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"strikewing",shardsToAscend:28,ascensionsToEvolve:null},
-  // Wind line 3
-  {id:"whirlbug",name:"Whirlbug",emoji:"🪲",type:"Wind",rarity:"common",description:"A large spinning beetle that generates a personal tornado at all times. Very hard to catch.",
-   stats:{hp:51,atk:54,def:30,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Spin Slash",upgrades:["11 dmg; hit all nearby","14 dmg","18 dmg","24 dmg","Hit nearby+push all back"]},
-     special:{name:"Tornado Spin",charge:18,upgrades:["Spin; 40 dmg all nearby 2s","50 dmg","62 dmg","76 dmg","Spin 3s; pull enemies toward center"]},
-     unique:{name:"Perpetual Spin",upgrades:["Passive: spinning at all times; nearby foes -12% ATK","Spinning -16% ATK","Spinning -20% ATK+SPD","Spinning -25% ATK+SPD","Spinning -30% ATK+SPD+Ability Speed; Whirlbug gains +5 SPD per second it stays alive, max +50"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"cyclonbug"},
-  {id:"cyclonbug",name:"Cyclonbug",emoji:"🪲",type:"Wind",rarity:"common",description:"Whirlbug grown. Its spin generates F3-level winds. Construction workers hate it.",
-   stats:{hp:78,atk:81,def:45,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Cyclone Slash",upgrades:["15 dmg all nearby+push","19 dmg","24 dmg","32 dmg","Push+slow 25% 2s"]},
-     special:{name:"Cyclone Drill",charge:12,upgrades:["Drill through foe+cyclone at exit; 60 dmg","74 dmg","90 dmg","110 dmg","Cyclone persists 3s; 20 dmg/s; pulls enemies"]},
-     unique:{name:"Cyclone Body",upgrades:["Passive: spinning aura; nearby foes -20% ATK+SPD; Cyclonbug +15% dodge","Aura -26%; dodge +20%","Aura -32%; dodge +25%","Aura -38%; dodge +30%","Aura -46%; dodge +36%; spinning aura dmg nearby foes 15 dmg/s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"whirlbug",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"vortexbug"},
-  {id:"vortexbug",name:"Vortexbug",emoji:"🪲",type:"Wind",rarity:"common",description:"A living vortex in beetle form. Vortexbug doesn't fight enemies. It just spins until they stop existing.",
-   stats:{hp:105,atk:110,def:62,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Vortex Slash",upgrades:["20 dmg all nearby+push+slow","26 dmg","33 dmg","42 dmg","Push+stun 0.5s+slow 35%"]},
-     special:{name:"Vortex Core",charge:10,upgrades:["Super spin; 80 dmg all+pull+slow 50% 4s","96 dmg","116 dmg","140 dmg","Pull+silence 2s+strip 2 buffs"]},
-     unique:{name:"Omega Spin",upgrades:["Passive: aura -30% ATK+SPD+Ability Speed on foes; +26% dodge; dmg 20/s","Aura -38%; dodge +32%; dmg 26/s","Aura -46%; dodge +38%; dmg 32/s","Aura -55%; dodge +46%; dmg 40/s","Aura -65%; dodge +55%; dmg 50/s; Vortexbug immune to all projectiles; dodges trigger free Vortex Core once per 4s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"cyclonbug",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"typhoonid"},
-  {id:"typhoonid",name:"Typhoonid",emoji:"🪲",type:"Wind",rarity:"common",description:"Vortexbug at escape velocity. It has technically stopped spinning; the world now spins around it.",
-   stats:{hp:137,atk:143,def:81,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Typhoon Slash",upgrades:["25 dmg all nearby+push+slow","32 dmg","41 dmg","52 dmg","Push+stun 1s+slow 40%"]},
-     special:{name:"Typhoon Core",charge:10,upgrades:["Super spin; 100 dmg all+pull+slow 55% 4s","120 dmg","145 dmg","175 dmg","Pull+silence 3s+strip all buffs"]},
-     unique:{name:"World Spin",upgrades:["Passive: aura -38% ATK+SPD+Ability Speed on foes; +32% dodge; dmg 26/s","Aura -46%; dodge +38%; dmg 33/s","Aura -55%; dodge +45%; dmg 42/s","Aura -65%; dodge +54%; dmg 52/s","Aura -76%; dodge +64%; dmg 65/s; Typhoonid immune to all projectiles; dodges trigger free Typhoon Core once per 4s"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"vortexbug",shardsToAscend:28,ascensionsToEvolve:null},
   // Electric stage 3
-  {id:"arcstorm",name:"Arcstorm",emoji:"🌩️",type:"Electric",rarity:"common",description:"Stormclaw transcended. It no longer moves — it teleports between lightning bolts.",
+  {id:"arcstorm",name:"Trivolt",emoji:"🐲",type:"Electric",rarity:"common",description:"Three heads, three opinions, one shared lightning supply. Disputes are settled by whichever head charges fastest.",
    stats:{hp:127,atk:132,def:73,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Static Zap",upgrades:["14 dmg; arc 1 foe 50%","19 dmg","25 dmg","32 dmg","Arc to 2 foes; stun each 0.5s"]},
      special:{name:"Arc Surge",charge:8,upgrades:["Teleport+75 dmg+stun 1s","90 dmg","108 dmg","130 dmg","Stun 1.5s; shockwave 50 dmg nearby on arrival"]},
-     unique:{name:"Arc Sovereign",upgrades:["Passive: every hit arcs to 3 foes 60% dmg; electric +22%","Arc to 4 foes 70%; +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%; arcs stun 0.5s; Arcstorm immune to paralysis+stun"]}
+     unique:{name:"Arc Sovereign",upgrades:["Passive: every hit arcs to 3 foes 60% dmg; electric +22%","Arc to 4 foes 70%; +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%; arcs stun 0.5s; Trivolt immune to paralysis+stun"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"stormclaw",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"ionarch"},
-  {id:"ionarch",name:"Ionarch",emoji:"⚡",type:"Electric",rarity:"common",description:"Arcstorm crowned. It rules a court of lightning bolts that arrive slightly before it gives the order.",
+  {id:"ionarch",name:"Aurivern",emoji:"🐉",type:"Electric",rarity:"common",description:"Fully grown, gold-scaled and finally of one mind. Its three heads now argue only about which of them gets to end the storm.",
    stats:{hp:166,atk:172,def:95,spd:1,abilitySpeed:1},
    abilities:{
      basic:{name:"Ion Zap",upgrades:["18 dmg; arc 2 foes 60%","24 dmg","31 dmg","40 dmg","Arc to 3 foes; stun each 0.5s"]},
      special:{name:"Ion Cascade",charge:8,upgrades:["Teleport+95 dmg+stun 1s","114 dmg","138 dmg","165 dmg","Stun 2s; shockwave 70 dmg nearby on arrival"]},
-     unique:{name:"Storm Singularity",upgrades:["Passive: every hit arcs to 4 foes 70% dmg; electric +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%","Arc all foes 110%; +60%; arcs stun 0.5s; Ionarch immune to paralysis+stun"]}
+     unique:{name:"Storm Singularity",upgrades:["Passive: every hit arcs to 4 foes 70% dmg; electric +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%","Arc all foes 110%; +60%; arcs stun 0.5s; Aurivern immune to paralysis+stun"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"arcstorm",shardsToAscend:28,ascensionsToEvolve:null},
   // Electric line 2
   {id:"zapfrog",name:"Zapfrog",emoji:"🐸",type:"Electric",rarity:"common",description:"A neon frog whose skin conducts lethal voltage. Its croak causes nearby electronics to malfunction.",
@@ -892,35 +726,6 @@ export const CREATURES=[
      special:{name:"Thunderhead Leap",charge:22,upgrades:["Mega leap; 120 dmg+stun 2s; shockwave 90 dmg all","145 dmg","175 dmg","210 dmg","Stun 2.5s; shockwave chains 5 foes; electric lake 5s 28 dmg/s"]},
      unique:{name:"Climate Lord",upgrades:["Passive: melee attackers take 52 shock+stun 0.5s; lightning rain hits 4 random foes each second","Shock 66; rain 5 foes","Shock 82; rain 6 foes","Shock 100; rain 7 foes","Shock 122+stun 1s; rain all foes; enemies in range have a 28% chance to be struck by lightning every 2s"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"stormtoad",shardsToAscend:28,ascensionsToEvolve:null},
-  // Electric line 3
-  {id:"shockbeetle",name:"Shockbeetle",emoji:"🪲",type:"Electric",rarity:"common",description:"A metallic beetle that stores charge in its shell. Touching it is inadvisable.",
-   stats:{hp:68,atk:48,def:52,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Slam",upgrades:["12 dmg+paralyze 15% 0.5s","15 dmg","19 dmg","25 dmg","Paralyze 22% 1s"]},
-     special:{name:"Discharge Shell",charge:12,upgrades:["Release charge; 55 dmg+stun 0.5s","68 dmg","84 dmg","102 dmg","Stun 1s; paralyze all nearby 0.75s"]},
-     unique:{name:"Charge Build",upgrades:["Passive: each hit taken adds 1 charge (max 6); at 6 release 80 dmg burst","Burst 100 dmg","Burst 124 dmg","Burst 152 dmg","Burst 185 dmg; burst stuns all nearby 1.5s; Shockbeetle regens 5 HP per charge"]}
-   },role:"Tank",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"voltbeetle"},
-  {id:"voltbeetle",name:"Voltbeetle",emoji:"🪲",type:"Electric",rarity:"common",description:"Shockbeetle evolved. Its shell is now a superconductor. Scientists want to study it. It disagrees.",
-   stats:{hp:104,atk:72,def:78,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Volt Slam",upgrades:["16 dmg+paralyze 20% 0.75s","21 dmg","27 dmg","35 dmg","Paralyze 28% 1.5s"]},
-     special:{name:"Superdischarge",charge:22,upgrades:["Discharge; 80 dmg+stun 1s; recharge 4 charge","96 dmg","116 dmg","140 dmg","Stun 1.5s; chain to 2 nearby foes 50%"]},
-     unique:{name:"Supercharge",upgrades:["Passive: charges max 8; burst 120 dmg; gain 1 charge every 4s passively","Burst 148 dmg; charge every 3s","Burst 180 dmg; every 3s","Burst 218 dmg; every 2s","Burst 260 dmg; every 2s; burst stuns+paralyzes 2s; Voltbeetle immune to electric dmg"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"shockbeetle",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"arcbeetle"},
-  {id:"arcbeetle",name:"Arcbeetle",emoji:"🪲",type:"Electric",rarity:"common",description:"Voltbeetle's arc-welded final form. It generates its own electromagnetic field that disrupts everything nearby.",
-   stats:{hp:142,atk:98,def:106,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Arc Slam",upgrades:["22 dmg+paralyze 28% 1.5s","28 dmg","36 dmg","46 dmg","Paralyze 38% 2s; arc to 1 nearby 60%"]},
-     special:{name:"Arc Explosion",charge:22,upgrades:["120 dmg; EM burst disables abilities 2s+stun 1.5s","144 dmg","172 dmg","204 dmg","Disable 3s; stun 2s; chain full power to 2 nearby"]},
-     unique:{name:"Electromagnetic Core",upgrades:["Passive: EM aura; all enemies -25% Ability Speed+paralyze 15% each action","-30%; paralyze 20%","-36%; paralyze 25%","-44%; paralyze 32%","-52%; paralyze 40%; ArcBeetle revives once; death triggers full EMP stunning all enemies 3s"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"voltbeetle",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"dynamid"},
-  {id:"dynamid",name:"Dynamid",emoji:"🔋",type:"Electric",rarity:"common",description:"Arcbeetle rebuilt around its own reactor. Power companies list it as both a competitor and a hazard.",
-   stats:{hp:184,atk:128,def:137,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Dynamo Slam",upgrades:["28 dmg+paralyze 32% 1.5s","36 dmg","46 dmg","58 dmg","Paralyze 44% 2s; arc to 2 nearby 70%"]},
-     special:{name:"Reactor Burst",charge:22,upgrades:["150 dmg; EM burst disables abilities 2.5s+stun 2s","180 dmg","216 dmg","260 dmg","Disable 3.5s; stun 2.5s; chain full power to 3 nearby"]},
-     unique:{name:"Fusion Core",upgrades:["Passive: EM aura; all enemies -32% Ability Speed+paralyze 20% each action","-38%; paralyze 25%","-46%; paralyze 31%","-55%; paralyze 38%","-65%; paralyze 46%; Dynamid revives once; death triggers full EMP stunning all enemies 4s"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"arcbeetle",shardsToAscend:28,ascensionsToEvolve:null},
   // Light line 1
   {id:"aurorabird",name:"Aurorabird",emoji:"🦜",type:"Light",rarity:"common",description:"A parrot made of aurora light. Every feather is a different color. Extremely chatty about healing.",
    stats:{hp:52,atk:38,def:45,spd:1,abilitySpeed:1},
@@ -1037,64 +842,36 @@ export const CREATURES=[
      special:{name:"Oblivion Web",charge:16,upgrades:["Web all; root 4s+silence 4s+strip all buffs+100 dmg","120 dmg","145 dmg","175 dmg","Root+silence 6s; webbed foes take 32 dmg/s; void drains 8 HP/s"]},
      unique:{name:"Forgotten Sovereign",upgrades:["Passive: permanently invisible; stealth attacks always crit; void venom ignores 50% DEF","Ignore 58%","Ignore 68%","Ignore 80%","Ignore 92%; on kill gain 8s invisibility and +32% dmg on the next strike; Oblivirach revives once invisible"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"abyssspider",shardsToAscend:28,ascensionsToEvolve:null},
-  // Dark line 2
-  {id:"gloomtoad",name:"Teneboad",emoji:"🐸",type:"Dark",rarity:"common",description:"A bloated dark toad that absorbs light around it. Anything it eats seems to just disappear.",
-   stats:{hp:60,atk:62,def:45,spd:1,abilitySpeed:1},
+  // Dark line 3: moths whose wing-dust mends whatever it settles on -- the
+  // kit below is placeholder text pending its real LOC.
+  {id:"dustling",name:"Dustling",emoji:"🐛",type:"Dark",rarity:"common",description:"A grub that already sheds more dust than it weighs. Anything it crawls across ends the day healthier and covered in glitter.",
+   stats:{hp:44,atk:26,def:24,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Dark Tongue",upgrades:["12 dmg; drain 6 HP from target","15 dmg","19 dmg","25 dmg","Drain 10 HP; silence 0.5s"]},
-     special:{name:"Gloom Cloud",charge:18,upgrades:["Cloud; -20% ATK+SPD all enemies 4s","Cloud -26%","Cloud -32%","Cloud -40%","Cloud -48%; also -20% Ability Speed; silence all 1.5s"]},
-     unique:{name:"Void Stomach",upgrades:["Passive: 20% of dmg dealt heals Gloomtoad","24%","28%","33%","38%; overheal = shield up to 50 HP; on kill absorb 40% of foe's max HP as permanent bonus HP"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"voidtoad"},
-  {id:"voidtoad",name:"Noctoad",emoji:"🐸",type:"Dark",rarity:"common",description:"Gloomtoad evolved into something that shouldn't exist. Its croaks erase nearby shadows from existence.",
-   stats:{hp:90,atk:94,def:68,spd:1,abilitySpeed:1},
+     basic:{name:"Dust Flick",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Pollen Veil",charge:12,upgrades:["Heal 24 HP","Heal 30 HP","Heal 38 HP","Heal 48 HP","Heal 48 HP and Blind"]},
+     unique:{name:"Moonlit Scales",upgrades:["Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 14 HP","Heal 14 HP and they gain Speed Up"]}
+   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"silkhusk"},
+  {id:"silkhusk",name:"Silkhusk",emoji:"🌰",type:"Dark",rarity:"common",description:"It stopped moving three weeks ago and has been quietly rebuilding itself since. The dust still drifts out through the silk, and still works.",
+   stats:{hp:71,atk:43,def:41,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Void Tongue",upgrades:["16 dmg; drain 10 HP+silence 0.5s","21 dmg","27 dmg","35 dmg","Drain 15 HP; silence 1s; strip 1 buff"]},
-     special:{name:"Void Cloud",charge:10,upgrades:["Cloud; -30% all enemy stats 5s; silence all 2s","-38%","-46%","-55%","-64%; silence 3s; enemies in cloud can't use abilities"]},
-     unique:{name:"Void Absorption",upgrades:["Passive: 28% dmg heals; on kill absorb 50% foe max HP as bonus","32%; absorb 60%","38%; absorb 70%","44%; absorb 80%","52%; absorb 100%; Voidtoad also absorbs 1 buff from each foe it kills"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"gloomtoad",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"shadowtoad"},
-  {id:"shadowtoad",name:"Nyctoad",emoji:"🐸",type:"Dark",rarity:"common",description:"Voidtoad's final form. A darkness incarnate — wherever Shadowtoad is, light simply ceases to function.",
-   stats:{hp:122,atk:128,def:92,spd:1,abilitySpeed:1},
+     basic:{name:"Dust Flick",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Pollen Veil",charge:12,upgrades:["Heal 24 HP","Heal 30 HP","Heal 38 HP","Heal 48 HP","Heal 48 HP and Blind"]},
+     unique:{name:"Moonlit Scales",upgrades:["Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 14 HP","Heal 14 HP and they gain Speed Up"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"dustling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"gloamwing"},
+  {id:"gloamwing",name:"Gloamwing",emoji:"🦋",type:"Dark",rarity:"common",description:"Newly out of the husk, and only willing to fly between dusk and true dark. Field medics have learned to work in that window and ask no questions.",
+   stats:{hp:101,atk:61,def:58,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Void Tongue",upgrades:["16 dmg+drain 10 HP+silence","21 dmg","27 dmg","35 dmg","Drain 15+silence 1s+strip 1 buff"]},
-     special:{name:"Shadow Abyss",charge:8,upgrades:["Abyss cloud; -40% all enemy stats 6s; silence 3s; can't gain buffs in cloud","-50%","-60%","-72%","-84%; silence 4s; all abilities silenced; drain 20 HP/s in cloud"]},
-     unique:{name:"Darkness Incarnate",upgrades:["Passive: 36% dmg heals; kills absorb 100% foe HP bonus; absorb 1 buff per kill","40%; absorb 2 buffs","46%; absorb 3 buffs","52%; absorb all buffs","60%; absorb all buffs+skills; Shadowtoad immune to all light dmg+blind; revives twice growing stronger each time"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"voidtoad",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"erebotoad"},
-  {id:"erebotoad",name:"Erebotoad",emoji:"🌑",type:"Dark",rarity:"common",description:"Nyctoad, once the last light finished going out. Astronomers keep finding it in photographs of nothing.",
-   stats:{hp:159,atk:166,def:120,spd:1,abilitySpeed:1},
+     basic:{name:"Dust Flick",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Pollen Veil",charge:12,upgrades:["Heal 24 HP","Heal 30 HP","Heal 38 HP","Heal 48 HP","Heal 48 HP and Blind"]},
+     unique:{name:"Moonlit Scales",upgrades:["Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 14 HP","Heal 14 HP and they gain Speed Up"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"silkhusk",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"lunashroud"},
+  {id:"lunashroud",name:"Lunashroud",emoji:"🌙",type:"Dark",rarity:"common",description:"A moth the size of a banner, trailing dust that closes wounds it never made. It has been mistaken for the moon by two separate expeditions.",
+   stats:{hp:134,atk:82,def:78,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Erebus Tongue",upgrades:["20 dmg+drain 14 HP+silence","26 dmg","33 dmg","42 dmg","Drain 22+silence 1.5s+strip 2 buffs"]},
-     special:{name:"Event Horizon",charge:8,upgrades:["Abyss cloud; -50% all enemy stats 6s; silence 3s; no buffs in cloud","-60%","-72%","-86%","-100%; silence 5s; drain 28 HP/s in cloud"]},
-     unique:{name:"Final Dark",upgrades:["Passive: 42% of dmg dealt heals; kills absorb 2 buffs","46%; absorb 3 buffs","52%; absorb all buffs","60%; absorb all buffs+skills","70%; Erebotoad immune to all light dmg+blind; revives twice growing stronger each time"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"shadowtoad",shardsToAscend:28,ascensionsToEvolve:null},
-  // Dark line 3
-  {id:"wraithworm",name:"Wraithworm",emoji:"🐛",type:"Dark",rarity:"common",description:"A translucent dark caterpillar that phases through solid matter. Not malicious, just deeply unsettling.",
-   stats:{hp:57,atk:58,def:31,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Phase Bite",upgrades:["13 dmg; ignore 20% DEF","16 dmg","21 dmg","27 dmg","Ignore 28% DEF; silence 0.5s"]},
-     special:{name:"Phase Shift",charge:18,upgrades:["Become untargetable 2s; pass through walls","2.5s","3s; emerge deal 40 dmg","3s; emerge 50 dmg","3.5s; emerge 62 dmg+silence 1.5s"]},
-     unique:{name:"Phase Body",upgrades:["Passive: 20% chance any hit phases through (negate)","24%","28%; when negated counter 25 dmg","32%; counter 35 dmg","38%; counter 48 dmg+silence 1s; at 5 negated hits trigger a free Phase Shift"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"phantomworm"},
-  {id:"phantomworm",name:"Spectriworm",emoji:"🐛",type:"Dark",rarity:"common",description:"Wraithworm evolved into a spectral serpent. It exists only partially in this dimension and fully in chaos.",
-   stats:{hp:85,atk:87,def:48,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Phase Bite",upgrades:["13 dmg; ignore 20% DEF","16 dmg","21 dmg","27 dmg","Ignore 28%+silence 0.5s"]},
-     special:{name:"Phantom Phase",charge:8,upgrades:["Untargetable 3s; during this auto-attack for 30 dmg/s","35 dmg/s","42 dmg/s","50 dmg/s","58 dmg/s; emerge dealing 80 dmg+silence all nearby 2s"]},
-     unique:{name:"Phantom Existence",upgrades:["Passive: 30% phase-negate chance; counter 40 dmg; attacks ignore 25% DEF","35%; counter 52; ignore 32%","40%; counter 66; ignore 40%","46%; counter 82; ignore 48%","52%; counter 100; ignore 58%; Phantomworm permanently phases between attacks; cannot be targeted between actions"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"wraithworm",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"voidwyrm"},
-  {id:"voidwyrm",name:"Vacumamba",emoji:"🐉",type:"Dark",rarity:"common",description:"Phantomworm's draconic final form. Voidwyrm doesn't exist in any fixed location — it appears wherever it decides to strike.",
-   stats:{hp:116,atk:119,def:65,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Void Fang",upgrades:["18 dmg; ignore 30% DEF+silence 0.5s","23 dmg","30 dmg","38 dmg","Ignore 38% DEF+silence 1s+strip 1 buff"]},
-     special:{name:"Void Shift",charge:20,upgrades:["Vanish all fight; reappear at will; strike for 90 dmg+crit+silence 2s","108 dmg","130 dmg","156 dmg","Strike is undodgeable; applies full void web; strip all buffs from target"]},
-     unique:{name:"Void Incarnate",upgrades:["Passive: 44% phase-negate; attacks always ignore 45% DEF; counter 80 dmg; invisible between actions","Ignore 55%; counter 100","Ignore 66%; counter 122","Ignore 78%; counter 148","Ignore 90%; counter 178; Voidwyrm cannot be damaged while phasing; revives once fully healed+invisible"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"phantomworm",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"nihilmamba"},
-  {id:"nihilmamba",name:"Nihilmamba",emoji:"🐍",type:"Dark",rarity:"common",description:"Vacumamba refined to a single principle: things it bites stop being things. Philosophers refuse to study it further.",
-   stats:{hp:151,atk:155,def:84,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Nihil Fang",upgrades:["23 dmg; ignore 38% DEF+silence 1s","29 dmg","37 dmg","47 dmg","Ignore 48% DEF+silence 1.5s+strip 2 buffs"]},
-     special:{name:"Unmake",charge:20,upgrades:["Vanish; reappear at will; strike for 115 dmg+crit+silence 2.5s","138 dmg","165 dmg","198 dmg","Strike is undodgeable; strips all buffs; target loses 10% max HP"]},
-     unique:{name:"Nonexistence",upgrades:["Passive: 50% phase-negate; attacks ignore 55% DEF; counter 100 dmg; invisible between actions","Ignore 65%; counter 125","Ignore 76%; counter 152","Ignore 88%; counter 185","Ignore 100%; counter 225; Nihilmamba cannot be damaged while phasing; revives once fully healed+invisible"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"voidwyrm",shardsToAscend:28,ascensionsToEvolve:null},
+     basic:{name:"Dust Flick",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Pollen Veil",charge:12,upgrades:["Heal 24 HP","Heal 30 HP","Heal 38 HP","Heal 48 HP","Heal 48 HP and Blind"]},
+     unique:{name:"Moonlit Scales",upgrades:["Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 14 HP","Heal 14 HP and they gain Speed Up"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"gloamwing",shardsToAscend:18,ascensionsToEvolve:null},
   {id:"magmavore",name:"Magmavore",emoji:"🌋",type:"Fire",rarity:"epic",description:"Born inside a volcano, it feeds on molten rock and spits lava at those who dare approach.",
    stats:{hp:100,atk:70,def:75,spd:1,abilitySpeed:1},
    abilities:{
@@ -1161,21 +938,21 @@ export const CREATURES=[
   {id:"blazehornet",name:"Emberstar",emoji:"⭐",type:"Fire",rarity:"epic",description:"A starfish that washed onto a lava flow and simply kept walking. Its five arms glow like heating elements.",
    stats:{hp:77,atk:79,def:42,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Twin Barb",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
-     special:{name:"Charging Pierce",charge:20,upgrades:["70 dmg.","74 dmg","74 dmg; increased damage range","81 dmg; increased damage range","81 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
+     basic:{name:"Twin Barb",upgrades:["15 dmg 2 times.","16 dmg each","3 hits; 12 dmg each","3 hits; 13 dmg each","4 hits; 11 dmg each"]},
+     special:{name:"Charging Pierce",charge:20,upgrades:["30 dmg.","34 dmg","34 dmg; increased damage range","38 dmg; increased damage range","38 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
      unique:{name:"Burning Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +10% DEF","+20% DEF","+30% DEF","+40% DEF","+40% DEF; deals additional damage for every 5 Burn stacks on the target"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"infernohive"},
   {id:"infernohive",name:"Magmastar",emoji:"🌟",type:"Fire",rarity:"epic",description:"Emberstar's arms have hardened into vents of molten rock. Wherever it rests, the seafloor starts smoking.",
    stats:{hp:107,atk:108,def:57,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Twin Barb",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
-     special:{name:"Charging Pierce",charge:20,upgrades:["70 dmg.","74 dmg","74 dmg; increased damage range","81 dmg; increased damage range","81 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
+     basic:{name:"Twin Barb",upgrades:["15 dmg 2 times.","16 dmg each","3 hits; 12 dmg each","3 hits; 13 dmg each","4 hits; 11 dmg each"]},
+     special:{name:"Charging Pierce",charge:20,upgrades:["30 dmg.","34 dmg","34 dmg; increased damage range","38 dmg; increased damage range","38 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
      unique:{name:"Burning Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +15% DEF","+25% DEF","+35% DEF","+45% DEF","+45% DEF; deals additional damage for every 5 Burn stacks on the target; burn deals 15% more damage"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"blazehornet",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"infernoswarm"},  {id:"infernoswarm",name:"Blastar",emoji:"☄️",type:"Fire",rarity:"epic",description:"Emberstar grown into a burning star of the deep. Every arm ends in a plasma spine, and it regrows them faster than anything can tear them off.",
    stats:{hp:125,atk:128,def:67,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Twin Barb",upgrades:["20 dmg 2 times.","21 dmg each","3 hits; 21 dmg each","3 hits; 23 dmg each","4 hits; 23 dmg each"]},
-     special:{name:"Charging Pierce",charge:20,upgrades:["105 dmg.","111 dmg","111 dmg; increased damage range","122 dmg; increased damage range","122 dmg; increased damage range; leaves behind a larger, longer-lasting fire trail, damaging enemies it touches"]},
+     basic:{name:"Twin Barb",upgrades:["15 dmg 2 times.","16 dmg each","3 hits; 12 dmg each","3 hits; 13 dmg each","4 hits; 11 dmg each"]},
+     special:{name:"Charging Pierce",charge:20,upgrades:["30 dmg.","34 dmg","34 dmg; increased damage range","38 dmg; increased damage range","38 dmg; increased damage range; leaves behind a temporary fire trail, damaging enemies it touches"]},
      unique:{name:"Burning Bond",upgrades:["Dealing damage inflicts Burn. If Starlit is on the field, both gain +20% DEF","+30% DEF","+40% DEF","+50% DEF","+50% DEF; deals additional damage for every 5 Burn stacks on the target; burn deals 25% more damage; Blastar is immune to fire and Burn"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"infernohive",shardsToAscend:20,ascensionsToEvolve:null},
   // Water line 1
@@ -1309,21 +1086,21 @@ export const CREATURES=[
   {id:"crystalcrab",name:"Crystalcrab",emoji:"🦀",type:"Earth",rarity:"epic",description:"A crab whose shell has grown into perfect gemstone crystal. It is the only creature that is also a geological landmark.",
    stats:{hp:122,atk:62,def:94,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg"]},
      special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
      unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"gemcrab"},
   {id:"gemcrab",name:"Gemcrab",emoji:"🦀",type:"Earth",rarity:"epic",description:"Crystalcrab's shell has grown into massive prismatic plates. Enemies go blind. Allies feel unreasonably safe.",
    stats:{hp:168,atk:84,def:128,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg"]},
      special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
      unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"crystalcrab",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"gemtitan"},
   {id:"gemtitan",name:"Gemtitan",emoji:"🦀",type:"Earth",rarity:"epic",description:"Crystalcrab's titan form. It is now its own mountain range and is frankly unreasonable about taking damage.",
    stats:{hp:197,atk:100,def:152,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Crystal Claw",upgrades:["14 dmg","16 dmg","18 dmg","20 dmg","23 dmg"]},
+     basic:{name:"Crystal Claw",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg"]},
      special:{name:"Taunting Snap",charge:10,upgrades:["26 dmg","29 dmg","33 dmg","38 dmg","38 dmg"]},
      unique:{name:"Prism Shell",upgrades:["Reflect 3% of the damage inflicted onto this creature","Reflect 6% of the damage inflicted onto this creature","Reflect 9% of the damage inflicted onto this creature","Reflect 12% of the damage inflicted onto this creature","Reflect 15% of the damage inflicted onto this creature"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"gemcrab",shardsToAscend:20,ascensionsToEvolve:null},
@@ -1454,27 +1231,6 @@ export const CREATURES=[
      special:{name:"Dragon Thunder",charge:22,upgrades:["130 dmg+stun 1.5s; chain ignores DEF; -35% SPD all hit","156 dmg","188 dmg","226 dmg","Stun 2s; -50% SPD; chain to all on screen; all hit lose 1 buff"]},
      unique:{name:"Dragon Lightning",upgrades:["Passive: every hit arcs to all enemies 80% dmg; paralyzed foes take +40% dmg; electric +38%","Arc 90%; +48%","Arc 100%; +60%","Arc 112%; +74%","Arc 125%; +90%; Thunderdrake revives once as a lightning storm hitting all enemies 10x for 80 dmg each"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"stormscale",shardsToAscend:20,ascensionsToEvolve:null},
-  // Electric line 2
-  {id:"boltfly",name:"Boltfly",emoji:"🦟",type:"Electric",rarity:"epic",description:"A mosquito-sized bolt of lightning that has decided it wants to be a mosquito. Fast, annoying, and 100,000 volts.",
-   stats:{hp:76,atk:77,def:41,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Pierce",upgrades:["18 dmg; ignore 20% DEF+paralyze 18% 1s","23 dmg","30 dmg","38 dmg","Ignore 28% DEF; paralyze 26% 1.5s; arc to 2 nearby"]},
-     special:{name:"Volt Dash",charge:10,upgrades:["Teleport to foe; 72 dmg+stun 1s+paralyze 2s","87 dmg","105 dmg","126 dmg","Stun 1.5s; paralyze 2.5s; shockwave 50 dmg on arrival to all nearby"]},
-     unique:{name:"Living Lightning",upgrades:["Passive: 28% dodge; each dodge teleport behind attacker; counter 40 dmg+paralyze 1s","32% dodge; counter 52","36% dodge; counter 66+paralyze 1.5s","42% dodge; counter 84","48% dodge; counter 106+stun 0.5s; immune to paralysis; at 5 dodges release full-screen lightning 120 dmg all"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"arcbolt"},
-  {id:"arcbolt",name:"Arcbolt",emoji:"🦟",type:"Electric",rarity:"epic",description:"Boltfly condensed into a faster, angrier bolt of itself. 500,000 volts and proud of it. Power grids file complaints.",
-   stats:{hp:104,atk:106,def:56,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Shock Pierce",upgrades:["18 dmg; ignore 20% DEF+paralyze 18% 1s","23 dmg","30 dmg","38 dmg","Ignore 28% DEF; paralyze 26% 1.5s; arc to 2 nearby"]},
-     special:{name:"Volt Dash",charge:10,upgrades:["Teleport to foe; 72 dmg+stun 1s+paralyze 2s","87 dmg","105 dmg","126 dmg","Stun 1.5s; paralyze 2.5s; shockwave 50 dmg on arrival to all nearby"]},
-     unique:{name:"Arc Current",upgrades:["Passive: 34% dodge; each dodge teleport behind attacker; counter 55 dmg+paralyze 1.5s; immune to paralysis","38% dodge; counter 72+paralyze 2s","44% dodge; counter 92","50% dodge; counter 116+stun 0.5s","56% dodge; counter 144+stun 0.5s; at 4 dodges release full-screen arc chain hitting all for 90 dmg+paralyze 2s"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"boltfly",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"zapdragon"},  {id:"zapdragon",name:"Voltray",emoji:"🐲",type:"Electric",rarity:"epic",description:"Boltfly evolved into a dragon of pure electrical current. Power grids within 10 miles behave erratically.",
-   stats:{hp:123,atk:125,def:66,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Arc Pierce",upgrades:["28 dmg; ignore 30% DEF; paralyze 30% 2s; arc all nearby 70%","36 dmg","46 dmg","58 dmg","Ignore 40%; paralyze 40% 2.5s; arc all 90%; stun on paralyze"]},
-     special:{name:"Dragon Volt",charge:20,upgrades:["Teleport to foe; 110 dmg+stun 1.5s+paralyze all nearby 2.5s; shockwave 80 dmg all","132 dmg","158 dmg","190 dmg","Stun 2s; paralyze 3s; shockwave stuns all nearby 1s; strip all buffs"]},
-     unique:{name:"Dragon Current",upgrades:["Passive: 42% dodge; each dodge teleport+counter 80 dmg+paralyze 2s; immune to paralysis; arc 100% all on every hit","Dodge 50%; counter 100","Dodge 58%; counter 125","Dodge 67%; counter 155","Dodge 76%; counter 190; Zapdragon revives once as a ball lightning that bounces between all enemies 10x for 100 dmg"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"arcbolt",shardsToAscend:20,ascensionsToEvolve:null},
   // Electric line 3
   {id:"shockcrab",name:"Shockstinger",emoji:"🦂",type:"Electric",rarity:"epic",description:"A scorpion that stores charge in its tail like a living capacitor. Desert electricians keep their distance.",
    stats:{hp:118,atk:61,def:96,spd:1,abilitySpeed:1},
@@ -1559,27 +1315,6 @@ export const CREATURES=[
      special:{name:"Radiant Fortress",charge:14,upgrades:["DEF+130+regen 28/s+blind aura 32% 7s; allies -28% dmg; immune to blind+slow","DEF+165","DEF+204","DEF+248","DEF+300; aura 44%; allies -40% dmg; immune to all debuffs 5s; allies regen 40/s"]},
      unique:{name:"Radiant Sovereign",upgrades:["Passive: -32 all dmg; allies regen 22/s; blind aura 38%; absorb 28% ally dmg; immune to blind+all CC","Reduce 42; regen 28/s; aura 48%; absorb 34%","Reduce 54; regen 36/s; aura 60%; absorb 42%","Reduce 68; regen 46/s; aura 74%; absorb 52%","Reduce 84; regen 58/s; aura 90%; absorb 64%; Radiantgator revives twice each revival healing all allies 200 HP+blinding all enemies 5s"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"gleamgator",shardsToAscend:20,ascensionsToEvolve:null},
-  // Dark line 2
-  {id:"eclipseboa",name:"Eclipseboa",emoji:"🐍",type:"Dark",rarity:"epic",description:"A massive boa that swallows light itself. Where it passes, even fire goes out.",
-   stats:{hp:85,atk:88,def:48,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Eclipse Bite",upgrades:["20 dmg+silence 0.5s+drain 10 HP","26 dmg","33 dmg","42 dmg","Silence 1s; drain 15 HP; strip 1 buff"]},
-     special:{name:"Shadow Coil",charge:22,upgrades:["Constrict; 80 dmg+silence 3s+drain 15/s 4s+DEF-22%","96 dmg","116 dmg","140 dmg","Silence 4s; drain 22/s; DEF-30%; strip all buffs; can't gain buffs while constricted"]},
-     unique:{name:"Eclipse Body",upgrades:["Passive: 20% of dmg dealt heals Eclipseboa; silence ignores 25% DEF; constricted foes take +25% dmg","Heal 26%; ignore 32%; +32%","Heal 32%; ignore 40%; +40%","Heal 40%; ignore 50%; +50%","Heal 50%; ignore 62%; +62%; on kill swallow foe absorbing 60% of its max HP as permanent bonus HP; invisible until attacking"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"voidboa"},
-  {id:"voidboa",name:"Voidboa",emoji:"🐍",type:"Dark",rarity:"epic",description:"Eclipseboa grown twice as long and twice as dark. It has begun sprouting additional heads. Each one has opinions.",
-   stats:{hp:116,atk:120,def:66,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Eclipse Bite",upgrades:["20 dmg+silence 0.5s+drain 10 HP","26 dmg","33 dmg","42 dmg","Silence 1s; drain 15 HP; strip 1 buff"]},
-     special:{name:"Shadow Coil",charge:22,upgrades:["Constrict; 80 dmg+silence 3s+drain 15/s 4s+DEF-22%","96 dmg","116 dmg","140 dmg","Silence 4s; drain 22/s; DEF-30%; strip all buffs; can't gain buffs while constricted"]},
-     unique:{name:"Void Scales",upgrades:["Passive: 28% of dmg dealt heals; silence ignores 32% DEF; constricted foes take +32% dmg; grow 1 phantom head on kill +15% dmg","Heal 34%; ignore 40%; +40%","Heal 40%; ignore 48%; +48%; phantom head +20%","Heal 48%; ignore 58%; +58%; phantom +26%","Heal 58%; ignore 70%; +70%; phantom +34%; max 3 phantom heads; each head attacks separately; invisible until attacking"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"eclipseboa",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"darkhydra"},  {id:"darkhydra",name:"Eclipsemaw",emoji:"🐲",type:"Dark",rarity:"epic",description:"Eclipseboa grew multiple heads and an attitude problem. Each head operates independently and all of them are hungry.",
-   stats:{hp:137,atk:142,def:78,spd:1,abilitySpeed:1},
-   abilities:{
-     basic:{name:"Void Fang",upgrades:["32 dmg+silence 1s+drain 18 HP; each head hits a different foe","40 dmg","50 dmg","64 dmg","Silence 1.5s; drain 26 HP; all 3 heads attack; strip 1 buff each"]},
-     special:{name:"Hydra Coil",charge:18,upgrades:["All 3 heads constrict a foe each; 100 dmg+silence 4s+drain 25/s","120 dmg","145 dmg","175 dmg","Silence 5s; drain 38/s; DEF-40%; can't gain buffs; strip all buffs; if only 1 foe then 1 head takes 3x"]},
-     unique:{name:"Hydra Darkness",upgrades:["Passive: 38% dmg heals; killed enemies absorbed 80% max HP bonus; silence ignores 40% DEF; each kill grows a phantom head +18% dmg","Heal 46%; absorb 100%; ignore 50%","Heal 56%; phantom heads +24%","Heal 68%; phantom heads +32%","Heal 82%; phantom heads +42%; max 5 phantom heads; Darkhydra revives once per head (3 revivals); each revival stronger"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"voidboa",shardsToAscend:20,ascensionsToEvolve:null},
   // Dark line 3: Doomshade -- Legendary spectre tank whose Wisps taunt and explode.
   {id:"doomgrub",name:"Doomshade",emoji:"👻",type:"Dark",rarity:"legendary",description:"A spectre that drifted out of a lantern festival centuries ago and never went back. It hands out little flames to anyone who gets close. The flames are load-bearing.",
    stats:{hp:155,atk:79,def:122,spd:1,abilitySpeed:1},
@@ -1733,14 +1468,14 @@ export const CREATURES=[
   {id:"morusk",name:"Morusk",emoji:"🦭",type:"Water",rarity:"legendary",description:"A walrus whose tusks have grown to the size of siege weapons. Ships have mistaken it for an island on three separate recorded occasions.",
    stats:{hp:145,atk:80,def:140,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Tusk Slam",upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg and inflict Healing Down"]},
+     basic:{name:"Tusk Slam",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Healing Down"]},
      special:{name:"Blubber Wall",charge:12,upgrades:["Shield 8% HP; burst 50% DEF","Shield 10% HP; burst 50% DEF","Shield 10% HP; burst 65% DEF","Shield 12% HP; burst 65% DEF","Shield 12% HP; burst 80% DEF"]},
      unique:{name:"Permafrost Hide",upgrades:["Dealing damage temporarily lowers the enemy's Speed by 1%","Dealing damage temporarily lowers the enemy's Speed by 2%","Dealing damage temporarily lowers the enemy's Speed by 3%","Dealing damage temporarily lowers the enemy's Speed by 4%","Dealing damage temporarily lowers the enemy's Speed by 5%"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ivormar"},
   {id:"ivormar",name:"Ivormar",emoji:"🦭",type:"Water",rarity:"legendary",description:"Morusk at its true scale. Oceanographers have been charting it as unexplored territory for three decades. It finds this mildly flattering.",
    stats:{hp:174,atk:96,def:168,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Tusk Slam",upgrades:["18 dmg","20 dmg","22 dmg","25 dmg","25 dmg and inflict Healing Down"]},
+     basic:{name:"Tusk Slam",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Healing Down"]},
      special:{name:"Blubber Wall",charge:12,upgrades:["Shield 8% HP; burst 50% DEF","Shield 10% HP; burst 50% DEF","Shield 10% HP; burst 65% DEF","Shield 12% HP; burst 65% DEF","Shield 12% HP; burst 80% DEF"]},
      unique:{name:"Permafrost Hide",upgrades:["Dealing damage temporarily lowers the enemy's Speed by 1%","Dealing damage temporarily lowers the enemy's Speed by 2%","Dealing damage temporarily lowers the enemy's Speed by 3%","Dealing damage temporarily lowers the enemy's Speed by 4%","Dealing damage temporarily lowers the enemy's Speed by 5%"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"morusk",shardsToAscend:30,ascensionsToEvolve:null},
@@ -1761,20 +1496,20 @@ export const CREATURES=[
      unique:{name:"World Tree",upgrades:["Passive: regrow 1 head/3s; each head +42% ATK+52% DEF+poison aura 60/s; 7 heads: invincible 3s every 4s","Head +52%+65%; aura 76/s","Head +65%+80%; aura 96/s","Head +80%+98%; aura 120/s","Head +100%+120%; aura 150/s; Roothydra revives 3 times each growing to 7 heads instantly and rooting all enemies 5s+max poison"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"verdanthydra",shardsToAscend:30,ascensionsToEvolve:null},
   // Nature line 2
-  {id:"sylvandragon",name:"Sylviguana",emoji:"🦎",type:"Nature",rarity:"legendary",description:"A dragon that tends the great forests and considers itself their gardener. Its pruning method involves venom.",
+  {id:"sylvandragon",name:"Siegefin",emoji:"🐠",type:"Nature",rarity:"legendary",description:"A seahorse that has anchored its tail to the seabed and refuses, on principle, to be anywhere else. It resolves distant problems by spitting at them very accurately.",
    stats:{hp:107,atk:112,def:63,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Thorn Fang",upgrades:["24 dmg+poison 9/s 3s; thorn return 20 on hit","30 dmg","38 dmg","48 dmg","Poison 14/s 4s; thorn 30; root 1s; spread poison to 1 nearby"]},
-     special:{name:"Ancient Venom",charge:18,upgrades:["Inject: foe gains max poison stacks+root 3s; 100 dmg over duration","120 dmg","145 dmg","175 dmg","Max stacks; root 4s; poison can't be cured; spread to all nearby of target"]},
-     unique:{name:"Garden Dragon",upgrades:["Passive: poison stacks 8x; each stack +14/s; poisoned foes +40% dmg taken; thorns 35 on each attacker+poison them 3 stacks","Stacks 9x; +16/s; +50%; thorns 44","Stacks 10x; +20/s; +62%; thorns 56","Stacks 11x; +25/s; +76%; thorns 72","Stacks 12x; +32/s; +94%; thorns 92; Sylvandragon revives once; revival injects all enemies with max poison stacks+root 5s"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ancientdragon"},
-  {id:"ancientdragon",name:"Primordrus",emoji:"🐉",type:"Nature",rarity:"legendary",description:"Sylvandragon become the ancient forest. It is both creature and ecosystem. Taxonomists have given up.",
+     basic:{name:"Brine Shot",upgrades:["28 dmg","32 dmg","36 dmg","40 dmg","40 dmg and inflict Healing Down"]},
+     special:{name:"Holdfast",charge:18,upgrades:["This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 15% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 20% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 25% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 30% Speed and its attacks Splash","This creature enduringly Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 30% Speed and its attacks Splash"]},
+     unique:{name:"Deepsight",upgrades:["This creature gains +1 Range","This creature gains +2 Range","This creature gains +3 Range","This creature gains +4 Range","This creature gains +5 Range"]}
+   },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"ancientdragon"},
+  {id:"ancientdragon",name:"Siegespire",emoji:"🐉",type:"Nature",rarity:"legendary",description:"It has not moved in sixty years and has no intention of starting. Ships navigate by it now, which it considers a reasonable arrangement.",
    stats:{hp:129,atk:134,def:75,spd:1,abilitySpeed:1},
    abilities:{
-     basic:{name:"Ancient Fang",upgrades:["38 dmg+max poison spread to 2 nearby+root 1.5s; thorn 55 return","48 dmg","60 dmg","74 dmg","Spread to all nearby; root 2s; thorn 80; strip 2 buffs; poison can't be removed"]},
-     special:{name:"Primordial Venom",charge:20,upgrades:["Inject all enemies; max 12-stack poison+root 4s; 160 dmg total","192 dmg","230 dmg","276 dmg","Root 5s; inject 12-stack; 280 dmg total; can't cure; death spreads to nearby; all allies fully healed"]},
-     unique:{name:"Primordial Dragon",upgrades:["Passive: poison stacks 12x; each +38/s; poisoned foes +65% dmg; thorns 80 on attacker+poison 6 stacks; kills spread max poison+root 4s AOE","Stacks 14x; +46/s; +80%; thorns 100","Stacks 16x; +56/s; +98%; thorns 125","Stacks 18x; +68/s; +120%; thorns 155","Stacks 20x; +84/s; +148%; thorns 192; Ancientdragon revives 3 times each as a world-forest explosion rooting all+max poisoning all"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"sylvandragon",shardsToAscend:30,ascensionsToEvolve:null},
+     basic:{name:"Brine Shot",upgrades:["28 dmg","32 dmg","36 dmg","40 dmg","40 dmg and inflict Healing Down"]},
+     special:{name:"Holdfast",charge:18,upgrades:["This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 15% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 20% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 25% Speed and its attacks Splash","This creature Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 30% Speed and its attacks Splash","This creature enduringly Roots itself, which can not be dispelled, and dispels all debuffs. While Rooted, this creature gains 30% Speed and its attacks Splash"]},
+     unique:{name:"Deepsight",upgrades:["This creature gains +1 Range","This creature gains +2 Range","This creature gains +3 Range","This creature gains +4 Range","This creature gains +5 Range"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"sylvandragon",shardsToAscend:30,ascensionsToEvolve:null},
   // Nature line 3
   {id:"bloomphoenix",name:"Bloomibis",emoji:"🦉",type:"Nature",rarity:"legendary",description:"A cat-faced owl crowned with living antlers. Whatever it watches over simply refuses to stay hurt.",
    stats:{hp:107,atk:70,def:67,spd:1,abilitySpeed:1},
@@ -2028,6 +1763,30 @@ CREATURE_MAP["__vine_minion"]={id:"__vine_minion",emoji:"🌱",name:"Vine Minion
 // in the Dex, hatches, or collections. Its real Health comes from the
 // summoning ability's tier; stats here are only a fallback shape.
 CREATURE_MAP["__wisp"]={id:"__wisp",emoji:"🕯️",name:"Wisp",type:"Dark",role:"Tank",attackType:"Melee",stats:{hp:25,atk:0,def:0,spd:1,abilitySpeed:1},abilities:{basic:{name:"Beckon",description:"Taunt an enemy"},special:{name:"Ghostly Step",charge:10,description:"Teleport beside a random enemy"},unique:{name:"Grave Grudge",description:"Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health"}}};
+
+/**
+ * Stand-in for content whose creature has been retired, until the real
+ * replacements land. Battle-only like the two above, so it never shows up in
+ * the Dex, hatches, or the collection.
+ *
+ * It has no ability module (see battle/playerAbilities/registry.js), which is
+ * exactly the behavior asked for: the engine's default flow walks it at the
+ * nearest enemy and swings, its special has no `charge` and no module so it
+ * never fires (and shows no ⚡ pill), and its passive is text only.
+ */
+CREATURE_MAP["__placeholder"]={id:"__placeholder",emoji:"❔",name:"Placeholder",type:"Nature",rarity:"common",role:"Attacker",attackType:"Melee",stats:{hp:80,atk:83,def:45,spd:1,abilitySpeed:1},abilities:{basic:{name:"Placeholder Strike",upgrades:["20 dmg","20 dmg","20 dmg","20 dmg","20 dmg"]},special:{name:"Placeholder Special",upgrades:["Does nothing","Does nothing","Does nothing","Does nothing","Does nothing"]},unique:{name:"Placeholder Passive",upgrades:["Does nothing","Does nothing","Does nothing","Does nothing","Does nothing"]}}};
+
+/**
+ * Retired evolution lines, removed from the roster ahead of their
+ * replacements: Whirlbug, Squallhawk, Shimmerfly, Buzzwig, Shockbeetle,
+ * Teneboad, Wraithworm, Sparkit, Boltfly, Eclipseboa, Pulvicrawl and
+ * Venomviper. Each id still resolves -- to its own copy of the placeholder,
+ * keeping its id so save records stay addressable -- so an existing save
+ * that owns one renders it as the Placeholder instead of breaking on a
+ * missing definition. Delete these once the replacement creatures exist.
+ */
+export const RETIRED_CREATURE_IDS=["whirlbug","cyclonbug","vortexbug","typhoonid","squallhawk","galebeak","strikewing","stormraptor","shimmerfly","lumiwing","brightclaw","celestipaw","buzzwig","zaptail","shockfang","stormhorn","shockbeetle","voltbeetle","arcbeetle","dynamid","gloomtoad","voidtoad","shadowtoad","erebotoad","wraithworm","phantomworm","voidwyrm","nihilmamba","sparkpup","voltkit","thunderpaw","boltlion","boltfly","arcbolt","zapdragon","eclipseboa","voidboa","darkhydra","dustcrawler","sandcrawler","dunekraken","venomviper","toxicserpent","poisonwyrm","ophidrax"];
+for(const id of RETIRED_CREATURE_IDS) CREATURE_MAP[id]={...CREATURE_MAP["__placeholder"],id};
 
 export const FINAL_FORMS=CREATURES.filter(c=>!c.evolutionId);
 export const ALL_TYPES=[...new Set(CREATURES.map(c=>c.type))].sort();

@@ -8,7 +8,7 @@ import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
-import AscStars from "../../../ui/components/AscStars.js";
+import AscStars, { ascStarTier } from "../../../ui/components/AscStars.js";
 import StatBar from "../../../ui/components/StatBar.js";
 import { STAT_CYCLE } from "../../../data/rarity.js";
 
@@ -91,7 +91,7 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
   // exactly as wide as the creature page's (which scrolls, so its content
   // sits a scrollbar-width narrower than the viewport) -- without both, the
   // header card and art shift sideways when entering/leaving this page.
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:10,display:"flex",flexDirection:"column",overflowY:"auto",overflowX:"hidden",scrollbarGutter:"stable"}},
+  return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:10,display:"flex",flexDirection:"column",overflowY:"auto",overflowX:"hidden",scrollbarGutter:"stable"}},
     // Header title carries the equipped flair title, matching the creature
     // page -- and it updates live when a title is equipped on this page.
     // The invisible 26px right-slot spacer keeps this header exactly as tall
@@ -106,7 +106,14 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
     // flair buffs land here live.
     React.createElement("div",{className:"card",style:{margin:"0 16px 12px",flexShrink:0}},
       React.createElement("div",{style:{textAlign:"center",marginBottom:14}},
-        ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
+        // This page has no level readout to sit under, so the banded stars
+        // stay above the art where the old gold count was.
+        (()=>{
+          const asc=ascStarTier(ownedData.ascensions);
+          if(!asc.count)return null;
+          return React.createElement("div",{style:{marginBottom:4}},
+            React.createElement(AscStars,{n:asc.count,max:5,doubled:asc.doubled,colors:asc.colors,slotted:true,style:{fontSize:11,gap:1,...asc.style}}));
+        })(),
         React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{margin:"0 auto"}})
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},

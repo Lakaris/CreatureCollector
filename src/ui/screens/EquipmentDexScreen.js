@@ -8,7 +8,8 @@ import { useGame } from "../../state/GameContext.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../data/equipment.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { equipBonus, equipBonusStr, itemAffectsStat } from "../../core/equipment.js";
+import { CREATURE_MAP } from "../../data/creatures.js";
+import { equipBonus, equipBonusStr, itemAffectsStat, isExclusive, exclusivityCaption } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 
 /** Read-only view of one item at its base state -- EquipmentDetail's info
@@ -20,8 +21,8 @@ function EquipmentDexEntry({ item, collected, onBack }) {
     React.createElement(ScreenHeader, { title: "", onBack }),
     React.createElement("div", { className: "card", style: { position: "relative", padding: "24px 20px" } },
       rarCfg && React.createElement("div", { style: { position: "absolute", top: 10, left: 12, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
-      (item.element || item.role || item.attackType) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
-        [item.element, item.role, item.attackType].filter(Boolean).join(" · ") + " exclusive"
+      isExclusive(item) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
+        exclusivityCaption(item)
       ),
       React.createElement("div", { style: { position: "absolute", top: 10, right: 12, fontSize: 10, fontWeight: 700, color: collected ? "#2e7d32" : "#aaa", background: collected ? "#e8f5e9" : "#f0f0f0", borderRadius: 4, padding: "2px 7px" } },
         collected ? "✓ Collected" : "Not collected"
@@ -136,6 +137,10 @@ function EquipmentDexScreen({ onBack }) {
             const rarCfg = EQUIP_RARITY_CONFIG[item.rarity];
             return React.createElement("div", { key: item.id, className: "creature-card", onClick: () => { setSelected(item); const c = document.querySelector(".app-content"); if (c) c.scrollTop = 0; }, style: { position: "relative", paddingTop: 30, background: rarCfg.bg, border: "1px solid " + rarCfg.color + "44" } },
               item.element && React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, TYPE_EMOJI[item.element] || ""),
+              // Creature-exclusive gear shares the top-left corner with the
+              // type icon; the two never co-occur (a species already implies
+              // its element, so pinning both would be redundant).
+              item.creatureId && React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, (CREATURE_MAP[item.creatureId] && CREATURE_MAP[item.creatureId].emoji) || "❓"),
               item.attackType && React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[item.attackType].emoji),
               item.role && React.createElement("span", { style: { position: "absolute", top: item.attackType ? 20 : 5, right: 5, fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[item.role].emoji),
               React.createElement("div", { className: "creature-emoji" }, item.emoji),

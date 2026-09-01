@@ -22,6 +22,7 @@ import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import { equipBonus, equipBonusStr, equippedStatBonuses } from "../../../core/equipment.js";
@@ -115,13 +116,37 @@ function TestBattleScreen({ onBack }) {
     if (y != null && autoScrollRafRef.current == null) autoScrollRafRef.current = requestAnimationFrame(autoScrollTick);
   }
 
+  // Attack-range preview: while a creature is being dragged over the grid, tint
+  // every tile it would be able to reach from the cell under the pointer.
+  const rangePreview = useRangePreview(ROWS, COLS);
+  /** The creature a drag is carrying, from either origin (roster or grid cell). */
+  function draggedCreatureId() { return dragId || (dragCell ? testGrid[dragCell]?.id : null); }
+  /** Ability levels the preview should read: a placed creature's own overrides,
+   * or -- for a roster drag, which has no entry yet -- the defaults applyDrop
+   * would give it on the side currently selected. */
+  function previewKitFor(id, fromCell) {
+    const entry = fromCell ? testGrid[fromCell] : null;
+    const isPlayer = (entry ? entry.side : side) === "player";
+    const ocBase = isPlayer ? (owned?.[id] || { level: 1, ascensions: 0 }) : null;
+    return { abilityLevels: resolveOverrides(entry || { id }, isPlayer, ocBase).kit };
+  }
+  function previewAt(id, r, c, fromCell) {
+    if (!id) { rangePreview.clear(); return; }
+    rangePreview.show(id, r, c, previewKitFor(id, fromCell));
+  }
   const touchDrag = useTouchDragPlacement({
     cellSelector: "[data-cell]",
     applyDrop,
     onCancelHold: cancelHold,
     onCancelDrop: (fromCell) => setTestGrid((prev) => { const n = { ...prev }; delete n[fromCell]; return n; }),
     onDragMove: (x, y) => trackDragPointer(y),
-    onDragEnd: () => trackDragPointer(null),
+    onDragOverCell: (cellKey, d) => {
+      const id = d.id || d.cellId;
+      if (!cellKey || !id) { rangePreview.clear(); return; }
+      const [r, c] = cellKey.split(",").map(Number);
+      previewAt(id, r, c, d.fromCell);
+    },
+    onDragEnd: () => { trackDragPointer(null); rangePreview.clear(); },
   });
   function handleCellDrop(r, c) {
     applyDrop(r, c, { id: dragId, fromCell: dragCell });
@@ -408,7 +433,7 @@ function TestBattleScreen({ onBack }) {
     const snap = bSnap || { playerUnits: [], enemyUnits: [], damageDealt: {} };
     const allUnits = [...snap.playerUnits, ...snap.enemyUnits];
     const selectedUnit = battleSelectedUid ? allUnits.find((u) => u.uid === battleSelectedUid && u.hp > 0) : null;
-    return React.createElement("div", { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5", zIndex: 200 } },
+    return React.createElement("div", { key: "sfv411", className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5", zIndex: 200 } },
       header,
       React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", padding: "12px", overflow: "hidden", gap: 6 } },
         React.createElement("div", { style: { display: "flex", gap: 8 } },
@@ -508,7 +533,7 @@ function TestBattleScreen({ onBack }) {
   }
 
   // ── Planning phase ───────────────────────────────────────────────────────
-  return React.createElement("div", { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5", zIndex: 200 } },
+  return React.createElement("div", { key: "sfv511", className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: "#f5f5f5", zIndex: 200 } },
     header,
     React.createElement("div", {
       ref: planScrollRef,
@@ -546,15 +571,15 @@ function TestBattleScreen({ onBack }) {
             onClick: () => { if (holdRef.current.fired) { holdRef.current.fired = false; return; } cellTap(r, c); },
             draggable: !!p,
             onDragStart: p ? (e) => { cancelHold(); e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
-            onDragEnd: p ? () => trackDragPointer(null) : undefined,
-            onDragOver: (e) => e.preventDefault(),
-            onDrop: (e) => { e.preventDefault(); handleCellDrop(r, c); },
+            onDragEnd: p ? () => { trackDragPointer(null); rangePreview.clear(); } : undefined,
+            onDragOver: (e) => { e.preventDefault(); previewAt(draggedCreatureId(), r, c, dragCell); },
+            onDrop: (e) => { e.preventDefault(); rangePreview.clear(); handleCellDrop(r, c); },
             onMouseDown: p ? () => beginHold(key) : undefined,
             onMouseUp: cancelHold,
             onMouseLeave: cancelHold,
             onTouchStart: p ? (e) => { e.preventDefault(); beginHold(key); touchDrag.start(e, { fromCell: key, cellId: p.id }); } : undefined,
             onTouchEnd: cancelHold,
-            style: { position: "absolute", left: c * TILE, top: r * TILE, width: TILE, height: TILE, borderTop: r === 0 ? "0" : "1px solid #e5e5e5", borderLeft: c === 0 ? "0" : "1px solid #e5e5e5", boxSizing: "border-box", cursor: p ? "grab" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", userSelect: "none", background: p ? (p.side === "player" ? "rgba(83,74,183,0.12)" : "rgba(239,68,68,0.12)") : "transparent" }
+            style: { position: "absolute", left: c * TILE, top: r * TILE, width: TILE, height: TILE, borderTop: r === 0 ? "0" : "1px solid #e5e5e5", borderLeft: c === 0 ? "0" : "1px solid #e5e5e5", boxSizing: "border-box", cursor: p ? "grab" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", userSelect: "none", background: p ? (p.side === "player" ? "rgba(83,74,183,0.12)" : "rgba(239,68,68,0.12)") : "transparent", ...(rangePreview.cellStyle(key) || {}) }
           },
             // Full-tile art: every decoration pins INSIDE the tile bounds so
             // nothing bleeds into a neighboring cell.
@@ -586,15 +611,15 @@ function TestBattleScreen({ onBack }) {
         style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", maxWidth: 480, paddingBottom: 20 },
         // Dropping a grid creature onto the roster area removes it, matching
         // the real planning screens' "drop outside the grid unequips" behavior.
-        onDragOver: (e) => e.preventDefault(),
-        onDrop: (e) => { e.preventDefault(); if (dragCell) { setTestGrid((prev) => { const n = { ...prev }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
+        onDragOver: (e) => { e.preventDefault(); rangePreview.clear(); },
+        onDrop: (e) => { e.preventDefault(); rangePreview.clear(); if (dragCell) { setTestGrid((prev) => { const n = { ...prev }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
       },
         list.map((c) => React.createElement("div", {
           key: c.id,
           onClick: () => setSelectedId(c.id === selectedId ? null : c.id),
           draggable: true,
           onDragStart: (e) => { e.dataTransfer.effectAllowed = "move"; setDragId(c.id); setDragCell(null); },
-          onDragEnd: () => trackDragPointer(null),
+          onDragEnd: () => { trackDragPointer(null); rangePreview.clear(); },
           onTouchStart: (e) => { e.preventDefault(); touchDrag.start(e, { id: c.id }); },
           style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, width: 64, padding: "6px 2px", borderRadius: 10, cursor: "grab", userSelect: "none", background: selectedId === c.id ? "#EEEDFE" : "#fff", border: "2px solid " + (selectedId === c.id ? "#534AB7" : "#eee") }
         },
@@ -612,7 +637,7 @@ function TestBattleScreen({ onBack }) {
       const equipped = entry.equipped || [null, null, null, null];
       const items = EQUIPMENT_DEFS.filter((it) => !equipSearch || it.name.toLowerCase().includes(equipSearch.toLowerCase()));
       return React.createElement("div", { onClick: () => setEquipCell(null), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 400 } },
-        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 16, padding: "16px", width: "min(92vw, 380px)", maxHeight: "82vh", display: "flex", flexDirection: "column", gap: 10, boxShadow: "0 8px 40px rgba(0,0,0,0.25)" } },
+        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 16, padding: "16px", width: "min(calc(92 * var(--vw)), 380px)", maxHeight: "calc(82 * var(--vh))", display: "flex", flexDirection: "column", gap: 10, boxShadow: "0 8px 40px rgba(0,0,0,0.25)" } },
           React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
             React.createElement(CreatureIcon, { def, size: 26 }),
             React.createElement("div", { style: { flex: 1 } },

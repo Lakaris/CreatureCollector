@@ -14,7 +14,10 @@ import { getDepthReward, nextRewardDepth, formatLabyrinthReward } from "../../co
 import { easternNoonDayKey } from "../../core/dates.js";
 import { TABS } from "../../ui/components/NavBar.js";
 
-const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TABS.length)*100+"vw";
+// Percent, not vw: these overlays are position:fixed inside the scaled app
+// (see ui/uiScale.js), so a percentage tracks the nav bar they point at while
+// a viewport unit would drift away from it as the screen changes.
+const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TABS.length)*100+"%";
 
 function HomeScreen(){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow, pendingDungeonReveal, setPendingDungeonReveal } = useGame();
@@ -159,14 +162,14 @@ function HomeScreen(){
       const rewardEmoji=onCurrent?formatLabyrinthReward(reward):(next?formatLabyrinthReward(next.reward):null);
       if(!rewardEmoji)return null;
       const label=onCurrent?"Victory Reward:":"Floor "+next.depth+" Victory Reward:";
-      return React.createElement("div",{style:{position:"fixed",left:"calc(75vw - 8px)",transform:"translateX(-50%)",bottom:222,textAlign:"center",fontSize:13,fontWeight:700,color:"#d97706",background:"#fffbeb",border:"2px solid #fbbf24",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(217,119,6,0.15)",zIndex:5,lineHeight:1.35}},
+      return React.createElement("div",{style:{position:"fixed",left:"calc(75% - 8px)",transform:"translateX(-50%)",bottom:222,textAlign:"center",fontSize:13,fontWeight:700,color:"#d97706",background:"#fffbeb",border:"2px solid #fbbf24",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(217,119,6,0.15)",zIndex:5,lineHeight:1.35}},
         React.createElement("div",{style:{whiteSpace:"nowrap"}},label),
         React.createElement("div",{style:{whiteSpace:"nowrap"}},rewardEmoji)
       );
     })(),
     (!tutorialRestricted||tutorialStep==="descend")&&React.createElement("button",{
       onClick:()=>{setGameMode("labyrinth");setTab("play");if(tutorialStep==="descend")setTutorialStep("labyrinth");},
-      style:{position:"fixed",left:"calc(75vw - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}
+      style:{position:"fixed",left:"calc(75% - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}
     },
       "🌀",
       React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#4f46e5"}},"Descend"),
@@ -179,7 +182,7 @@ function HomeScreen(){
     tutorialRestricted&&tutorialStep==="descend"&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:300,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6}},
       "You see a mysterious cave entrance that you didn't see before."
     ),
-    tutorialRestricted&&tutorialStep==="descend"&&React.createElement("div",{style:{position:"fixed",left:"calc(75vw - 8px)",bottom:226,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
+    tutorialRestricted&&tutorialStep==="descend"&&React.createElement("div",{style:{position:"fixed",left:"calc(75% - 8px)",bottom:226,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
     )
   );
 }

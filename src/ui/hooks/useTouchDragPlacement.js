@@ -6,6 +6,22 @@
 // (Dungeon, Arena, Labyrinth, Daily Boss), which otherwise only support it
 // via mouse.
 import React from "../../react.js";
+import { getUiScale } from "../uiScale.js";
+
+/**
+ * A touch's viewport coordinate, converted to the design-pixel space the
+ * ghost element is laid out in.
+ *
+ * The ghost is `position: fixed`, which inside the scaled app means it is
+ * positioned against `.app` and its `left`/`top` are design pixels -- while a
+ * touch reports visual ones. Without this the ghost drifts further from the
+ * finger the further the scale is from 1. Every other coordinate the hook
+ * touches (hit-testing, drag thresholds, autoscroll) is compared against
+ * something equally visual, so this is the only conversion needed.
+ */
+function toDesignPx(v) {
+  return v / getUiScale();
+}
 
 /**
  * cellSelector: attribute selector (e.g. '[data-cell]') used to find the grid
@@ -19,9 +35,13 @@ import React from "../../react.js";
  * onDragMove(x, y): optional; fired with the finger's client coords while a drag
  *   is active. Screens use it to edge-autoscroll their planning column, since
  *   an active drag preventDefaults the native scroll away.
+ * onDragOverCell(cellKey, dragged): optional; the "row,col" under the finger as
+ *   it moves (null when the finger is off the grid), plus {id, fromCell,
+ *   cellId} for what is being dragged. Touch has no dragover event, so this is
+ *   how the range preview learns where a touch placement would land.
  * onDragEnd(): optional; fired when the drag gesture ends for any reason.
  */
-export default function useTouchDragPlacement({ cellSelector, applyDrop, onCancelHold, onCancelDrop, onDragMove, onDragEnd }) {
+export default function useTouchDragPlacement({ cellSelector, applyDrop, onCancelHold, onCancelDrop, onDragMove, onDragOverCell, onDragEnd }) {
   const dragRef = React.useRef({ id: null, fromCell: null, cellId: null, startX: 0, startY: 0, active: false });
   const [ghost, setGhost] = React.useState(null); // {id, x, y} while actively dragging
 
@@ -50,13 +70,24 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
       }
       ts.active = true;
       onCancelHold && onCancelHold();
-      setGhost({ id: ts.id || ts.cellId, x: t.clientX, y: t.clientY });
+      setGhost({ id: ts.id || ts.cellId, x: toDesignPx(t.clientX), y: toDesignPx(t.clientY) });
       onDragMove && onDragMove(t.clientX, t.clientY);
+      reportCell(ts, t.clientX, t.clientY);
       return;
     }
     e.preventDefault();
-    setGhost(g => (g ? { ...g, x: t.clientX, y: t.clientY } : g));
+    setGhost(g => (g ? { ...g, x: toDesignPx(t.clientX), y: toDesignPx(t.clientY) } : g));
     onDragMove && onDragMove(t.clientX, t.clientY);
+    reportCell(ts, t.clientX, t.clientY);
+  }
+
+  /** Hit-test the grid under the finger. Mirrors the lookup `end` does on
+   * release, so the cell previewed mid-drag is the one the drop will use. */
+  function reportCell(ts, x, y) {
+    if (!onDragOverCell) return;
+    const el = document.elementFromPoint(x, y);
+    const cellEl = el && el.closest && el.closest(cellSelector);
+    onDragOverCell(cellEl ? cellEl.getAttribute("data-cell") : null, { id: ts.id, fromCell: ts.fromCell, cellId: ts.cellId });
   }
 
   function end(e) {
@@ -78,6 +109,7 @@ export default function useTouchDragPlacement({ cellSelector, applyDrop, onCance
     }
     dragRef.current = { id: null, fromCell: null, cellId: null, startX: 0, startY: 0, active: false };
     setGhost(null);
+    onDragOverCell && onDragOverCell(null, {});
     onDragEnd && onDragEnd();
   }
 

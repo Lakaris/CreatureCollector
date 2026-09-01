@@ -1,13 +1,32 @@
 /* Reset, document shell, and top-level app layout. */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body,#root{height:100%;overflow:hidden;overscroll-behavior:none}
+
+/* Global UI scale (see src/ui/uiScale.js). The game is laid out at its design
+   size in hardcoded pixels and then scaled as a whole, so every pixel in it
+   follows the screen. Sized 1/scale so that scaling back down covers the
+   viewport exactly.
+
+   This has to live on #root rather than on .app: a battle or planning screen
+   is returned straight from App as the root's only child, with no .app around
+   it, so anything anchored to .app would leave every battle screen unscaled.
+   #root is the one element always present.
+
+   The transform also makes #root the containing block for the app's
+   position:fixed screens, modals and overlays -- which is what carries them
+   along with the scale instead of anchoring them to the raw viewport. */
+#root{width:calc(100% / var(--ui-scale,1));height:calc(100% / var(--ui-scale,1));transform:scale(var(--ui-scale,1));transform-origin:top left}
 html{touch-action:pan-x pan-y}
 body{font-family:system-ui,sans-serif;background:#f5f5f5;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-x pan-y}
 input,textarea{-webkit-user-select:text;user-select:text}
 .app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:0}
 .app-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px;min-height:0;overscroll-behavior:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-.nav{display:flex;gap:4px;background:#fff;border-top:1px solid #e0e0e0;padding:10px 10px calc(18px + env(safe-area-inset-bottom));flex-shrink:0}
+/* The safe-area inset is a real, physical measurement of the device's chrome,
+   so it must not be scaled with the rest of the UI -- dividing by the scale
+   first cancels the transform out and leaves the notch clearance the size the
+   device actually asked for. */
+.nav{display:flex;gap:4px;background:#fff;border-top:1px solid #e0e0e0;padding:10px 10px calc(18px + env(safe-area-inset-bottom) / var(--ui-scale,1));flex-shrink:0}
 .nav-btn{flex:1;padding:7px 2px;border:none;background:transparent;border-radius:10px;font-size:10px;font-weight:500;cursor:pointer;color:#888;transition:all .15s}
 .nav-btn.active{background:#f0effe;color:#534AB7}
 .nav-btn i{display:block;font-size:17px;margin-bottom:2px}

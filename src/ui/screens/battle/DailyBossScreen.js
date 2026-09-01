@@ -20,8 +20,32 @@ import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } fr
 import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import useRangePreview from "../../../ui/hooks/useRangePreview.js";
+import useFitTile from "../../../ui/hooks/useFitTile.js";
+import { isAppNarrow } from "../../../ui/uiScale.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE } from "../../../battle/constants.js";
+
+/**
+ * Every Daily Boss runs the same generic kit (see battle/bosses/daily.js),
+ * just re-flavored by element -- not the dungeon's unique per-boss kits, which
+ * is why this doesn't read the abilities off the DUNGEON_BOSSES entry the
+ * screen borrows for name and type.
+ *
+ * Built here once rather than inline: the side panel and the narrow-screen
+ * popup both show it, and as two inline copies they were already one edit away
+ * from disagreeing. Tags follow the same rules as the dungeon bosses' (see
+ * data/bosses.js) -- Rising Fury's attack growth has no honest tag, so it has
+ * none.
+ */
+const DAILY_ABILITY_LABELS={basic:"Basic",special:"Special",unique:"Passive"};
+function dailyAbilitiesFor(type){
+  return {
+    basic:{name:type+" Strike",description:"Deals "+type+" damage to the nearest enemy",tags:["closest"]},
+    special:{name:type+" Nova",description:"Deals "+type+" damage around itself, pushing nearby enemies back 1 tile",tags:["nearby"]},
+    unique:{name:"Rising Fury",description:"Gains increased attack over time"},
+  };
+}
 
 function DailyBossScreen({onBack,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, dailyBossData, setDailyBossData, dailyBossLevel, setDailyBossLevel, devTimeOffset, setDevTimeOffset, owned, unlockedSkins, dailyBossPlanGrid: planGrid, setDailyBossPlanGrid: setPlanGrid } = useGame();
@@ -105,13 +129,18 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [bossPopupOpen,setBossPopupOpen]=useState(false);
   const bhs=React.useRef({timer:null,fired:false});
   // The boss popup only makes sense once the persistent boss panel is hidden
-  // (see .daily-boss-panel's 700px breakpoint in components.css) -- on wide
-  // screens there's already room for that panel, so the popup stays off.
-  const [isNarrowScreen,setIsNarrowScreen]=useState(()=>typeof window!=="undefined"&&window.innerWidth<=700);
+  // (see .daily-boss-panel in components.css) -- on wide screens there's
+  // already room for that panel, so the popup stays off. Both read the
+  // breakpoint from uiScale, in design pixels: a raw window.innerWidth check
+  // here would drift from the stylesheet as the UI scale changes, and the two
+  // disagreeing means either a hidden panel with no popup to replace it, or a
+  // popup competing with a panel that is already on screen.
+  const [isNarrowScreen,setIsNarrowScreen]=useState(()=>typeof window!=="undefined"&&isAppNarrow());
   useEffect(()=>{
-    function onResize(){setIsNarrowScreen(window.innerWidth<=700);}
+    function onResize(){setIsNarrowScreen(isAppNarrow());}
     window.addEventListener("resize",onResize);
-    return ()=>window.removeEventListener("resize",onResize);
+    window.addEventListener("orientationchange",onResize);
+    return ()=>{window.removeEventListener("resize",onResize);window.removeEventListener("orientationchange",onResize);};
   },[]);
   useEffect(()=>{if(!isNarrowScreen)setBossPopupOpen(false);},[isNarrowScreen]);
   function beginHold(creatureId,onComplete){
@@ -221,12 +250,12 @@ function DailyBossScreen({onBack,onViewCreature}){
     if(!acted)return;
     // Per-effect expiry windows, matching Dungeon -- boss kits now emit the same
     // shock/splash/dark/slam effects here that they always did there.
-    if(newFx.length)setAtkEffects(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:e.isDark?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
+    if(newFx.length)setAtkEffects(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:(e.isDark||e.isPoison)?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
     // snapshot only for log + unit lifecycle (not positions — RAF handles those).
     // The art-state timestamps (lastAttackTime etc.) MUST be copied along or
     // battleArtState only ever sees "idle"/no-defeat here.
     const takeSnap=()=>setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col,
-        burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,dotTicks:u.dotTicks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks,
+        burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,poisonStacks:u.poisonStacks,dotTicks:u.dotTicks,dotStacks:u.dotStacks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks,
         lastAttackTime:u.lastAttackTime,lastMoveTime:u.lastMoveTime,deathTime:u.deathTime,victoryTime:u.victoryTime,abilFlashTicks:u.abilFlashTicks,abilCharge:u.abilCharge,abilChargeMax:u.abilChargeMax,shield:u.shield})),
       boss:{...s.boss},log:[...s.log],damageDealt:{...s.damageDealt}});
     takeSnap();
@@ -346,11 +375,26 @@ function DailyBossScreen({onBack,onViewCreature}){
   function removeFromGrid(key){
     setPlanGrid(prev=>{const n={...prev};delete n[key];return n;});
   }
+  // Attack-range preview: while a creature is being dragged over the grid, tint
+  // every tile it would be able to reach from the cell under the pointer.
+  const rangePreview=useRangePreview(GRID_ROWS,GRID_COLS);
+  // Planning board shrinks to its column rather than making it scroll.
+  const [planAreaRef,planTile,planClamped]=useFitTile(GRID_ROWS,GRID_COLS,TILE,{reserveW:PLAN_PANEL_MIN_W});
+  /** The creature a drag is carrying, from either origin (tray or grid cell). */
+  function draggedCreature(){return dragId||(dragCell?planGrid[dragCell]:null);}
+  function previewAt(cid,r,c){if(!cid){rangePreview.clear();return;}rangePreview.show(cid,r,c,owned&&owned[cid]);}
   const touchDrag=useTouchDragPlacement({
     cellSelector:"[data-cell]",
     applyDrop,
     onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}},
     onCancelDrop:(fromCell)=>removeFromGrid(fromCell),
+    onDragOverCell:(cellKey,d)=>{
+      const cid=d.id||d.cellId;
+      if(!cellKey||!cid){rangePreview.clear();return;}
+      const [r,c]=cellKey.split(",").map(Number);
+      if(r<PLAYER_START_ROW){rangePreview.clear();return;}
+      previewAt(cid,r,c);
+    },
   });
   function autoDeploy(){
     const bossType=boss.type;
@@ -376,7 +420,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     setPlanGrid(grid);
   }
   // Victory rewards screen — beating the tier always drops a reward set
-  if(rewards&&phase==="won")return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  if(rewards&&phase==="won")return React.createElement("div",{key:"sfv379",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"✅ Victory!"),
       React.createElement("div",{style:{fontSize:13,color:"#888"}},"Rewards")
@@ -406,13 +450,13 @@ function DailyBossScreen({onBack,onViewCreature}){
     )
   );
   // Fallback victory screen (defensive — win always rolls rewards above)
-  if(phase==="won")return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
+  if(phase==="won")return React.createElement("div",{key:"sfv409",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
     React.createElement("div",{style:{fontSize:64,marginBottom:12}},"✅"),
     React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#534AB7",marginBottom:4}},"Victory!"),
     React.createElement("button",{onClick:continueAfterWin,style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
   );
   // Rewards screen (consolation reward for a loss)
-  if(rewards&&phase==="lost")return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  if(rewards&&phase==="lost")return React.createElement("div",{key:"sfv415",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"Rewards")
     ),
@@ -441,7 +485,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     )
   );
   // Lost with no rewards (already collected today)
-  if(phase==="lost"&&!rewards)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}},
+  if(phase==="lost"&&!rewards)return React.createElement("div",{key:"sfv444",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}},
     React.createElement("div",{style:{fontSize:48,lineHeight:1}},"💀"),
     React.createElement("div",{style:{fontSize:20,fontWeight:800,color:"#111"}},"Defeated"),
     React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:8}},"You've already collected today's rewards"),
@@ -460,7 +504,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     const now=Date.now();
     const selectedUnit=battleSelected?.type==="unit"?snap.playerUnits.find(u=>u.uid===battleSelected.uid):null;
     const selectedBoss=battleSelected?.type==="boss"?snap.boss:null;
-    return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv463",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       // header — boss HP updated via RAF (id="battle-boss-hp"), text via React
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
@@ -650,7 +694,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   // Planning screen
   if(phase==="planning")return React.createElement(React.Fragment,null,
     dailyAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dailyAbilityTagPopup,onClose:()=>setDailyAbilityTagPopup(null)}),
-    React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     // header
     React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
       React.createElement("button",{onClick:()=>{setPhase("idle");},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
@@ -661,21 +705,22 @@ function DailyBossScreen({onBack,onViewCreature}){
       ),
       React.createElement("button",{onClick:Object.keys(planGrid).length>0?startBattle:undefined,style:{background:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},"Fight →")
     ),
-    // grid
-    React.createElement("div",{style:{flex:1,overflowY:"auto",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
+    // grid. Never scrolls -- planTile shrinks the board to whatever height
+    // this row ends up with (see useFitTile).
+    React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
       React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative"}},
       React.createElement("div",{
         onMouseDown:isNarrowScreen?()=>{bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;setBossPopupOpen(true);},180);}:undefined,
         onMouseUp:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
         onTouchStart:isNarrowScreen?(e)=>{e.preventDefault();bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;setBossPopupOpen(true);},180);}:undefined,
         onTouchEnd:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
-        style:{position:"absolute",left:2*TILE,top:1*TILE,width:2*TILE,height:2*TILE,display:"flex",alignItems:"center",justifyContent:"center",fontSize:52,lineHeight:1,pointerEvents:isNarrowScreen?"auto":"none",cursor:isNarrowScreen?"pointer":"default",zIndex:10,userSelect:"none"}
+        style:{position:"absolute",left:2*planTile,top:1*planTile,width:2*planTile,height:2*planTile,display:"flex",alignItems:"center",justifyContent:"center",fontSize:Math.round(planTile*1.13),lineHeight:1,pointerEvents:isNarrowScreen?"auto":"none",cursor:isNarrowScreen?"pointer":"default",zIndex:10,userSelect:"none"}
       },TYPE_EMOJI[boss.type]||"👾"),
       React.createElement("div",{
         style:{
           display:"grid",
-          gridTemplateColumns:`repeat(${GRID_COLS},${TILE}px)`,
-          gridTemplateRows:`repeat(${GRID_ROWS},${TILE}px)`,
+          gridTemplateColumns:`repeat(${GRID_COLS},${planTile}px)`,
+          gridTemplateRows:`repeat(${GRID_ROWS},${planTile}px)`,
           gap:0,
         }
       },
@@ -691,14 +736,15 @@ function DailyBossScreen({onBack,onViewCreature}){
               key,"data-cell":key,
               draggable:!!(isPlayerZone&&creatureId),
               onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
-              onDragOver:isPlayerZone?(e)=>e.preventDefault():undefined,
-              onDrop:isPlayerZone?(e)=>{e.preventDefault();handleCellDrop(r,c);}:undefined,
+              onDragEnd:isPlayerZone&&creatureId?()=>rangePreview.clear():undefined,
+              onDragOver:isPlayerZone?(e)=>{e.preventDefault();previewAt(draggedCreature(),r,c);}:()=>rangePreview.clear(),
+              onDrop:isPlayerZone?(e)=>{e.preventDefault();rangePreview.clear();handleCellDrop(r,c);}:undefined,
               onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);}):undefined,
               onMouseUp:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
               onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
               onTouchEnd:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
               style:{
-                width:TILE,height:TILE,
+                width:planTile,height:planTile,
                 background:isPlayerZone?"#f0f0f0":"#fdf7f7",
                 borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,
                 borderLeft:c===0?"0":BORDER,
@@ -709,26 +755,21 @@ function DailyBossScreen({onBack,onViewCreature}){
                 cursor:isPlayerZone?(creatureId?"grab":"default"):"default",
                 boxSizing:"border-box",
                 userSelect:"none",
+                ...(rangePreview.cellStyle(key)||{}),
               }
             },
-            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:TILE,contain:true})):"");
+            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:planTile,contain:true})):"");
           })
         ).flat()
       )
       ),
       // right-side info panels
-      React.createElement("div",{ref:rightPanelRef,style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8,overflow:"hidden"}},
+      React.createElement("div",{ref:rightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
         // boss panel (always top 50%)
         (()=>{
-          const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
+          const abilityLabels=DAILY_ABILITY_LABELS;
           const bossStats=getBossStats(boss,level);
-          // Every Daily Boss runs the same generic kit (see battle/bosses/daily.js),
-          // just re-flavored by element -- not the dungeon's unique per-boss kits.
-          const dailyAbilities={
-            basic:{name:boss.type+" Strike",description:"Deals "+boss.type+" damage to the nearest enemy"},
-            special:{name:boss.type+" Nova",description:"Deals "+boss.type+" damage around itself, pushing nearby enemies back 1 tile"},
-            unique:{name:"Rising Fury",description:"Gains increased attack over time"},
-          };
+          const dailyAbilities=dailyAbilitiesFor(boss.type);
           return React.createElement("div",{className:"daily-boss-panel",style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
             React.createElement("button",{onClick:()=>setBossMinimized(p=>{const next=!p;if(!next)expandDailyPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},bossMinimized?"＋":"－"),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:bossMinimized?0:4}},
@@ -740,7 +781,12 @@ function DailyBossScreen({onBack,onViewCreature}){
             ),
             !bossMinimized&&Object.entries(dailyAbilities).map(([k,abl])=>{
               return React.createElement("div",{key:k,style:{marginBottom:10}},
-                React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+                React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+                  abl.tags&&abl.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                    React.createElement(AbilityTagPills,{tags:abl.tags,onOpen:setDailyAbilityTagPopup,compact:true})
+                  )
+                ),
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
                 React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.description)
               );
@@ -771,7 +817,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
                   React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
                   abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                    React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDailyAbilityTagPopup})
+                    React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDailyAbilityTagPopup,compact:true})
                   )
                 ),
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
@@ -785,9 +831,10 @@ function DailyBossScreen({onBack,onViewCreature}){
     // creature list
     React.createElement("div",{
       style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
-      onDragOver:e=>e.preventDefault(),
+      onDragOver:e=>{e.preventDefault();rangePreview.clear();},
       onDrop:e=>{
         e.preventDefault();
+        rangePreview.clear();
         if(dragCell){removeFromGrid(dragCell);}
         setDragId(null);setDragCell(null);
       }
@@ -825,6 +872,7 @@ function DailyBossScreen({onBack,onViewCreature}){
               if(hs.current.id===oc.id){e.preventDefault();return;}
               endHold();e.dataTransfer.effectAllowed="move";setDragId(oc.id);setDragCell(null);
             }:undefined,
+            onDragEnd:!isPlaced?()=>rangePreview.clear():undefined,
             onMouseDown:()=>beginHold(oc.id),
             onMouseUp:endHold,
             onTouchStart:(e)=>{e.preventDefault();beginHold(oc.id);if(!isPlaced)touchDrag.start(e,{id:oc.id});},
@@ -863,12 +911,8 @@ function DailyBossScreen({onBack,onViewCreature}){
   ),
   touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
   bossPopupOpen&&isNarrowScreen&&(()=>{
-    const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
-    const dailyAbilities={
-      basic:{name:boss.type+" Strike",description:"Deals "+boss.type+" damage to the nearest enemy"},
-      special:{name:boss.type+" Nova",description:"Deals "+boss.type+" damage around itself, pushing nearby enemies back 1 tile"},
-      unique:{name:"Rising Fury",description:"Gains increased attack over time"},
-    };
+    const abilityLabels=DAILY_ABILITY_LABELS;
+    const dailyAbilities=dailyAbilitiesFor(boss.type);
     return React.createElement("div",{onClick:()=>setBossPopupOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"18px",width:"100%",maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.2)",position:"relative"}},
         React.createElement("button",{onClick:()=>setBossPopupOpen(false),style:{position:"absolute",top:10,right:10,width:22,height:22,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},"×"),
@@ -881,7 +925,12 @@ function DailyBossScreen({onBack,onViewCreature}){
         ),
         Object.entries(dailyAbilities).map(([k,abl])=>
           React.createElement("div",{key:k,style:{marginBottom:10}},
-            React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},abilityLabels[k]||k),
+            React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+              React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
+              abl.tags&&abl.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                React.createElement(AbilityTagPills,{tags:abl.tags,onOpen:setDailyAbilityTagPopup,compact:true})
+              )
+            ),
             React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
             React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.description)
           )
@@ -891,7 +940,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   })(),
   );
   // Main screen
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  return React.createElement("div",{key:"sfv894",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})

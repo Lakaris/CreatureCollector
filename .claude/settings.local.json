@@ -138,7 +138,17 @@
       "PowerShell(Get-ChildItem -Recurse images | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\(\\(Get-Location\\).Path + '\\\\', ''\\) })",
       "PowerShell(foreach \\($f in @\\(\"src\\\\ui\\\\screens\\\\battle\\\\LabyrinthScreen.js\",\"src\\\\ui\\\\screens\\\\battle\\\\ArenaScreen.js\",\"src\\\\ui\\\\screens\\\\battle\\\\DailyBossScreen.js\",\"src\\\\ui\\\\screens\\\\battle\\\\DungeonScreen.js\"\\)\\) { $c = [System.IO.File]::ReadAllText\\($f\\); $c = $c.Replace\\('import { battleArtState, battleUnitOpacity } from \"../../../ui/components/battleArtState.js\";', 'import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from \"../../../ui/components/battleArtState.js\";'\\); [System.IO.File]::WriteAllText\\($f, $c, \\(New-Object System.Text.UTF8Encoding\\($false\\)\\)\\) }; \"imports updated\")",
       "PowerShell(Add-Type -AssemblyName System.Drawing; foreach \\($p in @\\(\"C:\\\\Users\\\\Annie\\\\Desktop\\\\Blastar_Attack.png\", \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Blastar_Idle.png\", \"images\\\\blastar\\\\idle.png\", \"images\\\\blastar\\\\defeat.png\"\\)\\) { $img = [System.Drawing.Image]::FromFile\\(\\(Resolve-Path $p\\)\\); \"{0}  {1}x{2}\" -f $p, $img.Width, $img.Height; $img.Dispose\\(\\) }; \"hashes:\"; \\(Get-FileHash \"C:\\\\Users\\\\Annie\\\\Desktop\\\\Blastar_Idle.png\"\\).Hash; \\(Get-FileHash \"images\\\\blastar\\\\idle.png\"\\).Hash)",
-      "Bash(grep -oE 'name:\\\\s*\"[^\"]{13,}\"' src/data/creatures.js)"
+      "Bash(grep -oE 'name:\\\\s*\"[^\"]{13,}\"' src/data/creatures.js)",
+      "Bash(awk -F: '{print}')",
+      "Bash(cd \"C:/Users/Annie/Desktop/Stuff/CreatureCollector\" && sed -i \"s|ratio of the current level's value to the basic's base value|current level's value over BASIC_DMG_BASELINE \\(see battle/constants.js\\)|\" src/battle/playerAbilities/*.js && grep -c \"over BASIC_DMG_BASELINE\" src/battle/playerAbilities/*.js | grep -v \":0\" | wc -l)",
+      "Bash(rm src/ui/components/EffectFilterPopup.js)",
+      "Bash(echo \"refs left: $?\")",
+      "Bash(awk '/^  return React.createElement/{found=NR} END{print found}' src/ui/screens/battle/DungeonScreen.js)",
+      "Bash(awk -F: '{print $1}')",
+      "Bash(sed -i 's/useFitTile\\(ARENA_GRID_ROWS,ARENA_GRID_COLS,ARENA_TILE\\)/useFitTile\\(ARENA_GRID_ROWS,ARENA_GRID_COLS,ARENA_TILE,{reserveW:PLAN_PANEL_MIN_W}\\)/' src/ui/screens/battle/ArenaScreen.js)",
+      "Bash(sed -i 's/useFitTile\\(GRID_ROWS,GRID_COLS,TILE\\)/useFitTile\\(GRID_ROWS,GRID_COLS,TILE,{reserveW:PLAN_PANEL_MIN_W}\\)/' src/ui/screens/battle/DailyBossScreen.js)",
+      "Bash(sed -i 's/useFitTile\\(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_TILE\\)/useFitTile\\(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_TILE,{reserveW:PLAN_PANEL_MIN_W}\\)/' src/ui/screens/battle/DungeonScreen.js)",
+      "Bash(sed -i 's/useFitTile\\(ARENA_GRID_ROWS, ARENA_GRID_COLS, ARENA_TILE\\)/useFitTile\\(ARENA_GRID_ROWS, ARENA_GRID_COLS, ARENA_TILE, { reserveW: PLAN_PANEL_MIN_W }\\)/' src/ui/screens/battle/LabyrinthScreen.js)"
     ]
   }
 }

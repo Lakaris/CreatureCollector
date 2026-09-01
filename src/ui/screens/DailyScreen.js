@@ -98,7 +98,7 @@ function DailyScreen({onBack}){
   );
   if(rewardItems){
     const allVisible=visibleCount>=rewardItems.length;
-    return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
+    return React.createElement("div",{key:"sfv101",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",padding:"32px 24px 16px",flexShrink:0}},"Obtained"),
       React.createElement("div",{style:{flex:1,padding:"0 24px",display:"flex",flexWrap:"wrap",gap:16,justifyContent:"center",alignContent:"center"}},
         rewardItems.map(([k,v],i)=>{
@@ -123,7 +123,7 @@ function DailyScreen({onBack}){
       popup
     );
   }
-  return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200,animation:"screenSlideUp .22s ease-out"}},
+  return React.createElement("div",{key:"sfv126",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200,animation:"screenSlideUp .22s ease-out"}},
     // White top bar with a back arrow, matching every other screen in the
     // game, instead of the round "✕" button that used to float at the
     // bottom of this one.

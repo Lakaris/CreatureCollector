@@ -11,7 +11,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
-import { equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../core/equipment.js";
+import { equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel, isExclusive, exclusivityBadge } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
 import EquipmentDexScreen from "../../ui/screens/EquipmentDexScreen.js";
@@ -48,6 +48,9 @@ function EquipmentScreen() {
   const [filterStats, setFilterStats] = useState(new Set());
   const [filterHasEffect, setFilterHasEffect] = useState(false);
   const [filterUniversal, setFilterUniversal] = useState(false);
+  // Creature-exclusive gear is the one exclusivity axis with no row of its own
+  // (a chip per species would be ~240 chips), so it gets a Show toggle instead.
+  const [filterCreatureExclusive, setFilterCreatureExclusive] = useState(false);
   const [filterFavorites, setFilterFavorites] = useState(false);
   const [filterElements, setFilterElements] = useState(new Set());
   const [filterRoles, setFilterRoles] = useState(new Set());
@@ -103,7 +106,8 @@ function EquipmentScreen() {
       if (filterStats.size > 0 && ![...filterStats].every((s) => itemAffectsStat(item, s))) return false;
       if (filterFavorites && !equipFavorites.has(item.id)) return false;
       if (filterHasEffect && !item.effect) return false;
-      if (filterUniversal && (item.element || item.role || item.attackType)) return false;
+      if (filterUniversal && isExclusive(item)) return false;
+      if (filterCreatureExclusive && !item.creatureId) return false;
       if (filterElements.size > 0 && !filterElements.has(item.element)) return false;
       if (filterRoles.size > 0 && !filterRoles.has(item.role)) return false;
       if (filterRanges.size > 0 && !filterRanges.has(item.attackType)) return false;
@@ -127,7 +131,7 @@ function EquipmentScreen() {
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 4 } }, "✦ Equipment Ascended"),
         ascendAllResult.length === 0
           ? React.createElement("div", { style: { fontSize: 13, color: "#666", padding: "12px 0" } }, "Nothing was ready to ascend.")
-          : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 12, maxHeight: "50vh", overflowY: "auto", textAlign: "left" } },
+          : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 12, maxHeight: "calc(50 * var(--vh))", overflowY: "auto", textAlign: "left" } },
               ascendAllResult.map((r) => React.createElement("div", { key: r.id, style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 12px" } },
                 React.createElement("div", { style: { fontSize: 26, flexShrink: 0 } }, r.emoji),
                 React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 700, color: "#111" } }, r.name),
@@ -209,7 +213,8 @@ function EquipmentScreen() {
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Show"),
         React.createElement("button", { className: "filter-chip" + (filterFavorites ? " active" : ""), onClick: () => setFilterFavorites((p) => !p) }, "★ Favorites"),
         React.createElement("button", { className: "filter-chip" + (filterHasEffect ? " active" : ""), onClick: () => setFilterHasEffect((p) => !p) }, "Has Effect"),
-        React.createElement("button", { className: "filter-chip" + (filterUniversal ? " active" : ""), onClick: () => setFilterUniversal((p) => !p) }, "Universal")
+        React.createElement("button", { className: "filter-chip" + (filterUniversal ? " active" : ""), onClick: () => setFilterUniversal((p) => !p) }, "Universal"),
+        React.createElement("button", { className: "filter-chip" + (filterCreatureExclusive ? " active" : ""), onClick: () => setFilterCreatureExclusive((p) => !p) }, "Creature Exclusive")
       )
     ),
     items.length === 0
@@ -235,10 +240,8 @@ function EquipmentScreen() {
               showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
                 React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= equipMaxLevel(item.id) ? "MAX" : "Lv " + lvl),
-                (item.element || item.role || item.attackType) && React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: "#7F77DD", background: "#7F77DD1a", borderRadius: 6, padding: "2px 6px", lineHeight: "12px", whiteSpace: "nowrap" } },
-                  item.element ? TYPE_EMOJI[item.element] + " " + item.element
-                    : item.role ? ROLE_CONFIG[item.role].emoji + " " + item.role
-                    : ATTACK_TYPE_CONFIG[item.attackType].emoji + " " + item.attackType
+                isExclusive(item) && React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: "#7F77DD", background: "#7F77DD1a", borderRadius: 6, padding: "2px 6px", lineHeight: "12px", whiteSpace: "nowrap" } },
+                  exclusivityBadge(item)
                 )
               ),
               React.createElement("div", { style: { position: "absolute", top: 6, right: 8, fontSize: 16, cursor: "pointer", color: equipFavorites.has(item.id) ? "#f59e0b" : "#ccc", lineHeight: 1 }, onClick: (e) => toggleFavorite(item.id, e) }, equipFavorites.has(item.id) ? "★" : "☆"),

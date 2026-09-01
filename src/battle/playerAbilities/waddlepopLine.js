@@ -18,13 +18,13 @@
 
 import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { RANGED_RANGE, STATUS_TICKS } from "../constants.js";
+import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyStatMod, applyFrostbite } from "../status.js";
 import { damageUnit } from "../hp.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [12, 14, 16, 18, 18];
 const SPECIAL_DMG_BY_LEVEL = [24, 28, 32, 37, 37];
 /** Snowball Effect: +damage% added to Cryo Bomb per use, by unique level. */
@@ -52,7 +52,7 @@ export function makeWaddlepopModule(cfg) {
     /** Ice Lob: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Ice Lob lvl 5: every landed hit chills -- one Speed Down stack. */
@@ -72,7 +72,7 @@ export function makeWaddlepopModule(cfg) {
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const snow = 1 + Math.min(SNOWBALL_MAX_PCT, (unit._snowballPct || 0)) / 100;
-      const mult = (specialDmgByLevel[idx] / basicDmgByLevel[0]) * snow;
+      const mult = (specialDmgByLevel[idx] / BASIC_DMG_BASELINE) * snow;
       const frostbites = idx >= MAX_IDX;
 
       // Closest targetable foe; the boss (via its body) as fallback center.

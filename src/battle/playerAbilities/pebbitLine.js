@@ -17,11 +17,12 @@
 // damage that tick would have dealt -- expiring faster means hurting less.
 
 import { aChebDist } from "../geometry.js";
-import { STATUS_TICKS } from "../constants.js";
+import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { tickStatMods } from "../status.js";
+import { applyShield } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [9, 10, 11, 12, 13];
 /** Boulder Hunker: Shield as a % of this creature's DEF, by special level. */
 const SHIELD_PCT_BY_LEVEL = [3, 6, 9, 12, 15];
@@ -43,9 +44,9 @@ function abilityIdx(unit, key) {
  * positive ATK/Speed mods and the Shield itself -- are untouched. */
 function bonusExpiryTick(u) {
   if ((u.burnTicks || 0) > 0 && !--u.burnTicks) { u.burnStacks = 0; u.burnSourceAtk = 0; }
-  if ((u.poisonTicks || 0) > 0) u.poisonTicks--;
-  if ((u.rootTicks || 0) > 0) u.rootTicks--;
-  if ((u.dotTicks || 0) > 0) u.dotTicks--;
+  if ((u.rootTicks || 0) > 0 && !--u.rootTicks) u.rootUndispellable = false;
+  if ((u.dotTicks || 0) > 0 && !--u.dotTicks) u.dotStacks = 0;
+  if ((u.poisonTicks || 0) > 0 && !--u.poisonTicks) u.poisonStacks = 0;
   if ((u.weakTicks || 0) > 0) u.weakTicks--;
   if ((u.healImmuneTicks || 0) > 0) u.healImmuneTicks--;
   if ((u.slowTicks || 0) > 0) u.slowTicks--;
@@ -56,8 +57,8 @@ function bonusExpiryTick(u) {
   if ((u.frostbiteTicks || 0) > 0 && !--u.frostbiteTicks) u.frostbiteStacks = 0;
   if ((u.dartShredTicks || 0) > 0 && !--u.dartShredTicks) u.dartShredPct = 0;
   // Negative stat-mod stacks (ATK/Speed/DEF Down, Healing Down) age one
-  // extra tick; buff stacks are untouched. Restrained has no timer (it
-  // never expires on its own), so Stone Skin's faster expiry can't touch it.
+  // extra tick; buff stacks are untouched. Restrained has no timer at all
+  // (it comes off by range), so Stone Skin's faster expiry can't touch it.
   tickStatMods(u, true);
 }
 
@@ -67,7 +68,7 @@ export function makePebbitModule(cfg) {
     /** Pebble Spit: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Stone Skin: debuffs on this creature expire N% faster. */
@@ -97,8 +98,7 @@ export function makePebbitModule(cfg) {
       }
 
       const pct = shieldPctByLevel[abilityIdx(unit, "special")];
-      unit.shield = Math.max(1, Math.round((unit.def * pct) / 100));
-      unit.shieldTicks = STATUS_TICKS;
+      applyShield(unit, (unit.def * pct) / 100, STATUS_TICKS);
     },
   };
 }

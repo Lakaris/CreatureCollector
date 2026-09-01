@@ -13,6 +13,8 @@ import CreatureDetail from "../../ui/screens/CreatureDetail/index.js";
 import DexScreen from "../../ui/screens/DexScreen.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import NavBar from "../../ui/components/NavBar.js";
+import EffectFilterScreen from "../../ui/components/EffectFilterScreen.js";
+import { getCreatureEffectLabels } from "../../core/abilityText.js";
 
 // Height of the ascension bar pinned to the bottom of every card. Tall enough
 // that a ringed star (the widest/tallest thing in it) clears both edges.
@@ -41,8 +43,11 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
   const [activeTypes,setActiveTypes]=useState(new Set());
   const [activeRoles,setActiveRoles]=useState(new Set());
   const [activeAttackTypes,setActiveAttackTypes]=useState(new Set());
+  const [activeEffects,setActiveEffects]=useState(new Set());
+  const [effectsOpen,setEffectsOpen]=useState(false);
 
   function toggleRarity(r){setActiveRarities(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
+  function toggleEffect(l){setActiveEffects(prev=>{const n=new Set(prev);n.has(l)?n.delete(l):n.add(l);return n;});}
   function toggleType(t){setActiveTypes(prev=>{const n=new Set(prev);n.has(t)?n.delete(t):n.add(t);return n;});}
   function toggleRole(r){setActiveRoles(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
   function toggleAttackType(a){setActiveAttackTypes(prev=>{const n=new Set(prev);n.has(a)?n.delete(a):n.add(a);return n;});}
@@ -55,6 +60,9 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     if(activeTypes.size>0)list=list.filter(({def})=>activeTypes.has(def.type));
     if(activeRoles.size>0)list=list.filter(({def})=>activeRoles.has(def.role));
     if(activeAttackTypes.size>0)list=list.filter(({def})=>activeAttackTypes.has(def.attackType));
+    // AND semantics: the kit must carry every selected effect (labels come
+    // from the same ability tags the detail cards show).
+    if(activeEffects.size>0)list=list.filter(({def})=>{const labels=getCreatureEffectLabels(def.id);return [...activeEffects].every(l=>labels.has(l));});
     if(search.trim()){const q=search.trim().toLowerCase();list=list.filter(({def})=>def.name.toLowerCase().includes(q));}
     list.sort((a,b)=>{
       if(b.owned.level!==a.owned.level)return b.owned.level-a.owned.level;
@@ -62,7 +70,7 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
       return a.def.name.localeCompare(b.def.name);
     });
     return list;
-  },[ownedDefs,activeRarities,activeTypes,activeRoles,search]);
+  },[ownedDefs,activeRarities,activeTypes,activeRoles,activeAttackTypes,activeEffects,search]);
 
   // Swipe-nav order, frozen for as long as a detail view stays open. The
   // grid's live sort is level-first, so levelling a creature inside the
@@ -78,7 +86,12 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
 
   if(showDex)return React.createElement(DexScreen,{onBack:()=>setShowDex(false),unlockedSkins,owned});
 
-  if(selected&&owned[selected])return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
+  if(effectsOpen)return React.createElement(EffectFilterScreen,{
+    active:activeEffects,onToggle:toggleEffect,
+    onClear:()=>setActiveEffects(new Set()),onBack:()=>setEffectsOpen(false)
+  });
+
+  if(selected&&owned[selected])return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
     pendingEvo&&React.createElement("div",{className:"modal-overlay"},
       React.createElement("div",{className:"modal-box"},
         React.createElement("span",{className:"modal-emoji"},pendingEvo.toEmoji),
@@ -182,12 +195,23 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
           )
         )
       ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Range"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.keys(ATTACK_TYPE_CONFIG).map(a=>
             React.createElement("button",{key:a,className:"filter-chip"+(activeAttackTypes.has(a)?" active":""),onClick:()=>toggleAttackType(a)},ATTACK_TYPE_CONFIG[a].emoji+" "+a)
           )
+        )
+      ),
+      // Effect filter: active labels render as removable chips; the ＋ button
+      // opens the full-page catalog (EffectFilterScreen).
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+        React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Effects"),
+        React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
+          [...activeEffects].sort().map(l=>
+            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},l+" ✕")
+          ),
+          React.createElement("button",{className:"filter-chip",onClick:()=>setEffectsOpen(true)},"＋ Select")
         )
       )
     ),

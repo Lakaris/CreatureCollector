@@ -118,8 +118,14 @@ export function rollDungeonRewards(count, bossType, bossLevel = 10) {
     ["epic", 0.5 + 4 * t],
     ["legendary", 0.05 + 0.45 * t],
   ];
+  // Element decides which boss can drop an item; role- and range-exclusive
+  // gear has always dropped from every boss. Creature-exclusive gear is held
+  // out of the generic pool entirely: a one-species item turning up in a
+  // random boss's loot is almost never what such an item is for, and the
+  // catalog has none yet, so this fails safe. Drop the `!item.creatureId`
+  // clause if a species item should be farmable from bosses after all.
   const pool = EQUIPMENT_DEFS.filter(
-    (item) => !item.element || item.element === bossType
+    (item) => !item.creatureId && (!item.element || item.element === bossType)
   );
   const byRarity = {};
   for (const item of pool) {

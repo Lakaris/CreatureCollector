@@ -8,11 +8,11 @@ import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
-import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel } from "../../../core/equipment.js";
+import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel, isExclusive, itemFitsCreature, exclusivityCaption } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
-import AscStars from "../../../ui/components/AscStars.js";
+import AscStars, { ascStarTier } from "../../../ui/components/AscStars.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import StatBar from "../../../ui/components/StatBar.js";
 import PipRow from "../../../ui/components/PipRow.js";
@@ -431,7 +431,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     const total=statsWithEquip[statInfoPopup];
     const bonusTotal=Math.round((total-base)*10)/10;
     return React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:280,maxHeight:"70vh",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:280,maxHeight:"calc(70 * var(--vh))",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
         React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
@@ -483,8 +483,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         React.createElement(ScreenHeader,{title:"",onBack:()=>setEquipDetailPage(null)}),
         React.createElement("div",{className:"card",style:{position:"relative",flex:1,minHeight:0,display:"flex",flexDirection:"column",overflow:"hidden"}},
           rarCfg&&React.createElement("div",{style:{position:"absolute",top:10,left:12,fontSize:10,fontWeight:700,color:rarCfg.color,background:rarCfg.bg,borderRadius:4,padding:"2px 7px"}},rarCfg.label),
-          (pi.element||pi.role||pi.attackType)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
-            [pi.element,pi.role,pi.attackType].filter(Boolean).join(" · ")+" exclusive"
+          isExclusive(pi)&&React.createElement("div",{style:{position:"absolute",top:34,left:12,fontSize:10,fontWeight:700,color:"#7F77DD"}},
+            exclusivityCaption(pi)
           ),
           React.createElement("div",{style:{textAlign:"center",marginBottom:16,paddingTop:12,flexShrink:0}},
             React.createElement("div",{style:{fontSize:64,marginBottom:4}},pi.emoji),
@@ -526,7 +526,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     return React.createElement("div",null,
       statInfoPopupEl,
       notify&&React.createElement(Notify,{msg:notify}),
-      equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+      equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
         React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
           React.createElement("div",{style:{fontSize:32,marginBottom:8}},EQUIPMENT_MAP[equipConflict.itemId]?.emoji),
           React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
@@ -683,13 +683,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                 if(equipFilterHasEffect&&!item.effect)return false;
                 if(equipFilterElements.size>0&&!equipFilterElements.has(item.element))return false;
                 if(equipFilterRoles.size>0&&!equipFilterRoles.has(item.role))return false;
-                if(equipFilterHideIncompatible&&!equipped.includes(item.id)&&((item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)||(item.attackType&&def.attackType!==item.attackType)))return false;
+                if(equipFilterHideIncompatible&&!equipped.includes(item.id)&&!itemFitsCreature(item,def))return false;
                 return true;
               })
               .sort((a,b)=>{
   const ea=equipped.includes(a.id)?1:0,eb=equipped.includes(b.id)?1:0;if(eb!==ea)return eb-ea;
-  const dA=((a.element&&def.type!==a.element)||(a.role&&def.role!==a.role)||(a.attackType&&def.attackType!==a.attackType))?1:0;
-  const dB=((b.element&&def.type!==b.element)||(b.role&&def.role!==b.role)||(b.attackType&&def.attackType!==b.attackType))?1:0;
+  const dA=itemFitsCreature(a,def)?0:1;
+  const dB=itemFitsCreature(b,def)?0:1;
   if(dA!==dB)return dA-dB;
   const ascA=equipmentAscensions[a.id]||0,ascB=equipmentAscensions[b.id]||0;
   const copA=equipmentCopies[a.id]||0,copB=equipmentCopies[b.id]||0;
@@ -712,7 +712,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             const isEquippedSlot1=equipped[1]===item.id;
             const equippedByPet=owned&&Object.values(owned).find(p=>p.id!==ownedData.id&&(p.equipped||[]).includes(item.id));
             const equippedByDef=equippedByPet?CREATURE_MAP[equippedByPet.id]:null;
-            const disabled=(item.element&&def.type!==item.element)||(item.role&&def.role!==item.role)||(item.attackType&&def.attackType!==item.attackType);
+            const disabled=!itemFitsCreature(item,def);
             // During the guided "choose gear" step, only the Iron Band tile
             // the pointer arrow highlights should respond to a tap.
             const tutorialBlocked=pickerTutorialLock&&!(tutorialStep==="item"&&item.id===TUTORIAL_ITEM_ID);
@@ -751,8 +751,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=equipMaxLevel(item.id)?"MAX":"Lv "+lvl),
-                (item.element||item.role||item.attackType)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
-                  [item.element,item.role,item.attackType].filter(Boolean).join(" · ")+" exclusive"
+                isExclusive(item)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
+                  exclusivityCaption(item)
                 )
               ),
               !tutorialBlocked&&React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
@@ -809,7 +809,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       },"Evolutions")
     )}),
     notify&&React.createElement(Notify,{msg:notify}),
-    equipConflict&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
+    equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},EQUIPMENT_MAP[equipConflict.itemId]?.emoji),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
@@ -822,7 +822,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         )
       )
     ),
-    confirmMelon&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}},
+    confirmMelon&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},ascMelon.emoji),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Use "+ascMelon.label+"s?"),
@@ -849,7 +849,6 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
         ),
         React.createElement("div",{style:{textAlign:"center"}},
-          ownedData.ascensions>0&&React.createElement("div",{style:{marginBottom:4}},React.createElement(AscStars,{n:ownedData.ascensions})),
           // No name or level under the portrait -- the name is already in the
           // ScreenHeader and the level sits top-right -- so the art gets the
           // freed space (130px, up from 100). Art renders transparent, no
@@ -857,9 +856,18 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           // background.
           React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{margin:"0 auto"}})
         ),
-        // Top-right: level. (Flair Effects lives in the ScreenHeader's right
-        // slot, beside Evolutions.)
-        React.createElement("span",{style:{position:"absolute",top:0,right:0,fontSize:17,fontWeight:700,color:"#666"}},"Lv "+ownedData.level)
+        // Top-right: level, with the ascension stars tucked under it. Same
+        // banded row the Collection cards draw (colour = band of ten, ringed
+        // star = worth two), just smaller -- it reads as a detail line beside
+        // the level here rather than a headline over the art.
+        React.createElement("div",{style:{position:"absolute",top:0,right:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3}},
+          React.createElement("span",{style:{fontSize:17,fontWeight:700,color:"#666"}},"Lv "+ownedData.level),
+          (()=>{
+            const asc=ascStarTier(ownedData.ascensions);
+            if(!asc.count)return null;
+            return React.createElement(AscStars,{n:asc.count,max:5,doubled:asc.doubled,colors:asc.colors,slotted:true,style:{fontSize:11,gap:1,...asc.style}});
+          })()
+        )
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},
         STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))

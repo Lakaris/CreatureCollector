@@ -14,24 +14,22 @@
 // advances the simulation and reports what happened.
 
 import { CREATURE_MAP } from "../data/creatures.js";
-import { MELEE_RANGE, RANGED_RANGE, BOSS_SIZE } from "./constants.js";
+import { BOSS_SIZE } from "./constants.js";
 import {
   aChebDist, aCardinalDist, aBestStep,
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
-  cellsOf, unitDist, unitCardinalDist,
+  cellsOf, unitDist, unitCardinalDist, attackRangeOf,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier } from "./status.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained } from "./status.js";
 import { damageUnit } from "./hp.js";
 import { tickMinionSpecials } from "./minions.js";
-import { unitDamage, playerDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
+import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
 import { getBossModule } from "./bosses/registry.js";
 import { makeBossContext } from "./bosses/context.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
 /** Rate applied to a player-inflicted Burn's stored source ATK, per tick. */
 const PLAYER_BURN_RATE = 0.035;
-/** Same rate for a player-inflicted Damage Over Time (Spectral Rake). */
-const PLAYER_DOT_RATE = 0.035;
 /** Rate applied to a fire trail's stored source ATK, per tick (e.g. Emberstar's Charging Pierce lvl 5). */
 const FIRE_TRAIL_RATE = 0.03;
 
@@ -75,7 +73,12 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
     nearestOpenCell(r, c) {
       return nearestOpenCell(r, c, blocked, gridRows, gridCols);
     },
+    /** Teleport the unit outright (Zephyr Step, Scapegoat, Ghostly Step).
+     * Refuses while Rooted -- Root stops movement by ANY means, not just
+     * walking -- and returns whether the unit actually moved, so a special
+     * that has to close the distance can bail instead of striking from afar. */
     relocate(nr, nc) {
+      if (!canMove) return false;
       allOcc.delete(unit.row + "," + unit.col);
       unit.prevRow = unit.row;
       unit.prevCol = unit.col;
@@ -83,6 +86,7 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       unit.row = nr;
       unit.col = nc;
       allOcc.add(nr + "," + nc);
+      return true;
     },
     /** Add a freshly-summoned unit (e.g. Doomshade's Wisp) to the acting
      * unit's own side. It joins the battle on the NEXT tick -- it is not in
@@ -106,6 +110,23 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       return canMove ? doStep(tr, tc) : false;
     },
   };
+}
+
+/**
+ * Blind (Pollen Veil): a blinded creature still takes its swing and still
+ * pays the cooldown -- it just misses, landing no damage and none of the
+ * on-hit effects. Returns true when the caller should end this unit's turn.
+ *
+ * Called at each basic-attack site rather than inside damageUnit, because
+ * only the attack sites know who is swinging. Specials are unaffected by
+ * design: Blind stops attacks, not abilities.
+ */
+function missBlindedSwing(u, row, col, penalty, newFx, now, isEnemySide) {
+  if (!consumeBlind(u)) return false;
+  u.atkCd = attackCooldown(u, penalty);
+  u.lastAttackTime = now;
+  newFx.push({ id: now + "miss" + u.uid, row, col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: isEnemySide, isMiss: true });
+  return true;
 }
 
 /** How long the "!" ability-ready marker stays visible, in ticks. */
@@ -153,7 +174,7 @@ export function specialChargeReady(u) {
  * deliberately fires from anywhere).
  */
 export function specialTargetInRange(u, allies, enemies, boss) {
-  const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+  const range = attackRangeOf(u);
   for (const e of enemies) {
     if (unitDist(u, e) <= range) return true;
   }
@@ -231,10 +252,27 @@ function tauntedFoe(u, foes) {
  * pulls anyone: units out of range keep doing whatever they were doing.
  */
 function markedFoeInRange(u, foes) {
-  const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+  const range = attackRangeOf(u);
   let best = null, bestD = Infinity;
   for (const f of foes) {
     if ((f.markedTicks || 0) <= 0 || f.hp <= 0 || isIntangible(f)) continue;
+    const d = unitDist(u, f);
+    if (d <= range && d < bestD) { bestD = d; best = f; }
+  }
+  return best;
+}
+
+/**
+ * Death Feast (Bonebeak line): the nearest foe ALREADY within this unit's
+ * attack range that is carrying a Damage Over Time, or null. Like Marked,
+ * this redirects the attack only -- it never pulls the vulture toward a
+ * rotting target it cannot already reach.
+ */
+function dotFoeInRange(u, foes) {
+  const range = attackRangeOf(u);
+  let best = null, bestD = Infinity;
+  for (const f of foes) {
+    if ((f.dotTicks || 0) <= 0 || f.hp <= 0 || isIntangible(f)) continue;
     const d = unitDist(u, f);
     if (d <= range && d < bestD) { bestD = d; best = f; }
   }
@@ -295,15 +333,26 @@ function selectTarget(u, foes) {
     const mk = markedFoeInRange(u, foes);
     if (mk) {
       return {
-        atkTgt: u.isRanged && unitCardinalDist(u, mk) <= RANGED_RANGE ? mk : null,
+        atkTgt: u.isRanged && unitCardinalDist(u, mk) <= attackRangeOf(u) ? mk : null,
         moveTgt: mk,
       };
+    }
+    // Death Feast's preference, same shape as Marked and ranked below it:
+    // switch onto a rotting foe already in reach, without moving for it.
+    if (u.prefersDotTargets) {
+      const rotting = dotFoeInRange(u, foes);
+      if (rotting) {
+        return {
+          atkTgt: u.isRanged && unitCardinalDist(u, rotting) <= attackRangeOf(u) ? rotting : null,
+          moveTgt: rotting,
+        };
+      }
     }
   }
   let atkTgt = null;
   if (u.isRanged) {
     const inLine = foes.filter(
-      (f) => unitCardinalDist(u, f) <= RANGED_RANGE
+      (f) => unitCardinalDist(u, f) <= attackRangeOf(u)
     );
     if (inLine.length) {
       atkTgt = inLine.sort(
@@ -354,7 +403,7 @@ export function runBattleTick(state, config) {
 
     const canMove = !isRooted(u);
     const penalty = speedPenalty(u);
-    const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+    const range = attackRangeOf(u);
     const distB = bossAlive ? distToBoss(boss, u.row, u.col) : Infinity;
 
     const abilMod = getPlayerAbilityModule(u.creatureId);
@@ -390,7 +439,11 @@ export function runBattleTick(state, config) {
         ? abilMod.specialInRange(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols })
         : specialTargetInRange(u, aliveP, aliveE, rangeBoss);
       if (abilMod?.special) {
-        if (canMove && inRange) {
+        // Rooted units still cast: Root holds a creature in place, it does not
+        // silence it (see isRooted in status.js). Repositioning specials are
+        // held back inside the context instead -- ctx.relocate refuses while
+        // Rooted -- so the creature acts without ever leaving its tile.
+        if (inRange) {
           const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "special", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
           abilMod.special(u, specialCtx);
           consumeSpecialCharge(u);
@@ -415,15 +468,16 @@ export function runBattleTick(state, config) {
     // melee attacker, or any unit with a Marked foe already in reach (the
     // minion-fight branch below).
     if (distB <= range && bossAlive && !tauntedFoe(u, aliveE) && !retaliationFoe(u, aliveE) && !markedFoeInRange(u, aliveE)) {
+      if (u.atkCd <= 0 && missBlindedSwing(u, boss.row + 0.5, boss.col + 0.5, penalty, newFx, now, false)) continue;
       if (u.atkCd <= 0) {
         // The swing itself is basic damage; an onHit bonus rides along with it
         // but belongs to the passive that granted it.
         let basicDmg = 0, passiveDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
-          const dmgToBoss = Math.max(1, Math.round(playerDamageToBoss(u, boss, aliveP) * dmgMultVs(boss) / hits));
+          const dmgToBoss = Math.max(1, Math.round(basicDamageToBoss(u, boss, aliveP) * dmgMultVs(boss) / hits));
           damageBoss(boss, dmgToBoss);
           basicDmg += dmgToBoss;
-          const bonus = abilMod?.onHit ? abilMod.onHit(u, boss) : 0;
+          const bonus = abilMod?.onHit ? abilMod.onHit(u, boss, dmgToBoss) : 0;
           if (bonus) { damageBoss(boss, bonus); passiveDmg += bonus; }
         }
         creditDamage(state, u.creatureId, basicDmg, "basic");
@@ -441,19 +495,28 @@ export function runBattleTick(state, config) {
       const tgt = atkTgt || moveTgt;
       if (tgt) {
         const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
+        if (dist <= range && u.atkCd <= 0 && missBlindedSwing(u, tgt.row, tgt.col, penalty, newFx, now, false)) continue;
         if (dist <= range && u.atkCd <= 0) {
           let basicDmg = 0, passiveDmg = 0;
-          const tgtMod = getPlayerAbilityModule(tgt.creatureId);
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
-            const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt) / hits));
-            basicDmg += damageUnit(tgt, dmg);
-            const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-            if (bonus) passiveDmg += damageUnit(tgt, bonus);
+            const dmg = Math.max(1, Math.round(basicUnitDamage(u, tgt) * dmgMultVs(tgt) / hits));
+            const dealt = damageUnit(tgt, dmg);
+            basicDmg += dealt;
+            // Protect may have handed this hit to a guardian: the on-hit
+            // effects, the dodge check, and the defender's reflect all belong
+            // to whoever actually took it (see Protect in hp.js).
+            const hit = tgt._redirectedTo || tgt;
+            // A dodged swing lands nothing: no damage, no on-hit effects, and
+            // nothing for the defender to reflect (see Dodge in hp.js).
+            if (hit._dodgedHit) continue;
+            const hitMod = getPlayerAbilityModule(hit.creatureId);
+            const bonus = abilMod?.onHit ? abilMod.onHit(u, hit, dealt) : 0;
+            if (bonus) passiveDmg += damageUnit(hit, bonus);
             // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
             // returns a slice of the hit to the attacker. Reflected damage is
-            // never itself reflected.
-            const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
-            if (reflect) damageUnit(u, reflect);
+            // never itself reflected, and counts as effect damage.
+            const reflect = hitMod?.onDamaged ? hitMod.onDamaged(hit, u, dmg + bonus) : 0;
+            if (reflect) damageUnit(u, reflect, { effectDamage: true });
           }
           creditDamage(state, u.creatureId, basicDmg, "basic");
           creditDamage(state, u.creatureId, passiveDmg, "passive");
@@ -491,7 +554,7 @@ export function runBattleTick(state, config) {
 
     const canMove = !isRooted(u);
     const penalty = speedPenalty(u);
-    const range = u.isRanged ? RANGED_RANGE : MELEE_RANGE;
+    const range = attackRangeOf(u);
 
     const abilMod = getPlayerAbilityModule(u.creatureId);
     const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
@@ -506,7 +569,8 @@ export function runBattleTick(state, config) {
         ? abilMod.specialInRange(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols })
         : specialTargetInRange(u, aliveE, aliveP, null);
       if (abilMod?.special) {
-        if (canMove && inRange) {
+        // Same as the player side: Rooted casts, it just can not relocate.
+        if (inRange) {
           abilMod.special(u, enemyCtx());
           consumeSpecialCharge(u);
         }
@@ -525,19 +589,26 @@ export function runBattleTick(state, config) {
     if (!tgt) continue;
 
     const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
+    if (dist <= range && u.atkCd <= 0 && missBlindedSwing(u, tgt.row, tgt.col, penalty, newFx, now, true)) continue;
     if (dist <= range && u.atkCd <= 0) {
-      const tgtMod = getPlayerAbilityModule(tgt.creatureId);
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
-        const dmg = Math.max(1, Math.round(unitDamage(u, tgt) * dmgMultVs(tgt) / hits));
-        damageUnit(tgt, dmg);
-        const bonus = abilMod?.onHit ? abilMod.onHit(u, tgt) : 0;
-        if (bonus) damageUnit(tgt, bonus);
+        const dmg = Math.max(1, Math.round(basicUnitDamage(u, tgt) * dmgMultVs(tgt) / hits));
+        const dealt = damageUnit(tgt, dmg);
+        // Protect may have handed this hit to a guardian: the on-hit effects,
+        // the dodge check, and the defender's reflect all belong to whoever
+        // actually took it (see Protect in hp.js).
+        const hit = tgt._redirectedTo || tgt;
+        // A dodged swing lands nothing (see Dodge in hp.js).
+        if (hit._dodgedHit) continue;
+        const hitMod = getPlayerAbilityModule(hit.creatureId);
+        const bonus = abilMod?.onHit ? abilMod.onHit(u, hit, dealt) : 0;
+        if (bonus) damageUnit(hit, bonus);
         // Reflect passives: a player-side defender's reflect counts toward
-        // its damage chart.
-        const reflect = tgtMod?.onDamaged ? tgtMod.onDamaged(tgt, u, dmg + bonus) : 0;
+        // its damage chart, and counts as effect damage.
+        const reflect = hitMod?.onDamaged ? hitMod.onDamaged(hit, u, dmg + bonus) : 0;
         if (reflect) {
-          damageUnit(u, reflect);
-          creditDamage(state, tgt.creatureId, reflect, "passive");
+          damageUnit(u, reflect, { effectDamage: true });
+          creditDamage(state, hit.creatureId, reflect, "passive");
         }
       }
       // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
@@ -561,19 +632,17 @@ export function runBattleTick(state, config) {
   for (const u of aliveE) {
     if ((u.burnTicks || 0) > 0) {
       const dmg = Math.max(1, Math.round((u.burnSourceAtk || 10) * PLAYER_BURN_RATE));
-      damageUnit(u, dmg);
+      damageUnit(u, dmg, { effectDamage: true });
       u.burnTicks--;
       newFx.push({ id: now + "pbrn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
-    // Player-inflicted Damage Over Time (Spectral Rake) on minions. Enemy
-    // Doomshades' DoT on players ticks in tickStatusEffects instead.
-    if ((u.dotTicks || 0) > 0 && u.dotSourceAtk) {
-      const dmg = Math.max(1, Math.round(u.dotSourceAtk * PLAYER_DOT_RATE));
-      damageUnit(u, dmg);
-      u.dotTicks--;
-      if (!u.dotTicks) u.dotSourceAtk = 0;
-      newFx.push({ id: now + "pdot" + u.uid, row: u.row, col: u.col, t: now, isDark: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
-    }
+    // Player-inflicted Damage Over Time (Carrion Rip, Spectral Rake) and
+    // Poison on minions -- scaled off the victim's own max Health, like every
+    // over-time effect. Enemy-inflicted ones on players tick in
+    // tickStatusEffects instead.
+    const hurt = (dmg) => damageUnit(u, dmg, { effectDamage: true });
+    tickOverTime(u, "dot", hurt, newFx, now, "p");
+    tickOverTime(u, "poison", hurt, newFx, now, "p");
   }
   if (bossAlive && (boss.burnTicks || 0) > 0) {
     const dmg = Math.max(1, Math.round((boss.burnSourceAtk || 10) * PLAYER_BURN_RATE));
@@ -581,12 +650,12 @@ export function runBattleTick(state, config) {
     boss.burnTicks--;
     newFx.push({ id: now + "pbrn" + "boss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
   }
-  if (bossAlive && (boss.dotTicks || 0) > 0 && boss.dotSourceAtk) {
-    const dmg = Math.max(1, Math.round(boss.dotSourceAtk * PLAYER_DOT_RATE));
-    damageBoss(boss, dmg);
-    boss.dotTicks--;
-    if (!boss.dotTicks) boss.dotSourceAtk = 0;
-    newFx.push({ id: now + "pdot" + "boss", row: boss.row, col: boss.col, t: now, isDark: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
+  if (bossAlive) {
+    // Boss damage skips damageUnit (it has its own shield pool), and it has
+    // no uid of its own, so both are passed in explicitly.
+    const hurtBoss = (dmg) => damageBoss(boss, dmg);
+    tickOverTime(boss, "dot", hurtBoss, newFx, now, "p", "boss");
+    tickOverTime(boss, "poison", hurtBoss, newFx, now, "p", "boss");
   }
 
   // Fire trails left behind by abilities (e.g. Emberstar's Charging Pierce
@@ -597,7 +666,7 @@ export function runBattleTick(state, config) {
       for (const u of victims) {
         if (trail.cells.has(u.row + "," + u.col)) {
           const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
-          damageUnit(u, dmg);
+          damageUnit(u, dmg, { effectDamage: true });
           newFx.push({ id: now + "trail" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
         }
       }
@@ -632,13 +701,24 @@ export function runBattleTick(state, config) {
         if (triggered.has(u.uid)) continue;
         if (u._lastStepTick === state.tick && hz.cells.has(u.prevRow + "," + u.prevCol)) {
           triggered.add(u.uid);
-          damageUnit(u, hz.dmg);
+          damageUnit(u, hz.dmg, { effectDamage: true });
           newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
         }
       }
       hz.ticksLeft--;
       return hz.ticksLeft > 0;
     });
+  }
+
+  // ── Restrained upkeep ────────────────────────────────────────────────────
+  // Restrained is a leash, not a timer: it falls off the moment the carrier is
+  // outside the reach of whoever applied it. Runs here, after every unit has
+  // finished moving, so it reads the positions the tick actually ended on.
+  {
+    const findUnit = (uid) =>
+      state.playerUnits.find((u) => u.uid === uid) || state.enemyUnits.find((u) => u.uid === uid);
+    tickRestrained(aliveP, findUnit);
+    tickRestrained(aliveE, findUnit);
   }
 
   // ── Summons ──────────────────────────────────────────────────────────────

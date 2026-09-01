@@ -22,6 +22,7 @@ import { attackCooldown } from "../damage.js";
 import { aChebDist } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS } from "../constants.js";
 import { speedPenalty, isStunned, applyStatMod, healReceivedMultiplier } from "../status.js";
+import { applyShield } from "../hp.js";
 
 /** Absolute heal per basic level (the ability text's HEAL badge values). */
 const BASIC_HEAL_BY_LEVEL = [10, 12, 14, 17, 20];
@@ -101,8 +102,7 @@ export function makeJadebunModule(cfg) {
       if (idx >= MAX_IDX) {
         // Shield for the heal amount; never stomp a bigger shield the ally
         // already carries (this is the game's first ally-granted shield).
-        tgt.shield = Math.max(tgt.shield || 0, heal);
-        tgt.shieldTicks = STATUS_TICKS;
+        applyShield(tgt, heal, STATUS_TICKS);
       }
       newFx.push({ id: now + "sd" + unit.uid, row: tgt.row, col: tgt.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },

@@ -17,12 +17,14 @@
 
 import { attackRoll, damageBoss } from "../damage.js";
 import { aChebDist, distToBoss } from "../geometry.js";
-import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
+import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
-const BASIC_DMG_BY_LEVEL = [14, 16, 18, 20, 23];
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
+// Tank-priced (1.17-1.67x): the epic tank sits a notch above the commons and
+// Morusk's 1.42x cap, but stays under every Attacker's opener.
+const BASIC_DMG_BY_LEVEL = [14, 15, 17, 20, 20];
 const SPECIAL_DMG_BY_LEVEL = [26, 29, 33, 38, 38];
 /** Prism Shell: % of each attack hit returned to the attacker, by unique level. */
 const REFLECT_PCT_BY_LEVEL = [3, 6, 9, 12, 15];
@@ -41,7 +43,7 @@ export function makeCrystalcrabModule(cfg) {
     /** Crystal Claw: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Prism Shell: reflect a % of every attack hit back at the attacker. */
@@ -59,7 +61,7 @@ export function makeCrystalcrabModule(cfg) {
     special(unit, ctx) {
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
-      const mult = specialDmgByLevel[idx] / basicDmgByLevel[0];
+      const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
 
       let best = null, bestD = Infinity;
       for (const e of aliveE) {

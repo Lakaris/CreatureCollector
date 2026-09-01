@@ -17,11 +17,11 @@
 
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies, aCardinalDist } from "../geometry.js";
-import { BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [30, 34, 38, 43, 43];
 const SPECIAL_DMG_BY_LEVEL = [55, 62, 70, 80, 80];
 /** Stoked Flames: +damage% per stack of Burn on the target, by unique level. */
@@ -68,7 +68,7 @@ export function makeIgnissaurModule(cfg) {
     /** Magma Fang level scaling x Stoked Flames' per-Burn-stack amplifier. */
     dmgMultForAttack(unit, target) {
       const idx = abilityIdx(unit, "basic");
-      return (basicDmgByLevel[idx] / basicDmgByLevel[0]) * stokedMult(unit, target);
+      return (basicDmgByLevel[idx] / BASIC_DMG_BASELINE) * stokedMult(unit, target);
     },
 
     /** Magma Fang lvl 5: every landed hit inflicts a stack of Burn. */
@@ -109,7 +109,7 @@ export function makeIgnissaurModule(cfg) {
       if (!dir) return;
 
       const idx = abilityIdx(unit, "special");
-      const ratio = specialDmgByLevel[idx] / basicDmgByLevel[0];
+      const ratio = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const burns = idx >= MAX_IDX;
       let totalDmg = 0, hitBoss = false;
 

@@ -5,6 +5,7 @@ import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_LABELS } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../../data/equipment.js";
+import { isExclusive, exclusivityChip } from "../../../core/equipment.js";
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
@@ -22,10 +23,32 @@ import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import useRangePreview from "../../../ui/hooks/useRangePreview.js";
+import useFitTile from "../../../ui/hooks/useFitTile.js";
 
 // Shared empty grid so a boss with no deployment yields a stable identity
 // instead of a fresh {} every render.
 const EMPTY_GRID={};
+
+// The boss-select page wears its boss's element: a desaturated wash of the
+// type's colour behind the white cards. Yellow (Electric) and gold (Light)
+// are kept apart by warmth -- gold sits darker and browner. The container
+// transitions between these when another boss is tapped.
+// Boss bar display order only. DUNGEON_BOSSES itself must not be reordered:
+// the Daily Boss rotation indexes into it by level, so shuffling the array
+// would silently reassign which boss appears on which day.
+const DUNGEON_BAR_ORDER=["fire","nature","earth","wind","electric","water","light","dark"];
+
+const DUNGEON_BG_BY_TYPE={
+  Fire:"#f0d4cf",     // red
+  Nature:"#e2efe0",   // green
+  Earth:"#ece2d5",    // brown
+  Electric:"#f7f3d4", // yellow
+  Water:"#dfeaf6",    // blue
+  Light:"#f2e7c6",    // gold
+  Dark:"#e9e2f3",     // purple
+  Wind:"#e7e9ec",     // grey
+};
 
 function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   const { currencies, setCurrencies, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, passRechargeCount, setPassRechargeCount, dungeonBossLevels, setDungeonBossLevels, owned, unlockedSkins, dungeonDeepLink, setDungeonDeepLink, dungeonPlanGrid: dPlanGrids, setDungeonPlanGrid: setDPlanGrids, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, dungeonStarterPackPurchased } = useGame();
@@ -56,6 +79,30 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   const [dPlanHighlight,setDPlanHighlight]=useState(null);
   const [dBossMinimized,setDBossMinimized]=useState(false);
   const [dCreatureMinimized,setDCreatureMinimized]=useState(false);
+  // Indices of the EXPANDED minion cards -- a set rather than a boolean, since
+  // a boss may bring any number of them and each folds on its own.
+  //
+  // Tracking which are open (rather than which are closed) is what makes them
+  // start closed: the boss is the headline of this column and the minions are
+  // a footnote to it, so they arrive as collapsed headers and cost nothing
+  // until asked for. An empty set is "all closed" whatever the boss brings,
+  // with no need to seed one entry per minion each time the boss changes.
+  const [dMinionExpanded,setDMinionExpanded]=useState(()=>new Set());
+  // A different boss is a fresh column: the boss card open, its minions closed.
+  // Without this, collapsing the boss card to make room for a minion here would
+  // follow you to the next boss, which has nothing to do with that decision.
+  React.useEffect(()=>{
+    setDMinionExpanded(new Set());
+    setDBossMinimized(false);
+    setDCreatureMinimized(false);
+  },[selected]);
+  function toggleDMinion(i){
+    setDMinionExpanded(p=>{
+      const n=new Set(p);
+      if(n.has(i))n.delete(i);else{n.add(i);expandDPanel("minion");}
+      return n;
+    });
+  }
   const [dAbilityTagPopup,setDAbilityTagPopup]=useState(null);
   const [dBattling,setDBattling]=useState(false);
   const [dBattleOutcome,setDBattleOutcome]=useState(null);
@@ -81,22 +128,34 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   React.useLayoutEffect(()=>{
     if(!dRightPanelRef.current)return;
     if(dGridInfoCreature){
+      // The creature the player just asked to see wins the column; the boss
+      // card, then the minion cards, fold up to pay for it -- in that order,
+      // because the boss card is the longest.
       setDCreatureMinimized(false);
       const el=dRightPanelRef.current;
       if(el.scrollHeight>el.clientHeight+4)setDBossMinimized(true);
+      requestAnimationFrame(()=>{
+        const e2=dRightPanelRef.current;if(!e2)return;
+        if(e2.scrollHeight>e2.clientHeight+4)minimizeAllMinions();
+      });
     } else {
       setDBossMinimized(false);
       setDCreatureMinimized(false);
+      minimizeAllMinions();
     }
   },[dGridInfoCreature]);
-  // Whichever panel the player just expanded wins the space; if the two together
-  // don't fit, the OTHER panel auto-minimizes to make room.
+  function minimizeAllMinions(){
+    setDMinionExpanded(new Set());
+  }
+  // Whichever panel the player just expanded wins the space; if the cards
+  // together don't fit, the OTHERS auto-minimize to make room.
   function expandDPanel(which){
     requestAnimationFrame(()=>{
       const el=dRightPanelRef.current;if(!el)return;
-      if(el.scrollHeight>el.clientHeight+4){
-        if(which==="boss")setDCreatureMinimized(true);else setDBossMinimized(true);
-      }
+      if(el.scrollHeight<=el.clientHeight+4)return;
+      if(which==="boss"){setDCreatureMinimized(true);minimizeAllMinions();}
+      else if(which==="minion"){setDBossMinimized(true);setDCreatureMinimized(true);}
+      else {setDBossMinimized(true);minimizeAllMinions();}
     });
   }
   const dhs=React.useRef({delay:null,raf:null,id:null,fired:false});
@@ -143,7 +202,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const {newFx,acted,now}=runBattleTick(s,{gridRows:DUNGEON_GRID_ROWS,gridCols:DUNGEON_GRID_COLS});
     if(!acted)return;
     const b=s.boss;
-    if(newFx.length)setDAtkFx(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:e.isDark?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
+    if(newFx.length)setDAtkFx(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:(e.isDark||e.isPoison)?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
     setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
     const dGameElapsed=(Date.now()-dBattleStartRef.current)*dSpeedRef.current;
     const dTL=Math.min(60,Math.ceil(Math.max(0,60000-dGameElapsed)/1000));
@@ -190,12 +249,14 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const bStats=getBossStats(boss,bossLevel);
     const bRow=1,bCol=Math.floor((DUNGEON_GRID_COLS-2)/2);
     battle.boss={row:bRow,col:bCol,prevRow:bRow,prevCol:bCol,lastMoveTime:Date.now()-dAnimRef.current,hp:bStats.hp,maxHp:bStats.hp,atk:bStats.atk,atkCd:0,moveCd:0,specialCd:10,_bossKey:boss.key};
-    if(boss.key==='nature'){
+    if(boss.minions){
       const vNow=Date.now();const vHP=Math.round(80*4*(1+bossLevel*0.15));const vATK=Math.round(25*(1+bossLevel*0.1));
-      battle.enemyUnits.push(
-        {uid:"vm0",creatureId:"__vine_minion",row:4,col:1,prevRow:4,prevCol:1,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,isRanged:false,atkCd:3,specialCd:8,isVineMinion:true},
-        {uid:"vm1",creatureId:"__vine_minion",row:4,col:4,prevRow:4,prevCol:4,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,isRanged:false,atkCd:5,specialCd:12,isVineMinion:true}
-      );
+      // Staggered opening cooldowns so the pair doesn't act in lockstep.
+      const OPENING_CDS=[[3,8],[5,12]];
+      battle.enemyUnits.push(...boss.minions.map((m,i)=>{
+        const [atkCd,specialCd]=OPENING_CDS[i%OPENING_CDS.length];
+        return {uid:"vm"+i,creatureId:"__vine_minion",row:m.row,col:m.col,prevRow:m.row,prevCol:m.col,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,isRanged:false,atkCd,specialCd,isVineMinion:true};
+      }));
     }
     dBRef.current=battle;
     startDRenderLoop();
@@ -232,11 +293,26 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     dApplyDrop(r,c,{id:dDragId,fromCell:dDragCell});
     setDDragId(null);setDDragCell(null);
   }
+  // Attack-range preview: while a creature is being dragged over the grid, tint
+  // every tile it would be able to reach from the cell under the pointer.
+  const dRangePreview=useRangePreview(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS);
+  // Planning board shrinks to its column rather than making it scroll.
+  const [dPlanAreaRef,dPlanTile,dPlanClamped]=useFitTile(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_TILE,{reserveW:PLAN_PANEL_MIN_W});
+  /** The creature a drag is carrying, from either origin (tray or grid cell). */
+  function dDraggedCreature(){return dDragId||(dDragCell?dPlanGrid[dDragCell]:null);}
+  function dPreviewAt(cid,r,c){if(!cid){dRangePreview.clear();return;}dRangePreview.show(cid,r,c,owned&&owned[cid]);}
   const dTouchDrag=useTouchDragPlacement({
     cellSelector:"[data-cell]",
     applyDrop:dApplyDrop,
     onCancelHold:()=>{dEndHold();if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}},
     onCancelDrop:(fromCell)=>setDPlanGrid(p=>{const n={...p};delete n[fromCell];return n;}),
+    onDragOverCell:(cellKey,d)=>{
+      const cid=d.id||d.cellId;
+      if(!cellKey||!cid){dRangePreview.clear();return;}
+      const [r,c]=cellKey.split(",").map(Number);
+      if(r<DUNGEON_PLAYER_START_ROW){dRangePreview.clear();return;}
+      dPreviewAt(cid,r,c);
+    },
   });
   function dEndHoldDoc(){dEndHold();document.removeEventListener('mouseup',dEndHoldDoc);document.removeEventListener('touchend',dEndHoldDoc);}
   function dBeginHold(id){
@@ -315,7 +391,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   }
   if(dBattleOutcome){
     const won=dBattleOutcome==="won";
-    return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
+    return React.createElement("div",{key:"sfv338",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?"Dungeon Cleared!":"Defeat!"),
       React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?"Equipment rewards collected!":""),
@@ -329,7 +405,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const snapBoss=snap.boss;
     const selectedUnit=dBattleSelected?.type==="unit"?allUnits.find(u=>u.uid===dBattleSelected.uid):null;
     const selectedBoss=dBattleSelected?.type==="boss"?snapBoss:null;
-    return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv352",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
@@ -378,6 +454,9 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             if(e.isShock){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(250,204,21,0.55)",boxShadow:"inset 0 0 8px rgba(234,179,8,0.9)",animation:"shockLine 0.8s ease-out forwards",pointerEvents:"none",zIndex:20}});}
             if(e.isSplash){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:e.isCenter?"rgba(56,189,248,0.65)":"rgba(56,189,248,0.35)",boxShadow:"inset 0 0 8px rgba(14,165,233,0.8)",animation:`splashWave ${e.isCenter?0.8:1.1}s ease-out forwards`,animationDelay:e.isCenter?"0ms":"80ms",pointerEvents:"none",zIndex:20}});}
             if(e.isDark){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(109,40,217,0.45)",boxShadow:"inset 0 0 8px rgba(139,92,246,0.9)",animation:"splashWave 0.9s ease-out forwards",pointerEvents:"none",zIndex:20}});}
+            // Poison is Damage Over Time under another name, so it gets the same
+            // pulse as isDark above -- venom green instead of shadow purple.
+            if(e.isPoison){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(22,163,74,0.45)",boxShadow:"inset 0 0 8px rgba(74,222,128,0.9)",animation:"splashWave 0.9s ease-out forwards",pointerEvents:"none",zIndex:20}});}
             if(e.isHeal){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,borderRadius:"50%",background:"rgba(34,197,94,0.4)",boxShadow:"inset 0 0 8px rgba(22,163,74,0.9)",animation:"splashWave 0.7s ease-out forwards",pointerEvents:"none",zIndex:21}});}
             if(e.isGust){
               const dRow=e.row-e.fromRow,dCol=e.col-e.fromCol;
@@ -446,7 +525,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     // the real hit area cannot drift apart the way the old duplicated copies did.
     const planGeo=makePlanGeometry(PLAN_BOSS_ROW,PLAN_BOSS_COL,DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_PLAYER_START_ROW);
     const highlightCells=getHighlightTiles(boss.key,dPlanHighlight,planGeo);
-    return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv472",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       dAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dAbilityTagPopup,onClose:()=>setDAbilityTagPopup(null)}),
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
         React.createElement("button",{onClick:()=>{setDPlanning(false);},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
@@ -455,9 +534,11 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         ),
         React.createElement("button",{onClick:deployedCount>0?dFight:undefined,style:{background:deployedCount>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:deployedCount>0?"pointer":"default"}},"Fight →")
       ),
-      React.createElement("div",{style:{flex:1,overflowY:"auto",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
+      // Never scrolls -- dPlanTile shrinks the board to whatever height this
+      // row ends up with (see useFitTile).
+      React.createElement("div",{ref:dPlanAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:dPlanClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
         React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:`repeat(${DUNGEON_GRID_COLS},${DUNGEON_TILE}px)`,gridTemplateRows:`repeat(${DUNGEON_GRID_ROWS},${DUNGEON_TILE}px)`,gap:0}},
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:`repeat(${DUNGEON_GRID_COLS},${dPlanTile}px)`,gridTemplateRows:`repeat(${DUNGEON_GRID_ROWS},${dPlanTile}px)`,gap:0}},
             Array.from({length:DUNGEON_GRID_ROWS},(_,r)=>Array.from({length:DUNGEON_GRID_COLS},(_,c)=>{
               const isPlayerZone=r>=DUNGEON_PLAYER_START_ROW;const key=r+","+c;
               const creatureId=dPlanGrid[key];const def=creatureId?CREATURE_MAP[creatureId]:null;
@@ -467,41 +548,94 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
               const onHE=isPlayerZone&&creatureId?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}if(!dhs.current.fired&&!dTouchDrag.dragRef.current.active){setDPlanGrid(p=>{const n={...p};delete n[key];return n;});}dEndHold();}):enemyDef?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}}):undefined;
               return React.createElement("div",{key,"data-cell":key,draggable:!!(isPlayerZone&&creatureId),
                 onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDDragCell(key);setDDragId(null);}:undefined,
-                onDragOver:isPlayerZone?(e)=>e.preventDefault():undefined,
-                onDrop:isPlayerZone?(e)=>{e.preventDefault();handleDCellDrop(r,c);}:undefined,
+                onDragEnd:isPlayerZone&&creatureId?()=>dRangePreview.clear():undefined,
+                onDragOver:isPlayerZone?(e)=>{e.preventDefault();dPreviewAt(dDraggedCreature(),r,c);}:()=>dRangePreview.clear(),
+                onDrop:isPlayerZone?(e)=>{e.preventDefault();dRangePreview.clear();handleDCellDrop(r,c);}:undefined,
                 onMouseDown:onHS,onMouseUp:onHE,
                 onTouchStart:onHS?(e)=>{e.preventDefault();onHS();if(isPlayerZone&&creatureId)dTouchDrag.start(e,{fromCell:key,cellId:creatureId});}:undefined,onTouchEnd:onHE,
-                style:{width:DUNGEON_TILE,height:DUNGEON_TILE,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none"}
-              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:DUNGEON_TILE,contain:true}));})());
+                style:{width:dPlanTile,height:dPlanTile,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none",...(dRangePreview.cellStyle(key)||{})}
+              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:dPlanTile,contain:true}));})());
             })).flat()
           ),
-          React.createElement("div",{style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*DUNGEON_TILE,top:1*DUNGEON_TILE,width:2*DUNGEON_TILE,height:2*DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,pointerEvents:"none",zIndex:10}},
-            React.createElement("div",{style:{fontSize:36,lineHeight:1}},TYPE_EMOJI[boss?.type]||"👾"),
+          React.createElement("div",{style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*dPlanTile,top:1*dPlanTile,width:2*dPlanTile,height:2*dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,pointerEvents:"none",zIndex:10}},
+            React.createElement("div",{style:{fontSize:Math.round(dPlanTile*0.78),lineHeight:1}},TYPE_EMOJI[boss?.type]||"👾"),
             React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#ef4444",marginTop:2}},boss?.name)
           ),
-          boss?.key==='nature'&&React.createElement(React.Fragment,null,
-            React.createElement("div",{style:{position:"absolute",left:1*DUNGEON_TILE,top:4*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.10)",border:"2px solid rgba(34,197,94,0.5)",borderRadius:6,pointerEvents:"none",zIndex:10}},
-              React.createElement("div",{style:{fontSize:22,lineHeight:1}},"🌱"),
-              React.createElement("div",{style:{fontSize:8,fontWeight:800,color:"#16a34a",marginTop:1}},"Vine")
-            ),
-            React.createElement("div",{style:{position:"absolute",left:4*DUNGEON_TILE,top:4*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.10)",border:"2px solid rgba(34,197,94,0.5)",borderRadius:6,pointerEvents:"none",zIndex:10}},
-              React.createElement("div",{style:{fontSize:22,lineHeight:1}},"🌱"),
-              React.createElement("div",{style:{fontSize:8,fontWeight:800,color:"#16a34a",marginTop:1}},"Vine")
+          boss?.minions&&boss.minions.map((m,i)=>
+            React.createElement("div",{key:"minion"+i,style:{position:"absolute",left:m.col*dPlanTile,top:m.row*dPlanTile,width:dPlanTile,height:dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.10)",border:"2px solid rgba(34,197,94,0.5)",borderRadius:6,pointerEvents:"none",zIndex:10}},
+              React.createElement("div",{style:{fontSize:Math.round(dPlanTile*0.48),lineHeight:1}},m.emoji),
+              React.createElement("div",{style:{fontSize:8,fontWeight:800,color:"#16a34a",marginTop:1}},m.name)
             )
           )
         ),
-        React.createElement("div",{ref:dRightPanelRef,style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8,overflow:"hidden"}},
+        React.createElement("div",{ref:dRightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
           React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
             React.createElement("button",{onClick:()=>setDBossMinimized(p=>{const next=!p;if(!next)expandDPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dBossMinimized?"＋":"－"),
-            React.createElement("div",{style:{fontSize:28,lineHeight:1,marginBottom:6}},TYPE_EMOJI[boss?.type]||"👾"),
-            React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}},boss?.name),
-            React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:700,marginBottom:dBossMinimized?0:12}},"Lv. "+bossLevel),
+            // Emoji, level, then name on one row -- same header shape as the
+            // minion cards below, so the column reads as one kind of card.
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:dBossMinimized?0:12,paddingRight:24}},
+              React.createElement("div",{style:{fontSize:24,lineHeight:1,flexShrink:0}},TYPE_EMOJI[boss?.type]||"👾"),
+              React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:700,flexShrink:0}},"Lv. "+bossLevel),
+              React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},boss?.name)
+            ),
             !dBossMinimized&&boss?.abilities&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
-              [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>ab&&
-                React.createElement("div",{key:label,onClick:()=>setDPlanHighlight(p=>p===key?null:key),style:{background:dPlanHighlight===key?"rgba(239,68,68,0.10)":"transparent",borderRadius:8,padding:"8px 10px",margin:"0 -10px",border:dPlanHighlight===key?"1.5px solid rgba(239,68,68,0.5)":"1px solid transparent",cursor:"pointer"}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:2}},label),
+              [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>{
+                if(!ab)return null;
+                // A row is only interactive when tapping it would actually show
+                // something: the boss modules define tiles for their basic and
+                // special, never for a passive like Burning Touch, so those rows
+                // used to offer a pointer and a highlight that did nothing.
+                // Asking the same registry the highlight itself uses means a
+                // module that later gains passive tiles turns its row on with no
+                // change here.
+                const canHighlight=getHighlightTiles(boss.key,key,planGeo).size>0;
+                const on=canHighlight&&dPlanHighlight===key;
+                // The border stays 1.5px in both states and only changes colour.
+                // It used to be 1px when unselected, so selecting a row grew its
+                // border by half a pixel on every side and nudged the name and
+                // description as the highlight came and went.
+                return React.createElement("div",{key:label,onClick:canHighlight?()=>setDPlanHighlight(p=>p===key?null:key):undefined,style:{background:on?"rgba(239,68,68,0.10)":"transparent",borderRadius:8,padding:"8px 10px",margin:"0 -10px",border:"1.5px solid "+(on?"rgba(239,68,68,0.5)":"transparent"),cursor:canHighlight?"pointer":"default"}},
+                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},label),
+                    // Boss ability tags come from data/bosses.js; creature ones
+                    // are derived per creature by getAbilityTags.
+                    ab.tags&&ab.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                      React.createElement(AbilityTagPills,{tags:ab.tags,onOpen:setDAbilityTagPopup,compact:true})
+                    )
+                  ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},ab.name),
                   React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},ab.description)
+                );
+              })
+            )
+          ),
+          // One card per minion, not one per KIND -- each is its own creature
+          // with its own kit, so two Vines with different abilities would read
+          // correctly without any change here.
+          //
+          // Same shape as the boss card above, minus the tile-highlight rows:
+          // the Vines walk at you from the moment the fight starts, so any
+          // "these tiles" preview would stop being true after their first step.
+          // Where each one SPROUTS is already on the board as a marker.
+          ...(boss?.minions||[]).map((m,i)=>
+            React.createElement("div",{key:"minioncard"+i,style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative",flexShrink:0}},
+              React.createElement("button",{onClick:()=>toggleDMinion(i),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dMinionExpanded.has(i)?"－":"＋"),
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:dMinionExpanded.has(i)?12:0}},
+                React.createElement("div",{style:{fontSize:24,lineHeight:1}},m.emoji),
+                React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},m.name)
+              ),
+              dMinionExpanded.has(i)&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+                [["basic","Basic",m.abilities.basic],["special","Special",m.abilities.special],["unique","Passive",m.abilities.unique]].map(([key,label,ab])=>ab&&
+                  React.createElement("div",{key:label},
+                    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
+                      React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},label),
+                      ab.tags&&ab.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
+                        React.createElement(AbilityTagPills,{tags:ab.tags,onOpen:setDAbilityTagPopup,compact:true})
+                      )
+                    ),
+                    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},ab.name),
+                    React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},ab.description)
+                  )
                 )
               )
             )
@@ -528,7 +662,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
                   React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
                     React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
                     abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDAbilityTagPopup})
+                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDAbilityTagPopup,compact:true})
                     )
                   ),
                   React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
@@ -540,8 +674,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         )
       ),
       React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
-        onDragOver:e=>e.preventDefault(),
-        onDrop:e=>{e.preventDefault();if(dDragCell){setDPlanGrid(p=>{const n={...p};delete n[dDragCell];return n;});}setDDragId(null);setDDragCell(null);}
+        onDragOver:e=>{e.preventDefault();dRangePreview.clear();},
+        onDrop:e=>{e.preventDefault();dRangePreview.clear();if(dDragCell){setDPlanGrid(p=>{const n={...p};delete n[dDragCell];return n;});}setDDragId(null);setDDragCell(null);}
       },
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
           React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:4}},
@@ -580,6 +714,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             const CIRC=2*Math.PI*18;
             return React.createElement("div",{key:oc.id,"data-creature":oc.id,draggable:!isPlaced,
               onDragStart:!isPlaced?(e)=>{if(dDragScroll.current.intentScroll){e.preventDefault();return;}if(dhs.current.id===oc.id){e.preventDefault();return;}dEndHold();e.dataTransfer.effectAllowed="move";setDDragId(oc.id);setDDragCell(null);}:undefined,
+              onDragEnd:!isPlaced?()=>dRangePreview.clear():undefined,
               onMouseDown:()=>dBeginHold(oc.id),onMouseUp:dEndHold,
               onTouchStart:(e)=>{e.preventDefault();dBeginHold(oc.id);if(!isPlaced)dTouchDrag.start(e,{id:oc.id});},onTouchEnd:dEndHold,
               style:{flexShrink:0,width:52,height:58,position:"relative",background:isPlaced?"#f0f0f0":"#fff",border:"none",borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,cursor:isPlaced?"default":"grab",userSelect:"none"}
@@ -601,7 +736,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       dTouchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[dTouchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:dTouchDrag.ghost.x-26,top:dTouchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})()
     );
   }
-  if(rewards)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  if(rewards)return React.createElement("div",{key:"sfv627",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"🎁 Dungeon Rewards"),
       React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},rewards.length+" items from "+boss.name)
@@ -630,7 +765,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("button",{onClick:collectRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
     )
   );
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+  return React.createElement("div",{key:"sfv656",className:"screen-fade",style:{position:"fixed",inset:0,background:DUNGEON_BG_BY_TYPE[boss?.type]||"#f5f5f5",transition:"background 0.5s ease",display:"flex",flexDirection:"column"}},
     // Final beat of the post-Set-1 Dungeon reveal. Same box style/size as
     // every other tutorial text box in the game (see HomeScreen's) -- full
     // width, not sized to the Fight button. The arrow (near the Fight
@@ -716,11 +851,9 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
         React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},previewItem.emoji),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        (previewItem.element||previewItem.role||previewItem.attackType)&&React.createElement("div",{style:{textAlign:"center",marginBottom:8}},
+        isExclusive(previewItem)&&React.createElement("div",{style:{textAlign:"center",marginBottom:8}},
           React.createElement("span",{style:{fontSize:11,fontWeight:600,color:"#7c5cf6",background:"#f0effe",borderRadius:20,padding:"3px 12px",display:"inline-block"}},
-            previewItem.element?(TYPE_EMOJI[previewItem.element]||"")+" "+previewItem.element+" type exclusive"
-            :previewItem.role?{Attacker:"⚔️",Tank:"🛡️",Support:"💚"}[previewItem.role]+" "+previewItem.role+" role exclusive"
-            :{Melee:"🗡️",Ranged:"🏹"}[previewItem.attackType]+" "+previewItem.attackType+" exclusive"
+            exclusivityChip(previewItem)
           )
         ),
         previewItem.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},Object.entries(previewItem.stats).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ")),
@@ -783,7 +916,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     ),
     React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",flexShrink:0,paddingBottom:"env(safe-area-inset-bottom)"}},
       React.createElement("div",{style:{display:"flex",borderTop:"1px solid #e0e0e0"}},
-        DUNGEON_BOSSES.map(b=>React.createElement("button",{
+        DUNGEON_BAR_ORDER.map(k=>DUNGEON_BOSSES.find(b=>b.key===k)).filter(Boolean).map(b=>React.createElement("button",{
           key:b.key,onClick:()=>{if(dungeonEnterActive)return;setSelected(b.key);},
           style:{
             flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,

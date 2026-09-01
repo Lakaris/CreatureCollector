@@ -33,7 +33,7 @@ function TreasureScreen({onBack}){
       React.createElement("button",{onClick:()=>setTreasurePopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
     )
   );
-  const setCompletePopupEl=setCompletePopup&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:400,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
+  const setCompletePopupEl=setCompletePopup&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:400,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
     React.createElement("div",{style:{background:"#fff",borderRadius:24,padding:"32px 24px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 12px 48px rgba(0,0,0,0.22)",position:"relative",overflow:"hidden"}},
       React.createElement("div",{style:{fontSize:48,marginBottom:4}},"🎉"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#d97706",marginBottom:2}},setCompletePopup.name),
@@ -199,7 +199,7 @@ function TreasureScreen({onBack}){
     )
   );
   // Main screen
-  return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f5f5f5"}},
+  return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f5f5f5"}},
     treasurePopupEl,
     setCompletePopupEl,
     redeemPopupEl,

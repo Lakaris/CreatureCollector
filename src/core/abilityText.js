@@ -109,7 +109,10 @@ export function formatAbilityStep(text, prevText) {
  * effect lists (e.g. Deep Submerge's final tier) were pushing the ability
  * name and text around, especially on small screens.
  */
-export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest"]);
+// "beside" picks out allies rather than an enemy, but it is still a targeting
+// rule, so it rides with the others as its own pill instead of collapsing
+// into the Effects popup.
+export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest", "beside"]);
 
 /** Split an ability's tags into standalone targeting pills and collapsed effects. */
 export function splitAbilityTags(tags) {
@@ -122,26 +125,51 @@ export function splitAbilityTags(tags) {
 /** Small mechanic tags shown on ability cards (e.g. Emberstar's Charging Pierce); click opens a definition popup. */
 export const ABILITY_TAG_DEFS = {
   pierce: { label: "Pierce", description: "Deal damage to all enemies this attack passes through." },
-  closest: { label: "Closest", description: "Targets the closest enemy in range" },
-  farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range" },
-  burn: { label: "🔥 Burn", description: "Deals damage over time" },
-  energy: { label: "⚡ Energy", description: "Energy needed to use this ability" },
-  weakest: { label: "Weakest", description: "Targets the creature with the lowest current Health" },
-  cleanse: { label: "Cleanse", description: "Removes all debuffs" },
-  line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge" },
-  horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row" },
-  speedup: { label: "💨 Speed Up", description: "Increases the creature's Speed", stacking: [25, 50, 75, 100, 125] },
-  taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them" },
+  closest: { label: "Closest", description: "Targets the closest enemy in range." },
+  farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range." },
+  burn: { label: "Burn", description: "Deals damage over time." },
+  // Label only -- the blue charge pill draws its own ⚡ (see CreatureDetail
+  // and DexEntry); this is just the heading of the popup it opens.
+  energy: { label: "Energy", description: "Energy needed to use this ability." },
+  weakest: { label: "Weakest", description: "Targets the creature with the lowest current Health." },
+  beside: { label: "Beside", description: "Affects the allies standing in the tiles next to this creature." },
+  dodge: { label: "Dodge", description: "The attack misses; no damage and negative effects are dealt." },
+  // The same miss as Dodge, but worn by the attacker instead of the defender:
+  // a debuff spent by the swing it ruins, and deliberately not stackable.
+  blind: { label: "Blind", description: "This creature's next attack misses; no damage and negative effects are dealt." },
+  assist: { label: "Assist", description: "Called allies immediately use their Basic ability on the enemy this creature targeted." },
+  cleanse: { label: "Cleanse", description: "Removes all debuffs." },
+  line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge." },
+  horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row." },
+  speedup: { label: "Speed Up", description: "Increases the creature's Speed.", stacking: [25, 50, 75, 100, 125] },
+  taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them." },
   // Marked never pulls allies toward the target: only allies who already
   // have it within attack range switch onto it -- no forced movement.
-  marked: { label: "Marked", description: "All allies within range targets this creature" },
-  splash: { label: "Splash", description: "Affects all tiles surrounding the targeted creature" },
-  frostbite: { label: "❄️ Frostbite", description: "Water creatures deal 5% more damage to this creature", stacking: [5, 10, 15, 20, 25] },
+  marked: { label: "Marked", description: "All allies within range targets this creature." },
+  splash: { label: "Splash", description: "Affects all tiles surrounding the targeted creature." },
+  frostbite: { label: "Frostbite", description: "Water creatures deal 5% more damage to this creature.", stacking: [5, 10, 15, 20, 25] },
   hazard: { label: "Hazard", description: "Deal damage if a creature moves while on a tile with a Hazard on it." },
-  immortal: { label: "Immortal", description: "Health can not be reduced below 1" },
-  healovertime: { label: "Heal Over Time", description: "Restores Health over time" },
-  revive: { label: "Revive", description: "Returns to battle after being defeated" },
-  damageovertime: { label: "Damage Over Time", description: "Deals damage over time" },
+  immortal: { label: "Immortal", description: "Health can not be reduced below 1." },
+  healovertime: { label: "Heal Over Time", description: "Restores Health over time." },
+  revive: { label: "Revive", description: "Returns to battle after being defeated." },
+  // Each stack ticks for another DOT_HEALTH_PCT of the AFFECTED creature's
+  // max Health (see battle/status.js), so the per-stack totals below read as
+  // percentages of the victim's own health bar -- keep the two in sync.
+  damageovertime: { label: "Damage Over Time", maxStacks: 5, stackingLabel: "Damage per tick", stacking: [0.5, 1, 1.5, 2, 2.5], description: "Deals damage over time; each stack increases damage." },
+  // Poison is Damage Over Time under a second name: same per-stack damage,
+  // same cap, same duration, but its own independent stacks -- a creature can
+  // carry both at once, and an ability that eats one leaves the other alone.
+  poison: { label: "Poison", maxStacks: 5, stackingLabel: "Damage per tick", stacking: [0.5, 1, 1.5, 2, 2.5], description: "Deals damage over time; each stack increases damage." },
+  // Stacks are charges, not magnitude -- the reduction is a flat 50% at any
+  // stack count -- so this deliberately has no `stacking` table.
+  //
+  // Implementation notes: "damaged by an ability" covers basic attacks AND
+  // damaging specials -- both are reduced and both consume one stack. Effect
+  // damage (Burn, Damage Over Time, Hazards, reflects) is NOT reduced and
+  // never consumes a stack, so damage over time is the clean counter to a
+  // stacked-up Fortify. Fortify is an ordinary dispellable buff.
+  fortify: { label: "Fortify", maxStacks: 10, description: "Receive 50% less damage, remove 1 stack when damaged by an ability." },
+  dispel: { label: "Dispel", description: "Removes all debuffs." },
   // Summoned creatures carry their own type line and kit, rendered as a
   // miniature ability card by AbilityTagPopup.
   //
@@ -157,17 +185,44 @@ export const ABILITY_TAG_DEFS = {
       { key: "Passive", text: "Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health. Goes away when the Summoner is defeated." },
     ],
   },
-  attackup: { label: "Attack Up", description: "Increases the creature's Attack", stacking: [15, 30, 45, 60, 75] },
-  reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature" },
-  shield: { label: "Shield", description: "Temporary bonus Health" },
-  nearby: { label: "Nearby", description: "Affects this creature and every tile surrounding it" },
-  healdown: { label: "💔 Healing Down", description: "Reduces the creature's healing received", stacking: [20, 40, 60, 80, 100] },
-  stun: { label: "Stun", description: "For a small period of time, this creature can not attack and does not work towards their Special ability" },
-  restrained: { label: "Restrained", undispellable: true, description: "Interacts with this creature's abilities. Never expires." },
-  hastedown: { label: "Haste Down", description: "Reduces the creature's Haste", stacking: [5, 10, 15, 20, 25] },
-  speeddown: { label: "🐌 Speed Down", description: "Reduces the creature's Speed", stacking: [5, 10, 15, 20, 25] },
-  attackdown: { label: "Attack Down", description: "Reduces the creature's Attack", stacking: [15, 20, 25, 30, 40] },
-  defensedown: { label: "Defense Down", description: "Reduces the creature's Defense", stacking: [15, 20, 25, 30, 40] },
+  attackup: { label: "Attack Up", description: "Increases the creature's Attack.", stacking: [15, 30, 45, 60, 75] },
+  reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature." },
+  shield: { label: "Shield", description: "Temporary bonus Health." },
+  // Stacks are charges, not magnitude -- one stack soaks one redirected hit --
+  // so this has no `stacking` table, the same shape as Fortify. Which allies
+  // carry it is set by the granting ability's own targeting tag (Beside,
+  // Nearby, and so on). An ordinary dispellable buff.
+  protect: { label: "Protect", maxStacks: 5, description: "Redirect attacks and abilities to the creature that granted Protect; remove 1 stack whenever anything is redirected." },
+  counter: { label: "Counter", description: "Attacks the creature that attacked it." },
+  nearby: { label: "Nearby", description: "Affects this creature and every tile surrounding it." },
+  healdown: { label: "Healing Down", description: "Reduces the creature's healing received.", stacking: [20, 40, 60, 80, 100] },
+  stun: { label: "Stun", description: "Can not attack or gain ability charge." },
+  root: { label: "Root", description: "Can not move. Attacks and abilities still work." },
+  // Same effect as Root, but self-inflicted as a stance, so Cleanse and Dispel
+  // leave it alone. A twin entry rather than a flag on `root` because the pill
+  // has to read differently -- same shape as Poison twinning Damage Over Time.
+  rootundispellable: { label: "Root", undispellable: true, description: "Can not move. Attacks and abilities still work." },
+  restrained: { label: "Restrained", undispellable: true, description: "Interacts with this creature's abilities. Removed when leaving the inflicting creature's range." },
+  // Drains the bar itself, unlike Haste Down (which slows how fast it fills)
+  // and Stun (which stops it filling at all).
+  abilitychargeremoval: { label: "Ability Charge Removal", description: "Reduces the Ability Charge progress." },
+  // Slow, Shock and Heal Block are boss-inflicted statuses (battle/bosses/*).
+  // They already existed as mechanics with their own icons in the battle info
+  // panel (ui/components/UnitInfoPanel.js) but had no definitions, so the boss
+  // abilities that inflict them had nothing to put on a pill.
+  //
+  // Slow and Shock are mechanically the same penalty (speedPenalty in
+  // battle/status.js doubles the attack cooldown for either) but they are two
+  // separate statuses with two separate names on screen, so they get two
+  // entries rather than one shared label -- the same reasoning that gives
+  // Poison its own entry alongside Damage Over Time.
+  slow: { label: "Slow", description: "This creature attacks half as often." },
+  shock: { label: "Shock", description: "This creature attacks half as often." },
+  healimmunity: { label: "Heal Block", description: "Can not be healed." },
+  hastedown: { label: "Haste Down", description: "Reduces the creature's Haste.", stacking: [5, 10, 15, 20, 25] },
+  speeddown: { label: "Speed Down", description: "Reduces the creature's Speed.", stacking: [5, 10, 15, 20, 25] },
+  attackdown: { label: "Attack Down", description: "Reduces the creature's Attack.", stacking: [15, 20, 25, 30, 40] },
+  defensedown: { label: "Defense Down", description: "Reduces the creature's Defense.", stacking: [15, 20, 25, 30, 40] },
   intangible: { label: "Intangible", undispellable: true, description: "Can not be targeted or damaged. Enemies targeting this creature change targets." },
 };
 
@@ -190,9 +245,47 @@ const BLOOMIBIS_PHRASES = {
   unique: { phrase: "Allies within range are passively healed", heal: true },
 };
 
+// Inferno Breath is a Line attack, not a screen-wide one -- it burns the
+// column ahead of the dragon, so the phrase says column rather than "all".
 const IGNISSAUR_PHRASES = {
   basic: null,
-  special: { phrase: "Deal damage to all enemies" },
+  special: { phrase: "Deal damage to a column of enemies" },
+};
+
+// Dustling line: placeholder kit -- a plain damage basic and a heal special
+// whose final tier carries its own shield clause; Moonlit Scales' per-tier
+// numbers render raw.
+const DUSTLING_PHRASES = {
+  basic: null,
+  // Both a heal and a hit in one cast, so it uses the dual-badge shape.
+  // Heal-only: the splash lands Healing Down on enemies but deals no damage,
+  // so this uses the plain heal badge. The phrase deliberately stops on
+  // "Healing Down" so the max tier can append " and Blind" and finish the
+  // same sentence.
+  special: {
+    phrase: "Heal and Splash the Lowest ally. Allies recover half the amount and enemies are inflicted with Healing Down",
+    heal: true,
+  },
+  // "other ally" is load-bearing: the moth never heals itself with this, only
+  // whichever OTHER ally is lowest. The phrase stops before the max tier's
+  // " and they gain Speed Up" so that upgrade finishes the same sentence --
+  // and "they" is the healed ally, not the moth: the Speed Up lands on
+  // whoever was healed.
+  unique: { phrase: "When damaged by an attack, Heal the Lowest other ally", heal: true },
+};
+
+// Bonebeak line: the basic's stack count varies per tier, so it rides on the
+// generic damage phrase; Death Feast's per-tier percentages render raw.
+const BONEBEAK_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to an enemy. Dispel all stacks of Damage Over Time on the enemy and deal 5% extra damage for each stack dispelled" },
+};
+
+// Cragling line: the basic's Ability Charge % and the passive's dodge
+// interval vary per tier, so both carry their own per-tier sentences.
+const CRAGLING_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to a column of enemies" },
 };
 
 const BREEZEKIT_PHRASES = {
@@ -228,6 +321,21 @@ const NESSLING_PHRASES = {
     phrase: "Briefly become Intangible and Heal. Afterwards deal damage to the front row of enemies",
     healDamage: true,
   },
+};
+
+// Scrapcaw line (ids still say murkwing/darkpaw/abysslord -- creature ids
+// never change): both attacks are plain damage phrases; Shadow Pact's
+// per-Dark-ally percentages vary per tier, so the passive renders raw.
+const MURKWING_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to an enemy and call all allies beside you to Assist" },
+};
+
+// Iglet line: only the basic gets a plain phrase (generic damage) -- Hunker
+// In's stack counts and Windbreak's percentages vary per tier, so both render
+// their own sentences raw.
+const IGLET_PHRASES = {
+  basic: null,
 };
 
 // Doomshade line: only the basic gets a plain phrase (generic damage) --
@@ -272,9 +380,30 @@ const LOPTRIX_PHRASES = {
   special: { phrase: "Teleport to an enemy. Deal damage and inflict Marked on them" },
 };
 
+// Siegefin line: Brine Shot is a plain hit. Holdfast and Deepsight carry their
+// own per-tier numbers (Speed while anchored, Range gained) and render as written.
+const SIEGEFIN_PHRASES = {
+  basic: null,
+};
+
+// Frillet line: Guard Horn is a plain hit, so it rides the generic damage
+// phrase; Aegis Frill and Bulwark Body carry their own per-tier numbers
+// (Shield share of Defense, counter chance) and render as written.
+const FRILLET_PHRASES = {
+  basic: null,
+};
+
+// Venomcoil line: both damaging abilities carry a percentage that changes at
+// max tier (the lifesteal share, the Ability Charge drained), so their level
+// text is written out per tier and rides on the generic damage phrase.
+const VENOMCOIL_PHRASES = {
+  basic: null,
+  special: null,
+};
+
 const SHOCKSTINGER_PHRASES = {
   basic: null,
-  special: { phrase: "This ability has no cooldown but can only be used if a Restrained enemy with 20+ stacks is within range. Deal damage and Stun them. Remove all stacks of Restrained" },
+  special: { phrase: "This ability has no cooldown but can only be used if a Restrained enemy with 20+ stacks is within range. Deal damage and briefly Stun them. Remove all stacks of Restrained" },
 };
 
 const PLAIN_ABILITY_PHRASES = {
@@ -316,12 +445,40 @@ const PLAIN_ABILITY_PHRASES = {
   galeserpent: QUETZALIS_PHRASES,
   vortexserpent: QUETZALIS_PHRASES,
   cyclonwyrm: QUETZALIS_PHRASES,
+  dustling: DUSTLING_PHRASES,
+  silkhusk: DUSTLING_PHRASES,
+  gloamwing: DUSTLING_PHRASES,
+  lunashroud: DUSTLING_PHRASES,
+  bonebeak: BONEBEAK_PHRASES,
+  gravewing: BONEBEAK_PHRASES,
+  charnelord: BONEBEAK_PHRASES,
+  ironmole: CRAGLING_PHRASES,
+  steelmole: CRAGLING_PHRASES,
+  titanmole: CRAGLING_PHRASES,
+  skysage: CRAGLING_PHRASES,
+  murkwing: MURKWING_PHRASES,
+  darkpaw: MURKWING_PHRASES,
+  abysslord: MURKWING_PHRASES,
+  frostpup: IGLET_PHRASES,
+  snowmane: IGLET_PHRASES,
+  blizzardback: IGLET_PHRASES,
+  glaciertusk: IGLET_PHRASES,
   doomgrub: DOOMSHADE_PHRASES,
   nihilwyrm: DOOMSHADE_PHRASES,
   emberchirp: EMBERCHIRP_PHRASES,
   pyrefinch: EMBERCHIRP_PHRASES,
   cauterix: EMBERCHIRP_PHRASES,
   hearthenix: EMBERCHIRP_PHRASES,
+  leafling: VENOMCOIL_PHRASES,
+  canoparch: VENOMCOIL_PHRASES,
+  verdantlord: VENOMCOIL_PHRASES,
+  ancientgrove: VENOMCOIL_PHRASES,
+  sylvandragon: SIEGEFIN_PHRASES,
+  ancientdragon: SIEGEFIN_PHRASES,
+  mosskrab: FRILLET_PHRASES,
+  jadekrab: FRILLET_PHRASES,
+  crystalshell: FRILLET_PHRASES,
+  rampartops: FRILLET_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -456,13 +613,44 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "basic") tags.push("closest");
     if (key === "special") tags.push("taunt", "shield", "nearby");
   }
+  const isSiegefinLine = getRootDef(creatureId)?.id === "sylvandragon";
+  if (isSiegefinLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      // Brine Shot only saps healing from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("healdown");
+    }
+    // Holdfast's Root is the undispellable twin -- it is the creature's own
+    // stance, and the same cast dispels everything else.
+    if (key === "special") tags.push("rootundispellable");
+  }
+  const isFrilletLine = getRootDef(creatureId)?.id === "mosskrab";
+  if (isFrilletLine) {
+    // Guard Horn only shaves Defense from its 4th upgrade on.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
+    if (key === "special") tags.push("beside", "protect");
+    if (key === "unique") tags.push("counter");
+  }
+  const isVenomcoilLine = getRootDef(creatureId)?.id === "leafling";
+  if (isVenomcoilLine) {
+    if (key === "basic") tags.push("closest");
+    // Restrained is the same debuff the Shockstinger line uses -- it comes off
+    // by range, which for a melee constrictor means the moment its grip breaks.
+    if (key === "special") tags.push("closest", "restrained", "abilitychargeremoval");
+    // The Speed gain is a flat stat bump, not the Speed Up buff, so it carries
+    // no pill of its own; the Poison the Restrain drags along does.
+    if (key === "unique") tags.push("poison");
+  }
   const isShockstingerLine = getRootDef(creatureId)?.id === "shockcrab";
   if (isShockstingerLine) {
     if (key === "basic") tags.push("closest", "restrained");
     if (key === "special") {
       tags.push("closest", "stun", "restrained");
       // Overload Sting only grants Speed Up from its 4th upgrade on -- same
-      // level-gating rule as Breezekit's Zephyr Step.
+      // level-gating rule as Cirruskit's Zephyr Step.
       if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
     }
     if (key === "unique") tags.push("restrained");
@@ -478,6 +666,65 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") {
       tags.push("intangible", "closest");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
+    }
+  }
+  const isDustlingLine = getRootDef(creatureId)?.id === "dustling";
+  if (isDustlingLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
+    }
+    if (key === "special") {
+      // "Lowest" is this game's existing Weakest tag -- same rule, and the
+      // one already used by the other ally-healers.
+      tags.push("weakest", "splash");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("blind");
+    }
+    if (key === "unique") {
+      tags.push("weakest");
+      // Moonlit Scales only hands out Speed Up from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
+    }
+  }
+  const isBonebeakLine = getRootDef(creatureId)?.id === "bonebeak";
+  if (isBonebeakLine) {
+    // Carrion Rip applies the DoT from tier 1 -- the upgrades only add a
+    // second stack -- so the tag is not level-gated here. Gorge carries it
+    // too now that it leaves stacks behind; Death Feast has no tags.
+    if (key === "basic") tags.push("closest", "damageovertime");
+    if (key === "special") tags.push("damageovertime");
+  }
+  const isCraglingLine = getRootDef(creatureId)?.id === "ironmole";
+  if (isCraglingLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") {
+      tags.push("closest", "line");
+      // Ruyi Reach only stuns from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("stun");
+    }
+    if (key === "unique") tags.push("dodge");
+  }
+  const isMurkwingLine = getRootDef(creatureId)?.id === "murkwing";
+  if (isMurkwingLine) {
+    if (key === "basic") tags.push("closest");
+    // Beside is a targeting pill (it picks the allies called); Assist is the
+    // effect. Shadow Pact deliberately carries no tags.
+    if (key === "special") tags.push("beside", "assist");
+  }
+  const isIgletLine = getRootDef(creatureId)?.id === "frostpup";
+  if (isIgletLine) {
+    if (key === "basic") tags.push("closest");
+    if (key === "special") {
+      tags.push("fortify");
+      // Hunker In only dispels from its 4th upgrade on -- same level-gating
+      // rule as the other final-tier effects.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispel");
+    }
+    if (key === "unique") {
+      // Fortify is listed here too: Windbreak's text keys off it, and the
+      // tag popup is the only place Fortify's rules are written down.
+      tags.push("nearby", "fortify");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
   }
   const isDoomshadeLine = getRootDef(creatureId)?.id === "doomgrub";
@@ -569,6 +816,31 @@ const STARLIT_SPECIAL_HEAL_BY_LEVEL = [0, 0, 0, 5, 10];
  * null when this doesn't apply (any other creature, or the unique ability) -- callers should
  * fall back to the generic formatting in that case.
  */
+/**
+ * Effect-filter support (the Collection/Dex "Effects" filter): every tag
+ * LABEL a creature's kit carries at max rank, so level-gated riders (a max
+ * tier's Blind, Defense Down, ...) count. Deduped by label rather than key so
+ * twin tags sharing a name -- Root and its undispellable stance twin -- read
+ * as one effect. `energy` is excluded (a pill heading, not an effect).
+ *
+ * Kits are static for a session, so results cache per creature id.
+ */
+const effectLabelCache = new Map();
+export function getCreatureEffectLabels(creatureId) {
+  let set = effectLabelCache.get(creatureId);
+  if (set) return set;
+  set = new Set();
+  for (const key of ["basic", "special", "unique"]) {
+    for (const t of getAbilityTags(creatureId, key, null)) {
+      if (t === "energy") continue;
+      const def = ABILITY_TAG_DEFS[t];
+      if (def) set.add(def.label);
+    }
+  }
+  effectLabelCache.set(creatureId, set);
+  return set;
+}
+
 export function formatStarlitAbilityLevel(creatureId, key, upgrades, idx) {
   if (!isStarlitAbilityLine(creatureId) || (key !== "basic" && key !== "special")) return null;
   const text = upgrades[idx];

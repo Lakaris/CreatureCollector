@@ -11,10 +11,10 @@
 // Per-source stacking (see applyStatMod in battle/status.js): one Starlit
 // maintains one stack, refreshed per cast; several Starlits stack.
 
-import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS, BASIC_ATTACK_DMG_MULT } from "../constants.js";
 import { aCardinalDist, distToBoss } from "../geometry.js";
 import { attackCooldown, damageBoss } from "../damage.js";
-import { speedPenalty, applyStatMod, healReceivedMultiplier } from "../status.js";
+import { speedPenalty, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
 import { getRootDef } from "../../core/creatures.js";
 import { damageUnit } from "../hp.js";
 
@@ -115,6 +115,8 @@ export function makeStarlitModule(cfg) {
     basicAttack(unit, ctx) {
       const { aliveE, aliveP, boss, newFx, now } = ctx;
       if (unit.atkCd > 0) return;
+      // Blinded: the beam fires and misses entirely, cooldown still paid.
+      if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       // Farthest aligned enemy in range wins -- the whole point of this ability.
       const range = rangeOf(unit);
@@ -139,7 +141,9 @@ export function makeStarlitModule(cfg) {
       }
 
       const idx = abilityIdx(unit, "basic", basicDmgByLevel);
-      const dmg = basicDmgByLevel[idx];
+      // Flat per-level damage rather than the stat formula, so it takes the
+      // basic-attack scaling directly (see BASIC_ATTACK_DMG_MULT).
+      const dmg = Math.max(1, Math.round(basicDmgByLevel[idx] * BASIC_ATTACK_DMG_MULT));
       const heal = basicHealByLevel[idx];
       let totalDmg = 0;
 

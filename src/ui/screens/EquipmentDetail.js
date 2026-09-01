@@ -7,7 +7,7 @@ import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
-import { equipUpgradeCost, equipBonus, equipBonusStr, equipMaxLevel } from "../../core/equipment.js";
+import { equipUpgradeCost, equipBonus, equipBonusStr, equipMaxLevel, isExclusive, exclusivityCaption } from "../../core/equipment.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import Notify from "../../ui/components/Notify.js";
 import EquipmentPicker from "../../ui/screens/EquipmentPicker.js";
@@ -113,8 +113,8 @@ function EquipmentDetail({ itemId, onBack }) {
     // info and the Upgrade/Ascension controls pins those to the bottom.
     React.createElement("div", { className: "card", style: { position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" } },
       rarCfg && React.createElement("div", { style: { position: "absolute", top: 10, left: 12, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
-      (pi.element || pi.role || pi.attackType) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
-        [pi.element, pi.role, pi.attackType].filter(Boolean).join(" · ") + " exclusive"
+      isExclusive(pi) && React.createElement("div", { style: { position: "absolute", top: 34, left: 12, fontSize: 10, fontWeight: 700, color: "#7F77DD" } },
+        exclusivityCaption(pi)
       ),
       (() => {
         const pet = equippedBy[0];

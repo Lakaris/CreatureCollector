@@ -17,7 +17,7 @@
 // hp.js's damageUnit the first time Health would hit 0, so every damage
 // source honors it.
 
-import { STATUS_TICKS } from "../constants.js";
+import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { unitDist } from "../geometry.js";
 import { healReceivedMultiplier, applyHealOverTime } from "../status.js";
 import { damageUnit } from "../hp.js";
@@ -72,7 +72,7 @@ export function makeEmberchirpModule(cfg) {
     /** Stolen Spark: level scaling relative to the base level's damage. */
     dmgMultForAttack(unit) {
       const idx = abilityIdx(unit, "basic");
-      return basicDmgByLevel[idx] / basicDmgByLevel[0];
+      return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
     /** Stolen Spark's other half: recover Health on every landed hit. */

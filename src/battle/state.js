@@ -14,7 +14,8 @@ const HP_SCALE = 4;
 
 /** Attack cooldown in ticks, derived from speed. Faster creatures act sooner. */
 function cooldownFor(spd) {
-  return Math.max(3, Math.round(COOLDOWN_TICKS_AT_SPD_1 / spd));
+  // Same floor as attackCooldown in damage.js -- keep the two in step.
+  return Math.max(2, Math.round(COOLDOWN_TICKS_AT_SPD_1 / spd));
 }
 
 /**

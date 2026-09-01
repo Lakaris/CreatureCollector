@@ -165,7 +165,7 @@ function QuestsScreen({onBack}){
 
   const questTabDef=QUEST_TABS.find(t=>t.id===questTab);
   const headerTitle=questTab==="daily"?"📅 Daily Quests":(questTabDef?.emoji+" "+questTabDef?.label+" Quests");
-  return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
+  return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
     questRewardPopupEl,
     lockedMsg&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:300,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},lockedMsg),
     React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid #e0e0e0",flexShrink:0,background:"#fff",display:"flex",alignItems:"center",gap:8}},

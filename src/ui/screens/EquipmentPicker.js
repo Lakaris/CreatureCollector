@@ -1,7 +1,7 @@
 // Creature picker for equipping one piece of gear, opened from EquipmentDetail.
 // Mirrors CollectionScreen's own creature-grid/creature-card markup so this
-// picker looks and feels like browsing the Collection tab. For type/role-
-// exclusive gear, creatures that can't take it (wrong element/role) are left
+// picker looks and feels like browsing the Collection tab. For exclusive gear,
+// creatures that can't take it (wrong element/role/range/species) are left
 // out of the list entirely rather than shown disabled.
 // Eligible creatures whose 4 gear slots are already full are still tappable --
 // tapping one opens a popup asking which of its equipped items to replace.
@@ -9,12 +9,16 @@
 import React, { useState } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { EQUIPMENT_MAP } from "../../data/equipment.js";
+import { EQUIPMENT_MAP, EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
+import { getDisplayArt } from "../../core/creatures.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
-import { equipBonus, equipBonusStr } from "../../core/equipment.js";
-import AscStars from "../../ui/components/AscStars.js";
+import { equipBonus, equipBonusStr, isExclusive, itemFitsCreature, exclusivityLabels } from "../../core/equipment.js";
+import AscStars, { ascStarTier } from "../../ui/components/AscStars.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
+
+/** Height of the bottom ascension bar -- matches CollectionScreen's ASC_BAR_H. */
+const ASC_BAR_H = 26;
 
 function EquipmentPicker({ itemId, onBack, onEquipped }) {
   const { owned, setOwned, unlockedSkins, equipmentLevels, equipmentAscensions } = useGame();
@@ -50,10 +54,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
   const entries = Object.values(owned || {})
     .filter((o) => CREATURE_MAP[o.id])
     .filter((o) => !(o.equipped || []).includes(itemId)) // already-equipped creature isn't a switch target
-    .filter((o) => {
-      const d = CREATURE_MAP[o.id];
-      return (!item.element || d.type === item.element) && (!item.role || d.role === item.role) && (!item.attackType || d.attackType === item.attackType);
-    });
+    .filter((o) => itemFitsCreature(item, CREATURE_MAP[o.id]));
 
   const replacePet = replaceCreatureId ? owned[replaceCreatureId] : null;
   const replaceDef = replacePet ? CREATURE_MAP[replacePet.id] : null;
@@ -90,32 +91,49 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
     React.createElement(ScreenHeader, { title: "Choose a Creature", onBack }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 12, color: "#666" } },
       React.createElement("span", { style: { fontSize: 20 } }, item.emoji),
-      React.createElement("span", null, "Equipping " + item.name + (item.element ? " · " + item.element + " only" : "") + (item.role ? " · " + item.role + " only" : "") + (item.attackType ? " · " + item.attackType + " only" : ""))
+      React.createElement("span", null, "Equipping " + item.name + exclusivityLabels(item).map((l) => " · " + l + " only").join(""))
     ),
     entries.length === 0
       ? React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#666" } },
-          React.createElement("p", { style: { fontSize: 13 } }, item.element || item.role || item.attackType ? "No eligible creatures for this gear yet." : "No creatures yet — hatch some eggs!")
+          React.createElement("p", { style: { fontSize: 13 } }, isExclusive(item) ? "No eligible creatures for this gear yet." : "No creatures yet — hatch some eggs!")
         )
       : React.createElement("div", { className: "creature-grid" },
+          // Card layout is CollectionScreen's, element for element: rarity-tinted
+          // card, full-card art, Type/Role/Range stacked top-left, level top-right,
+          // and the banded ascension stars in a white bar along the bottom. Keep
+          // the two in sync -- this picker is meant to read as the Collection grid.
           entries.map((o) => {
             const d = CREATURE_MAP[o.id];
             const hasOpenSlot = (o.equipped || [null, null, null, null]).some((s) => !s);
+            const art = getDisplayArt(d, o, unlockedSkins);
+            const rarCfg = EQUIP_RARITY_CONFIG[d.rarity];
+            const asc = ascStarTier(o.ascensions);
             return React.createElement("div", {
               key: o.id,
               className: "creature-card",
               onClick: () => handlePick(o, hasOpenSlot),
-              style: { position: "relative", paddingTop: 30, cursor: "pointer" }
+              style: { position: "relative", paddingTop: 30, cursor: "pointer", background: rarCfg.bg, border: "1px solid " + rarCfg.color + "44" }
             },
-              React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, TYPE_EMOJI[d.type] || d.type),
-              d.attackType && React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[d.attackType].emoji),
-              d.role && React.createElement("span", { style: { position: "absolute", top: 20, right: 5, fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[d.role].emoji),
-              o.ascensions > 0 && React.createElement("div", { style: { position: "absolute", top: 5, left: 0, right: 0, textAlign: "center", lineHeight: 1 } }, React.createElement(AscStars, { n: o.ascensions })),
-              React.createElement(CreatureIcon, { def: d, ownedData: o, unlockedSkins, size: 26, className: "creature-emoji", style: { lineHeight: 1.2, margin: "0 auto 3px" } }),
-              React.createElement("div", { className: "creature-name" }, d.name),
-              React.createElement("div", { style: { display: "flex", gap: 4, justifyContent: "center", marginBottom: 4, flexWrap: "wrap", alignItems: "center" } },
-                React.createElement("span", { className: "lv-badge" }, "Lv " + o.level)
+              art.kind !== "emoji" && React.createElement(CreatureIcon, { key: "art", def: d, ownedData: o, unlockedSkins, still: true, size: 72, style: { position: "absolute", top: 0, left: 0, width: "100%", height: "calc(100% - " + ASC_BAR_H + "px)" } }),
+              // Badge column, top-left: Type, then Role, then Range.
+              React.createElement("div", { style: { position: "absolute", top: 5, left: 5, display: "flex", flexDirection: "column", gap: 4, alignItems: "center", pointerEvents: "none" } },
+                React.createElement("span", { style: { fontSize: 14, lineHeight: 1 } }, TYPE_EMOJI[d.type] || d.type),
+                d.role && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[d.role].emoji),
+                d.attackType && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[d.attackType].emoji)
               ),
-              !hasOpenSlot && React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#d97706", textAlign: "center" } }, "Slots full — tap to replace")
+              React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 12, fontWeight: 700, color: "#666", lineHeight: 1, pointerEvents: "none", textShadow: "0 0 3px #fff, 0 0 3px #fff" } }, "Lv " + o.level),
+              // Picker-only: this creature's four slots are taken, so tapping it
+              // opens the replace popup instead of equipping. Floated just above
+              // the star bar with the same halo the level uses, so it reads over
+              // art without changing the card's shape.
+              !hasOpenSlot && React.createElement("div", { style: { position: "absolute", left: 2, right: 2, bottom: ASC_BAR_H + 2, fontSize: 8, fontWeight: 800, color: "#d97706", textAlign: "center", lineHeight: 1.15, pointerEvents: "none", textShadow: "0 0 3px #fff, 0 0 3px #fff" } }, "Slots full · tap to replace"),
+              React.createElement("div", { style: { position: "absolute", left: 0, right: 0, bottom: 0, height: ASC_BAR_H, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.92)", borderTop: "0.5px solid rgba(0,0,0,0.08)", borderRadius: "0 0 9px 9px", overflow: "hidden", containerType: "inline-size" } },
+                React.createElement(AscStars, { n: asc.count, max: 5, doubled: asc.doubled, colors: asc.colors, slotted: true, style: { fontSize: "min(16px,17.5cqw)", gap: 1, ...asc.style } })
+              ),
+              art.kind !== "emoji"
+                ? React.createElement("div", { style: { height: 72 } })
+                : React.createElement("div", { style: { height: 72, display: "flex", alignItems: "center", justifyContent: "center" } },
+                    React.createElement(CreatureIcon, { def: d, ownedData: o, unlockedSkins, still: true, size: 26 }))
             );
           })
         )

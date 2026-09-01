@@ -53,7 +53,8 @@ function finalFormDef(starterId) {
 }
 
 // The tutorial's first fight uses a smaller grid than a real arena/dungeon
-// battle, with a single fixed level-1 Murkwing as the only enemy. Tile size
+// battle, with a single fixed level-1 Scrapcaw as the only enemy (its id is
+// still "murkwing" -- creature ids never change). Tile size
 // is bumped up from ARENA_TILE just for this screen -- it's a much shorter
 // grid than a real arena/dungeon board, so it can afford bigger tiles.
 const TUTORIAL_GRID_COLS = 5;

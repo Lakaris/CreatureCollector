@@ -130,7 +130,7 @@ function BattlepassScreen({onBack}){
   // into view one card at a time, then Continue returns to the track.
   if(rewardItems){
     const allVisible=visibleCount>=rewardItems.length;
-    return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
+    return React.createElement("div",{key:"sfv133",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",padding:"32px 24px 16px",flexShrink:0}},"Obtained"),
       React.createElement("div",{style:{flex:1,padding:"0 24px",display:"flex",flexWrap:"wrap",gap:16,justifyContent:"center",alignContent:"center"}},
         rewardItems.map(([k,v],i)=>{
@@ -155,7 +155,7 @@ function BattlepassScreen({onBack}){
       popup
     );
   }
-  return React.createElement("div",{style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200}},
+  return React.createElement("div",{key:"sfv158",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f8f8ff",zIndex:200}},
     popup,
     // Header -- fixed above the scroll area, never scrolls with the track
     React.createElement("div",{style:{flexShrink:0,borderBottom:"1px solid #ede8ff"}},

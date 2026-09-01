@@ -6,7 +6,7 @@ export const SKIN_SETS=[
   {id:"pup_arctic",name:"Arctic",tier:"rare",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🐩"},emberhound:{emoji:"🐺"}}},
   {id:"pup_shadow",name:"Shadow",tier:"epic",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🐕‍🦺"},emberhound:{emoji:"🦝"}}},
   {id:"pup_golden",name:"Golden",tier:"legendary",chain:["emberpup","emberhound"],appearances:{emberpup:{emoji:"🦊"},emberhound:{emoji:"🦁"}}},
-  // leafling / canoparch (Sprighorn / Thickethorn)
+  // leafling / canoparch (Venomcoil / Mirewreathe)
   {id:"leaf_blossom",name:"Blossom",tier:"common",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🌱"},canoparch:{emoji:"🌸"}}},
   {id:"leaf_autumn",name:"Autumn",tier:"rare",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🍂"},canoparch:{emoji:"🍁"}}},
   {id:"leaf_ancient",name:"Ancient",tier:"legendary",chain:["leafling","canoparch"],appearances:{leafling:{emoji:"🦴"},canoparch:{emoji:"🗿"}}},
@@ -14,7 +14,7 @@ export const SKIN_SETS=[
   {id:"rock_sandy",name:"Sandy",tier:"common",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🦎"},bouldrath:{emoji:"🐢"}}},
   {id:"rock_crystal",name:"Crystal",tier:"epic",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"💎"},bouldrath:{emoji:"🗿"}}},
   {id:"rock_volcanic",name:"Volcanic",tier:"legendary",chain:["pebbit","bouldrath"],appearances:{pebbit:{emoji:"🌋"},bouldrath:{emoji:"🏔️"}}},
-  // Breezekit / Galestride
+  // breezekit / galestride (Cirruskit / Cumulynx)
   {id:"wind_storm",name:"Stormborn",tier:"rare",chain:["breezekit","galestride"],appearances:{breezekit:{emoji:"🍃"},galestride:{emoji:"🌀"}}},
   {id:"wind_arctic",name:"Frostwind",tier:"epic",chain:["breezekit","galestride"],appearances:{breezekit:{emoji:"🌬️"},galestride:{emoji:"🌨️"}}},
   {id:"wind_thunder",name:"Thunder",tier:"legendary",chain:["breezekit","galestride"],appearances:{breezekit:{emoji:"⚡"},galestride:{emoji:"🌩️"}}},
@@ -22,7 +22,7 @@ export const SKIN_SETS=[
   {id:"frost_ember",name:"Ember",tier:"common",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🦊"},glacierwulf:{emoji:"🔥"},frostwyvern:{emoji:"🐊"}}},
   {id:"frost_shadow",name:"Nightfall",tier:"rare",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🌑"},glacierwulf:{emoji:"🌚"},frostwyvern:{emoji:"👻"}}},
   {id:"frost_blizzard",name:"Blizzard",tier:"legendary",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🌨️"},glacierwulf:{emoji:"🧊"},frostwyvern:{emoji:"❄️"}}},
-  // Voltail / Stormclaw
+  // voltail / stormclaw / arcstorm (Monovolt / Duovolt / Trivolt)
   {id:"volt_ember",name:"Ember",tier:"common",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🦎"},stormclaw:{emoji:"🦅"},arcstorm:{emoji:"🔥"}}},
   {id:"volt_neon",name:"Neon",tier:"epic",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🔋"},stormclaw:{emoji:"💡"},arcstorm:{emoji:"✨"}}},
   {id:"volt_apex",name:"Apex",tier:"legendary",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🌟"},stormclaw:{emoji:"☄️"},arcstorm:{emoji:"💫"}}},
@@ -62,11 +62,7 @@ export const SKIN_SETS=[
   {id:"scorp_venom",name:"Venom",tier:"rare",chain:["emberscorp","pyrescorp","magmascorp"],appearances:{emberscorp:{emoji:"🦂"},pyrescorp:{emoji:"🐍"},magmascorp:{emoji:"☠️"}}},
   {id:"scorp_crystal",name:"Crystal",tier:"epic",chain:["emberscorp","pyrescorp","magmascorp"],appearances:{emberscorp:{emoji:"💎"},pyrescorp:{emoji:"🔮"},magmascorp:{emoji:"🪩"}}},
   {id:"scorp_ancient",name:"Ancient",tier:"legendary",chain:["emberscorp","pyrescorp","magmascorp"],appearances:{emberscorp:{emoji:"🦕"},pyrescorp:{emoji:"🦖"},magmascorp:{emoji:"🐉"}}},
-  // venomviper / toxicserpent / poisonwyrm
-  {id:"viper_ghost",name:"Ghost",tier:"rare",chain:["venomviper","toxicserpent","poisonwyrm"],appearances:{venomviper:{emoji:"👻"},toxicserpent:{emoji:"🌫️"},poisonwyrm:{emoji:"💀"}}},
-  {id:"viper_crystal",name:"Crystal",tier:"epic",chain:["venomviper","toxicserpent","poisonwyrm"],appearances:{venomviper:{emoji:"💚"},toxicserpent:{emoji:"💎"},poisonwyrm:{emoji:"🔮"}}},
-  {id:"viper_primordial",name:"Primordial",tier:"legendary",chain:["venomviper","toxicserpent","poisonwyrm"],appearances:{venomviper:{emoji:"🌿"},toxicserpent:{emoji:"🌳"},poisonwyrm:{emoji:"🐲"}}},
-  // mosskrab / jadekrab / crystalshell
+  // mosskrab / jadekrab / crystalshell (Frillet / Bulwarden / Aegiceras)
   {id:"krab_sand",name:"Sandy",tier:"rare",chain:["mosskrab","jadekrab","crystalshell"],appearances:{mosskrab:{emoji:"🏖️"},jadekrab:{emoji:"🦀"},crystalshell:{emoji:"⭐"}}},
   {id:"krab_lava",name:"Magma",tier:"epic",chain:["mosskrab","jadekrab","crystalshell"],appearances:{mosskrab:{emoji:"🔥"},jadekrab:{emoji:"🌋"},crystalshell:{emoji:"🌊"}}},
   {id:"krab_ancient",name:"Ancient",tier:"legendary",chain:["mosskrab","jadekrab","crystalshell"],appearances:{mosskrab:{emoji:"🌊"},jadekrab:{emoji:"🏔️"},crystalshell:{emoji:"🌌"}}},
@@ -74,14 +70,10 @@ export const SKIN_SETS=[
   {id:"turtle_sea",name:"Deep Sea",tier:"rare",chain:["thornturtle","jadeshell","ancientshell"],appearances:{thornturtle:{emoji:"🐢"},jadeshell:{emoji:"🌊"},ancientshell:{emoji:"🐬"}}},
   {id:"turtle_prism",name:"Prism",tier:"epic",chain:["thornturtle","jadeshell","ancientshell"],appearances:{thornturtle:{emoji:"💎"},jadeshell:{emoji:"🔮"},ancientshell:{emoji:"✨"}}},
   {id:"turtle_titan",name:"Titan",tier:"legendary",chain:["thornturtle","jadeshell","ancientshell"],appearances:{thornturtle:{emoji:"🗿"},jadeshell:{emoji:"🏔️"},ancientshell:{emoji:"🌍"}}},
-  // ironmole / steelmole / titanmole
-  {id:"mole_sand",name:"Desert",tier:"rare",chain:["ironmole","steelmole","titanmole"],appearances:{ironmole:{emoji:"🦔"},steelmole:{emoji:"🏜️"},titanmole:{emoji:"🌵"}}},
+  // ironmole / steelmole / titanmole (Cragling / Cragfist / Cloudvault)
+  {id:"mole_sand",name:"Desert",tier:"rare",chain:["ironmole","steelmole","titanmole"],appearances:{ironmole:{emoji:"🏜️"},steelmole:{emoji:"🌵"},titanmole:{emoji:"🐪"}}},
   {id:"mole_crystal",name:"Crystal",tier:"epic",chain:["ironmole","steelmole","titanmole"],appearances:{ironmole:{emoji:"💎"},steelmole:{emoji:"🔮"},titanmole:{emoji:"✨"}}},
   {id:"mole_volcanic",name:"Volcanic",tier:"legendary",chain:["ironmole","steelmole","titanmole"],appearances:{ironmole:{emoji:"🗿"},steelmole:{emoji:"🏔️"},titanmole:{emoji:"🌋"}}},
-  // dustcrawler / sandcrawler / dunekraken
-  {id:"dune_frost",name:"Frosted",tier:"rare",chain:["dustcrawler","sandcrawler","dunekraken"],appearances:{dustcrawler:{emoji:"❄️"},sandcrawler:{emoji:"🧊"},dunekraken:{emoji:"🌨️"}}},
-  {id:"dune_void",name:"Void",tier:"epic",chain:["dustcrawler","sandcrawler","dunekraken"],appearances:{dustcrawler:{emoji:"🌑"},sandcrawler:{emoji:"💀"},dunekraken:{emoji:"🌌"}}},
-  {id:"dune_relic",name:"Relic",tier:"legendary",chain:["dustcrawler","sandcrawler","dunekraken"],appearances:{dustcrawler:{emoji:"🏺"},sandcrawler:{emoji:"🗿"},dunekraken:{emoji:"🏛️"}}},
   // quakebeetle / stonebeetle / gemscrab
   {id:"beetle_gilded",name:"Gilded",tier:"rare",chain:["quakebeetle","stonebeetle","gemscrab"],appearances:{quakebeetle:{emoji:"🪲"},stonebeetle:{emoji:"🏅"},gemscrab:{emoji:"🥇"}}},
   {id:"beetle_shadow",name:"Shadow",tier:"epic",chain:["quakebeetle","stonebeetle","gemscrab"],appearances:{quakebeetle:{emoji:"🌑"},stonebeetle:{emoji:"💀"},gemscrab:{emoji:"🌌"}}},
@@ -90,22 +82,10 @@ export const SKIN_SETS=[
   {id:"eel_coral",name:"Coral",tier:"rare",chain:["skyeel","galeeel","stormeel"],appearances:{skyeel:{emoji:"🐠"},galeeel:{emoji:"🌊"},stormeel:{emoji:"🌀"}}},
   {id:"eel_lightning",name:"Lightning",tier:"epic",chain:["skyeel","galeeel","stormeel"],appearances:{skyeel:{emoji:"⚡"},galeeel:{emoji:"🌩️"},stormeel:{emoji:"💫"}}},
   {id:"eel_aurora",name:"Aurora",tier:"legendary",chain:["skyeel","galeeel","stormeel"],appearances:{skyeel:{emoji:"🌌"},galeeel:{emoji:"✨"},stormeel:{emoji:"🌠"}}},
-  // squallhawk / galebeak / strikewing
-  {id:"hawk_ember",name:"Ember",tier:"rare",chain:["squallhawk","galebeak","strikewing"],appearances:{squallhawk:{emoji:"🔥"},galebeak:{emoji:"🦅"},strikewing:{emoji:"🌟"}}},
-  {id:"hawk_shadow",name:"Shadow",tier:"epic",chain:["squallhawk","galebeak","strikewing"],appearances:{squallhawk:{emoji:"🌑"},galebeak:{emoji:"🦇"},strikewing:{emoji:"💀"}}},
-  {id:"hawk_arctic",name:"Arctic",tier:"legendary",chain:["squallhawk","galebeak","strikewing"],appearances:{squallhawk:{emoji:"❄️"},galebeak:{emoji:"🌨️"},strikewing:{emoji:"🧊"}}},
-  // whirlbug / cyclonbug / vortexbug
-  {id:"bug_electric",name:"Electric",tier:"rare",chain:["whirlbug","cyclonbug","vortexbug"],appearances:{whirlbug:{emoji:"⚡"},cyclonbug:{emoji:"🌩️"},vortexbug:{emoji:"🔋"}}},
-  {id:"bug_phantom",name:"Phantom",tier:"epic",chain:["whirlbug","cyclonbug","vortexbug"],appearances:{whirlbug:{emoji:"🌑"},cyclonbug:{emoji:"💀"},vortexbug:{emoji:"🌌"}}},
-  {id:"bug_gilded",name:"Gilded",tier:"legendary",chain:["whirlbug","cyclonbug","vortexbug"],appearances:{whirlbug:{emoji:"🌟"},cyclonbug:{emoji:"⭐"},vortexbug:{emoji:"☀️"}}},
   // zapfrog / voltfrog / stormtoad
   {id:"frog_verdant",name:"Verdant",tier:"rare",chain:["zapfrog","voltfrog","stormtoad"],appearances:{zapfrog:{emoji:"🐸"},voltfrog:{emoji:"🌿"},stormtoad:{emoji:"🌊"}}},
   {id:"frog_shadow",name:"Shadow",tier:"epic",chain:["zapfrog","voltfrog","stormtoad"],appearances:{zapfrog:{emoji:"🌑"},voltfrog:{emoji:"👻"},stormtoad:{emoji:"💀"}}},
   {id:"frog_gilded",name:"Gilded",tier:"legendary",chain:["zapfrog","voltfrog","stormtoad"],appearances:{zapfrog:{emoji:"🌟"},voltfrog:{emoji:"⭐"},stormtoad:{emoji:"☀️"}}},
-  // shockbeetle / voltbeetle / arcbeetle
-  {id:"arcbeetle_verdant",name:"Verdant",tier:"rare",chain:["shockbeetle","voltbeetle","arcbeetle"],appearances:{shockbeetle:{emoji:"🍀"},voltbeetle:{emoji:"🌿"},arcbeetle:{emoji:"🌱"}}},
-  {id:"arcbeetle_prism",name:"Prismatic",tier:"epic",chain:["shockbeetle","voltbeetle","arcbeetle"],appearances:{shockbeetle:{emoji:"💎"},voltbeetle:{emoji:"🔮"},arcbeetle:{emoji:"✨"}}},
-  {id:"arcbeetle_cosmic",name:"Cosmic",tier:"legendary",chain:["shockbeetle","voltbeetle","arcbeetle"],appearances:{shockbeetle:{emoji:"🌌"},voltbeetle:{emoji:"🌠"},arcbeetle:{emoji:"💫"}}},
   // aurorabird / radiancebird / celestbird
   {id:"abird_night",name:"Nightfall",tier:"rare",chain:["aurorabird","radiancebird","celestbird"],appearances:{aurorabird:{emoji:"🌙"},radiancebird:{emoji:"⭐"},celestbird:{emoji:"🌌"}}},
   {id:"abird_shadow",name:"Shadow",tier:"epic",chain:["aurorabird","radiancebird","celestbird"],appearances:{aurorabird:{emoji:"🌑"},radiancebird:{emoji:"💀"},celestbird:{emoji:"🕳️"}}},
@@ -122,14 +102,6 @@ export const SKIN_SETS=[
   {id:"spider_ember",name:"Ember",tier:"rare",chain:["voidspider","shadowspider","abyssspider"],appearances:{voidspider:{emoji:"🔥"},shadowspider:{emoji:"🦂"},abyssspider:{emoji:"🌋"}}},
   {id:"spider_crystal",name:"Crystal",tier:"epic",chain:["voidspider","shadowspider","abyssspider"],appearances:{voidspider:{emoji:"💎"},shadowspider:{emoji:"🔮"},abyssspider:{emoji:"✨"}}},
   {id:"spider_cosmic",name:"Cosmic",tier:"legendary",chain:["voidspider","shadowspider","abyssspider"],appearances:{voidspider:{emoji:"🌌"},shadowspider:{emoji:"🌑"},abyssspider:{emoji:"🕳️"}}},
-  // gloomtoad / voidtoad / shadowtoad
-  {id:"gtoad_ember",name:"Ember",tier:"rare",chain:["gloomtoad","voidtoad","shadowtoad"],appearances:{gloomtoad:{emoji:"🔥"},voidtoad:{emoji:"🌋"},shadowtoad:{emoji:"💀"}}},
-  {id:"gtoad_crystal",name:"Crystal",tier:"epic",chain:["gloomtoad","voidtoad","shadowtoad"],appearances:{gloomtoad:{emoji:"💎"},voidtoad:{emoji:"🔮"},shadowtoad:{emoji:"✨"}}},
-  {id:"gtoad_abyssal",name:"Abyssal",tier:"legendary",chain:["gloomtoad","voidtoad","shadowtoad"],appearances:{gloomtoad:{emoji:"🌌"},voidtoad:{emoji:"🌑"},shadowtoad:{emoji:"🕳️"}}},
-  // wraithworm / phantomworm / voidwyrm
-  {id:"wworm_verdant",name:"Verdant",tier:"rare",chain:["wraithworm","phantomworm","voidwyrm"],appearances:{wraithworm:{emoji:"🌿"},phantomworm:{emoji:"🍃"},voidwyrm:{emoji:"🌱"}}},
-  {id:"wworm_crystal",name:"Crystal",tier:"epic",chain:["wraithworm","phantomworm","voidwyrm"],appearances:{wraithworm:{emoji:"💎"},phantomworm:{emoji:"🔮"},voidwyrm:{emoji:"✨"}}},
-  {id:"wworm_cosmic",name:"Cosmic",tier:"legendary",chain:["wraithworm","phantomworm","voidwyrm"],appearances:{wraithworm:{emoji:"🌌"},phantomworm:{emoji:"🌑"},voidwyrm:{emoji:"🕳️"}}},
   // ── EPIC creature lines ───────────────────────────────────────────────────
   // salamagma / lavawyrm
   {id:"salama_glacial",name:"Glacial",tier:"rare",chain:["salamagma","lavawyrm"],appearances:{salamagma:{emoji:"❄️"},lavawyrm:{emoji:"🧊"}}},
@@ -191,10 +163,6 @@ export const SKIN_SETS=[
   {id:"vdrake_frost",name:"Frosted",tier:"rare",chain:["voltdrake","thunderdrake"],appearances:{voltdrake:{emoji:"❄️"},thunderdrake:{emoji:"🧊"}}},
   {id:"vdrake_void",name:"Void",tier:"epic",chain:["voltdrake","thunderdrake"],appearances:{voltdrake:{emoji:"🌑"},thunderdrake:{emoji:"💀"}}},
   {id:"vdrake_solar",name:"Solar",tier:"legendary",chain:["voltdrake","thunderdrake"],appearances:{voltdrake:{emoji:"☀️"},thunderdrake:{emoji:"🌟"}}},
-  // boltfly / zapdragon
-  {id:"bfly_verdant",name:"Verdant",tier:"rare",chain:["boltfly","zapdragon"],appearances:{boltfly:{emoji:"🌿"},zapdragon:{emoji:"🍃"}}},
-  {id:"bfly_void",name:"Void",tier:"epic",chain:["boltfly","zapdragon"],appearances:{boltfly:{emoji:"🌑"},zapdragon:{emoji:"💀"}}},
-  {id:"bfly_solar",name:"Solar",tier:"legendary",chain:["boltfly","zapdragon"],appearances:{boltfly:{emoji:"☀️"},zapdragon:{emoji:"🌟"}}},
   // shockcrab / galvaniccrab
   {id:"gcrab_frost",name:"Frosted",tier:"rare",chain:["shockcrab","galvaniccrab"],appearances:{shockcrab:{emoji:"❄️"},galvaniccrab:{emoji:"🧊"}}},
   {id:"gcrab_void",name:"Void",tier:"epic",chain:["shockcrab","galvaniccrab"],appearances:{shockcrab:{emoji:"🌑"},galvaniccrab:{emoji:"💀"}}},
@@ -211,10 +179,6 @@ export const SKIN_SETS=[
   {id:"lgator_night",name:"Nightfall",tier:"rare",chain:["lumigator","radiantgator"],appearances:{lumigator:{emoji:"🌙"},radiantgator:{emoji:"⭐"}}},
   {id:"lgator_void",name:"Void",tier:"epic",chain:["lumigator","radiantgator"],appearances:{lumigator:{emoji:"🌑"},radiantgator:{emoji:"💀"}}},
   {id:"lgator_ancient",name:"Ancient",tier:"legendary",chain:["lumigator","radiantgator"],appearances:{lumigator:{emoji:"🏛️"},radiantgator:{emoji:"🌌"}}},
-  // eclipseboa / darkhydra
-  {id:"eboa_ember",name:"Ember",tier:"rare",chain:["eclipseboa","darkhydra"],appearances:{eclipseboa:{emoji:"🔥"},darkhydra:{emoji:"🌋"}}},
-  {id:"eboa_crystal",name:"Crystal",tier:"epic",chain:["eclipseboa","darkhydra"],appearances:{eclipseboa:{emoji:"💎"},darkhydra:{emoji:"🔮"}}},
-  {id:"eboa_cosmic",name:"Cosmic",tier:"legendary",chain:["eclipseboa","darkhydra"],appearances:{eclipseboa:{emoji:"🌌"},darkhydra:{emoji:"🌠"}}},
   // doomgrub / nihilwyrm
   {id:"dgrub_verdant",name:"Verdant",tier:"rare",chain:["doomgrub","nihilwyrm"],appearances:{doomgrub:{emoji:"🌿"},nihilwyrm:{emoji:"🍃"}}},
   {id:"dgrub_crystal",name:"Crystal",tier:"epic",chain:["doomgrub","nihilwyrm"],appearances:{doomgrub:{emoji:"💎"},nihilwyrm:{emoji:"🔮"}}},

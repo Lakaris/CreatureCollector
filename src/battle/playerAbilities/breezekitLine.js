@@ -1,4 +1,8 @@
-// Breezekit line: Gust Swipe / Zephyr Step / Slipstream.
+// Cirruskit line: Gust Swipe / Zephyr Step / Slipstream.
+//
+// (Ids and this file's name still say "breezekit" -- the line was re-themed
+// into a cloud leopard, and creature ids never change, for save compat.
+// "Breezekit" below reads as the line, whose display name is now Cirruskit.)
 //
 // Gust Swipe is a piercing melee strike at the closest foe: the swipe travels
 // in a straight (or diagonal) line and also hits whatever stands directly
@@ -15,14 +19,14 @@
 // Slipstream passively amplifies all of Breezekit's damage by +5%..+20%, and
 // at max level extends its attack reach (and pierce depth) by one tile.
 
-import { unitDamage, playerDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
-import { speedPenalty, applyStatMod } from "../status.js";
+import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
+import { speedPenalty, applyStatMod, consumeBlind } from "../status.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { BOSS_SIZE, STATUS_TICKS } from "../constants.js";
+import { BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
- * ratio of the current level's value to the basic's base value. */
+ * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
 const BASIC_DMG_BY_LEVEL = [10, 11, 12, 13, 13];
 const SPECIAL_DMG_BY_LEVEL = [18, 20, 22, 25, 25];
 /** Slipstream: +damage% on everything Breezekit does, by unique level. */
@@ -123,15 +127,17 @@ export function makeBreezekitModule(cfg) {
         return;
       }
       if (unit.atkCd > 0) return;
+      // Blinded: the swipe misses entirely, cooldown still paid.
+      if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       const idx = abilityIdx(unit, "basic");
-      const ratio = basicDmgByLevel[idx] / basicDmgByLevel[0];
+      const ratio = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const mult = ratio * slipstreamMult(unit);
       const shreds = idx >= MAX_IDX;
       let totalDmg = 0;
 
       if (best.isBoss) {
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, aliveP) * mult));
+        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
         damageBoss(boss, dmg);
         totalDmg += dmg;
         if (shreds) applyDefShred(unit, boss);
@@ -144,14 +150,14 @@ export function makeBreezekitModule(cfg) {
           const r = unit.row + best.dr * k, c = unit.col + best.dc * k;
           const victim = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
           if (victim) {
-            const dmg = Math.max(1, Math.round(unitDamage(unit, victim) * mult));
+            const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
             damageUnit(victim, dmg);
             totalDmg += dmg;
             if (shreds) applyDefShred(unit, victim);
             newFx.push({ id: now + unit.uid + "gs" + k, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
           }
           if (!hitBossOnLine && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
-            const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, aliveP) * mult));
+            const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
             damageBoss(boss, dmg);
             totalDmg += dmg;
             if (shreds) applyDefShred(unit, boss);
@@ -191,7 +197,7 @@ export function makeBreezekitModule(cfg) {
     special(unit, ctx) {
       const { aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
-      const mult = (specialDmgByLevel[idx] / basicDmgByLevel[0]) * slipstreamMult(unit);
+      const mult = (specialDmgByLevel[idx] / BASIC_DMG_BASELINE) * slipstreamMult(unit);
 
       for (const cand of candidatesByHp(aliveE, boss)) {
         const besideAlready = cand.isBossCandidate
@@ -208,7 +214,10 @@ export function makeBreezekitModule(cfg) {
         }
 
         const fromRow = unit.row, fromCol = unit.col;
-        if (dest) ctx.relocate(dest[0], dest[1]);
+        // Rooted: the step never happens, so this foe is out of reach -- try
+        // the next one rather than striking from where we stand. A foe we are
+        // ALREADY beside needs no step and still gets hit.
+        if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
         const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
         if (cand.isBossCandidate) damageBoss(cand.boss, dmg);

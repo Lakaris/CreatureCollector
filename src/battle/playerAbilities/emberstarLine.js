@@ -7,13 +7,18 @@
 import { getRootDef } from "../../core/creatures.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies } from "../geometry.js";
-import { STATUS_TICKS } from "../constants.js";
+import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 
 /** Hits per attack, indexed by ability level (0-based, level 1 = index 0). */
 const HITS_BY_LEVEL = [2, 2, 3, 3, 4];
-/** Cumulative basic-attack damage multiplier, same indexing. */
-const DMG_MULT_BY_LEVEL = [1, 1.05, 1.05, 1.15, 1.15];
+/** The card's per-hit damage, same indexing. The swing's multiplier is the
+ * card TOTAL (hits x per-hit) over BASIC_DMG_BASELINE, and the engine then
+ * splits it back across the hits -- so the totals (30/32/36/39/44) track
+ * Ignissaur's curve, its epic-Attacker peer, while extra hits keep buying
+ * extra Burn applications rather than extra damage. */
+const PER_HIT_DMG_BY_LEVEL = [15, 16, 12, 13, 11];
+const DMG_MULT_BY_LEVEL = PER_HIT_DMG_BY_LEVEL.map((d, i) => (d * HITS_BY_LEVEL[i]) / BASIC_DMG_BASELINE);
 
 const BURN_DURATION_TICKS = STATUS_TICKS;
 const BURN_STACK_CAP = 10;
@@ -24,12 +29,18 @@ const STARLIT_ROOT_ID = "sacredwasp";
 
 /** Charging Pierce: lane width (tiles), indexed by special-ability level. */
 const WIDTH_BY_LEVEL = [1, 1, 3, 3, 3];
-/** Cumulative per-hit damage multiplier along the charge, same indexing as basic. */
-const SPECIAL_DMG_MULT_BY_LEVEL = [1, 1.05, 1.05, 1.15, 1.15];
+/** Charging Pierce's card damage per cell struck, over the same baseline.
+ * Priced per CELL: the dash hits every cell in its lane (3 wide from tier 3),
+ * so it lands on several foes plus the boss in one cast. Per-target it sits
+ * below the single-target specials (Scapegoat 40-95, Crushing Coil 35-68) --
+ * a lane at 2.5-3.17x apiece is the sweeper, not the nuke. The old 70-81
+ * card was authored when numbers were fiction (effective 1.0-1.15x). */
+const SPECIAL_DMG_BY_LEVEL = [30, 34, 34, 38, 38];
+const SPECIAL_DMG_MULT_BY_LEVEL = SPECIAL_DMG_BY_LEVEL.map((d) => d / BASIC_DMG_BASELINE);
 /** Only the final upgrade (lvl 5) leaves a fire trail. */
 const TRAIL_FROM_LEVEL = 4;
 const TRAIL_DURATION_TICKS = 6;
-/** Ticks between charges, at spd 1 (see attackCooldown's COOLDOWN_TICKS_AT_SPD_1=12 for basic attacks). */
+/** Ticks between charges, at spd 1 (see attackCooldown's COOLDOWN_TICKS_AT_SPD_1 for basic attacks). */
 const SPECIAL_COOLDOWN_TICKS = 20;
 
 function abilityIdx(unit, key) {
@@ -105,6 +116,10 @@ export function makeEmberstarModule(defBonusByLevel) {
      */
     special(unit, ctx) {
       const { aliveE, boss, gridRows, gridCols, newFx, now } = ctx;
+      // The damage IS the charge -- it lands on everything the dash passes
+      // through -- so a Rooted Emberstar has no charge to make and does
+      // nothing at all, rather than striking a lane it never crossed.
+      if (!ctx.canMove) return;
 
       const enemyPoints = aliveE.filter((e) => e.hp > 0).map((e) => ({ row: e.row, col: e.col }));
       if (boss && boss.hp > 0) enemyPoints.push({ row: boss.row + 0.5, col: boss.col + 0.5 });

@@ -23,8 +23,15 @@ import { glowpup, radiantkit, dawnbeast, solarcrown } from "./jadebunLine.js";
 import { galeserpent, vortexserpent, cyclonwyrm } from "./quetzalisLine.js";
 import { emberchirp, pyrefinch, cauterix, hearthenix } from "./emberchirpLine.js";
 import { doomgrub, nihilwyrm, wispModule } from "./doomshadeLine.js";
+import { frostpup, snowmane, blizzardback, glaciertusk } from "./igletLine.js";
+import { ironmole, steelmole, titanmole, skysage } from "./craglingLine.js";
+import { bonebeak, gravewing, charnelord } from "./bonebeakLine.js";
+import { dustling, silkhusk, gloamwing, lunashroud } from "./dustlingLine.js";
+import { leafling, canoparch, verdantlord, ancientgrove } from "./venomcoilLine.js";
+import { mosskrab, jadekrab, crystalshell, rampartops } from "./frilletLine.js";
+import { sylvandragon, ancientdragon } from "./siegefinLine.js";
 
-export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem, frosthydra, glacialhydra, bombardguin, cryogeddon, glowpup, radiantkit, dawnbeast, solarcrown, galeserpent, vortexserpent, cyclonwyrm, emberchirp, pyrefinch, cauterix, hearthenix, doomgrub, nihilwyrm, "__wisp": wispModule };
+export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem, frosthydra, glacialhydra, bombardguin, cryogeddon, glowpup, radiantkit, dawnbeast, solarcrown, galeserpent, vortexserpent, cyclonwyrm, emberchirp, pyrefinch, cauterix, hearthenix, doomgrub, nihilwyrm, frostpup, snowmane, blizzardback, glaciertusk, ironmole, steelmole, titanmole, skysage, bonebeak, gravewing, charnelord, dustling, silkhusk, gloamwing, lunashroud, leafling, canoparch, verdantlord, ancientgrove, mosskrab, jadekrab, crystalshell, rampartops, sylvandragon, ancientdragon, "__wisp": wispModule };
 
 /** Look up a player creature's ability module. Returns undefined if unimplemented. */
 export function getPlayerAbilityModule(creatureId) {

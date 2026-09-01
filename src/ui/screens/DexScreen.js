@@ -11,6 +11,8 @@ import { getEvolutionStage, getDisplayArt } from "../../core/creatures.js";
 import DexEntry from "../../ui/screens/DexEntry.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
+import EffectFilterScreen from "../../ui/components/EffectFilterScreen.js";
+import { getCreatureEffectLabels } from "../../core/abilityText.js";
 
 const STAGE_LABELS={1:"1st",2:"2nd",3:"3rd",4:"4th"};
 
@@ -25,6 +27,8 @@ function DexScreen({onBack}){
   const [activeStages,setActiveStages]=useState(new Set());
   const [missingOnly,setMissingOnly]=useState(false);
   const [filtersOpen,setFiltersOpen]=useState(false);
+  const [activeEffects,setActiveEffects]=useState(new Set());
+  const [effectsOpen,setEffectsOpen]=useState(false);
 
   // Every stage is its own dex entry now (pre-evolutions included), so
   // "collected" is per-form -- own that exact stage, not just any stage in
@@ -39,17 +43,26 @@ function DexScreen({onBack}){
     if(activeRoles.size>0)list=list.filter(def=>activeRoles.has(def.role));
     if(activeAttackTypes.size>0)list=list.filter(def=>activeAttackTypes.has(def.attackType));
     if(activeStages.size>0)list=list.filter(def=>activeStages.has(getEvolutionStage(def.id)));
+    // AND semantics: the kit must carry every selected effect (labels come
+    // from the same ability tags the detail cards show).
+    if(activeEffects.size>0)list=list.filter(def=>{const labels=getCreatureEffectLabels(def.id);return [...activeEffects].every(l=>labels.has(l));});
     if(search.trim()){const q=search.trim().toLowerCase();list=list.filter(def=>def.name.toLowerCase().includes(q));}
     return list;
-  },[activeRarities,activeTypes,activeRoles,activeAttackTypes,activeStages,missingOnly,search,owned]);
+  },[activeRarities,activeTypes,activeRoles,activeAttackTypes,activeStages,activeEffects,missingOnly,search,owned]);
 
   function toggleRarity(r){setActiveRarities(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
   function toggleType(t){setActiveTypes(prev=>{const n=new Set(prev);n.has(t)?n.delete(t):n.add(t);return n;});}
   function toggleRole(r){setActiveRoles(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
   function toggleAttackType(a){setActiveAttackTypes(prev=>{const n=new Set(prev);n.has(a)?n.delete(a):n.add(a);return n;});}
   function toggleStage(s){setActiveStages(prev=>{const n=new Set(prev);n.has(s)?n.delete(s):n.add(s);return n;});}
+  function toggleEffect(l){setActiveEffects(prev=>{const n=new Set(prev);n.has(l)?n.delete(l):n.add(l);return n;});}
 
   if(selected)return React.createElement(DexEntry,{def:selected,onBack:()=>setSelected(null),onNavigate:(d)=>setSelected(d),unlockedSkins,navList:visibleForms});
+
+  if(effectsOpen)return React.createElement(EffectFilterScreen,{
+    active:activeEffects,onToggle:toggleEffect,
+    onClear:()=>setActiveEffects(new Set()),onBack:()=>setEffectsOpen(false)
+  });
 
   return React.createElement("div",null,
     React.createElement(ScreenHeader,{title:"Creature Dex",onBack,right:
@@ -103,12 +116,23 @@ function DexScreen({onBack}){
           )
         )
       ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Evolution"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           [1,2,3,4].map(s=>
             React.createElement("button",{key:s,className:"filter-chip"+(activeStages.has(s)?" active":""),onClick:()=>toggleStage(s)},STAGE_LABELS[s])
           )
+        )
+      ),
+      // Effect filter: active labels render as removable chips; the ＋ button
+      // opens the full-page catalog (EffectFilterScreen).
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+        React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Effects"),
+        React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
+          [...activeEffects].sort().map(l=>
+            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},l+" ✕")
+          ),
+          React.createElement("button",{className:"filter-chip",onClick:()=>setEffectsOpen(true)},"＋ Select")
         )
       )
     ),

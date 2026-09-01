@@ -3,12 +3,20 @@
 // snapshot each render, so HP/debuffs stay live while it's open.
 
 import React from "../../react.js";
-import { statModStacks } from "../../battle/status.js";
+import { statModStacks, overTimeStacks } from "../../battle/status.js";
+import { protectStacks } from "../../battle/hp.js";
+
+/** The over-time debuffs (battle/status.js): one identical effect, two names,
+ * each carrying its own independent stacks. Shown with a ×n stack count. */
+const OVER_TIME_ROWS = [
+  { flavor: "dot", icon: "🟣", label: "Damage Over Time" },
+  { flavor: "poison", icon: "🐍", label: "Poison" },
+];
 
 export const DEBUFF_DEFS = [
   { key: "burnTicks", icon: "🔥", label: "Burn" },
-  { key: "poisonTicks", icon: "🐍", label: "Poison" },
-  { key: "dotTicks", icon: "🟣", label: "Damage Over Time" },
+  // Damage Over Time and Poison get their own stack-counted rows below,
+  // like Fortify.
   { key: "rootTicks", icon: "🌱", label: "Rooted" },
   { key: "weakTicks", icon: "⬇️", label: "Weakened" },
   { key: "slowTicks", icon: "🐌", label: "Slowed" },
@@ -45,6 +53,26 @@ const STAT_MOD_ROWS = [
 export function debuffsFor(u) {
   if (!u) return [];
   const rows = DEBUFF_DEFS.filter((d) => (u[d.key] || 0) > 0);
+  // Damage Over Time and Poison are the same effect under two names, so they
+  // read the same way here -- separate rows, each with its own stack count.
+  for (const ot of OVER_TIME_ROWS) {
+    const n = overTimeStacks(u, ot.flavor);
+    if (n > 0) rows.push({ key: ot.flavor, icon: ot.icon, label: ot.label + (n > 1 ? " ×" + n : "") });
+  }
+  // Fortify carries a stack count rather than a timer, so it gets its own row
+  // (like the stat mods below) instead of a DEBUFF_DEFS entry.
+  if ((u.fortifyStacks || 0) > 0) {
+    rows.push({ key: "fortify", icon: "🧱", label: "Fortify" + (u.fortifyStacks > 1 ? " ×" + u.fortifyStacks : "") });
+  }
+  // Protect is a buff carrying charges, not a timer: one stack per hit it
+  // will redirect onto the guardian (battle/hp.js).
+  const guarded = protectStacks(u);
+  if (guarded > 0) rows.push({ key: "protect", icon: "🛡️", label: "Protect" + (guarded > 1 ? " ×" + guarded : "") });
+  // Blind is a one-shot flag spent by the next attack, not a timer.
+  if (u.blinded) rows.push({ key: "blind", icon: "🌀", label: "Blind" });
+  if ((u.windbreakTicks || 0) > 0 && (u.windbreakPct || 0) > 0) {
+    rows.push({ key: "windbreak", icon: "🌬️", label: "Windbreak " + u.windbreakPct + "%" });
+  }
   for (const r of STAT_MOD_ROWS) {
     const n = statModStacks(u, r.kind, r.negative);
     if (n > 0) rows.push({ key: r.kind + (r.negative ? "-" : "+"), icon: r.icon, label: r.label + (n > 1 ? " ×" + n : "") });

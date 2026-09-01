@@ -22,6 +22,8 @@ import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
+import useRangePreview from "../../../ui/hooks/useRangePreview.js";
+import useFitTile from "../../../ui/hooks/useFitTile.js";
 
 function seedFor(depth) {
   return (depth * 2654435761) >>> 0;
@@ -49,9 +51,11 @@ function getEnemiesForDepth(depth) {
 // __giant handling). The rotations are curated for variety -- consecutive
 // boss floors differ in type, role, AND range -- and the evolution stage
 // tracks the floor's normal enemy mix (base forms early, finals late).
-const LAB_BOSS_ROTATION_BASE = ["pebbit", "voltail", "bloomphoenix", "blazehornet", "coralleviathan", "voidspider", "sacredwasp", "shockcrab", "squallhawk", "morusk"];
-const LAB_BOSS_ROTATION_MID = ["infernohive", "tidecrush", "galebeak", "jadekrab", "divinedrone", "shadowspider", "voltcrusher", "deepdrake", "spectrumcrab", "steelmole"];
-const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "arcstorm", "lifephoenix", "infernoswarm", "tidelord", "abyssspider", "holyswarm", "galvaniccrab", "strikewing", "ivormar"];
+// "__placeholder" slots held the retired Squallhawk line; they stand in until
+// the replacement creatures land (see RETIRED_CREATURE_IDS in data/creatures.js).
+const LAB_BOSS_ROTATION_BASE = ["pebbit", "voltail", "bloomphoenix", "blazehornet", "coralleviathan", "voidspider", "sacredwasp", "shockcrab", "__placeholder", "morusk"];
+const LAB_BOSS_ROTATION_MID = ["infernohive", "tidecrush", "__placeholder", "jadekrab", "divinedrone", "shadowspider", "voltcrusher", "deepdrake", "spectrumcrab", "steelmole"];
+const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "arcstorm", "lifephoenix", "infernoswarm", "tidelord", "abyssspider", "holyswarm", "galvaniccrab", "__placeholder", "ivormar"];
 
 /** The predetermined Boss creature for a depth, or null off boss floors. */
 function getLabyrinthBossForDepth(depth) {
@@ -62,16 +66,17 @@ function getLabyrinthBossForDepth(depth) {
 }
 
 function getEnemyLayoutForDepth(depth) {
-  // Floor 1 is hand-placed: 2 fixed enemies (Duskling + Sparkit) instead of
+  // Floor 1 is hand-placed: 2 fixed enemies (Duskling + Cirruskit) instead of
   // the usual seeded 6-enemy roster (see FLOOR_1_DIFFICULTY in
   // core/labyrinth.js for the matching stat tuning -- both were calibrated
-  // together).
+  // together). Cirruskit took the second slot when the Sparkit line was
+  // retired; it is the closest stand-in the roster still has.
   if (depth === 1) {
     const duskling = CREATURE_MAP["shadowpup"];
-    const sparkit = CREATURE_MAP["sparkpup"];
+    const cirruskit = CREATURE_MAP["breezekit"];
     const layout = {};
     if (duskling) layout["1,1"] = duskling;
-    if (sparkit) layout["1,3"] = sparkit;
+    if (cirruskit) layout["1,3"] = cirruskit;
     return layout;
   }
   let enemies = getEnemiesForDepth(depth);
@@ -145,6 +150,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const continueTimerRef = React.useRef(null);
   const [dragId, setDragId] = useState(null);
   const [dragCell, setDragCell] = useState(null);
+  // Planning board shrinks to its column rather than making it scroll.
+  const [planAreaRef, planTile, planClamped] = useFitTile(ARENA_GRID_ROWS, ARENA_GRID_COLS, ARENA_TILE, { reserveW: PLAN_PANEL_MIN_W });
   const [enemyInfo, setEnemyInfo] = useState(null); // { id, boss } | null
   const [bossInfoOpen, setBossInfoOpen] = useState(false);
   const [floor10Warning, setFloor10Warning] = useState(false);
@@ -252,11 +259,24 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     applyDrop(r, c, { id: dragId, fromCell: dragCell });
     setDragId(null); setDragCell(null);
   }
+  // Attack-range preview: while a creature is being dragged over the grid, tint
+  // every tile it would be able to reach from the cell under the pointer.
+  const rangePreview = useRangePreview(ARENA_GRID_ROWS, ARENA_GRID_COLS);
+  /** The creature a drag is carrying, from either origin (tray or grid cell). */
+  function draggedCreature() { return dragId || (dragCell ? planGrid[dragCell] : null); }
+  function previewAt(cid, r, c) { if (!cid) { rangePreview.clear(); return; } rangePreview.show(cid, r, c, owned && owned[cid]); }
   const touchDrag = useTouchDragPlacement({
     cellSelector: "[data-cell]",
     applyDrop,
     onCancelHold: () => { endHold(); if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } },
     onCancelDrop: (fromCell) => setPlanGrid((p) => { const n = { ...p }; delete n[fromCell]; return n; }),
+    onDragOverCell: (cellKey, d) => {
+      const cid = d.id || d.cellId;
+      if (!cellKey || !cid) { rangePreview.clear(); return; }
+      const [r, c] = cellKey.split(",").map(Number);
+      if (r < ARENA_PLAYER_START_ROW) { rangePreview.clear(); return; }
+      previewAt(cid, r, c);
+    },
   });
 
   function stopLoops() {
@@ -415,7 +435,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   if (battleOutcome) {
     const won = battleOutcome === "won";
     const reward = getDepthReward(wonDepthRef.current);
-    return React.createElement("div", { style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#fff", zIndex: 210, padding: 24, textAlign: "center" } },
+    return React.createElement("div", { key: "sfv421", className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#fff", zIndex: 210, padding: 24, textAlign: "center" } },
       React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, won ? "✅" : "💀"),
       React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: won ? "#534AB7" : "#ef4444", marginBottom: won ? 20 : 4 } }, won ? "Floor " + wonDepthRef.current + " Complete" : "Defeat!"),
       won && React.createElement("div", { style: { marginBottom: 20, minHeight: 55, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 } },
@@ -449,7 +469,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     const snap = bSnap || { playerUnits: [], enemyUnits: [], damageDealt: {} };
     const allUnits = [...snap.playerUnits, ...snap.enemyUnits];
     const selectedUnit = battleSelectedUid ? allUnits.find((u) => u.uid === battleSelectedUid) : null;
-    return React.createElement("div", { style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
+    return React.createElement("div", { key: "sfv455", className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 10, background: "#fff", borderBottom: "1px solid #e0e0e0", flexShrink: 0 } },
         React.createElement("div", { style: { flex: 1 } },
           React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111" } }, "🌀 Labyrinth — Floor " + depth)
@@ -545,7 +565,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   }
   const deployedCount = Object.keys(planGrid).length;
   const enemyGrid = withBossFootprint(getEnemyLayoutForDepth(depth));
-  return React.createElement("div", { style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
+  return React.createElement("div", { key: "sfv551", className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
       labAbilityTagPopup && React.createElement(AbilityTagPopup, { popup: labAbilityTagPopup, onClose: () => setLabAbilityTagPopup(null) }),
       // What the crown beside a Boss's name means. Same shape as
       // AbilityTagPopup so every definition popup reads the same.
@@ -553,7 +573,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         onClick: () => setBossInfoOpen(false),
         style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300 },
       },
-        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 14, padding: "18px 20px", width: 280, maxWidth: "85vw", boxShadow: "0 8px 30px rgba(0,0,0,0.25)" } },
+        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 14, padding: "18px 20px", width: 280, maxWidth: "calc(85 * var(--vw))", boxShadow: "0 8px 30px rgba(0,0,0,0.25)" } },
           React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 8 } }, "👑 Boss"),
           React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.4, marginBottom: 16 } }, "+25% to all stats"),
           React.createElement("button", { onClick: () => setBossInfoOpen(false), style: { width: "100%", padding: "9px 0", background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "Close")
@@ -574,9 +594,11 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           style: { background: (deployedCount > 0 && depth < MAX_LABYRINTH_DEPTH) ? "#534AB7" : "#ccc", border: "none", borderRadius: 10, padding: "6px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: (deployedCount > 0 && depth < MAX_LABYRINTH_DEPTH) ? "pointer" : "default" },
         }, depth >= MAX_LABYRINTH_DEPTH ? "Max Floor" : "Fight →")
       ),
-      React.createElement("div", { style: { flex: 1, overflowY: "auto", display: "flex", justifyContent: "flex-start", alignItems: "flex-start", padding: "16px 0 16px 16px", gap: 12 } },
+      // Never scrolls -- planTile shrinks the board to whatever height this
+      // row ends up with (see useFitTile).
+      React.createElement("div", { ref: planAreaRef, style: { flex: 1, minHeight: 0, overflowX: "hidden", overflowY: planClamped ? "auto" : "hidden", display: "flex", justifyContent: "flex-start", alignItems: "flex-start", padding: "16px 0 16px 16px", gap: 12 } },
         React.createElement("div", { style: { borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0 } },
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: `repeat(${ARENA_GRID_COLS},${ARENA_TILE}px)`, gridTemplateRows: `repeat(${ARENA_GRID_ROWS},${ARENA_TILE}px)`, gap: 0 } },
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: `repeat(${ARENA_GRID_COLS},${planTile}px)`, gridTemplateRows: `repeat(${ARENA_GRID_ROWS},${planTile}px)`, gap: 0 } },
             Array.from({ length: ARENA_GRID_ROWS }, (_, r) => Array.from({ length: ARENA_GRID_COLS }, (_, c) => {
               const isPlayerZone = r >= ARENA_PLAYER_START_ROW;
               const key = r + "," + c;
@@ -599,14 +621,15 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                 key, "data-cell": key,
                 draggable: !!(isPlayerZone && creatureId),
                 onDragStart: isPlayerZone && creatureId ? (e) => { e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
-                onDragOver: isPlayerZone ? (e) => e.preventDefault() : undefined,
-                onDrop: isPlayerZone ? (e) => { e.preventDefault(); handleCellDrop(r, c); } : undefined,
+                onDragEnd: isPlayerZone && creatureId ? () => rangePreview.clear() : undefined,
+                onDragOver: isPlayerZone ? (e) => { e.preventDefault(); previewAt(draggedCreature(), r, c); } : () => rangePreview.clear(),
+                onDrop: isPlayerZone ? (e) => { e.preventDefault(); rangePreview.clear(); handleCellDrop(r, c); } : undefined,
                 onMouseDown: onHoldStart,
                 onMouseUp: onHoldEnd,
                 onTouchStart: onHoldStart ? (e) => { e.preventDefault(); onHoldStart(); if (isPlayerZone && creatureId) touchDrag.start(e, { fromCell: key, cellId: creatureId }); } : undefined,
                 onTouchEnd: onHoldEnd,
                 style: {
-                  width: ARENA_TILE, height: ARENA_TILE,
+                  width: planTile, height: planTile,
                   background: isPlayerZone ? "#f0f0f0" : "#fdf7f7",
                   borderTop: isDivider ? "2.5px solid #534AB7" : r === 0 ? "0" : BORDER,
                   borderLeft: c === 0 ? "0" : BORDER,
@@ -614,6 +637,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 26, cursor: isPlayerZone ? (creatureId ? "grab" : "default") : "default",
                   boxSizing: "border-box", userSelect: "none",
+                  ...(rangePreview.cellStyle(key) || {}),
                 },
               }, (() => {
                 const d = def || enemyDef;
@@ -624,19 +648,19 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                 if (d.__giantFootprint) return "";
                 if (d.__giant) {
                   return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", pointerEvents: "none" } },
-                    React.createElement("div", { style: { position: "absolute", top: 0, left: 0, width: ARENA_TILE * 2, height: ARENA_TILE * 2, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, borderRadius: 10, boxShadow: "inset 0 0 0 2px rgba(245,158,11,0.75)" } },
-                      React.createElement(CreatureIcon, { def: d, size: ARENA_TILE * 2, contain: true }),
+                    React.createElement("div", { style: { position: "absolute", top: 0, left: 0, width: planTile * 2, height: planTile * 2, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, borderRadius: 10, boxShadow: "inset 0 0 0 2px rgba(245,158,11,0.75)" } },
+                      React.createElement(CreatureIcon, { def: d, size: planTile * 2, contain: true }),
                       React.createElement("span", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 12, lineHeight: 1 } }, "👑"),
                       React.createElement("span", { style: { position: "absolute", top: 3, left: 4, fontSize: 9, lineHeight: 1 } }, TYPE_EMOJI[d.type] || ""),
                       React.createElement("span", { style: { position: "absolute", top: 3, right: 4, fontSize: 9, lineHeight: 1 } }, d.attackType === "Ranged" ? "🏹" : "⚔️")
                     ));
                 }
-                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: ARENA_TILE, contain: true }));
+                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: planTile, contain: true }));
               })());
             })).flat()
           )
         ),
-        React.createElement("div", { ref: rightPanelRef, style: { flex: 1, alignSelf: "stretch", padding: "0 12px 0 0", minWidth: 0, display: "flex", flexDirection: "column", gap: 8, overflow: "hidden" } },
+        React.createElement("div", { ref: rightPanelRef, className: "plan-side-panel", style: { flex: 1, alignSelf: "stretch", padding: "0 12px 0 0", minWidth: 0, display: "flex", flexDirection: "column", gap: 8 } },
           enemyInfo && (() => {
             const def = CREATURE_MAP[enemyInfo.id];
             if (!def) return null;
@@ -663,7 +687,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 } },
                     React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 } }, abilityLabels[k] || k),
                     abilityTags.length > 0 && React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" } },
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup})
+                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup,compact:true})
                     )
                   ),
                   React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
@@ -693,7 +717,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 } },
                     React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 } }, abilityLabels[k] || k),
                     abilityTags.length > 0 && React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" } },
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup})
+                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup,compact:true})
                     )
                   ),
                   React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
@@ -721,8 +745,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       ),
       React.createElement("div", {
         style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },
-        onDragOver: (e) => e.preventDefault(),
-        onDrop: (e) => { e.preventDefault(); if (dragCell) { setPlanGrid((p) => { const n = { ...p }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
+        onDragOver: (e) => { e.preventDefault(); rangePreview.clear(); },
+        onDrop: (e) => { e.preventDefault(); rangePreview.clear(); if (dragCell) { setPlanGrid((p) => { const n = { ...p }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
       },
         React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 } },
           React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 4 } },
@@ -753,6 +777,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               "data-creature": oc.id,
               draggable: !isPlaced,
               onDragStart: !isPlaced ? (e) => { if (dragScroll.current.intentScroll) { e.preventDefault(); return; } if (hs.current.id === oc.id) { e.preventDefault(); return; } endHold(); e.dataTransfer.effectAllowed = "move"; setDragId(oc.id); setDragCell(null); } : undefined,
+              onDragEnd: !isPlaced ? () => rangePreview.clear() : undefined,
               onMouseDown: () => beginHold(oc.id),
               onMouseUp: endHold,
               onTouchStart: (e) => { e.preventDefault(); beginHold(oc.id); if (!isPlaced) touchDrag.start(e, { id: oc.id }); },

@@ -50,9 +50,14 @@ export function artLoops(state, entry) {
 }
 
 export const CREATURE_ART = {
-  // Legacy single image, migrated from creatures.js's old `image:` field. It is
-  // drawn on opaque white, hence the multiply blend.
-  breezekit: { idle: { src: "images/breezekit.png", blend: "multiply" } },
+  // Was legacy art on an opaque white background, and carried `blend:
+  // "multiply"` to knock that background out. The file now ships real alpha
+  // (measured: no white pixels at all, 81% fully transparent), so the blend had
+  // nothing left to erase except the artwork itself -- multiplying the
+  // creature's own colours into every surface behind it, which turned it muddy
+  // on the tinted cards and near-black on dark ones. Nothing to knock out any
+  // more; the alpha does the job.
+  breezekit: { idle: { src: "images/breezekit.png" } },
 
   // Blastar (id "infernoswarm" -- final stage of the Emberstar line).
   // Attack and defeat are stills: attack shows for ATTACK_ART_MS after each

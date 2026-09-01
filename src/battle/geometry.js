@@ -4,7 +4,17 @@
 // than closing over module constants, so the same code serves the 6x10 dungeon
 // grid, the 5x8 arena grid, and any future size.
 
-import { BOSS_SIZE } from "./constants.js";
+import { BOSS_SIZE, MELEE_RANGE, RANGED_RANGE } from "./constants.js";
+
+/**
+ * How far a unit can reach with a basic attack, in tiles. Ranged creatures
+ * start at RANGED_RANGE and melee at MELEE_RANGE; `rangeBonus` extends either
+ * (Siegefin's Deepsight). Every range check in the engine goes through here so
+ * a bonus applies to targeting and attacking alike, never one without the other.
+ */
+export function attackRangeOf(u) {
+  return (u.isRanged ? RANGED_RANGE : MELEE_RANGE) + (u.rangeBonus || 0);
+}
 
 /** 8-directional distance. This is the range metric attacks use. */
 export function aChebDist(r1, c1, r2, c2) {

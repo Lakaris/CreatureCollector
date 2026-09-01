@@ -183,7 +183,7 @@ function GachaScreen({onHatch}){
               React.createElement("div",{style:{height:"100%",width:pct+"%",background:banner.titleColor,opacity:.7,borderRadius:4,transition:"width .3s"}})
             )
           ),
-          React.createElement("div",{className:"rates-table",style:{marginTop:0,marginBottom:16,textAlign:"left",maxHeight:"50vh",overflowY:"auto"}},
+          React.createElement("div",{className:"rates-table",style:{marginTop:0,marginBottom:16,textAlign:"left",maxHeight:"calc(50 * var(--vh))",overflowY:"auto"}},
             banner.rates
               ? banner.rates.map((entry,i)=>{
                   const label=entry.type==="creature"
@@ -237,7 +237,7 @@ function GachaScreen({onHatch}){
       const ownedData=owned[c.id];
       const shards=ownedData?ownedData.shards:0;
       const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
-      return React.createElement("div",{style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}},
+      return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}},
         React.createElement("div",{style:{alignSelf:"flex-end",marginBottom:8,display:"flex",gap:6}},
           React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+formatNum(currencies[eggKey]||0)),
           !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+formatNum(currencies.gems))
@@ -338,7 +338,7 @@ function GachaScreen({onHatch}){
       const c=detailItem.def;const isNew=detailItem.isNew;const shards=detailItem.shards;
       const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
       return React.createElement("div",{className:"modal-overlay",style:{zIndex:400},onClick:()=>setDetailItem(null)},
-        React.createElement("div",{className:"modal-box",style:{maxWidth:460,maxHeight:"85vh",overflowY:"auto"},onClick:e=>e.stopPropagation()},
+        React.createElement("div",{className:"modal-box",style:{maxWidth:460,maxHeight:"calc(85 * var(--vh))",overflowY:"auto"},onClick:e=>e.stopPropagation()},
           React.createElement("span",{style:{fontSize:72,display:"block",marginBottom:8}},c.emoji),
           isNew&&React.createElement("span",{style:{display:"inline-block",fontSize:11,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"2px 10px",marginBottom:8,letterSpacing:".04em"}},"NEW"),
           React.createElement("span",{className:"badge "+RARITY_CONFIG[c.rarity].color,style:{display:"inline-block",marginBottom:10}},RARITY_CONFIG[c.rarity].label),

@@ -5,7 +5,11 @@
 // fields are purely cosmetic and do NOT gate the stat bonus.
 
 export const FLAIR_RARITIES=[{id:"common",label:"Common"},{id:"rare",label:"Rare"},{id:"epic",label:"Epic"},{id:"legendary",label:"Legendary"}];
-export const BUFF_STAT_LABEL={hp:"Health",atk:"Attack",def:"Defense",spd:"Speed",abilitySpeed:"Haste"};
+// Short forms for the crit pair. A flair's buff line lives in a card barely
+// 60px wide, and "+0.1% Crit Chance" does not fit even at the smallest size the
+// auto-fitting label will go to -- it ellipsized. These match the abbreviations
+// the creature page's stat pills already use.
+export const BUFF_STAT_LABEL={hp:"Health",atk:"Attack",def:"Defense",spd:"Speed",abilitySpeed:"Haste",crit:"Crit",critDmg:"Crit Dmg"};
 export const FLAIR_TITLES={
   common:[
     {name:"Bold",      buff:{stat:"hp",           pct:0.5}},
@@ -23,11 +27,11 @@ export const FLAIR_TITLES={
     {name:"Swift",     buff:{stat:"spd",          pct:0.1}},
     {name:"Keen",      buff:{stat:"spd",          pct:0.1}},
     {name:"Quick",     buff:{stat:"spd",          pct:0.1}},
-    {name:"Loyal",     buff:{stat:"spd",          pct:0.1}},
+    {name:"Loyal",     buff:{stat:"crit",         pct:0.1}},
     {name:"Clever",    buff:{stat:"abilitySpeed", pct:0.1}},
     {name:"Proud",     buff:{stat:"abilitySpeed", pct:0.1}},
     {name:"Fair",      buff:{stat:"abilitySpeed", pct:0.1}},
-    {name:"Wise",      buff:{stat:"abilitySpeed", pct:0.1}},
+    {name:"Wise",      buff:{stat:"critDmg",      pct:0.5}},
   ],
   rare:[
     {name:"Stone Guard",     buff:{stat:"hp",           pct:1}},
@@ -45,11 +49,11 @@ export const FLAIR_TITLES={
     {name:"Wind Chaser",     buff:{stat:"spd",          pct:0.3}},
     {name:"Wave Rider",      buff:{stat:"spd",          pct:0.3}},
     {name:"Dawn Breaker",    buff:{stat:"spd",          pct:0.3}},
-    {name:"Tide Caller",     buff:{stat:"spd",          pct:0.3}},
+    {name:"Tide Caller",     buff:{stat:"crit",         pct:0.2}},
     {name:"Star Gazer",      buff:{stat:"abilitySpeed", pct:0.3}},
     {name:"Void Seeker",     buff:{stat:"abilitySpeed", pct:0.3}},
     {name:"Soul Binder",     buff:{stat:"abilitySpeed", pct:0.3}},
-    {name:"Flame Keeper",    buff:{stat:"abilitySpeed", pct:0.3}},
+    {name:"Flame Keeper",    buff:{stat:"critDmg",      pct:1}},
   ],
   epic:[
     {name:"Titan of the Frost",   buff:{stat:"hp",           pct:3}},
@@ -67,11 +71,11 @@ export const FLAIR_TITLES={
     {name:"Harbinger of Dawn",    buff:{stat:"spd",          pct:0.5}},
     {name:"Tempest Incarnate",    buff:{stat:"spd",          pct:0.5}},
     {name:"Ascendant Flame",      buff:{stat:"spd",          pct:0.5}},
-    {name:"Herald of Thunder",    buff:{stat:"spd",          pct:0.5}},
+    {name:"Herald of Thunder",    buff:{stat:"crit",         pct:0.25}},
     {name:"Sovereign of Tides",   buff:{stat:"abilitySpeed", pct:0.5}},
     {name:"Seeker of Eternity",   buff:{stat:"abilitySpeed", pct:0.5}},
     {name:"Emperor of Wind",      buff:{stat:"abilitySpeed", pct:0.5}},
-    {name:"Oracle of Stars",      buff:{stat:"abilitySpeed", pct:0.5}},
+    {name:"Oracle of Stars",      buff:{stat:"critDmg",      pct:2}},
   ],
   legendary:[
     {name:"Eternal Colossus",     buff:{stat:"hp",           pct:5}},
@@ -89,11 +93,11 @@ export const FLAIR_TITLES={
     {name:"Last Light",           buff:{stat:"spd",          pct:1}},
     {name:"First Born",           buff:{stat:"spd",          pct:1}},
     {name:"Architect of Fate",    buff:{stat:"spd",          pct:1}},
-    {name:"Lord of the Void",     buff:{stat:"spd",          pct:1}},
+    {name:"Lord of the Void",     buff:{stat:"crit",         pct:0.5}},
     {name:"God of Ruin",          buff:{stat:"abilitySpeed", pct:1}},
     {name:"Bringer of the End",   buff:{stat:"abilitySpeed", pct:1}},
     {name:"Ruler of the Infinite",buff:{stat:"abilitySpeed", pct:1}},
-    {name:"Ascendant God",        buff:{stat:"abilitySpeed", pct:1}},
+    {name:"Ascendant God",        buff:{stat:"critDmg",      pct:5}},
   ],
 };
 export const FLAIR_TITLE_MAP=Object.fromEntries(Object.values(FLAIR_TITLES).flat().map(t=>[t.name,t]));
@@ -114,11 +118,11 @@ export const FLAIR_AURAS={
     {id:"smoke_white",name:"White Smoke",emoji:"🌫️",desc:"A thin wisp of white smoke curls upward"},
     {id:"water_drip",name:"Water Drips",emoji:"💦",desc:"Small droplets fall from the creature"},
     {id:"clovers",name:"Clovers",emoji:"🍀",desc:"Lucky clovers tumble past the creature"},
-    {id:"stars_tiny",name:"Tiny Stars",emoji:"⭐",desc:"Faint pinprick stars orbit slowly"},
+    {id:"stars_tiny",name:"Tiny Stars",emoji:"⭐",desc:"Faint pinprick stars orbit slowly",buff:{stat:"crit",pct:0.1}},
     {id:"hearts_small",name:"Small Hearts",emoji:"🤍",desc:"Pale white hearts float upward"},
     {id:"wind_lines",name:"Wind Lines",emoji:"🌬️",desc:"Soft streaks of wind trail behind"},
     {id:"embers_cool",name:"Cool Embers",emoji:"🩶",desc:"Gray embers drift up and fade"},
-    {id:"dew_drops",name:"Dew Drops",emoji:"🌊",desc:"Glistening droplets bead along the ground"},
+    {id:"dew_drops",name:"Dew Drops",emoji:"🌊",desc:"Glistening droplets bead along the ground",buff:{stat:"critDmg",pct:0.5}},
   ],
   rare:[
     {id:"flame_blue",name:"Blue Flame",emoji:"🔵",desc:"Cool blue flames lick upward from the feet"},
@@ -136,11 +140,11 @@ export const FLAIR_AURAS={
     {id:"sand_swirl",name:"Sand Swirl",emoji:"🏜️",desc:"Fine sand spirals at ground level"},
     {id:"ink_drops",name:"Ink Drops",emoji:"🖤",desc:"Black droplets splash and fade underfoot"},
     {id:"crystal_shards",name:"Crystal Shards",emoji:"💎",desc:"Small crystals float and slowly rotate"},
-    {id:"ember_orange",name:"Orange Embers",emoji:"🔥",desc:"Hot orange embers drift and flicker upward"},
+    {id:"ember_orange",name:"Orange Embers",emoji:"🔥",desc:"Hot orange embers drift and flicker upward",buff:{stat:"crit",pct:0.2}},
     {id:"aurora_green",name:"Green Aurora",emoji:"💚",desc:"A faint green aurora ripples behind the creature"},
     {id:"thunder_ground",name:"Thunder Ground",emoji:"🌩️",desc:"Cracks of lightning branch across the floor"},
     {id:"vine_crawl",name:"Crawling Vines",emoji:"🌱",desc:"Thin vines creep outward from the feet"},
-    {id:"snow_burst",name:"Snow Burst",emoji:"⛄",desc:"A burst of snowflakes radiates outward with each step"},
+    {id:"snow_burst",name:"Snow Burst",emoji:"⛄",desc:"A burst of snowflakes radiates outward with each step",buff:{stat:"critDmg",pct:1}},
   ],
   epic:[
     {id:"lava_ground",name:"Lava Cracks",emoji:"🌋",desc:"Glowing lava seeps through cracks in the ground"},
@@ -158,11 +162,11 @@ export const FLAIR_AURAS={
     {id:"tide_surge",name:"Tide Surge",emoji:"🌊",desc:"Crashing waves radiate outward along the ground"},
     {id:"time_shatter",name:"Time Shatter",emoji:"⏳",desc:"Hourglasses and clocks fragment and orbit the creature"},
     {id:"ember_vortex",name:"Ember Vortex",emoji:"🔥",desc:"A spinning column of fire wraps the creature's body"},
-    {id:"crystal_bloom",name:"Crystal Bloom",emoji:"💜",desc:"Amethyst crystals bloom and shatter on the ground"},
+    {id:"crystal_bloom",name:"Crystal Bloom",emoji:"💜",desc:"Amethyst crystals bloom and shatter on the ground",buff:{stat:"crit",pct:0.25}},
     {id:"thunder_wings",name:"Thunder Wings",emoji:"🦅",desc:"Arcing electricity forms the silhouette of huge wings"},
     {id:"plague_mist",name:"Plague Mist",emoji:"☠️",desc:"Sickly green mist rolls across the ground"},
     {id:"starfall",name:"Starfall",emoji:"💫",desc:"Stars plummet in streams around the creature"},
-    {id:"iron_fortress",name:"Iron Fortress",emoji:"🏰",desc:"Heavy metallic plates rotate in a slow defensive ring"},
+    {id:"iron_fortress",name:"Iron Fortress",emoji:"🏰",desc:"Heavy metallic plates rotate in a slow defensive ring",buff:{stat:"critDmg",pct:2}},
   ],
   legendary:[
     {id:"cosmic_collapse",name:"Cosmic Collapse",emoji:"🌌",desc:"A miniature galaxy implodes and reforms around the creature"},
@@ -180,11 +184,11 @@ export const FLAIR_AURAS={
     {id:"reaper_mist",name:"Reaper Mist",emoji:"💀",desc:"Skulls and dark smoke pour from the creature like a river"},
     {id:"celestial_armor",name:"Celestial Armor",emoji:"✨",desc:"Plate armor of pure starlight assembles and dissolves"},
     {id:"death_clock",name:"Death Clock",emoji:"🕰️",desc:"A colossal clock face emerges, ticking down ominously"},
-    {id:"genesis_bloom",name:"Genesis Bloom",emoji:"🌸",desc:"A whole ecosystem blooms to life and dies with each step"},
+    {id:"genesis_bloom",name:"Genesis Bloom",emoji:"🌸",desc:"A whole ecosystem blooms to life and dies with each step",buff:{stat:"crit",pct:0.5}},
     {id:"chaos_storm",name:"Chaos Storm",emoji:"🌪️",desc:"Every element erupts at once in a violent spiraling storm"},
     {id:"eternal_winter",name:"Eternal Winter",emoji:"❄️",desc:"A blizzard of absolute zero encases the surrounding ground"},
     {id:"eclipse_halo",name:"Eclipse Halo",emoji:"🌑",desc:"A permanent solar eclipse follows overhead, casting divine shadow"},
-    {id:"omnipotent_glow",name:"Omnipotent Glow",emoji:"🌟",desc:"Pure blinding white light radiates from every inch of the body"},
+    {id:"omnipotent_glow",name:"Omnipotent Glow",emoji:"🌟",desc:"Pure blinding white light radiates from every inch of the body",buff:{stat:"critDmg",pct:5}},
   ],
 };
 export const FLAIR_BACKGROUNDS={
@@ -204,11 +208,11 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_mud",name:"Muddy Swamp",emoji:"🟤",desc:"A boggy swamp with murky water patches"},
     {id:"bg_snow_plain",name:"Snowy Field",emoji:"🌨️",desc:"A flat field blanketed in fresh snow"},
     {id:"bg_village",name:"Village Road",emoji:"🏘️",desc:"A cobblestone road through a small village"},
-    {id:"bg_market",name:"Busy Market",emoji:"🛒",desc:"Colorful market stalls and banners"},
+    {id:"bg_market",name:"Busy Market",emoji:"🛒",desc:"Colorful market stalls and banners",buff:{stat:"crit",pct:0.1}},
     {id:"bg_canyon",name:"Dry Canyon",emoji:"🏜️",desc:"A cracked canyon floor under harsh sun"},
     {id:"bg_autumn",name:"Autumn Woods",emoji:"🍁",desc:"Trees blazing with red and gold autumn color"},
     {id:"bg_sunrise",name:"Sunrise Meadow",emoji:"🌄",desc:"A dewy meadow glowing in soft sunrise light"},
-    {id:"bg_dock",name:"Old Dock",emoji:"⚓",desc:"Creaky wooden planks over calm harbour water"},
+    {id:"bg_dock",name:"Old Dock",emoji:"⚓",desc:"Creaky wooden planks over calm harbour water",buff:{stat:"critDmg",pct:0.5}},
   ],
   rare:[
     {id:"bg_volcano",name:"Volcanic Ridge",emoji:"🌋",desc:"A smoking ridge overlooking a lava lake"},
@@ -226,11 +230,11 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_crystal_cave",name:"Crystal Cave",emoji:"💎",desc:"A cavern encrusted with glittering gemstone walls"},
     {id:"bg_arena",name:"Battle Arena",emoji:"⚔️",desc:"A stone arena scarred by countless fights"},
     {id:"bg_clocktower",name:"Clock Tower",emoji:"🕰️",desc:"The gears of a massive ancient clock tower"},
-    {id:"bg_shipwreck",name:"Shipwreck",emoji:"⛵",desc:"A sunken ship resting on the sea floor"},
+    {id:"bg_shipwreck",name:"Shipwreck",emoji:"⛵",desc:"A sunken ship resting on the sea floor",buff:{stat:"crit",pct:0.2}},
     {id:"bg_bamboo",name:"Bamboo Grove",emoji:"🎋",desc:"A serene grove of tall swaying bamboo"},
     {id:"bg_aurora",name:"Aurora Valley",emoji:"🌌",desc:"A snowy valley under dancing aurora lights"},
     {id:"bg_savanna",name:"Savanna Dusk",emoji:"🦁",desc:"A wide savanna bathed in fiery dusk light"},
-    {id:"bg_haunted",name:"Haunted Manor",emoji:"👻",desc:"A dark foggy manor with lit windows and iron gates"},
+    {id:"bg_haunted",name:"Haunted Manor",emoji:"👻",desc:"A dark foggy manor with lit windows and iron gates",buff:{stat:"critDmg",pct:1}},
   ],
   epic:[
     {id:"bg_sky_fortress",name:"Sky Fortress",emoji:"🏰",desc:"A fortress city floating in the upper atmosphere"},
@@ -248,11 +252,11 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_dragon_nest",name:"Dragon's Nest",emoji:"🐉",desc:"A scorched mountain peak littered with giant eggs"},
     {id:"bg_time_ruins",name:"Ruins of Time",emoji:"⏳",desc:"Ancient ruins where time flows visibly as streams of light"},
     {id:"bg_mirror_world",name:"Mirror World",emoji:"🪞",desc:"A perfect inverted reflection of reality stretching endlessly"},
-    {id:"bg_celestial_garden",name:"Celestial Garden",emoji:"🌸",desc:"A garden floating among the stars, blooming eternally"},
+    {id:"bg_celestial_garden",name:"Celestial Garden",emoji:"🌸",desc:"A garden floating among the stars, blooming eternally",buff:{stat:"crit",pct:0.25}},
     {id:"bg_war_torn",name:"War-Torn Wasteland",emoji:"💣",desc:"A devastated battlefield scarred by catastrophic battle"},
     {id:"bg_soul_river",name:"River of Souls",emoji:"👁️",desc:"A glowing river carrying whisps of light into the beyond"},
     {id:"bg_worldtree",name:"World Tree",emoji:"🌳",desc:"The roots and canopy of an impossibly large world tree"},
-    {id:"bg_neon_city",name:"Neon City",emoji:"🌆",desc:"A futuristic city ablaze with neon lights and holograms"},
+    {id:"bg_neon_city",name:"Neon City",emoji:"🌆",desc:"A futuristic city ablaze with neon lights and holograms",buff:{stat:"critDmg",pct:2}},
   ],
   legendary:[
     {id:"bg_genesis",name:"Genesis",emoji:"🌌",desc:"The very moment of creation — light splitting from darkness"},
@@ -270,11 +274,11 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_omniscience",name:"Omniscience",emoji:"👁️",desc:"An all-seeing realm where every timeline is visible at once"},
     {id:"bg_singularity",name:"Singularity",emoji:"💫",desc:"Every point in space converging into one blinding point"},
     {id:"bg_false_heaven",name:"False Heaven",emoji:"😇",desc:"A beautiful paradise that slowly reveals its horrifying truth"},
-    {id:"bg_death_realm",name:"Death's Domain",emoji:"💀",desc:"The personal realm of death itself — silent, vast, and final"},
+    {id:"bg_death_realm",name:"Death's Domain",emoji:"💀",desc:"The personal realm of death itself — silent, vast, and final",buff:{stat:"crit",pct:0.5}},
     {id:"bg_universe_forge",name:"Universe Forge",emoji:"🔨",desc:"The cosmic workshop where universes are hammered into shape"},
     {id:"bg_eclipse_throne",name:"Eclipse Throne",emoji:"🌑",desc:"A throne balanced on the edge of a collapsing star"},
     {id:"bg_firstlight",name:"First Light",emoji:"✨",desc:"The very first photon ever emitted — an infinite warm glow"},
-    {id:"bg_beyond",name:"Beyond",emoji:"🌠",desc:"A place that has no name, no rules, and no end"},
+    {id:"bg_beyond",name:"Beyond",emoji:"🌠",desc:"A place that has no name, no rules, and no end",buff:{stat:"critDmg",pct:5}},
   ],
 };
 export const FLAIR_ITEMS={
@@ -294,11 +298,11 @@ export const FLAIR_ITEMS={
     {id:"env_cloud_low",name:"Low Cloud",emoji:"☁️",desc:"A small puffy cloud drifting at ground level"},
     {id:"env_breeze",name:"Gentle Breeze",emoji:"🌬️",desc:"Light wind lines flowing softly past"},
     {id:"env_anthill",name:"Anthill",emoji:"🐜",desc:"A small anthill with busy ants circling it"},
-    {id:"env_reed",name:"Reed Stalks",emoji:"🎋",desc:"Thin reeds growing in a small cluster"},
+    {id:"env_reed",name:"Reed Stalks",emoji:"🎋",desc:"Thin reeds growing in a small cluster",buff:{stat:"crit",pct:0.1}},
     {id:"env_pinecone",name:"Pinecone",emoji:"🌲",desc:"A pinecone resting on a bed of needles"},
     {id:"env_snail",name:"Snail",emoji:"🐌",desc:"A slow snail making its way across the ground"},
     {id:"env_cobweb",name:"Cobweb",emoji:"🕸️",desc:"A small cobweb draped between two twigs"},
-    {id:"env_clover",name:"Clover Patch",emoji:"🍀",desc:"A patch of bright green clover on the ground"},
+    {id:"env_clover",name:"Clover Patch",emoji:"🍀",desc:"A patch of bright green clover on the ground",buff:{stat:"critDmg",pct:0.5}},
   ],
   rare:[
     {id:"env_tree_branch",name:"Tree Branch",emoji:"🌳",desc:"A large gnarled branch arching overhead"},
@@ -316,11 +320,11 @@ export const FLAIR_ITEMS={
     {id:"env_ivy_wall",name:"Ivy Wall",emoji:"🌿",desc:"A crumbling wall thick with climbing ivy"},
     {id:"env_moonbeam",name:"Moonbeam",emoji:"🌙",desc:"A shaft of pale moonlight cutting through the scene"},
     {id:"env_crystal_cluster",name:"Crystal Cluster",emoji:"💎",desc:"A cluster of small translucent crystals growing from the ground"},
-    {id:"env_falling_leaves",name:"Falling Leaves",emoji:"🍁",desc:"A constant swirl of red and gold leaves in the air"},
+    {id:"env_falling_leaves",name:"Falling Leaves",emoji:"🍁",desc:"A constant swirl of red and gold leaves in the air",buff:{stat:"crit",pct:0.2}},
     {id:"env_rain",name:"Rain",emoji:"🌧️",desc:"A soft steady rain falling around the creature"},
     {id:"env_sunbeam",name:"Sunbeam",emoji:"🌤️",desc:"A warm shaft of golden sunlight breaking through clouds"},
     {id:"env_vine_hang",name:"Hanging Vines",emoji:"🎋",desc:"Long vines hanging down from above"},
-    {id:"env_spiderweb_lg",name:"Giant Cobweb",emoji:"🕸️",desc:"A huge intricate cobweb glistening with dew"},
+    {id:"env_spiderweb_lg",name:"Giant Cobweb",emoji:"🕸️",desc:"A huge intricate cobweb glistening with dew",buff:{stat:"critDmg",pct:1}},
   ],
   epic:[
     {id:"env_moon",name:"Full Moon",emoji:"🌕",desc:"A huge glowing full moon hovering close behind"},
@@ -338,11 +342,11 @@ export const FLAIR_ITEMS={
     {id:"env_frost_bloom",name:"Frost Bloom",emoji:"❄️",desc:"Giant flowers made entirely of ice blooming across the ground"},
     {id:"env_fire_pillar",name:"Fire Pillar",emoji:"🔥",desc:"A column of intense fire shooting up from the earth"},
     {id:"env_sand_storm",name:"Sandstorm",emoji:"🏜️",desc:"A wall of churning sand approaching from behind"},
-    {id:"env_sky_whale",name:"Sky Whale",emoji:"🐋",desc:"The silhouette of a massive whale drifting through the clouds"},
+    {id:"env_sky_whale",name:"Sky Whale",emoji:"🐋",desc:"The silhouette of a massive whale drifting through the clouds",buff:{stat:"crit",pct:0.25}},
     {id:"env_ice_spires",name:"Ice Spires",emoji:"🧊",desc:"Towering jagged spires of ice jutting from the ground"},
     {id:"env_spore_cloud",name:"Spore Cloud",emoji:"🍄",desc:"A billowing cloud of glowing mushroom spores"},
     {id:"env_gravity_lift",name:"Gravity Lift",emoji:"🌀",desc:"Rocks, leaves, and debris lifting silently into the air"},
-    {id:"env_giant_moon",name:"Giant Moon",emoji:"🌕",desc:"A moon so close it fills the entire sky"},
+    {id:"env_giant_moon",name:"Giant Moon",emoji:"🌕",desc:"A moon so close it fills the entire sky",buff:{stat:"critDmg",pct:2}},
   ],
   legendary:[
     {id:"env_sun",name:"The Sun",emoji:"☀️",desc:"The actual sun, burning brilliantly just overhead"},
@@ -360,18 +364,24 @@ export const FLAIR_ITEMS={
     {id:"env_titan_tree",name:"Titan's Tree",emoji:"🌲",desc:"A tree so large its roots are mountains and its leaves are clouds"},
     {id:"env_dying_star",name:"Dying Star",emoji:"💥",desc:"A star collapsing into a supernova right behind the creature"},
     {id:"env_time_streams",name:"Time Streams",emoji:"⌛",desc:"Visible rivers of time flowing through the air in all directions"},
-    {id:"env_dead_gods",name:"Fallen Gods",emoji:"👁️",desc:"Enormous ancient statues of forgotten gods crumbling in the background"},
+    {id:"env_dead_gods",name:"Fallen Gods",emoji:"👁️",desc:"Enormous ancient statues of forgotten gods crumbling in the background",buff:{stat:"crit",pct:0.5}},
     {id:"env_inverse_sky",name:"Inverse Sky",emoji:"🌑",desc:"The sky and ground are flipped — stars below, void above"},
     {id:"env_endless_rain",name:"Endless Rain",emoji:"🌧️",desc:"Rain falling upward, sideways, and downward all at once"},
     {id:"env_omnipresent_sun",name:"Omnipresent Sun",emoji:"☀️",desc:"A sun that exists in every direction simultaneously"},
-    {id:"env_birth_of_world",name:"Birth of a World",emoji:"🌍",desc:"A planet forming from cosmic dust right beside the creature"},
+    {id:"env_birth_of_world",name:"Birth of a World",emoji:"🌍",desc:"A planet forming from cosmic dust right beside the creature",buff:{stat:"critDmg",pct:5}},
   ],
 };
 
 // Auras, backgrounds, and items get their `buff` field injected here rather than
-// being written out per entry. This MUTATES the three tables in place and must run
-// at module init, before anything reads a `.buff`.
-{const _S=["hp","atk","def","spd","abilitySpeed"],_P={common:0.5,rare:1,epic:3,legendary:5},_P_SPD={common:0.1,rare:0.3,epic:0.5,legendary:1};[FLAIR_AURAS,FLAIR_BACKGROUNDS,FLAIR_ITEMS].forEach(data=>Object.entries(data).forEach(([r,arr])=>arr.forEach((x,i)=>{const stat=_S[Math.floor(i/4)%5];x.buff={stat,pct:(stat==="spd"||stat==="abilitySpeed")?_P_SPD[r]:_P[r]};})));}
+// being written out per entry: four of each stat, in array order. This MUTATES
+// the three tables in place and must run at module init, before anything reads
+// a `.buff`.
+//
+// An entry that declares its OWN `buff` above keeps it -- that is the escape
+// hatch for the handful that step off the generated pattern (the Crit Chance
+// and Crit Damage ones). Without the guard this pass would silently overwrite
+// them, and the entry would read one way in the source and behave another.
+{const _S=["hp","atk","def","spd","abilitySpeed"],_P={common:0.5,rare:1,epic:3,legendary:5},_P_SPD={common:0.1,rare:0.3,epic:0.5,legendary:1};[FLAIR_AURAS,FLAIR_BACKGROUNDS,FLAIR_ITEMS].forEach(data=>Object.entries(data).forEach(([r,arr])=>arr.forEach((x,i)=>{if(x.buff)return;const stat=_S[Math.floor(i/4)%5];x.buff={stat,pct:(stat==="spd"||stat==="abilitySpeed")?_P_SPD[r]:_P[r]};})));}
 export const FLAIR_AURA_MAP=Object.fromEntries(Object.values(FLAIR_AURAS).flat().map(e=>[e.id,e]));
 export const FLAIR_BG_MAP=Object.fromEntries(Object.values(FLAIR_BACKGROUNDS).flat().map(e=>[e.id,e]));
 export const FLAIR_ITEM_MAP=Object.fromEntries(Object.values(FLAIR_ITEMS).flat().map(e=>[e.id,e]));

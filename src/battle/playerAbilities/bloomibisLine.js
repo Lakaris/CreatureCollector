@@ -17,6 +17,7 @@
 import { aChebDist } from "../geometry.js";
 import { healReceivedMultiplier, applyStatMod, hasNegativeStatMods, dispelDebuffs } from "../status.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
+import { healUnit } from "../hp.js";
 
 /** Displayed per-hit damage by basic-ability level; the engine deals stat-based
  * damage scaled by the ratio of the current level's value to the base value. */
@@ -100,7 +101,7 @@ export function makeBloomibisModule(cfg) {
       for (const a of ctx.aliveP) {
         if (aChebDist(unit.row, unit.col, a.row, a.col) > AURA_RANGE) continue;
         if (unit._groveGate && a.hp < a.maxHp && canBeHealed(a)) {
-          a.hp = Math.min(a.maxHp, a.hp + Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
+          healUnit(a, Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
         }
         if (idx >= MAX_IDX) {
           // One ATK Up stack per Bloomibis, refreshed every tick while the
@@ -132,7 +133,7 @@ export function makeBloomibisModule(cfg) {
       const targets = [...aliveP].sort((a, z) => a.hp - z.hp).slice(0, SPECIAL_TARGETS);
       for (const a of targets) {
         if (cleanses) clearDebuffs(a);
-        if (canBeHealed(a)) a.hp = Math.min(a.maxHp, a.hp + Math.max(1, Math.round(heal * healReceivedMultiplier(a))));
+        if (canBeHealed(a)) healUnit(a, Math.max(1, Math.round(heal * healReceivedMultiplier(a))));
         newFx.push({ id: now + "hoot" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
 

@@ -176,7 +176,7 @@ export function makeLoptrixModule(cfg) {
         // One we are already beside needs no teleport and still gets hit.
         if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         if (cand.isBossCandidate) {
           damageBoss(cand.boss, dmg);
           ctx.addDamageDealt(dmg);

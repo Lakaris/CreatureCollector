@@ -103,9 +103,11 @@ export function makeOwnedCreature(def) {
  *
  * Each level past 1 bumps one stat, rotating through LEVEL_STAT_CYCLE
  * (HP/ATK/DEF only); ascensions then scale those same HP/ATK/DEF stats by 8%
- * each. Speed and Haste never grow from leveling or ascending -- they only
- * come from Equipment and Flairs, layered on top by computeCombatStats in
- * src/core/stats.js -- this function deliberately knows nothing about them.
+ * each. Speed, Haste, and Crit Chance never grow from leveling or ascending --
+ * they only come from Equipment and Flairs, layered on top by
+ * computeCombatStats in src/core/stats.js -- this function deliberately knows
+ * nothing about them. They still ride through in the `{...base}` spread, so a
+ * creature keeps its base value for each.
  */
 export function calcStats(def, ownedData) {
   const base = def.stats;

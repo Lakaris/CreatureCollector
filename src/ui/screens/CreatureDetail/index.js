@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, STAT_LABELS, STAT_DESCRIPTIONS } from "../../../data/rarity.js";
+import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, shortStatLabel } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
@@ -14,7 +14,7 @@ import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/Ability
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
 import AscStars, { ascStarTier } from "../../../ui/components/AscStars.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
-import StatBar from "../../../ui/components/StatBar.js";
+import StatStrip from "../../../ui/components/StatStrip.js";
 import PipRow from "../../../ui/components/PipRow.js";
 import Notify from "../../../ui/components/Notify.js";
 import SkinSection from "../../../ui/screens/CreatureDetail/SkinSection.js";
@@ -37,12 +37,26 @@ function equipBonusLines(bonuses){
   return Object.entries(bonuses).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]);
 }
 
-/** Percent-of-base gain for a stat bonus (equip effect / flair / ability). Speed and Haste are
- * allowed to be fractional (e.g. 20% of a base-1 stat is 0.2, not rounded up to 1); every other
- * stat stays a whole number since they're discrete counts in the UI. */
+/** Stats where a percentage of the base is meaningfully fractional, so gains keep their decimals
+ * instead of being rounded up to a whole unit: Speed and Haste sit at a base of 1, Crit Chance at
+ * 4 and Crit Damage at 30, and their flairs are worth fractions of a percent of that. Rounding
+ * those up would multiply them many times over -- the whole Crit Chance set is worth 0.168 between
+ * them, which as a whole 1 would read as six times what the labels promise. HP/ATK/DEF stay whole:
+ * they're discrete counts in the UI, and a percentage of a three-digit stat loses nothing. */
+const FRACTIONAL_STATS=new Set(["spd","abilitySpeed","crit","critDmg"]);
+
+/** Rounding step for a fractional stat: one decimal unless STAT_DECIMALS asks
+ * for finer. Rounding a gain away before it reaches the display is the same
+ * thing as not showing it, so the two have to agree. */
+function roundFractional(stat,raw){
+  const f=Math.pow(10,STAT_DECIMALS[stat]??1);
+  return Math.round(raw*f)/f;
+}
+
+/** Percent-of-base gain for a stat bonus (equip effect / flair / ability). */
 function statPctGain(stat,base,pct){
   const raw=base*pct/100;
-  if(stat==="spd"||stat==="abilitySpeed")return Math.round(raw*10)/10;
+  if(FRACTIONAL_STATS.has(stat))return roundFractional(stat,raw);
   return Math.ceil(raw);
 }
 
@@ -51,7 +65,7 @@ function statPctGain(stat,base,pct){
  * rounding each source individually. */
 function flairStatGain(stat,base,buffs){
   const raw=buffs.filter(b=>b.stat===stat).reduce((acc,b)=>acc+base*b.pct/100,0);
-  if(stat==="spd"||stat==="abilitySpeed")return Math.round(raw*10)/10;
+  if(FRACTIONAL_STATS.has(stat))return roundFractional(stat,raw);
   return Math.ceil(raw);
 }
 
@@ -94,7 +108,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const [abilityTagPopup,setAbilityTagPopup]=useState(null);
   const def=CREATURE_MAP[ownedData.id];
   const stats=calcStats(def,ownedData);
-  const equipBonusStats={hp:0,atk:0,def:0,spd:0,abilitySpeed:0};
+  const equipBonusStats={hp:0,atk:0,def:0,spd:0,abilitySpeed:0,crit:0,critDmg:0};
   (ownedData.equipped||[null,null,null,null]).forEach(itemId=>{
     if(!itemId)return;
     const item=EQUIPMENT_MAP[itemId];
@@ -127,7 +141,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const statsWithEquip=Object.fromEntries(STAT_CYCLE.map(s=>{
     const base=stats[s]+(equipBonusStats[s]||0);
     const fb=flairStatGain(s,stats[s],flairBuffs);
-    return[s,Math.round((base+fb)*10)/10];
+    return[s,roundFractional(s,base+fb)];
   }));
   const isMaxLevel=ownedData.level>=MAX_LEVEL;
   const cost=energyCost(ownedData.level);
@@ -429,14 +443,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     const sources=getStatSources(statInfoPopup);
     const base=stats[statInfoPopup];
     const total=statsWithEquip[statInfoPopup];
-    const bonusTotal=Math.round((total-base)*10)/10;
+    const bonusTotal=roundFractional(statInfoPopup,total-base);
+    // Same formatting the stat pills use, so a stat reads the same way wherever
+    // it appears rather than only on the pill it was tapped from.
+    const fmt=(v)=>formatStat(statInfoPopup,v);
     return React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:280,maxHeight:"calc(70 * var(--vh))",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
         React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
           React.createElement("span",{style:{fontSize:12,color:"#888"}},"Base"),
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#222"}},base)
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#222"}},fmt(base))
         ),
         sources.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
           React.createElement("span",{style:{fontSize:12,color:"#555",display:"flex",alignItems:"center",gap:5}},
@@ -444,12 +461,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("span",null,s.label),
             s.pct&&React.createElement("span",{style:{fontSize:10,color:"#aaa"}},"("+(s.pct>0?"+":"")+s.pct+"%)")
           ),
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},"+"+s.value)
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},"+"+fmt(s.value))
         )),
         sources.length===0&&React.createElement("div",{style:{padding:"10px 0",fontSize:12,color:"#bbb",textAlign:"center",borderTop:"1px solid #eee"}},"No equipment or flair boosting this stat"),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderTop:"2px solid #ddd",marginTop:4,marginBottom:16}},
           React.createElement("span",{style:{fontSize:12,fontWeight:700,color:"#111"}},"Total"),
-          React.createElement("span",{style:{fontSize:14,fontWeight:800,color:"#111"}},total+(bonusTotal>0?" (+"+bonusTotal+")":""))
+          React.createElement("span",{style:{fontSize:14,fontWeight:800,color:"#111"}},fmt(total)+(bonusTotal>0?" (+"+fmt(bonusTotal)+")":""))
         ),
         React.createElement("button",{onClick:()=>setStatInfoPopup(null),style:{width:"100%",padding:"9px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
       )
@@ -555,9 +572,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             )
           )
         ),
-        React.createElement("div",{style:{display:"flex",gap:4}},
-          STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))
-        )
+        React.createElement(StatStrip,{values:statsWithEquip,onClick:setStatInfoPopup,isHighlighted:s=>lastLeveledStat===s})
       ),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#666",marginBottom:10}},"Equipped"),
@@ -643,8 +658,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Stat"),
             React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
-              [...CORE_STAT_CYCLE,"spd","abilitySpeed"].map(s=>
-                React.createElement("button",{key:s,className:"filter-chip"+(equipFilterStats.has(s)?" active":""),onClick:()=>toggleEquipStat(s)},STAT_LABELS[s])
+              GEAR_FILTER_STATS.map(s=>
+                React.createElement("button",{key:s,className:"filter-chip"+(equipFilterStats.has(s)?" active":""),onClick:()=>toggleEquipStat(s)},shortStatLabel(s))
               )
             )
           ),
@@ -792,16 +807,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,unlockedSkins,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
     // The header title carries the equipped flair title ("Blastar the
-    // Mighty") -- it's the only place the title shows on this page. The
-    // right slot holds Flair Effects (when any flair is unlocked) then
-    // Evolutions. Equal-width grid tracks + stretch keep the two buttons the
-    // exact same size (the ✨ emoji would otherwise make Flair Effects taller
-    // and its longer label wider).
+    // Mighty") -- it's the only place the title shows on this page. The right
+    // slot holds Evolutions; Flair Effects lives on the Flair page's own
+    // header, beside the flair it summarises. The grid survives the move
+    // because it costs nothing with one button and is what keeps them equally
+    // sized should a second ever come back.
     React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{display:"grid",gridAutoFlow:"column",gridAutoColumns:"1fr",gap:6,alignItems:"stretch"}},
-      flairBuffs.length>0&&React.createElement("button",{
-        onClick:()=>setShowFlairEffects(true),
-        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
-      },"✨ Flair Effects"),
       chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
         disabled:equipTutorialLock,
         onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
@@ -869,9 +880,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           })()
         )
       ),
-      React.createElement("div",{style:{display:"flex",gap:4}},
-        STAT_CYCLE.map(s=>React.createElement(StatBar,{key:s,stat:s,value:statsWithEquip[s],highlight:lastLeveledStat===s,onClick:setStatInfoPopup}))
-      )
+      React.createElement(StatStrip,{values:statsWithEquip,onClick:setStatInfoPopup,isHighlighted:s=>lastLeveledStat===s})
     ),
     showFlairEffects&&(()=>{
       const totals=Object.fromEntries(Object.keys(BUFF_STAT_LABEL).map(s=>[s,0]));
@@ -1041,7 +1050,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         const ac=abilityColors[k];
         const isStarlitLine=isStarlitAbilityLine(def.id);
         const starlitFmt=formatStarlitAbilityLevel(def.id,k,abl.upgrades,displayIdx);
-        const plainFmt=formatPlainAbilityLevel(def.id,k,displayText);
+        const plainFmt=formatPlainAbilityLevel(def.id,k,displayText,displayIdx);
         const displayFmt=starlitFmt
           ? {isPercent:false, label:starlitFmt.label, amount:starlitFmt.amount}
           : plainFmt
@@ -1096,7 +1105,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     // so the flair page's stat row updates (and flashes) live. onStatClick
     // opens this page's stat-info popup (fixed, zIndex 300), which renders
     // above the flair overlay (zIndex 10) even while it's up.
-    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,statsWithEquip,onStatClick:setStatInfoPopup,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep}),
+    // hasFlairEffects/onShowFlairEffects drive the header button that used to
+    // sit on this page. The popup it opens stays here -- it is a top-level
+    // overlay and outranks the Flair page's own layer, so it still shows over it.
+    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,statsWithEquip,onStatClick:setStatInfoPopup,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep,hasFlairEffects:flairBuffs.length>0,onShowFlairEffects:()=>setShowFlairEffects(true)}),
     tab==="skins"&&React.createElement(SkinSection,{
       ownedData,def,currencies,setCurrencies,setOwned,
       unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,

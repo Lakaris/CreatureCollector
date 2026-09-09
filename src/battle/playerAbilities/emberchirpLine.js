@@ -20,7 +20,7 @@
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { unitDist } from "../geometry.js";
 import { healReceivedMultiplier, applyHealOverTime } from "../status.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, healUnit } from "../hp.js";
 
 /** Displayed damage by basic level; the engine deals stat-based damage
  * scaled by the ratio of the current level's value to the base value. */
@@ -79,7 +79,7 @@ export function makeEmberchirpModule(cfg) {
     onHit(unit) {
       if (unit.hp > 0 && unit.hp < unit.maxHp && canBeHealed(unit)) {
         const heal = healFor(unit, unit, basicHealByLevel[abilityIdx(unit, "basic")]);
-        if (heal > 0) unit.hp = Math.min(unit.maxHp, unit.hp + heal);
+        if (heal > 0) healUnit(unit, heal);
       }
       return 0;
     },
@@ -113,7 +113,7 @@ export function makeEmberchirpModule(cfg) {
         if (unitDist(unit, a) <= NEARBY_RANGE) {
           if (!canBeHealed(a)) continue;
           const amt = healFor(unit, a, heal);
-          if (amt > 0) a.hp = Math.min(a.maxHp, a.hp + amt);
+          if (amt > 0) healUnit(a, amt);
           newFx.push({ id: now + "sf" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         } else if (idx >= MAX_IDX) {
           // "All other allies gain Heal Over Time": the same total healing

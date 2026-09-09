@@ -219,7 +219,7 @@ export function makeBreezekitModule(cfg) {
         // ALREADY beside needs no step and still gets hit.
         if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         if (cand.isBossCandidate) damageBoss(cand.boss, dmg);
         else damageUnit(cand.unit, dmg);
         ctx.addDamageDealt(dmg);

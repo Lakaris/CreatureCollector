@@ -5,7 +5,12 @@
 @keyframes fadeInCentered{from{opacity:0;transform:translate(-50%,-50%) scale(.88) translateY(8px)}to{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}}
 @keyframes screenSlideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes toastFade{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
-@keyframes dupeFade{0%{opacity:0;transform:scale(.88)}25%{opacity:1;transform:scale(1)}100%{opacity:0.3;transform:scale(1)}}
+/* A pulled duplicate: pops in like a win, then settles back to mark itself as
+   the lesser result. It used to settle at 0.3, which stacked on top of the
+   already-grey dupe palette and left the name unreadable -- you could see that
+   you'd got a dupe but not WHICH one. 0.85 still reads as dimmer than the wins
+   beside it while keeping the text legible. */
+@keyframes dupeFade{0%{opacity:0;transform:scale(.88)}25%{opacity:1;transform:scale(1)}100%{opacity:0.85;transform:scale(1)}}
 @keyframes pointerBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-10px)}}
 @keyframes pointerBounceX{0%,100%{transform:translate(0,-50%)}50%{transform:translate(10px,-50%)}}
 @keyframes pointerBounceXLeft{0%,100%{transform:translate(0,-50%)}50%{transform:translate(-10px,-50%)}}

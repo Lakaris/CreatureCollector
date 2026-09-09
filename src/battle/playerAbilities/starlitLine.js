@@ -16,7 +16,7 @@ import { aCardinalDist, distToBoss } from "../geometry.js";
 import { attackCooldown, damageBoss } from "../damage.js";
 import { speedPenalty, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
 import { getRootDef } from "../../core/creatures.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, healUnit } from "../hp.js";
 
 const EMBERSTAR_ROOT_ID = "blazehornet";
 
@@ -158,7 +158,7 @@ export function makeStarlitModule(cfg) {
         totalDmg += dmg;
       }
       for (const a of aliveP) {
-        if (onBeam(unit, best.tr, best.tc, a)) a.hp = Math.min(a.maxHp, a.hp + Math.round(heal * healReceivedMultiplier(a)));
+        if (onBeam(unit, best.tr, best.tc, a)) healUnit(a, Math.round(heal * healReceivedMultiplier(a)));
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);
@@ -230,7 +230,7 @@ export function makeStarlitModule(cfg) {
       // At max level this also recovers HP, matching Radiant Exchange's final upgrade text.
       for (const a of aliveP) {
         applyStatMod(a, { kind: "atk", pct: atkModPct, src: unit.uid, ticks: atkModTicks });
-        if (heal) a.hp = Math.min(a.maxHp, a.hp + Math.round(heal * healReceivedMultiplier(a)));
+        if (heal) healUnit(a, Math.round(heal * healReceivedMultiplier(a)));
       }
 
       if (totalDmg > 0) ctx.addDamageDealt(totalDmg);

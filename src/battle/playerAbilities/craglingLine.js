@@ -106,7 +106,7 @@ export function makeCraglingModule(cfg) {
       for (const e of aliveE) {
         const size = e.size || 1;
         if (e.hp <= 0 || isIntangible(e) || col < e.col || col > e.col + size - 1) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         total += dealt;
         // A dodged strike lands nothing -- the stun included.

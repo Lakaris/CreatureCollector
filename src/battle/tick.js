@@ -20,7 +20,7 @@ import {
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
   cellsOf, unitDist, unitCardinalDist, attackRangeOf,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained } from "./status.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields } from "./status.js";
 import { damageUnit } from "./hp.js";
 import { tickMinionSpecials } from "./minions.js";
 import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
@@ -31,7 +31,10 @@ import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 /** Rate applied to a player-inflicted Burn's stored source ATK, per tick. */
 const PLAYER_BURN_RATE = 0.035;
 /** Rate applied to a fire trail's stored source ATK, per tick (e.g. Emberstar's Charging Pierce lvl 5). */
-const FIRE_TRAIL_RATE = 0.03;
+/** Water Hazard: Haste lost while standing in it, and how long that lasts
+ * once you step off. Short, so it lapses a tick after leaving the tile. */
+const HAZARD_HASTE_DOWN_PCT = 10;
+const HAZARD_HASTE_TICKS = 2;
 
 /**
  * Damage-chart buckets. Every point of player damage is credited to exactly one
@@ -97,13 +100,15 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       (isEnemySide ? state.enemyUnits : state.playerUnits).push(su);
       for (const cell of cellsOf(su)) allOcc.add(cell);
     },
-    addFireTrail(cells, ticks, sourceAtk) {
-      (state.fireTrails || (state.fireTrails = [])).push({ cells: new Set(cells), ticksLeft: ticks, sourceAtk, enemySide: isEnemySide });
+    /** Ground Hazard. `kind` is "water" or "fire" -- see the Hazards pass in
+     * runBattleTick for what each one does. `dmg` is per trigger. */
+    addHazard(cells, ticks, dmg, kind) {
+      (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide });
     },
-    /** Ground Hazard (e.g. Cryo Bomb's ice spikes): damages a foe that MOVES
-     * while standing on one of the cells. `dmg` is per trigger. */
-    addHazard(cells, ticks, dmg) {
-      (state.iceHazards || (state.iceHazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, enemySide: isEnemySide });
+    /** Is a Hazard of this kind covering (row,col)? For passives that read the
+     * ground -- Cinder Scent hunts whatever is standing in fire. */
+    hazardsOn(row, col, kind) {
+      return (state.hazards || []).some((h) => h.kind === kind && h.cells.has(row + "," + col));
     },
     /** Take one BFS step toward (tr,tc); no-ops when rooted. */
     stepToward(tr, tc) {
@@ -127,6 +132,24 @@ function missBlindedSwing(u, row, col, penalty, newFx, now, isEnemySide) {
   u.lastAttackTime = now;
   newFx.push({ id: now + "miss" + u.uid, row, col, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: isEnemySide, isMiss: true });
   return true;
+}
+
+/** How far past itself a fleeing creature aims -- far enough that the normal
+ * pathfinder just walks it away, without needing its own flee-planner. */
+const FLEE_REACH = 4;
+
+/**
+ * Fear's movement: step AWAY from `src`. Aims at a point on the far side of
+ * the fleeing unit and lets stepUnit path there, so it inherits the ordinary
+ * movement rules (occupancy, the no-backtrack guard, the boss's body). A
+ * Rooted or source-less creature simply holds still.
+ */
+function fleeFrom(u, src, canMove, blocked, allOcc, now, tick, gridRows, gridCols) {
+  if (!canMove || !src) return;
+  const fr = Math.max(0, Math.min(gridRows - 1, u.row + (u.row - src.row) * FLEE_REACH));
+  const fc = Math.max(0, Math.min(gridCols - 1, u.col + (u.col - src.col) * FLEE_REACH));
+  if (fr === u.row && fc === u.col) return;
+  stepUnit(u, fr, fc, blocked, allOcc, now, tick);
 }
 
 /** How long the "!" ability-ready marker stays visible, in ticks. */
@@ -377,6 +400,10 @@ export function runBattleTick(state, config) {
 
   const aliveP = state.playerUnits.filter((u) => u.hp > 0);
   const aliveE = state.enemyUnits.filter((u) => u.hp > 0);
+  /** Resolve a uid against BOTH sides -- effects that remember who inflicted
+   * them (Fear, Restrained) always point at the opposite roster. */
+  const unitByUid = (uid) =>
+    state.playerUnits.find((u) => u.uid === uid) || state.enemyUnits.find((u) => u.uid === uid);
   const boss = state.boss;
   const newFx = [];
   if (!aliveP.length) return { newFx, now, acted: false };
@@ -420,6 +447,14 @@ export function runBattleTick(state, config) {
     if (abilMod?.onTick) {
       const tickCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "passive", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
       abilMod.onTick(u, tickCtx);
+    }
+
+    // Fear: spend the turn fleeing whoever inflicted it. Neither attacks nor
+    // specials happen while it lasts; the always-on passive above still runs.
+    // Rooted-and-feared just cowers. See applyFear in status.js.
+    if (isFeared(u)) {
+      fleeFrom(u, unitByUid(u.fearSourceUid), canMove, blocked, allOcc, now, state.tick, gridRows, gridCols);
+      continue;
     }
 
     // Special abilities run off the charge bar (see tickSpecialCharge),
@@ -520,6 +555,11 @@ export function runBattleTick(state, config) {
           }
           creditDamage(state, u.creatureId, basicDmg, "basic");
           creditDamage(state, u.creatureId, passiveDmg, "passive");
+          // Who last swung at this creature, and when. Stamped for passives
+          // that watch their ALLIES rather than themselves (Sworn Guard) --
+          // onDamaged only ever tells a creature about its own wounds.
+          tgt._lastHitByUid = u.uid;
+          tgt._lastHitAt = now;
           // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
           if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
           u.atkCd = attackCooldown(u, penalty);
@@ -562,6 +602,12 @@ export function runBattleTick(state, config) {
     const enemyCtx = () => makePlayerAbilityContext({ unit: u, aliveE: aliveP, aliveP: aliveE, boss: null, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, isEnemySide: true, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
 
     if (abilMod?.onTick) abilMod.onTick(u, enemyCtx());
+
+    // Same Fear rule on this side (see the player loop above).
+    if (isFeared(u)) {
+      fleeFrom(u, unitByUid(u.fearSourceUid), canMove, blocked, allOcc, now, state.tick, gridRows, gridCols);
+      continue;
+    }
 
     const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange);
     if (specialChargeReady(u) || chargelessReady) {
@@ -611,6 +657,11 @@ export function runBattleTick(state, config) {
           creditDamage(state, hit.creatureId, reflect, "passive");
         }
       }
+      // Same stamp as the player loop above -- and this is the side that
+      // matters for a player-side Sworn Guard, since this is where an ally
+      // of its own actually gets hit.
+      tgt._lastHitByUid = u.uid;
+      tgt._lastHitAt = now;
       // A ranged victim of a melee hit turns to face its attacker (see retaliationFoe).
       if (!u.isRanged && tgt.isRanged && tgt.hp > 0) tgt._retaliateUid = u.uid;
       u.atkCd = attackCooldown(u, penalty);
@@ -625,6 +676,12 @@ export function runBattleTick(state, config) {
   tickMinionSpecials(aliveE, aliveP, newFx, now);
 
   // ── 4. Status effects ────────────────────────────────────────────────────
+  // Auras are fields, not buffs written onto the units they help, so what each
+  // creature is standing in is recomputed here rather than tracked as anyone
+  // moves. Per side: an aura only ever lifts its emitter's own allies.
+  refreshAuraFields(aliveP);
+  refreshAuraFields(aliveE);
+
   tickStatusEffects(aliveP, boss, newFx, now);
 
   // Player-inflicted Burn (e.g. Emberstar's Burning Bond) on minions/boss.
@@ -658,51 +715,54 @@ export function runBattleTick(state, config) {
     tickOverTime(boss, "poison", hurtBoss, newFx, now, "p", "boss");
   }
 
-  // Fire trails left behind by abilities (e.g. Emberstar's Charging Pierce
-  // lvl 5) damage anything from the OTHER side standing on them, then expire.
-  if (state.fireTrails && state.fireTrails.length) {
-    state.fireTrails = state.fireTrails.filter((trail) => {
-      const victims = trail.enemySide ? aliveP : aliveE;
-      for (const u of victims) {
-        if (trail.cells.has(u.row + "," + u.col)) {
-          const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
-          damageUnit(u, dmg, { effectDamage: true });
-          newFx.push({ id: now + "trail" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
-        }
-      }
-      if (bossAlive && !trail.enemySide) {
-        let onTrail = false;
-        for (let dr = 0; dr < BOSS_SIZE && !onTrail; dr++) {
-          for (let dc = 0; dc < BOSS_SIZE && !onTrail; dc++) {
-            if (trail.cells.has((boss.row + dr) + "," + (boss.col + dc))) onTrail = true;
-          }
-        }
-        if (onTrail) {
-          const dmg = Math.max(1, Math.round(trail.sourceAtk * FIRE_TRAIL_RATE));
-          damageBoss(boss, dmg);
-          newFx.push({ id: now + "trailboss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
-        }
-      }
-      trail.ticksLeft--;
-      return trail.ticksLeft > 0;
-    });
-  }
-
-  // Ground Hazards (e.g. Cryo Bomb's ice spikes): a foe that MOVED this tick
-  // while standing on a hazard cell takes the hazard's damage -- the check
-  // reads the cell the unit stepped FROM. Teleports don't trigger hazards
-  // (blinks clear the spikes entirely). One trigger per unit per tick even
-  // when hazards overlap.
-  if (state.iceHazards && state.iceHazards.length) {
-    const triggered = new Set();
-    state.iceHazards = state.iceHazards.filter((hz) => {
+  // ── Ground Hazards ───────────────────────────────────────────────────────
+  // Both flavors punish MOVING across them: a foe that stepped this tick from
+  // a hazard cell takes the damage -- the check reads the cell it stepped
+  // FROM. Teleports never trigger a hazard (a blink is not a step). One
+  // move-trigger per unit per tick even when hazards overlap.
+  //
+  // What each flavor adds while a creature simply STANDS on it:
+  //   water (Cryo Bomb's ice) -- 10% less Haste, on EVERY creature on the
+  //     tile, friend or foe: slick ground does not take sides. Refreshed each
+  //     tick under one shared source, so overlapping fields never stack past
+  //     10% and it lapses a tick after stepping off. Bosses are skipped --
+  //     their cast timers do not read unit Haste (same policy as Haste Down).
+  //   fire (Charging Pierce's trail) -- damage to enemies standing on it,
+  //     boss included, every tick.
+  if (state.hazards && state.hazards.length) {
+    const stepped = new Set();
+    state.hazards = state.hazards.filter((hz) => {
       const victims = hz.enemySide ? aliveP : aliveE;
       for (const u of victims) {
-        if (triggered.has(u.uid)) continue;
-        if (u._lastStepTick === state.tick && hz.cells.has(u.prevRow + "," + u.prevCol)) {
-          triggered.add(u.uid);
+        // Moving across any hazard hurts.
+        if (!stepped.has(u.uid) && u._lastStepTick === state.tick && hz.cells.has(u.prevRow + "," + u.prevCol)) {
+          stepped.add(u.uid);
           damageUnit(u, hz.dmg, { effectDamage: true });
-          newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
+          newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isBurn: hz.kind === "fire", isFrost: hz.kind === "water", fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
+        }
+        // Fire also burns whoever is standing in it.
+        if (hz.kind === "fire" && hz.cells.has(u.row + "," + u.col)) {
+          damageUnit(u, hz.dmg, { effectDamage: true });
+          newFx.push({ id: now + "hzstand" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
+        }
+      }
+      if (hz.kind === "water") {
+        for (const u of [...aliveP, ...aliveE]) {
+          if (hz.cells.has(u.row + "," + u.col)) {
+            applyStatMod(u, { kind: "haste", pct: -HAZARD_HASTE_DOWN_PCT, src: "hazard", ticks: HAZARD_HASTE_TICKS });
+          }
+        }
+      }
+      if (hz.kind === "fire" && bossAlive && !hz.enemySide) {
+        let onIt = false;
+        for (let dr = 0; dr < BOSS_SIZE && !onIt; dr++) {
+          for (let dc = 0; dc < BOSS_SIZE && !onIt; dc++) {
+            if (hz.cells.has((boss.row + dr) + "," + (boss.col + dc))) onIt = true;
+          }
+        }
+        if (onIt) {
+          damageBoss(boss, hz.dmg);
+          newFx.push({ id: now + "hzboss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
         }
       }
       hz.ticksLeft--;

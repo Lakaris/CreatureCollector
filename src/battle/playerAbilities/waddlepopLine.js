@@ -96,7 +96,7 @@ export function makeWaddlepopModule(cfg) {
       // its body overlaps; chill each unit hit, frostbite them at max level.
       for (const e of aliveE) {
         if (isIntangible(e) || !cellSet.has(e.row + "," + e.col)) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         applyStatMod(e, { kind: "spd", pct: -SPEED_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
@@ -115,7 +115,7 @@ export function makeWaddlepopModule(cfg) {
       }
 
       // Ice spikes on all splash cells, then the snowball ramps for next time.
-      ctx.addHazard(cells, HAZARD_TICKS, Math.max(1, Math.round(unit.atk * HAZARD_ATK_RATE)));
+      ctx.addHazard(cells, HAZARD_TICKS, Math.max(1, Math.round(unit.atk * HAZARD_ATK_RATE)), "water");
       newFx.push({ id: now + "cbc" + unit.uid, row: cr, col: cc, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       unit._snowballPct = Math.min(SNOWBALL_MAX_PCT, (unit._snowballPct || 0) + snowballPctByLevel[abilityIdx(unit, "unique")]);
     },

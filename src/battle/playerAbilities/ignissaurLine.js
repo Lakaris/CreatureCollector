@@ -119,13 +119,13 @@ export function makeIgnissaurModule(cfg) {
 
         const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
         if (minion) {
-          const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * ratio * stokedMult(unit, minion)));
+          const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, minion)));
           damageUnit(minion, dmg);
           totalDmg += dmg;
           if (burns) applyBurn(unit, minion);
         }
         if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
-          const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * ratio * stokedMult(unit, boss)));
+          const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, boss)));
           damageBoss(boss, dmg);
           totalDmg += dmg;
           if (burns) applyBurn(unit, boss);

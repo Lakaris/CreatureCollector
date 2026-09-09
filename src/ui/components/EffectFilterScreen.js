@@ -32,6 +32,8 @@ export function effectFilterCatalog() {
   // ability lands, like Closest/Beside do. Deliberately not added to
   // TARGETING_TAGS itself: that set also decides which tags get standalone
   // purple pills on ability cards, and these three stay in the Effects pill.
+  // Cone is already in TARGETING_TAGS (it gets a standalone pill on cards);
+  // these four are Effects-pill tags that still read as shapes here.
   for (const k of ["horizontalrow", "line", "nearby", "splash"]) {
     const label = ABILITY_TAG_DEFS[k]?.label;
     if (label) targetingLabels.add(label);

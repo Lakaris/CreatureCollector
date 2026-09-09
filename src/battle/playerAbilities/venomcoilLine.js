@@ -23,7 +23,7 @@
 import { aChebDist, distToBoss } from "../geometry.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, healUnit } from "../hp.js";
 import { applyRestrained, applyPoison, applyStatMod, healReceivedMultiplier } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -80,7 +80,7 @@ export function makeVenomcoilModule(cfg) {
       const pct = lifestealPctByLevel[abilityIdx(unit, "basic")];
       const raw = (dealt * pct) / 100;
       const heal = Math.max(1, Math.round(raw * healReceivedMultiplier(unit)));
-      unit.hp = Math.min(unit.maxHp, unit.hp + heal);
+      healUnit(unit, heal);
       return 0;
     },
 
@@ -104,7 +104,7 @@ export function makeVenomcoilModule(cfg) {
         // The boss takes the hit but can not be wrapped -- same CC-immunity
         // policy as Taunt -- so there is no Poison and no charge to drain
         // either (bosses run on their own cast timers, not an Ability bar).
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         damageBoss(boss, dmg);
         ctx.addDamageDealt(dmg);
         newFx.push({ id: now + "cc" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
@@ -116,7 +116,7 @@ export function makeVenomcoilModule(cfg) {
       // means what it says.
       const alreadyWrapped = isRestrained(best);
 
-      const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+      const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
       const dealt = damageUnit(best, dmg);
       if (dealt) ctx.addDamageDealt(dealt);
 

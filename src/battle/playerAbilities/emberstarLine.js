@@ -40,6 +40,10 @@ const SPECIAL_DMG_MULT_BY_LEVEL = SPECIAL_DMG_BY_LEVEL.map((d) => d / BASIC_DMG_
 /** Only the final upgrade (lvl 5) leaves a fire trail. */
 const TRAIL_FROM_LEVEL = 4;
 const TRAIL_DURATION_TICKS = 6;
+/** The trail is a Fire Hazard: this share of Emberstar's ATK per trigger,
+ * both for standing in it and for stepping off it (see the Hazards pass in
+ * battle/tick.js). Was FIRE_TRAIL_RATE, which lived in tick.js. */
+const TRAIL_DMG_RATE = 0.03;
 /** Ticks between charges, at spd 1 (see attackCooldown's COOLDOWN_TICKS_AT_SPD_1 for basic attacks). */
 const SPECIAL_COOLDOWN_TICKS = 20;
 
@@ -158,7 +162,7 @@ export function makeEmberstarModule(defBonusByLevel) {
           trailCells.push(r + "," + c);
           newFx.push({ id: now + "charge" + unit.uid + r + "_" + c, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
-          const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * dmgMult));
+          const dmg = Math.max(1, Math.round(attackRoll(unit) * dmgMult));
           const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
           if (minion) damageUnit(minion, dmg);
           if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
@@ -176,7 +180,7 @@ export function makeEmberstarModule(defBonusByLevel) {
       }
 
       if (idx >= TRAIL_FROM_LEVEL && trailCells.length) {
-        ctx.addFireTrail(trailCells, TRAIL_DURATION_TICKS, unit.atk);
+        ctx.addHazard(trailCells, TRAIL_DURATION_TICKS, Math.max(1, Math.round(unit.atk * TRAIL_DMG_RATE)), "fire");
       }
     },
   };

@@ -20,12 +20,27 @@
 // knockback, pull, the charge) are left untagged rather than mislabelled; the
 // description still describes them.
 
+/**
+ * A boss's stats at a given level.
+ *
+ * Only the statline scales. `crit` and `critDmg` are passed through untouched
+ * -- a chance and a multiplier are not a statline, and a level-10 boss critting
+ * far more often than a level-1 one would be a different kind of difficulty
+ * than this curve is meant to express. Enemy creatures work the same way (see
+ * makeArenaBattle).
+ *
+ * NOTE: every field returned here has to be stamped onto the boss unit by
+ * whoever builds it -- DungeonScreen's dFight and DailyBossScreen's initBattle.
+ * A field added here and not stamped there simply never reaches the fight.
+ */
 export function getBossStats(boss,level){
   const t=(level-1)/9;
   return {
     hp:Math.round(boss.baseStats.hp*(1+1.5*t)),
     atk:Math.round(boss.baseStats.atk*(1+t)),
     def:Math.round(boss.baseStats.def*(1+0.5*t)),
+    crit:boss.baseStats.crit??0,
+    critDmg:boss.baseStats.critDmg??0,
   };
 }
 export function makeBoss(key,name,type){
@@ -35,7 +50,10 @@ export function makeBoss(key,name,type){
       special:{name:type+" Nova",description:"Deals "+type+" damage around itself, pushing nearby enemies back 1 tile",tags:["nearby"]},
       unique:{name:"Rising Fury",description:"Gains increased attack over time"},
     },
-    baseStats:{hp:800,atk:100,def:60},
+    // crit/critDmg match the roster's uniform pair (see data/creatures.js), so
+    // a boss lands critical hits on the same terms the party does. Spent by
+    // ctx.dmg in battle/bosses/context.js -- every boss attack rolls through it.
+    baseStats:{hp:800,atk:100,def:60,crit:4,critDmg:30},
   };
 }
 /**

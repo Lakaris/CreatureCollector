@@ -6,7 +6,7 @@
 import React, { useState, useMemo } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../data/equipment.js";
-import { CORE_STAT_CYCLE, STAT_LABELS } from "../../data/rarity.js";
+import { GEAR_FILTER_STATS, STAT_LABELS, shortStatLabel } from "../../data/rarity.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { equipBonus, equipBonusStr, itemAffectsStat, isExclusive, exclusivityCaption } from "../../core/equipment.js";
@@ -100,7 +100,7 @@ function EquipmentDexScreen({ onBack }) {
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Stat"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          [...CORE_STAT_CYCLE, "spd", "abilitySpeed"].map((s) => React.createElement("button", { key: s, className: "filter-chip" + (filterStats.has(s) ? " active" : ""), onClick: () => toggleStat(s) }, STAT_LABELS[s]))
+          GEAR_FILTER_STATS.map((s) => React.createElement("button", { key: s, className: "filter-chip" + (filterStats.has(s) ? " active" : ""), onClick: () => toggleStat(s) }, shortStatLabel(s)))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },

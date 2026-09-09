@@ -12,6 +12,31 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import useSwipeNav from "../../ui/hooks/useSwipeNav.js";
 
+// ── Evolution Line sizing ────────────────────────────────────────────────
+//
+// Every chain's nodes render at the SAME size, whether the line is two stages
+// long or four. They used to be plain `flex:1`, so each node took a share of
+// whatever the row had: a four-stage line gave 52px nodes and a two-stage line
+// gave 143px ones -- the same box, nearly three times the size, depending only
+// on how long that particular family happens to be.
+//
+// So the share is capped at what the LONGEST chain in the roster would produce.
+// Sizing to the longest is what makes the cap safe: a four-stage line still
+// fits exactly, and shorter lines stop growing into the space they don't need
+// (the row centres them instead).
+//
+// The reserve is everything in the row that isn't a node -- the arrow columns
+// and the gaps between all of them -- at the longest chain's counts. It stays a
+// percentage-based calc rather than a fixed pixel width so the nodes still grow
+// with the card on a wider screen; they just grow together.
+const EVO_MAX_STAGES = 4;
+const EVO_ROW_GAP = 2;
+/** Widest an arrow column gets: the "→" over an "×NN asc." caption. */
+const EVO_ARROW_W = 33;
+const EVO_RESERVED_W =
+  (EVO_MAX_STAGES - 1) * EVO_ARROW_W + (2 * EVO_MAX_STAGES - 2) * EVO_ROW_GAP;
+const EVO_NODE_MAX_W = "calc((100% - " + EVO_RESERVED_W + "px) / " + EVO_MAX_STAGES + ")";
+
 function DexEntry({def,onBack,onNavigate,navList}){
   const { unlockedSkins } = useGame();
   const [skinPreview,setSkinPreview]=useState(null);
@@ -87,7 +112,11 @@ function DexEntry({def,onBack,onNavigate,navList}){
       React.createElement("div",{className:"section-label"},"Evolution Line"),
       // Never wraps: nodes flex to share the row and ellipsize long names,
       // while the arrow columns keep their natural width.
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:2,flexWrap:"nowrap"}},
+      //
+      // Centred, because the nodes are capped (see EVO_NODE_MAX_W) and a short
+      // chain therefore leaves space over. Without this a two-stage line would
+      // sit hard against the left edge.
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:EVO_ROW_GAP,flexWrap:"nowrap"}},
         chainDefs.map((d,i)=>React.createElement(React.Fragment,{key:d.id},
           // The requirement belongs to the arrow's source creature: evolving
           // chainDefs[i-1] into d costs chainDefs[i-1].ascensionsToEvolve.
@@ -96,13 +125,18 @@ function DexEntry({def,onBack,onNavigate,navList}){
             chainDefs[i-1].ascensionsToEvolve&&React.createElement("span",{style:{fontSize:9,color:"#aaa",whiteSpace:"nowrap"}},"×"+chainDefs[i-1].ascensionsToEvolve+" asc.")
           ),
           React.createElement("div",{
-            style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"4px 0",borderRadius:8,flex:1,minWidth:0,
+            style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"4px 0",borderRadius:8,flex:1,minWidth:0,maxWidth:EVO_NODE_MAX_W,
               background:d.id===def.id?"#EEEDFE":"transparent",
               cursor:d.id!==def.id?"pointer":"default",
               border:d.id===def.id?"1px solid #CECBF6":"1px solid transparent"},
             onClick:d.id!==def.id?()=>onNavigate(d):undefined
           },
-            React.createElement(CreatureIcon,{def:d,still:true,size:44}),
+            // `contain` so an emoji is boxed to `size` like image art already
+            // is. Without it an emoji paints about 1.4x its font-size wide --
+            // 60px against art's 44 -- so the two kinds of icon sat at
+            // different widths in the same row, and the wide ones overlapped
+            // the arrows either side of them by a couple of pixels.
+            React.createElement(CreatureIcon,{def:d,still:true,size:44,contain:true}),
             React.createElement("span",{style:{fontSize:10,color:d.id===def.id?"#534AB7":"#666",fontWeight:500,maxWidth:"100%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},d.name)
           )
         ))
@@ -156,7 +190,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
             abl.upgrades.map((u,i)=>{
               const isFirst=i===0;
               const starlitFmt=formatStarlitAbilityLevel(def.id,k,abl.upgrades,i);
-              const plainFmt=formatPlainAbilityLevel(def.id,k,u);
+              const plainFmt=formatPlainAbilityLevel(def.id,k,u,i);
               const fmt=starlitFmt||plainFmt||(isFirst?formatAbilityDisplay(u):null);
               const step=fmt?null:formatUpgradeStep(u,abl.upgrades[i-1]);
               const numBits=[

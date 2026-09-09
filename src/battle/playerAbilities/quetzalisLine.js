@@ -105,7 +105,7 @@ export function makeQuetzalisModule(cfg) {
       for (const e of aliveE) {
         const size = e.size || 1;
         if (isIntangible(e) || row < e.row || row > e.row + size - 1) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         if (debuffs) applyStatMod(e, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });

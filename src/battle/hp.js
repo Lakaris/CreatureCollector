@@ -1,4 +1,9 @@
-// Applying damage to a unit's Health.
+// Applying damage and healing to a unit's Health.
+//
+// POLICY: every point of Health a unit is GIVEN goes through healUnit, so
+// Overheal can see the overflow a heal would otherwise discard. Never write
+// `.hp = Math.min(maxHp, ...)` anywhere else. (The Light boss is the one
+// exception and says why at healUnit.)
 //
 // POLICY: every point of damage dealt to a unit goes through damageUnit --
 // basic attacks, ability modules, boss actions, minion specials, DoTs, and
@@ -108,6 +113,43 @@ export function applyShield(u, amount, ticks) {
   u.shield = shield;
   u.shieldTicks = ticks;
   return true;
+}
+
+/**
+ * POLICY: every point of Health a unit is given goes through healUnit --
+ * the same rule damageUnit sets for damage, and for the same reason: Overheal
+ * has to see the part of a heal that would otherwise be thrown away, and it
+ * can only do that if there is one place where that overflow is visible.
+ *
+ * Callers pass the FINAL amount, already scaled by Healing Down
+ * (healReceivedMultiplier) and already guarded by canBeHealed where that
+ * applies -- this function only clamps to maxHp and banks the remainder.
+ * Returns the Health actually restored, so callers keeping heal totals are
+ * unaffected.
+ *
+ * Overheal (Oathcub's Reliquary): a unit carrying `overhealPct` turns the
+ * discarded excess into a Shield, capped at that share of its Defense. It
+ * goes through applyShield like every other Shield, so the no-stacking rule
+ * still holds -- an Overheal Shield replaces a smaller one and is ignored by
+ * a larger one, rather than accumulating over a fight.
+ *
+ * The Light boss's self-heal deliberately does NOT come through here: a boss
+ * keeps a separate shield pool spent by damageBoss (see damage.js), and
+ * routing it would let a heal write to the wrong pool.
+ */
+const OVERHEAL_SHIELD_TICKS = 6;
+
+export function healUnit(u, amount) {
+  if (!u || !(amount > 0) || u.hp <= 0) return 0;
+  const before = u.hp;
+  u.hp = Math.min(u.maxHp, u.hp + amount);
+  const healed = u.hp - before;
+  const excess = amount - healed;
+  if (excess > 0 && (u.overhealPct || 0) > 0) {
+    const cap = ((u.def || 0) * u.overhealPct) / 100;
+    if (cap > 0) applyShield(u, Math.min(excess, cap), OVERHEAL_SHIELD_TICKS);
+  }
+  return healed;
 }
 
 /**

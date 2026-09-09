@@ -24,7 +24,7 @@ import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
 import { unitDist, distToBoss } from "../geometry.js";
 import { MELEE_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyDot, clearDot, healReceivedMultiplier } from "../status.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, healUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine scales off the base level's value. */
 const BASIC_DMG_BY_LEVEL = [14, 18, 23, 29, 29];
@@ -115,7 +115,7 @@ export function makeBonebeakModule(cfg) {
         for (let i = 0; i < meals; i++) {
           if (unit.hp > 0 && canBeHealed(unit)) {
             const heal = Math.round(((unit.maxHp * healPctByLevel[idx]) / 100) * healReceivedMultiplier(unit));
-            if (heal > 0) unit.hp = Math.min(unit.maxHp, unit.hp + heal);
+            if (heal > 0) healUnit(unit, heal);
           }
           unit._feastStacks = (unit._feastStacks || 0) + 1;
         }
@@ -156,7 +156,7 @@ export function makeBonebeakModule(cfg) {
       if (!best) return;
 
       const eaten = clearDot(best);
-      const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult * (1 + (eaten * GORGE_BONUS_PCT_PER_STACK) / 100)));
+      const dmg = Math.max(1, Math.round(attackRoll(unit) * mult * (1 + (eaten * GORGE_BONUS_PCT_PER_STACK) / 100)));
       const dealt = damageUnit(best, dmg);
       ctx.addDamageDealt(dealt);
       newFx.push({ id: now + "gg" + unit.uid + best.uid, row: best.row, col: best.col, t: now, isDark: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });

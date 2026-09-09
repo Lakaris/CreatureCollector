@@ -16,6 +16,27 @@ export function attackRangeOf(u) {
   return (u.isRanged ? RANGED_RANGE : MELEE_RANGE) + (u.rangeBonus || 0);
 }
 
+/**
+ * The Cone shape: an expanding wedge in front of (row,col), widening by one
+ * tile on each side per step out -- 1 cell at distance 1, 3 at 2, 5 at 3.
+ *
+ * The wedge runs along ROWS, because that is the axis battles are fought on:
+ * the player's side deploys at the high rows (DUNGEON_PLAYER_START_ROW) and
+ * the enemy/boss at the low ones, so "forward" is -row for a player unit and
+ * +row for an enemy-side one. It widens across columns.
+ *
+ * Returns [row, col] pairs without bounds-checking; callers either match them
+ * against unit positions or clip them to the grid.
+ */
+export function coneCells(row, col, dir, depth = 3) {
+  const out = [];
+  for (let d = 1; d <= depth; d++) {
+    const r = row + dir * d;
+    for (let c = col - (d - 1); c <= col + (d - 1); c++) out.push([r, c]);
+  }
+  return out;
+}
+
 /** 8-directional distance. This is the range metric attacks use. */
 export function aChebDist(r1, c1, r2, c2) {
   return Math.max(Math.abs(r1 - r2), Math.abs(c1 - c2));

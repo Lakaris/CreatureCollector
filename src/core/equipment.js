@@ -4,7 +4,7 @@
 // but its level and ascension are GLOBAL, keyed by itemId in app state --
 // upgrading an item upgrades it on every creature wearing it.
 
-import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL } from "../data/equipment.js";
+import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION } from "../data/equipment.js";
 import { STAT_LABELS } from "../data/rarity.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../data/types.js";
@@ -147,6 +147,37 @@ function equipCurve(lvl) {
   const x = lvl - 1;
   return x + EQUIP_CURVE_K * (x + EQUIP_CURVE_TAU * (Math.exp(-x / EQUIP_CURVE_TAU) - 1));
 }
+/**
+ * Stats an item's `stats` entry declares as a CAP rather than a growth rate.
+ *
+ * Health, Attack and Defense are unbounded: a `hp:5` item is worth ~450 at max
+ * level and ~1100 fully ascended, and that is fine for a three-digit stat. The
+ * crit pair is not that kind of number -- Crit Chance sits at 4 and Crit Damage
+ * at 30 on a creature, so the same growth would hand out 450 percentage points
+ * of crit chance and end the game. So for these the declared number is the most
+ * the item can ever give, and investment moves it TOWARDS that number instead
+ * of past it.
+ */
+const CAPPED_EQUIP_STATS = new Set(["crit", "critDmg"]);
+
+/**
+ * What a capped stat is worth at a given level and ascension, as a fraction of
+ * its cap.
+ *
+ * It rides the same curve every other stat does, normalised so that full
+ * investment -- max level AND max ascension -- lands exactly on the cap. The
+ * floor is what a brand-new copy is worth, so a level 1 item with crit on it
+ * still does something; without it the curve starts at zero and the stat reads
+ * as broken until several upgrades in.
+ */
+const CAPPED_MIN_FRACTION = 0.25;
+function cappedStatFraction(lvl, asc) {
+  const full = equipCurve(EQUIP_MAX_LEVEL) * (1 + EQUIP_MAX_ASCENSION * 0.15);
+  const here = equipCurve(lvl) * (1 + asc * 0.15);
+  const progress = full > 0 ? Math.min(1, here / full) : 0;
+  return CAPPED_MIN_FRACTION + (1 - CAPPED_MIN_FRACTION) * progress;
+}
+
 export function equipBonus(itemId, level, asc = 0) {
   const e = EQUIPMENT_MAP[itemId];
   if (!e) return {};
@@ -154,8 +185,16 @@ export function equipBonus(itemId, level, asc = 0) {
   const ascMult = 1 + asc * 0.15;
   const step = EQUIP_STEP_BY_RARITY[e.rarity] || 1;
   const curve = equipCurve(lvl);
+  const capFrac = cappedStatFraction(lvl, asc);
   return Object.fromEntries(
-    Object.entries(e.stats).map(([stat, base]) => [stat, Math.round((base + step * curve) * ascMult)])
+    Object.entries(e.stats).map(([stat, base]) => [
+      stat,
+      CAPPED_EQUIP_STATS.has(stat)
+        // Rounded to one decimal, not to a whole number: these caps are small
+        // enough that whole-number steps would make early levels look static.
+        ? Math.round(base * capFrac * 10) / 10
+        : Math.round((base + step * curve) * ascMult),
+    ])
   );
 }
 
@@ -184,7 +223,7 @@ export function equipBonusStr(bonuses) {
  * Shared by the detail UI and the battle stat pipeline so the two cannot drift.
  */
 export function totalEquipBonus(ownedData, equipmentLevels, equipmentAscensions) {
-  const totals = { hp: 0, atk: 0, def: 0, spd: 0, abilitySpeed: 0 };
+  const totals = { hp: 0, atk: 0, def: 0, spd: 0, abilitySpeed: 0, crit: 0, critDmg: 0 };
   for (const itemId of ownedData?.equipped || []) {
     if (!itemId) continue;
     const bonus = equipBonus(

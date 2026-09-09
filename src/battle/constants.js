@@ -44,6 +44,15 @@ export const DUNGEON_PASS_OVERFLOW_MULT = 3;
  */
 export const PLAN_PANEL_MIN_W = 160;
 
+/**
+ * Critical hits have no constants here on purpose: BOTH halves are stats.
+ * `crit` is the chance one lands and `critDmg` how much extra damage it deals,
+ * each in percentage points, carried per creature in data/creatures.js and per
+ * boss in data/bosses.js. Neither grows with level or ascension, the same way
+ * Speed and Haste don't. The rolls live in battle/damage.js (creatures) and
+ * battle/bosses/context.js (bosses).
+ */
+
 /** Melee units attack at Chebyshev distance 1; ranged at 3. */
 export const MELEE_RANGE = 1;
 export const RANGED_RANGE = 3;

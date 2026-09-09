@@ -112,7 +112,11 @@ export function formatAbilityStep(text, prevText) {
 // "beside" picks out allies rather than an enemy, but it is still a targeting
 // rule, so it rides with the others as its own pill instead of collapsing
 // into the Effects popup.
-export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest", "beside"]);
+// Tags that get their own standalone pill instead of collapsing into the
+// "Effects" pill. Cone is here as a shape rather than a picker because it IS
+// the ability's targeting -- the other shapes (Line, Splash, Nearby,
+// Horizontal Row) stay inside the Effects pill, where they already were.
+export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest", "beside", "cone"]);
 
 /** Split an ability's tags into standalone targeting pills and collapsed effects. */
 export function splitAbilityTags(tags) {
@@ -147,8 +151,18 @@ export const ABILITY_TAG_DEFS = {
   // have it within attack range switch onto it -- no forced movement.
   marked: { label: "Marked", description: "All allies within range targets this creature." },
   splash: { label: "Splash", description: "Affects all tiles surrounding the targeted creature." },
+  // A shape, not a flavor -- any expanding front (a howl, a breath, a
+  // shockwave) can use it. Grouped under Targeting on the effect-filter page
+  // alongside Line, Splash, and Nearby.
+  cone: { label: "Cone", description: "Hits an expanding area up to 3 tiles in front of this creature, widening from 1 tile to 3 to 5." },
+  // The missing half of Taunt: forced movement AWAY instead of toward.
+  fear: { label: "Fear", description: "Paths away from the creature that inflicted it if able; can not attack or use Special abilities until it ends." },
   frostbite: { label: "Frostbite", description: "Water creatures deal 5% more damage to this creature.", stacking: [5, 10, 15, 20, 25] },
-  hazard: { label: "Hazard", description: "Deal damage if a creature moves while on a tile with a Hazard on it." },
+  // Both Hazards punish moving across them; each adds its own effect on
+  // whatever simply stands there. Water slows EVERYONE on the tile, its own
+  // side included -- slick ground does not take sides.
+  waterhazard: { label: "Water Hazard", description: "Deals damage if a creature attempts to move while on it; -10% Haste when standing on it." },
+  firehazard: { label: "Fire Hazard", description: "Deals damage if a creature attempts to move while on it; deals damage over time when standing on it." },
   immortal: { label: "Immortal", description: "Health can not be reduced below 1." },
   healovertime: { label: "Heal Over Time", description: "Restores Health over time." },
   revive: { label: "Revive", description: "Returns to battle after being defeated." },
@@ -170,6 +184,9 @@ export const ABILITY_TAG_DEFS = {
   // stacked-up Fortify. Fortify is an ordinary dispellable buff.
   fortify: { label: "Fortify", maxStacks: 10, description: "Receive 50% less damage, remove 1 stack when damaged by an ability." },
   dispel: { label: "Dispel", description: "Removes all debuffs." },
+  // Crits are stats (crit chance x critDmg -- see battle/constants.js); this
+  // tag marks the abilities that skip the chance roll entirely.
+  guaranteedcrit: { label: "Guaranteed Crit", description: "This attack always lands a Critical Hit." },
   // Summoned creatures carry their own type line and kit, rendered as a
   // miniature ability card by AbilityTagPopup.
   //
@@ -186,8 +203,15 @@ export const ABILITY_TAG_DEFS = {
     ],
   },
   attackup: { label: "Attack Up", description: "Increases the creature's Attack.", stacking: [15, 30, 45, 60, 75] },
+  // The positive twin of Defense Down, on the same per-source stacking rules
+  // as Attack Up. Its magnitudes match Attack Up's rather than Defense Down's
+  // -- buffs and debuffs are tuned on separate ladders here.
+  defenseup: { label: "Defense Up", description: "Increases the creature's Defense.", stacking: [15, 30, 45, 60, 75] },
   reflect: { label: "Reflect", description: "Damages the enemy that damaged this creature." },
   shield: { label: "Shield", description: "Temporary bonus Health." },
+  // Rides on the ordinary Shield rules, so the bigger shield still wins and
+  // an Overheal shield never stacks on top of an existing one.
+  overheal: { label: "Overheal", description: "Healing beyond full Health is gained as a Shield instead of being wasted." },
   // Stacks are charges, not magnitude -- one stack soaks one redirected hit --
   // so this has no `stacking` table, the same shape as Fortify. Which allies
   // carry it is set by the granting ability's own targeting tag (Beside,
@@ -195,6 +219,13 @@ export const ABILITY_TAG_DEFS = {
   protect: { label: "Protect", maxStacks: 5, description: "Redirect attacks and abilities to the creature that granted Protect; remove 1 stack whenever anything is redirected." },
   counter: { label: "Counter", description: "Attacks the creature that attacked it." },
   nearby: { label: "Nearby", description: "Affects this creature and every tile surrounding it." },
+  // Deliberately says nothing about size or effect: each Aura sets its own in
+  // the ability that grants it (Sovereign Call's reaches 2 tiles). The rules
+  // the description no longer spells out still hold, and the implementation
+  // owes them: an Aura runs for a set time, Auras DO stack with one another
+  // (each is its own field, not stacks of one effect), and one ends the moment
+  // the creature emitting it is defeated.
+  aura: { label: "Aura", description: "An area around this creature; allies inside it gain its effect." },
   healdown: { label: "Healing Down", description: "Reduces the creature's healing received.", stacking: [20, 40, 60, 80, 100] },
   stun: { label: "Stun", description: "Can not attack or gain ability charge." },
   root: { label: "Root", description: "Can not move. Attacks and abilities still work." },
@@ -371,7 +402,7 @@ const JADEBUN_PHRASES = {
 // Waddlepop line: the passive's ramp % renders raw per tier.
 const WADDLEPOP_PHRASES = {
   basic: null,
-  special: { phrase: "Deal damage to enemies and leaves ice spikes on the ground" },
+  special: { phrase: "Deal damage to all enemies and temporarily leave a Water Hazard" },
 };
 
 // Loptrix line: the passive's charge/teleport text renders raw per tier.
@@ -382,6 +413,26 @@ const LOPTRIX_PHRASES = {
 
 // Siegefin line: Brine Shot is a plain hit. Holdfast and Deepsight carry their
 // own per-tier numbers (Speed while anchored, Range gained) and render as written.
+// Aurorion line: both damaging abilities ride the phrase system. Solar
+// Pounce's max tier LEADS with the buff dispel, using the tier text's
+// semicolon-clause prefix ("Dispel all buffs; 58 dmg" -- see
+// LEADING_DAMAGE_RE), which formatPlainAbilityLevel renders in front of the
+// shared phrase. Radiant Mane's Critical Damage ladder renders as written.
+const AURORION_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to an enemy, this attack always critically hits" },
+};
+
+// Emberpup line: Hellfang rides the generic damage phrase; Dread Howl names
+// its own shape. Cinder Scent's Attack ladder renders as written.
+const EMBERPUP_PHRASES = {
+  basic: null,
+  special: {
+    phrase: "Deal damage to all enemies in a Cone and temporarily leave a Fire Hazard",
+    phraseByLevel: { 4: "Deal damage to all enemies in a Cone, inflict Fear, and temporarily leave a Fire Hazard" },
+  },
+};
+
 const SIEGEFIN_PHRASES = {
   basic: null,
 };
@@ -391,6 +442,23 @@ const SIEGEFIN_PHRASES = {
 // (Shield share of Defense, counter chance) and render as written.
 const FRILLET_PHRASES = {
   basic: null,
+};
+
+// Auravast line: Twin Radiance splits one swing across two hits, so it needs
+// its own phrase rather than the generic "Deal damage to an enemy" -- the card
+// number is the TOTAL, same rule every multi-hit follows. Sovereign Call and
+// Sworn Guard are written out per tier and render as-is.
+const AURAVAST_PHRASES = {
+  basic: { phrase: "Deal damage twice to an enemy" },
+};
+
+// Oathcub line: Mailed Paw is a plain hit riding the generic damage phrase, so
+// its number-bump tiers read as the full sentence instead of "+10% damage".
+// Radiant Smite and Reliquary carry their own per-tier percentages (the share
+// of Shield converted, the Overheal cap) and render exactly as written.
+const OATHCUB_PHRASES = {
+  basic: null,
+  special: null,
 };
 
 // Venomcoil line: both damaging abilities carry a percentage that changes at
@@ -473,12 +541,26 @@ const PLAIN_ABILITY_PHRASES = {
   canoparch: VENOMCOIL_PHRASES,
   verdantlord: VENOMCOIL_PHRASES,
   ancientgrove: VENOMCOIL_PHRASES,
+  emberpup: EMBERPUP_PHRASES,
+  emberhound: EMBERPUP_PHRASES,
+  infernoking: EMBERPUP_PHRASES,
+  ashmonarch: EMBERPUP_PHRASES,
+  aurorabird: AURORION_PHRASES,
+  radiancebird: AURORION_PHRASES,
+  celestbird: AURORION_PHRASES,
+  empyravis: AURORION_PHRASES,
   sylvandragon: SIEGEFIN_PHRASES,
   ancientdragon: SIEGEFIN_PHRASES,
   mosskrab: FRILLET_PHRASES,
   jadekrab: FRILLET_PHRASES,
   crystalshell: FRILLET_PHRASES,
   rampartops: FRILLET_PHRASES,
+  prismcrab: OATHCUB_PHRASES,
+  spectrumcrab: OATHCUB_PHRASES,
+  rainbowshell: OATHCUB_PHRASES,
+  chromatarch: OATHCUB_PHRASES,
+  holydragon: AURAVAST_PHRASES,
+  celestialdragon: AURAVAST_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -489,12 +571,20 @@ export function usesPlainAbilityLevels(creatureId, key) {
 const LEADING_HEAL_RE = /^Heal\s+(\d+)\s*HP(?:\/s)?\b/i;
 
 /**
+ * A lead-in clause joined to the shared phrase by a connector, ahead of the
+ * damage: "Dispel all buffs and 58 dmg". The clause may contain no digits, so
+ * a trailing rider ("24 dmg and inflict Healing Down") can never be mistaken
+ * for one -- there, the number comes first and the rider is appended instead.
+ */
+const LEAD_CLAUSE_RE = /^([^;\d]*?\s+and)\s+(?=\d+\s*dmg\b)/i;
+
+/**
  * {label, amount, healAmt} for one level of a plain-leveled ability (see
  * PLAIN_ABILITY_PHRASES), or null for every other ability -- callers fall back
  * to the generic formatting in that case. Text after the leading clause (e.g. a
  * final level's bonus effect) is appended to the phrase.
  */
-export function formatPlainAbilityLevel(creatureId, key, text) {
+export function formatPlainAbilityLevel(creatureId, key, text, idx) {
   if (!usesPlainAbilityLevels(creatureId, key)) return null;
   const cfg = PLAIN_ABILITY_PHRASES[creatureId][key];
   if (cfg && cfg.heal) {
@@ -522,10 +612,31 @@ export function formatPlainAbilityLevel(creatureId, key, text) {
       shieldAmt: sh ? sh[1] + "%" : null,
     };
   }
+  // `phraseByLevel` replaces the shared phrase outright at one tier, for a
+  // max tier that RE-ORDERS its clauses rather than appending one (Dread
+  // Howl's Fear lands mid-sentence). The override is the complete sentence,
+  // so the tier text's own rider is not appended on top of it.
+  const override = cfg && cfg.phraseByLevel && cfg.phraseByLevel[idx];
+  const phrase = override || (cfg ? cfg.phrase : "Deal damage to an enemy");
+  // A tier that LEADS with its own clause joined by a connector -- written
+  // "Dispel all buffs and 58 dmg" -- renders as ONE sentence: the clause,
+  // then the shared phrase with its first letter lowercased ("Dispel all
+  // buffs and deal damage to an enemy..."). The semicolon form
+  // ("Shield 55; 20 dmg") still renders as two clauses via hit.prefix below.
+  const lead = LEAD_CLAUSE_RE.exec(text);
+  if (lead) {
+    const after = extractLeadingDamage(text.slice(lead[0].length));
+    if (after) {
+      return {
+        label: lead[1] + " " + phrase.charAt(0).toLowerCase() + phrase.slice(1) + after.rest,
+        amount: after.amount,
+        healAmt: null,
+      };
+    }
+  }
   const hit = extractLeadingDamage(text);
   if (!hit) return { label: text, amount: null, healAmt: null };
-  const phrase = cfg ? cfg.phrase : "Deal damage to an enemy";
-  return { label: hit.prefix + phrase + hit.rest, amount: hit.amount, healAmt: null };
+  return { label: hit.prefix + phrase + (override ? "" : hit.rest), amount: hit.amount, healAmt: null };
 }
 
 /** sacredwasp/divinedrone/holyswarm (Starlit/Starbright/Starburn) currently share identical ability values. */
@@ -566,7 +677,11 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   const isEmberstarLine = getRootDef(creatureId)?.id === "blazehornet";
   const isStarlitLine = isStarlitAbilityLine(creatureId);
   const tags = [];
-  if (key === "special" && isEmberstarLine) tags.push("pierce", "closest");
+  if (key === "special" && isEmberstarLine) {
+    tags.push("pierce", "closest");
+    // Charging Pierce only leaves its trail from the 4th upgrade on.
+    if (abilityLevel == null || abilityLevel >= 4) tags.push("firehazard");
+  }
   if (key === "basic" && isEmberstarLine) tags.push("closest");
   if (key === "unique" && isEmberstarLine) tags.push("burn");
   if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
@@ -613,6 +728,32 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "basic") tags.push("closest");
     if (key === "special") tags.push("taunt", "shield", "nearby");
   }
+  const isEmberpupLine = getRootDef(creatureId)?.id === "emberpup";
+  if (isEmberpupLine) {
+    // Hellfang only pins from its 4th upgrade on; Dread Howl only Fears from
+    // its 4th on -- the Cone is its shape at every tier.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("root");
+    }
+    if (key === "special") {
+      tags.push("cone", "firehazard");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("fear");
+    }
+  }
+  const isAurorionLine = getRootDef(creatureId)?.id === "aurorabird";
+  if (isAurorionLine) {
+    if (key === "basic") {
+      tags.push("closest");
+      // Smite only shields from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");
+    }
+    if (key === "special") {
+      tags.push("closest", "guaranteedcrit");
+      // Solar Pounce only strips buffs from its 4th upgrade on.
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispel");
+    }
+  }
   const isSiegefinLine = getRootDef(creatureId)?.id === "sylvandragon";
   if (isSiegefinLine) {
     if (key === "basic") {
@@ -623,6 +764,37 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // Holdfast's Root is the undispellable twin -- it is the creature's own
     // stance, and the same cast dispels everything else.
     if (key === "special") tags.push("rootundispellable");
+  }
+  const isAuravastLine = getRootDef(creatureId)?.id === "holydragon";
+  if (isAuravastLine) {
+    // Twin Radiance only shaves Defense from its 4th upgrade on; Sovereign
+    // Call only pulls in an Assist from its 4th on. The Aura is the ability's
+    // fallback at every tier, so it carries no gate.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
+    if (key === "special") {
+      tags.push("closest", "taunt", "aura");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("assist");
+    }
+    // Sworn Guard is a targeting rule and a damage bonus -- neither is an
+    // effect anything else can read, so it deliberately carries no pills.
+  }
+  const isOathcubLine = getRootDef(creatureId)?.id === "prismcrab";
+  if (isOathcubLine) {
+    // Mailed Paw only braces from its 4th upgrade on; Radiant Smite only
+    // Blinds from its 4th on -- the Shield it spends is part of every tier.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defenseup");
+    }
+    if (key === "special") {
+      tags.push("nearby", "shield");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("blind");
+    }
+    // Reliquary banks excess Healing as a Shield, so it carries both.
+    if (key === "unique") tags.push("overheal", "shield");
   }
   const isFrilletLine = getRootDef(creatureId)?.id === "mosskrab";
   if (isFrilletLine) {
@@ -773,7 +945,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("speeddown");
     }
     if (key === "special") {
-      tags.push("closest", "splash", "speeddown", "hazard");
+      tags.push("closest", "splash", "speeddown", "waterhazard");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
   }

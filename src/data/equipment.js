@@ -28,22 +28,22 @@ export const EQUIP_RARITY_CONFIG={
 export const EQUIPMENT_DEFS=[
   // Common (base 5 per stat -- two-stat items nerfed to ~0.6x so their combined
   // total stays in line with same-rarity single-stat items)
-  {id:"com_hp_atk",  name:"Iron Band",        emoji:"⚔️",  rarity:"common",    stats:{hp:5,  atk:5}},
-  {id:"com_hp_atk2", name:"Leather Vambrace", emoji:"🧤",  rarity:"common",    stats:{hp:5,  atk:5}},
-  {id:"com_hp_atk3", name:"Boarhide Wrap",    emoji:"🐗",  rarity:"common",    stats:{hp:5,  atk:5}},
-  {id:"com_hp_def",  name:"Stone Brace",      emoji:"🪨",  rarity:"common",    stats:{hp:5,  def:5}},
-  {id:"com_hp_def2", name:"Wooden Buckler",   emoji:"🪵",  rarity:"common",    stats:{hp:5,  def:5}},
+  {id:"com_hp_atk",  name:"Iron Band",        emoji:"⚔️",  rarity:"common",    stats:{hp:5,crit:8}},
+  {id:"com_hp_atk2", name:"Leather Vambrace", emoji:"🧤",  rarity:"common",    stats:{hp:5,critDmg:8}},
+  {id:"com_hp_atk3", name:"Boarhide Wrap",    emoji:"🐗",  rarity:"common",    stats:{atk:5,crit:8}},
+  {id:"com_hp_def",  name:"Stone Brace",      emoji:"🪨",  rarity:"common",    stats:{def:5,crit:8}},
+  {id:"com_hp_def2", name:"Wooden Buckler",   emoji:"🪵",  rarity:"common",    stats:{def:5,critDmg:8}},
   {id:"com_hp_def3", name:"Bone Guard",       emoji:"🦴",  rarity:"common",    stats:{hp:5,  def:5}},
-  {id:"com_atk_def", name:"Iron Knuckles",    emoji:"🥊",  rarity:"common",    stats:{atk:5, def:5}},
+  {id:"com_atk_def", name:"Iron Knuckles",    emoji:"🥊",  rarity:"common",    stats:{atk:5,critDmg:8}},
   {id:"com_atk_def2",name:"Bronze Spikes",    emoji:"📌",  rarity:"common",    stats:{atk:5, def:5}},
   {id:"com_atk_def3",name:"Rawhide Wraps",    emoji:"🥋",  rarity:"common",    stats:{atk:5, def:5}},
   // Rare (base 7 per stat)
-  {id:"rar_hp_atk",  name:"Silver Armlet",    emoji:"⚔️",  rarity:"rare",      stats:{hp:7,  atk:7}},
-  {id:"rar_hp_atk2", name:"Falcon Bracer",    emoji:"🦅",  rarity:"rare",      stats:{hp:7,  atk:7}},
-  {id:"rar_hp_def",  name:"Guardian Crest",   emoji:"🛡️",  rarity:"rare",      stats:{hp:7,  def:7}},
-  {id:"rar_hp_def2", name:"Tortoise Shell",   emoji:"🐢",  rarity:"rare",      stats:{hp:7,  def:7}},
-  {id:"rar_atk_def", name:"War Gauntlet",     emoji:"🥊",  rarity:"rare",      stats:{atk:7, def:7}},
-  {id:"rar_atk_def2",name:"Wolf Fang Claw",   emoji:"🐺",  rarity:"rare",      stats:{atk:7, def:7}},
+  {id:"rar_hp_atk",  name:"Silver Armlet",    emoji:"⚔️",  rarity:"rare",      stats:{hp:7,crit:14}},
+  {id:"rar_hp_atk2", name:"Falcon Bracer",    emoji:"🦅",  rarity:"rare",      stats:{hp:7,critDmg:14}},
+  {id:"rar_hp_def",  name:"Guardian Crest",   emoji:"🛡️",  rarity:"rare",      stats:{def:7,crit:14}},
+  {id:"rar_hp_def2", name:"Tortoise Shell",   emoji:"🐢",  rarity:"rare",      stats:{def:7,critDmg:14}},
+  {id:"rar_atk_def", name:"War Gauntlet",     emoji:"🥊",  rarity:"rare",      stats:{atk:7,crit:14}},
+  {id:"rar_atk_def2",name:"Wolf Fang Claw",   emoji:"🐺",  rarity:"rare",      stats:{atk:7,critDmg:14}},
   // Stat Sigils — Rare single-stat (base 18), +10% that stat
   {id:"sig_hp",  name:"Life Sigil",   emoji:"❤️", rarity:"rare", stats:{hp:18},           effect:"Gain 10% more HP",    statBonus:{stat:"hp",  pct:10}},
   {id:"sig_atk", name:"Fury Sigil",   emoji:"⚔️", rarity:"rare", stats:{atk:18},          effect:"Gain 10% more ATK",   statBonus:{stat:"atk", pct:10}},
@@ -94,23 +94,23 @@ export const EQUIPMENT_DEFS=[
   {id:"rar_gen_def_anchor",  name:"Anchor Charm",    emoji:"⚓", rarity:"rare", stats:{def:13},       effect:"Cannot be pushed or pulled"},
   {id:"rar_gen_atk_def_haste",name:"Runner's Band",  emoji:"🏃", rarity:"rare", stats:{atk:5,def:5},  effect:"Abilities recharge 8% faster", hasteEffect:true},
   // Epic (base 11 per stat)
-  {id:"epi_hp_atk",  name:"Warlord's Seal",   emoji:"🔥",  rarity:"epic",      stats:{hp:11, atk:11}},
-  {id:"epi_hp_def",  name:"Citadel Core",     emoji:"🏰",  rarity:"epic",      stats:{hp:11, def:11}},
-  {id:"epi_atk_def", name:"Infernal Glove",   emoji:"🌋",  rarity:"epic",      stats:{atk:11,def:11}},
+  {id:"epi_hp_atk",  name:"Warlord's Seal",   emoji:"🔥",  rarity:"epic",      stats:{hp:11,crit:21}},
+  {id:"epi_hp_def",  name:"Citadel Core",     emoji:"🏰",  rarity:"epic",      stats:{hp:11,critDmg:21}},
+  {id:"epi_atk_def", name:"Infernal Glove",   emoji:"🌋",  rarity:"epic",      stats:{atk:11,crit:21}},
   // Stat Crests — Epic single-stat (base 25), +15% that stat
   {id:"cre_hp",  name:"Life Crest",   emoji:"❤️", rarity:"epic",      stats:{hp:25},           effect:"Gain 15% more HP",    statBonus:{stat:"hp",          pct:15}},
   {id:"cre_atk", name:"Fury Crest",   emoji:"⚔️", rarity:"epic",      stats:{atk:25},          effect:"Gain 15% more ATK",   statBonus:{stat:"atk",         pct:15}},
   {id:"cre_def", name:"Iron Crest",   emoji:"🛡️", rarity:"epic",      stats:{def:25},          effect:"Gain 15% more DEF",   statBonus:{stat:"def",         pct:15}},
   // Element Epic items — HP+DEF base 11, element resistance
-  {id:"res_fire",   name:"Cinder Ward",    emoji:"🛡️", rarity:"epic", stats:{hp:11,def:11}, effect:"Fire moves deal 20% less damage",   element:"Fire"},
-  {id:"res_water",  name:"Tide Guard",     emoji:"🌊", rarity:"epic", stats:{hp:11,def:11}, effect:"Water moves deal 20% less damage",  element:"Water"},
+  {id:"res_fire",   name:"Cinder Ward",    emoji:"🛡️", rarity:"epic", stats:{def:11,crit:21}, effect:"Fire moves deal 20% less damage",   element:"Fire"},
+  {id:"res_water",  name:"Tide Guard",     emoji:"🌊", rarity:"epic", stats:{def:11,critDmg:21}, effect:"Water moves deal 20% less damage",  element:"Water"},
   {id:"res_nature", name:"Bark Shield",    emoji:"🌿", rarity:"epic", stats:{hp:11,def:11}, effect:"Nature moves deal 20% less damage", element:"Nature"},
   {id:"res_earth",  name:"Stone Bulwark",  emoji:"⛰️", rarity:"epic", stats:{hp:11,def:11}, effect:"Earth moves deal 20% less damage",  element:"Earth"},
   {id:"res_wind",   name:"Gale Barrier",   emoji:"🌪️", rarity:"epic", stats:{hp:11,def:11}, effect:"Wind moves deal 20% less damage",   element:"Wind"},
   {id:"res_dark",   name:"Shadow Veil",    emoji:"🌑", rarity:"epic", stats:{hp:11,def:11}, effect:"Dark moves deal 20% less damage",   element:"Dark"},
   {id:"res_light",  name:"Radiant Aegis",  emoji:"☀️", rarity:"epic", stats:{hp:11,def:11}, effect:"Light moves deal 20% less damage",  element:"Light"},
   // Type-specific Epic items (non-Speed/Haste survivors)
-  {id:"typ_fire_hp_atk",   name:"Scorchmantle",      emoji:"🧥", rarity:"epic", element:"Fire",    stats:{hp:9,atk:8},           effect:"Deal 5% bonus damage for each turn a Burn debuff is active on any enemy"},
+  {id:"typ_fire_hp_atk",   name:"Scorchmantle",      emoji:"🧥", rarity:"epic", element:"Fire",    stats:{atk:8,critDmg:21},           effect:"Deal 5% bonus damage for each turn a Burn debuff is active on any enemy"},
   {id:"typ_water_hp_def",  name:"Tideweave Wrap",    emoji:"🌊", rarity:"epic", element:"Water",   stats:{hp:9,def:8},           effect:"Restore 3% HP whenever a Water move hits"},
   {id:"typ_water_atk_def", name:"Brineplate",        emoji:"🪸", rarity:"epic", element:"Water",   stats:{atk:8,def:9},          effect:"Counter-attack for 10% ATK when struck by a non-Water move"},
   {id:"typ_nat_hp_def",    name:"Thornback Vest",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:8,def:9},           effect:"Gain +6% DEF for each ally still standing (Auto Battler)"},
@@ -159,9 +159,9 @@ export const EQUIPMENT_DEFS=[
   {id:"rel_atk", name:"Fury Relic",   emoji:"⚔️", rarity:"legendary", stats:{atk:35},          effect:"Gain 25% more ATK",   statBonus:{stat:"atk",         pct:25}},
   {id:"rel_def", name:"Iron Relic",   emoji:"🛡️", rarity:"legendary", stats:{def:35},          effect:"Gain 25% more DEF",   statBonus:{stat:"def",         pct:25}},
   // Legendary (base 17 per stat)
-  {id:"leg_hp_atk",  name:"Divine Colossus",  emoji:"👑",  rarity:"legendary", stats:{hp:17, atk:17}},
-  {id:"leg_hp_def",  name:"Eternal Fortress", emoji:"🏯",  rarity:"legendary", stats:{hp:17, def:17}},
-  {id:"leg_atk_def", name:"Dragon's Claw",    emoji:"🐉",  rarity:"legendary", stats:{atk:17,def:17}},
+  {id:"leg_hp_atk",  name:"Divine Colossus",  emoji:"👑",  rarity:"legendary", stats:{hp:17,crit:30}},
+  {id:"leg_hp_def",  name:"Eternal Fortress", emoji:"🏯",  rarity:"legendary", stats:{def:17,critDmg:30}},
+  {id:"leg_atk_def", name:"Dragon's Claw",    emoji:"🐉",  rarity:"legendary", stats:{atk:17,crit:30}},
   // Legendary effect items — user-specified (base 17 per stat)
   {id:"eff_atk_hp_berserk",  name:"Berserk Core",        emoji:"🔴", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Special attacks are sealed. Basic attacks deal 100% more damage"},
   {id:"eff_atk_def_double",  name:"Twin Fang",           emoji:"🗡️", rarity:"legendary", stats:{atk:17,def:17},          effect:"Basic attacks hit 1 additional time"},
@@ -182,7 +182,7 @@ export const EQUIPMENT_DEFS=[
   {id:"eff_hp_def_revive",   name:"Phoenix Core",        emoji:"🔥", rarity:"legendary", stats:{hp:17, def:17},          effect:"Revive once per battle at 20% HP"},
   {id:"eff_atk_hp_lifesteal",name:"Bloodthirster",       emoji:"🩸", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Recover 8% of all damage dealt as HP"},
   // Additional user-specified legendaries
-  {id:"eff_hp_atk_bleed",    name:"Sanguine Fang",       emoji:"🩸", rarity:"legendary", stats:{hp:17, atk:17},                                    effect:"Whenever you inflict damage, also inflict Bleed and Burn"},
+  {id:"eff_hp_atk_bleed",    name:"Sanguine Fang",       emoji:"🩸", rarity:"legendary", stats:{atk:17,critDmg:30},                                    effect:"Whenever you inflict damage, also inflict Bleed and Burn"},
   {id:"eff_def_atk_buffstk", name:"Warbuff Plate",       emoji:"📈", rarity:"legendary", stats:{def:17,atk:17},                                     effect:"Gain +10% ATK and DEF when gaining a buff, up to +50%"},
   // Dungeon-exclusive elemental legendaries (non-Speed/Haste survivors)
   {id:"dng_fire_hp_atk",   name:"Ember Brand",       emoji:"🔥", rarity:"legendary", stats:{hp:17, atk:17},          element:"Fire",     effect:"Fire attacks inflict Burn on hit"},
@@ -201,7 +201,7 @@ export const EQUIPMENT_DEFS=[
   {id:"dng_wind_atk_def",  name:"Tempest Blade",     emoji:"🌬️", rarity:"legendary", stats:{atk:17,def:17},          element:"Wind",     effect:"Wind moves deal 25% more damage to slowed or rooted enemies"},
   {id:"dng_wind_hp_def",   name:"Cyclone Ring",      emoji:"🌪️", rarity:"legendary", stats:{hp:17, def:17},          element:"Wind",     effect:"Swirling winds cause enemies to miss 15% of their attacks against this creature"},
   {id:"dng_wind_atk_def2", name:"Sirocco Plate",     emoji:"🌫️", rarity:"legendary", stats:{atk:17,def:17},          element:"Wind",     effect:"Wind attacks reduce enemy SPD by 15% while increasing your own SPD by 5%", speedEffect:true},
-  {id:"dng_wind_hp_def2",  name:"Jetstream Band",    emoji:"⚡", rarity:"legendary", stats:{hp:17, def:17},          element:"Wind",     effect:"Wind abilities recharge 40% faster", hasteEffect:true},
+  {id:"dng_wind_hp_def2",  name:"Jetstream Band",    emoji:"⚡", rarity:"legendary", stats:{def:17,crit:30},          element:"Wind",     effect:"Wind abilities recharge 40% faster", hasteEffect:true},
   // Role-exclusive: Attacker (non-Speed/Haste survivors)
   {id:"role_atk_rampage",    name:"Rampage Shard",       emoji:"💢", rarity:"legendary", role:"Attacker", stats:{atk:21,hp:13},           effect:"[Attacker] After defeating an enemy, gain +25% ATK until end of battle"},
   {id:"role_atk_doubledown", name:"Gambler's Blade",     emoji:"🃏", rarity:"legendary", role:"Attacker", stats:{atk:21,def:13},          effect:"[Attacker] 50% chance to deal 100% bonus damage; 20% chance to deal 0 damage"},
@@ -214,7 +214,7 @@ export const EQUIPMENT_DEFS=[
   {id:"role_tank_thorns",    name:"Thornwall Aegis",     emoji:"🌵", rarity:"legendary", role:"Tank", stats:{def:17,hp:17},           effect:"[Tank] Enemies lose 10% of their ATK each time they hit this creature, up to -40%"},
   {id:"role_tank_guardian",  name:"Guardian's Oath",     emoji:"🤝", rarity:"legendary", role:"Tank", stats:{hp:17,def:17},           effect:"[Tank] Redirect 25% of damage dealt to allies to this creature instead"},
   // Role-exclusive: Support (non-Speed/Haste survivors)
-  {id:"role_sup_amplify",    name:"Amplifier Prism",     emoji:"🔮", rarity:"legendary", role:"Support", stats:{hp:17,atk:17},           effect:"[Support] All healing and buffs applied by this creature are 30% stronger"},
+  {id:"role_sup_amplify",    name:"Amplifier Prism",     emoji:"🔮", rarity:"legendary", role:"Support", stats:{hp:17,critDmg:30},           effect:"[Support] All healing and buffs applied by this creature are 30% stronger"},
   {id:"role_sup_haste",      name:"Swiftgrace Band",     emoji:"💨", rarity:"legendary", role:"Support", stats:{hp:17,def:17},           effect:"[Support] Allies gain +20% Haste for 2 turns after being healed by this creature", hasteEffect:true},
   {id:"role_sup_barrier",    name:"Sanctum Seal",        emoji:"✨", rarity:"legendary", role:"Support", stats:{hp:21,def:13},           effect:"[Support] After using a support ability, grant the lowest-HP ally a 15% HP shield"},
   {id:"role_sup_revive",     name:"Soul Lantern",        emoji:"🏮", rarity:"legendary", role:"Support", stats:{hp:21,atk:13},           effect:"[Support] Once per battle, revive a defeated ally at 30% HP"},

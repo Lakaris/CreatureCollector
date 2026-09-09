@@ -219,8 +219,23 @@ export function feedFlair(banana, ownedData, setOwned, setCurrencies, free = fal
   }
 
   // Everything at this rarity is already unlocked: convert to shards.
-  const allItems = Object.values(pools).flatMap((p) => p[rarity] || []);
-  const dupeItem = randomOf(allItems) || null;
+  //
+  // The consolation item is drawn from EVERY category, not the one rolled
+  // above, so `dupeCat` records where it actually came from. Callers that show
+  // the item have to label it with this rather than with `cat` -- the two
+  // disagree most of the time, which was invisible only while dupes were
+  // rendered too faint to read.
+  const allItems = Object.entries(pools).flatMap(([category, pool]) =>
+    (pool[rarity] || []).map((entry) => ({ category, entry }))
+  );
+  const picked = randomOf(allItems) || null;
   spendBanana((c) => ({ flairShard: (c.flairShard || 0) + FLAIR_SHARD_VALUES[rarity] }));
-  return { rarity, cat, won: null, dupeItem, shards: FLAIR_SHARD_VALUES[rarity] };
+  return {
+    rarity,
+    cat,
+    won: null,
+    dupeItem: picked ? picked.entry : null,
+    dupeCat: picked ? picked.category : cat,
+    shards: FLAIR_SHARD_VALUES[rarity],
+  };
 }

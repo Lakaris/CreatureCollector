@@ -5,6 +5,13 @@
 // only for bosses, melons, and arena tabs. That is intentional, not a gap.
 
 export const TYPE_EMOJI={Fire:"🔥",Water:"💧",Nature:"🌿",Earth:"🪨",Wind:"💨",Electric:"⚡",Light:"✨",Dark:"🌑"};
+
+// The one display order for types, so every list of them reads the same way
+// round the game: the Dungeon boss bar, and the Collection/Dex type filters
+// (via ALL_TYPES in data/creatures.js). Grouped by feel rather than
+// alphabetically -- the four elemental types first, then the two energies,
+// then the light/dark pair. This is presentation only; nothing indexes into it.
+export const TYPE_ORDER=["Fire","Nature","Earth","Wind","Electric","Water","Light","Dark"];
 // fieldRate/fieldAmount drive the Farm field's hourly bonus-drop rolls (and
 // the rates tooltip) -- one roll per melon per hour, paying fieldAmount on a hit.
 export const MELON_TYPES=Object.entries(TYPE_EMOJI).map(([type,emoji])=>({type,emoji,key:"melon"+type,label:type+" Melon",fieldRate:0.005,fieldAmount:1}));

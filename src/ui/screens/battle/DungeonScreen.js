@@ -6,10 +6,10 @@ import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_LABELS } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../../data/equipment.js";
 import { isExclusive, exclusivityChip } from "../../../core/equipment.js";
-import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
+import { TYPE_EMOJI, TYPE_STRONG_AGAINST, TYPE_ORDER } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
-import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED, DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS } from "../../../battle/constants.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED, DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
 import { aEase } from "../../../battle/geometry.js";
 import { getBossModule, getHighlightTiles } from "../../../battle/bosses/registry.js";
 import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/context.js";
@@ -17,6 +17,7 @@ import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
+import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
@@ -37,7 +38,10 @@ const EMPTY_GRID={};
 // Boss bar display order only. DUNGEON_BOSSES itself must not be reordered:
 // the Daily Boss rotation indexes into it by level, so shuffling the array
 // would silently reassign which boss appears on which day.
-const DUNGEON_BAR_ORDER=["fire","nature","earth","wind","electric","water","light","dark"];
+// Boss keys are lowercased type names (see makeBoss in data/bosses.js), so the
+// bar reads straight off the shared TYPE_ORDER -- the Collection and Dex type
+// filters order themselves by the same constant.
+const DUNGEON_BAR_ORDER=TYPE_ORDER.map(t=>t.toLowerCase());
 
 const DUNGEON_BG_BY_TYPE={
   Fire:"#f0d4cf",     // red
@@ -248,14 +252,18 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     battle._boss=boss;
     const bStats=getBossStats(boss,bossLevel);
     const bRow=1,bCol=Math.floor((DUNGEON_GRID_COLS-2)/2);
-    battle.boss={row:bRow,col:bCol,prevRow:bRow,prevCol:bCol,lastMoveTime:Date.now()-dAnimRef.current,hp:bStats.hp,maxHp:bStats.hp,atk:bStats.atk,atkCd:0,moveCd:0,specialCd:10,_bossKey:boss.key};
+    battle.boss={row:bRow,col:bCol,prevRow:bRow,prevCol:bCol,lastMoveTime:Date.now()-dAnimRef.current,hp:bStats.hp,maxHp:bStats.hp,atk:bStats.atk,crit:bStats.crit,critDmg:bStats.critDmg,atkCd:0,moveCd:0,specialCd:10,_bossKey:boss.key};
     if(boss.minions){
       const vNow=Date.now();const vHP=Math.round(80*4*(1+bossLevel*0.15));const vATK=Math.round(25*(1+bossLevel*0.1));
       // Staggered opening cooldowns so the pair doesn't act in lockstep.
       const OPENING_CDS=[[3,8],[5,12]];
       battle.enemyUnits.push(...boss.minions.map((m,i)=>{
         const [atkCd,specialCd]=OPENING_CDS[i%OPENING_CDS.length];
-        return {uid:"vm"+i,creatureId:"__vine_minion",row:m.row,col:m.col,prevRow:m.row,prevCol:m.col,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,isRanged:false,atkCd,specialCd,isVineMinion:true};
+        // Crit comes off the Vine's own CREATURE_MAP entry rather than a literal
+        // here, so the stat block the info card reads and the unit that fights
+        // can't disagree. Its HP/ATK are boss-level-scaled above; crit is a
+        // chance, so it scales with nothing (see state.js's enemy units).
+        return {uid:"vm"+i,creatureId:"__vine_minion",row:m.row,col:m.col,prevRow:m.row,prevCol:m.col,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,crit:CREATURE_MAP["__vine_minion"].stats.crit??0,critDmg:CREATURE_MAP["__vine_minion"].stats.critDmg??0,isRanged:false,atkCd,specialCd,isVineMinion:true};
       }));
     }
     dBRef.current=battle;
@@ -446,10 +454,16 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
               React.createElement("div",{className:"dboss-shield",style:{height:"100%",width:(Math.min(1,(snapBoss.shield||0)/snapBoss.maxHp)*100)+"%",background:"#60a5fa",borderRadius:3}})
             )
           ),
+          renderHazardField(dBRef.current && dBRef.current.hazards, DUNGEON_TILE),
           dAtkFx.map(e=>{
             const color=e.isEnemy?"#ef4444":"#a78bfa";
             if(e.isEmpSlam)return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE*2,height:DUNGEON_TILE*2,borderRadius:"50%",border:"4px solid #92400e",boxShadow:"0 0 18px #a16207, inset 0 0 12px rgba(146,64,14,0.5)",animation:"earthEmpSlam 0.9s ease-out forwards",pointerEvents:"none",zIndex:26}});
             if(e.isShockwave)return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE*2,height:DUNGEON_TILE*2,borderRadius:"50%",border:"3px solid #ef4444",boxShadow:"0 0 12px #ef4444",animation:"bossShockwave 0.6s ease-out forwards",pointerEvents:"none",zIndex:25}});
+            // Fire: Burn ticks, Fire Hazards, and cone breath (Dread Howl).
+            if(e.isBurn){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(249,115,22,0.5)",boxShadow:"inset 0 0 8px rgba(234,88,12,0.9)",animation:"pillarFlame 0.7s ease-out forwards",pointerEvents:"none",zIndex:20}});}
+            // Water Hazard triggers and missed swings -- this screen renders
+            // everything else itself, but never had these two.
+            if(e.isFrost||e.isMiss)return renderTileFx(e,DUNGEON_TILE);
             if(e.isPillar){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(251,146,60,0.6)",boxShadow:"inset 0 0 8px rgba(239,68,68,0.8)",animation:"pillarFlame 0.7s ease-out forwards",pointerEvents:"none",zIndex:20}});}
             if(e.isShock){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:"rgba(250,204,21,0.55)",boxShadow:"inset 0 0 8px rgba(234,179,8,0.9)",animation:"shockLine 0.8s ease-out forwards",pointerEvents:"none",zIndex:20}});}
             if(e.isSplash){return React.createElement("div",{key:e.id,style:{position:"absolute",left:e.col*DUNGEON_TILE,top:e.row*DUNGEON_TILE,width:DUNGEON_TILE,height:DUNGEON_TILE,background:e.isCenter?"rgba(56,189,248,0.65)":"rgba(56,189,248,0.35)",boxShadow:"inset 0 0 8px rgba(14,165,233,0.8)",animation:`splashWave ${e.isCenter?0.8:1.1}s ease-out forwards`,animationDelay:e.isCenter?"0ms":"80ms",pointerEvents:"none",zIndex:20}});}

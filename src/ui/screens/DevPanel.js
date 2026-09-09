@@ -253,9 +253,16 @@ function DevPanel(){
     React.createElement("div",{className:"dev-title"},
       React.createElement("i",{className:"ti ti-terminal",style:{fontSize:16}}),"Dev tools — set DEV_MODE=false to hide"
     ),
-    React.createElement("div",{style:{display:"flex",gap:4,marginBottom:10,background:"#2a2a3e",borderRadius:8,padding:4}},
+    // A grid, not a flex row. Nine labels don't fit one line on a phone, and a
+    // flex item won't shrink below its own min-content width, so `flex:1` let
+    // the row overflow the panel and left the last tabs off-screen and
+    // unclickable. auto-fit reflows instead: one line where there's room, as
+    // many even lines as it takes where there isn't. The 56px floor is the
+    // widest label ("Labyrinth") at this size, so nothing is ever squeezed
+    // narrower than its own text.
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(56px, 1fr))",gap:4,marginBottom:10,background:"#2a2a3e",borderRadius:8,padding:4}},
       devTabs.map(t=>React.createElement("button",{key:t.id,onClick:()=>setDevTab(t.id),style:{
-        flex:1,padding:"5px 0",fontSize:11,fontWeight:700,border:"none",borderRadius:6,cursor:"pointer",
+        padding:"5px 0",fontSize:11,fontWeight:700,border:"none",borderRadius:6,cursor:"pointer",
         background:devTab===t.id?"#534AB7":"transparent",color:devTab===t.id?"#fff":"#aaa"
       }},t.label))
     ),
@@ -293,10 +300,10 @@ function DevPanel(){
           setEquipmentCopies(prev=>{const n={...prev};EQUIPMENT_DEFS.forEach(item=>{if(!(n[item.id]>0))n[item.id]=1;});return n;});
         }},"Unlock all equipment (1 copy each)")
       ),
-      React.createElement("div",{style:{display:"flex",gap:3,margin:"6px 0 8px",background:"#2a2a3e",borderRadius:8,padding:3}},
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(56px, 1fr))",gap:3,margin:"6px 0 8px",background:"#2a2a3e",borderRadius:8,padding:3}},
         ["common","rare","epic","legendary"].map(r=>
           React.createElement("button",{key:r,onClick:()=>setEquipSubTab(r),style:{
-            flex:1,padding:"4px 0",fontSize:10,fontWeight:700,border:"none",borderRadius:6,cursor:"pointer",textTransform:"capitalize",
+            padding:"4px 0",fontSize:10,fontWeight:700,border:"none",borderRadius:6,cursor:"pointer",textTransform:"capitalize",
             background:equipSubTab===r?EQUIP_RARITY_CONFIG[r].bg:"transparent",
             color:equipSubTab===r?EQUIP_RARITY_CONFIG[r].color:"#aaa"
           }},r)

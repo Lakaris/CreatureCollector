@@ -21,6 +21,7 @@ import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
+import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
@@ -28,6 +29,7 @@ import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js"
 import { equipBonus, equipBonusStr, equippedStatBonuses } from "../../../core/equipment.js";
 import { calcStats, getSpecialChargeAt } from "../../../core/creatures.js";
 import { computeCombatStats } from "../../../core/stats.js";
+import { STAT_SUFFIX } from "../../../data/rarity.js";
 
 const COLS = ARENA_GRID_COLS, ROWS = ARENA_GRID_ROWS, TILE = ARENA_TILE;
 
@@ -299,7 +301,7 @@ function TestBattleScreen({ onBack }) {
   function gearDelta(def, baseOc, equipped) {
     const oc = { ...baseOc, equipped: equipped.map((s) => s && s.id) };
     const base = calcStats(def, oc);
-    const flat = { hp: 0, atk: 0, def: 0, spd: 0, abilitySpeed: 0 };
+    const flat = { hp: 0, atk: 0, def: 0, spd: 0, abilitySpeed: 0, crit: 0, critDmg: 0 };
     for (const slot of equipped) {
       if (!slot) continue;
       const b = equipBonus(slot.id, slotLvl(slot), slotAsc(slot));
@@ -307,7 +309,7 @@ function TestBattleScreen({ onBack }) {
     }
     const pcts = equippedStatBonuses(oc);
     const delta = {};
-    for (const stat of ["hp", "atk", "def", "spd", "abilitySpeed"]) {
+    for (const stat of ["hp", "atk", "def", "spd", "abilitySpeed", "crit", "critDmg"]) {
       const pct = pcts.filter((b) => b.stat === stat).reduce((acc, b) => acc + Math.ceil((base[stat] || 0) * (b.pct / 100)), 0);
       delta[stat] = (flat[stat] || 0) + pct;
     }
@@ -319,7 +321,7 @@ function TestBattleScreen({ onBack }) {
     const hpBonus = Math.round((d.hp || 0) * 4); // matches state.js's HP_SCALE
     unit.hp += hpBonus; unit.maxHp += hpBonus;
     unit.atk += d.atk || 0; unit.def += d.def || 0;
-    unit.spd += d.spd || 0; unit.abilitySpeed += d.abilitySpeed || 0;
+    unit.spd += d.spd || 0; unit.abilitySpeed += d.abilitySpeed || 0; unit.crit += d.crit || 0; unit.critDmg += d.critDmg || 0;
   }
 
   function startFight() {
@@ -366,7 +368,7 @@ function TestBattleScreen({ onBack }) {
         const hp = Math.round((stats.hp || 60) * 4); // matches state.js's HP_SCALE
         u.hp = hp; u.maxHp = hp;
         u.atk = stats.atk || 30; u.def = stats.def || 20;
-        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1;
+        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1; u.crit = stats.crit ?? 0; u.critDmg = stats.critDmg ?? 0;
       }
       u.abilityLevels = { ...ov.kit };
       u.abilChargeMax = getSpecialChargeAt(def, ov.kit.special || 0);
@@ -382,7 +384,7 @@ function TestBattleScreen({ onBack }) {
         const hp = Math.round((stats.hp || 60) * 4);
         u.hp = hp; u.maxHp = hp;
         u.atk = stats.atk || 30; u.def = stats.def || 20;
-        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1;
+        u.spd = stats.spd || 1; u.abilitySpeed = stats.abilitySpeed || 1; u.crit = stats.crit ?? 0; u.critDmg = stats.critDmg ?? 0;
       }
       // Kit always follows the sandbox's Enemy Lv tier (or the per-placement
       // override) -- makeArenaBattle defaults every enemy to a MAX kit, which
@@ -456,9 +458,14 @@ function TestBattleScreen({ onBack }) {
                 } });
               })).flat()
             ),
+            renderHazardField(bRef.current && bRef.current.hazards, TILE),
             atkEffects.map((e) => {
               const color = e.isEnemy ? "#ef4444" : "#a78bfa";
               if (e.isHeal) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * TILE, top: e.row * TILE, width: TILE, height: TILE, borderRadius: "50%", background: "rgba(34,197,94,0.4)", boxShadow: "inset 0 0 8px rgba(22,163,74,0.9)", animation: "splashWave 0.7s ease-out forwards", pointerEvents: "none", zIndex: 21 } }); }
+              // Burn, Hazards, DoT, Poison, Splash, Shock, gusts and misses --
+              // the shared tile pulses (ui/components/battleTileFx.js).
+              const tileFx = renderTileFx(e, TILE);
+              if (tileFx) return tileFx;
               if (e.isPillar) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * TILE, top: e.row * TILE, width: TILE, height: TILE, background: "rgba(251,146,60,0.6)", boxShadow: "inset 0 0 8px rgba(239,68,68,0.8)", animation: "pillarFlame 0.7s ease-out forwards", pointerEvents: "none", zIndex: 20 } }); }
               if (e.isRanged) {
                 const dRow = e.row - e.fromRow, dCol = e.col - e.fromCol;
@@ -691,15 +698,15 @@ function TestBattleScreen({ onBack }) {
                 const gd = gearDelta(def, { ...(isPlayer ? owned?.[entry.id] || {} : {}), level: ov.lvl, ascensions: ov.asc }, equipped);
                 const fmt = (v) => (Number.isInteger(v) ? v : Math.round(v * 100) / 100);
                 return React.createElement("div", { style: { display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", borderTop: "1px solid #e8e8f2", paddingTop: 6 } },
-                  [["hp", "❤️ HP"], ["atk", "⚔️ ATK"], ["def", "🛡️ DEF"], ["spd", "👟 SPD"], ["abilitySpeed", "⚡ Haste"]].map(([k, label]) => {
+                  [["hp", "❤️ HP"], ["atk", "⚔️ ATK"], ["def", "🛡️ DEF"], ["spd", "👟 SPD"], ["abilitySpeed", "⚡ Haste"], ["crit", "🎯 Crit"], ["critDmg", "💥 CritDmg"]].map(([k, label]) => {
                     // HP shown at battle scale (x4, state.js's HP_SCALE) so it
                     // matches the in-fight unit info panel.
                     const scale = k === "hp" ? 4 : 1;
                     const base = (stats[k] || 0) * scale, bonus = (gd[k] || 0) * scale;
                     return React.createElement("div", { key: k, style: { fontSize: 10, fontWeight: 700, color: "#333", background: "#fff", border: "1px solid #e0e0e0", borderRadius: 8, padding: "3px 7px", display: "flex", alignItems: "center", gap: 3 } },
                       React.createElement("span", { style: { color: "#888" } }, label),
-                      React.createElement("span", null, fmt(Math.round(base + bonus))),
-                      bonus > 0 && React.createElement("span", { style: { color: "#16a34a", fontWeight: 800 } }, "+" + fmt(Math.round(bonus)))
+                      React.createElement("span", null, fmt(Math.round(base + bonus)) + (STAT_SUFFIX[k] || "")),
+                      bonus > 0 && React.createElement("span", { style: { color: "#16a34a", fontWeight: 800 } }, "+" + fmt(Math.round(bonus)) + (STAT_SUFFIX[k] || ""))
                     );
                   })
                 );

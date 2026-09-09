@@ -3,7 +3,7 @@
 // DoT magnitudes scale off the boss's attack, so a level-10 boss's burn hurts
 // more than a level-1 boss's. When the boss is dead they fall back to a flat 2.
 
-import { damageUnit, FORTIFY_STACK_CAP } from "./hp.js";
+import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit } from "./hp.js";
 import { aChebDist } from "./geometry.js";
 
 /** Damage per tick for Burn, as a fraction of boss attack. Damage Over Time
@@ -70,6 +70,22 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
  */
 export function isRooted(u) {
   return (u.rootTicks || 0) > 0;
+}
+
+/**
+ * Fear (Dread Howl): the mirror of Taunt -- forced movement AWAY from
+ * whoever inflicted it rather than toward them. A feared creature spends its
+ * turn fleeing and can neither attack nor cast; its always-on passives still
+ * run. Rooted-and-feared means it simply cowers in place.
+ */
+export function applyFear(u, sourceUid, ticks) {
+  if (!u || u.uid == null) return;
+  u.fearTicks = ticks;
+  u.fearSourceUid = sourceUid;
+}
+
+export function isFeared(u) {
+  return (u.fearTicks || 0) > 0;
 }
 
 /** Slow and shock both halve action speed by doubling the cooldown. */
@@ -183,6 +199,11 @@ export function clearNegativeStatMods(u) {
   if (u.statMods) u.statMods = u.statMods.filter((m) => m.pct >= 0);
 }
 
+/** Strip every positive stat mod (buff dispel); debuffs are untouched. */
+export function clearPositiveStatMods(u) {
+  if (u.statMods) u.statMods = u.statMods.filter((m) => m.pct < 0);
+}
+
 /**
  * One expiry tick for stat mods: age every stack, drop the expired.
  * `negativeOnly` is for Pebbit's Stone Skin, which fast-forwards debuffs.
@@ -198,8 +219,62 @@ export function tickStatMods(u, negativeOnly = false) {
  * boss): stat-mod stacks, Taunt, Shield, and Stun. Ticked once per battle
  * tick from each unit loop.
  */
+/**
+ * AURAS. A field a creature emits around itself, not a buff written onto the
+ * creatures it helps -- which is what makes it behave the way an aura should.
+ *
+ * The aura lives on the EMITTER (`u.aura`). Nothing is stamped on the allies
+ * inside it; instead refreshAuraFields recomputes, once per tick, what each
+ * unit is currently standing in. Three of the four rules fall out of that for
+ * free: walking in or out of the field takes effect immediately, an aura ends
+ * the instant its emitter is defeated (a dead emitter is simply not scanned),
+ * and two different auras both apply rather than colliding the way stacks of
+ * one stat mod would. The fourth -- a set duration -- is the `ticks` counter
+ * below, spent in tickTimedMods like every other timer.
+ *
+ * Size and contents are per-ability: an aura names its own `range` and the
+ * bonuses it carries, so a future aura can be any shape of help at all.
+ */
+export function applyAura(source, { range, atkPct = 0, critDmgPct = 0, ticks = STATUS_TICKS }) {
+  if (!source || !(range > 0)) return;
+  source.aura = { range, atkPct, critDmgPct, ticks };
+}
+
+/** Drop an emitter's aura outright (buff removal, or the emitter dying). */
+export function clearAura(u) {
+  if (u) u.aura = null;
+}
+
+/**
+ * Recompute every unit's aura totals for this tick. Call once per side, with
+ * that side's whole roster: auras help allies, so a unit is only ever lifted
+ * by an emitter on its own list. The emitter counts as standing in its own
+ * field.
+ *
+ * Results land on `_auraAtkPct` / `_auraCritDmgPct`, which damage.js reads --
+ * see unitDamage and critMultiplier there.
+ */
+export function refreshAuraFields(units) {
+  if (!units || !units.length) return;
+  for (const u of units) {
+    u._auraAtkPct = 0;
+    u._auraCritDmgPct = 0;
+  }
+  for (const src of units) {
+    const a = src.aura;
+    if (!a || src.hp <= 0 || (a.ticks || 0) <= 0) continue;
+    for (const u of units) {
+      if (u.hp <= 0) continue;
+      if (aChebDist(src.row, src.col, u.row, u.col) > a.range) continue;
+      u._auraAtkPct += a.atkPct;
+      u._auraCritDmgPct += a.critDmgPct;
+    }
+  }
+}
+
 export function tickTimedMods(u) {
   tickStatMods(u);
+  if (u.aura && (u.aura.ticks || 0) > 0 && !--u.aura.ticks) u.aura = null;
   if ((u.tauntTicks || 0) > 0) {
     u.tauntTicks--;
     if (!u.tauntTicks) u.tauntSourceUid = null;
@@ -210,6 +285,7 @@ export function tickTimedMods(u) {
   }
   if ((u.stunTicks || 0) > 0) u.stunTicks--;
   if ((u.rootTicks || 0) > 0 && !--u.rootTicks) u.rootUndispellable = false;
+  if ((u.fearTicks || 0) > 0 && !--u.fearTicks) u.fearSourceUid = null;
   if ((u.intangibleTicks || 0) > 0) u.intangibleTicks--;
   if ((u.markedTicks || 0) > 0) u.markedTicks--;
   if ((u.frostbiteTicks || 0) > 0) {
@@ -233,7 +309,7 @@ export function tickTimedMods(u) {
     u.hotTicks--;
     if ((u.healImmuneTicks || 0) <= 0 && u.hp > 0) {
       const amt = Math.round((u.hotAmount || 1) * healReceivedMultiplier(u));
-      if (amt > 0) u.hp = Math.min(u.maxHp, u.hp + amt);
+      if (amt > 0) healUnit(u, amt);
     }
     if (!u.hotTicks) u.hotAmount = 0;
   }
@@ -439,6 +515,28 @@ export function applyRoot(u, ticks, { undispellable = false } = {}) {
   u.rootUndispellable = !!undispellable;
 }
 
+/**
+ * Strip every dispellable BUFF -- the mirror of dispelDebuffs, and the
+ * game's first buff removal (Solar Pounce's max tier). Positive stat mods,
+ * Shield, Fortify, Protect, Heal Over Time, and Immortal all come off.
+ *
+ * Deliberately left alone: Intangible (its tag is marked undispellable),
+ * Windbreak (a while-in-range aura its source re-applies every tick, so
+ * stripping it would just undo itself next tick), and properties that were
+ * never "applied" as buffs at all -- Cragling's Dodge interval, Rekindle's
+ * one-shot Revive, a Wisp's link to its summoner.
+ */
+export function dispelBuffs(u) {
+  clearPositiveStatMods(u);
+  u.shield = 0;
+  u.shieldTicks = 0;
+  u.fortifyStacks = 0;
+  clearProtect(u);
+  u.hotTicks = 0;
+  u.hotAmount = 0;
+  u.immortalTicks = 0;
+}
+
 export function dispelDebuffs(u) {
   u.burnTicks = 0;
   u.burnStacks = 0;
@@ -450,6 +548,8 @@ export function dispelDebuffs(u) {
   u.poisonTicks = 0;
   u.poisonStacks = 0;
   u.blinded = false;
+  u.fearTicks = 0;
+  u.fearSourceUid = null;
   u.weakTicks = 0;
   u.healImmuneTicks = 0;
   u.slowTicks = 0;

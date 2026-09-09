@@ -21,6 +21,7 @@
 
 import { RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { unitDist, distToBoss } from "../geometry.js";
+import { healUnit } from "../hp.js";
 import {
   applyFortify, hasFortify, applyWindbreak, applyFrostbite,
   dispelDebuffs, healReceivedMultiplier,
@@ -70,7 +71,7 @@ export function makeIgletModule(cfg) {
     onHit(unit, target, dealt) {
       if (abilityIdx(unit, "basic") >= MAX_IDX && dealt > 0 && unit.hp > 0 && canBeHealed(unit)) {
         const heal = Math.round(dealt * LIFESTEAL_FRAC * healReceivedMultiplier(unit));
-        if (heal > 0) unit.hp = Math.min(unit.maxHp, unit.hp + heal);
+        if (heal > 0) healUnit(unit, heal);
       }
       return 0;
     },

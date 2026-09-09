@@ -97,7 +97,7 @@ export function makeShockstingerModule(cfg) {
 
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
-      const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+      const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
       damageUnit(best, dmg);
       ctx.addDamageDealt(dmg);
 

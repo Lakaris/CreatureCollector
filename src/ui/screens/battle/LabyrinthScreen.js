@@ -9,7 +9,7 @@ import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
 import { applyRewards } from "../../../core/rewards.js";
-import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED } from "../../../battle/constants.js";
+import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
 import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
@@ -17,6 +17,7 @@ import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
+import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import { LABYRINTH_REWARD_DISPLAY as REWARD_DISPLAY, getDepthReward, MAX_LABYRINTH_DEPTH, getEnemyLevelForDepth, getEnemyEvolutionMixForDepth, getDifficultyMultipliers } from "../../../core/labyrinth.js";
 import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
@@ -495,9 +496,14 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               } });
             })).flat()
           ),
+          renderHazardField(bRef.current && bRef.current.hazards, ARENA_TILE),
           atkEffects.map((e) => {
             const color = e.isEnemy ? "#ef4444" : "#a78bfa";
             if (e.isHeal) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * ARENA_TILE, top: e.row * ARENA_TILE, width: ARENA_TILE, height: ARENA_TILE, borderRadius: "50%", background: "rgba(34,197,94,0.4)", boxShadow: "inset 0 0 8px rgba(22,163,74,0.9)", animation: "splashWave 0.7s ease-out forwards", pointerEvents: "none", zIndex: 21 } }); }
+            // Burn, Hazards, DoT, Poison, Splash, Shock, gusts and misses --
+            // the shared tile pulses (ui/components/battleTileFx.js).
+            const tileFx = renderTileFx(e, ARENA_TILE);
+            if (tileFx) return tileFx;
             if (e.isPillar) { return React.createElement("div", { key: e.id, style: { position: "absolute", left: e.col * ARENA_TILE, top: e.row * ARENA_TILE, width: ARENA_TILE, height: ARENA_TILE, background: "rgba(251,146,60,0.6)", boxShadow: "inset 0 0 8px rgba(239,68,68,0.8)", animation: "pillarFlame 0.7s ease-out forwards", pointerEvents: "none", zIndex: 20 } }); }
             if (e.isRanged) {
               const dRow = e.row - e.fromRow, dCol = e.col - e.fromCol;

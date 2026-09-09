@@ -94,6 +94,12 @@ export function makeArenaBattle(
       atk: stats.atk || 30,
       def: stats.def || 20,
       spd,
+      // The crit pair, both in percentage points, spent by critMultiplier in
+      // damage.js. `?? 0` rather than a default: a unit built from something
+      // with no crit stats should never crit, and silently substituting the
+      // roster's base values would hide that.
+      crit: stats.crit ?? 0,
+      critDmg: stats.critDmg ?? 0,
       isRanged: cdef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
       // Special-ability charge: +abilitySpeed (Haste) per tick, fires at
@@ -155,6 +161,12 @@ export function makeArenaBattle(
       atk,
       def,
       spd,
+      // Enemies crit on the same terms players do. Deliberately NOT scaled by
+      // the giant multiplier or the floor's difficulty: those scale statlines,
+      // and a chance is not a statline -- a Labyrinth boss critting half the
+      // time would be a different kind of difficulty than the curve intends.
+      crit: (lvlStats || edef?.stats)?.crit ?? 0,
+      critDmg: (lvlStats || edef?.stats)?.critDmg ?? 0,
       isRanged: edef?.attackType === "Ranged",
       atkCd: Math.floor(Math.random() * cooldownFor(spd)),
       abilitySpeed: (((lvlStats || edef?.stats)?.abilitySpeed || 1) * gm),

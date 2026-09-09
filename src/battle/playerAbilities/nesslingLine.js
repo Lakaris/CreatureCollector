@@ -22,7 +22,7 @@ import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCoold
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, healUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -118,7 +118,7 @@ export function makeNesslingModule(cfg) {
       const { newFx, now } = ctx;
       const heal = specialHealByLevel[abilityIdx(unit, "special")];
       if ((unit.healImmuneTicks || 0) <= 0) {
-        unit.hp = Math.min(unit.maxHp, unit.hp + Math.max(1, Math.round(heal * healReceivedMultiplier(unit))));
+        healUnit(unit, Math.max(1, Math.round(heal * healReceivedMultiplier(unit))));
       }
       unit.intangibleTicks = SUBMERGE_TICKS;
       unit._submergePending = true;
@@ -141,7 +141,7 @@ export function makeNesslingModule(cfg) {
 
       for (const e of aliveE) {
         if (e.col !== frontCol || Math.abs(e.row - unit.row) > 1 || isIntangible(e)) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         e.tauntTicks = STATUS_TICKS;
@@ -157,7 +157,7 @@ export function makeNesslingModule(cfg) {
         if (overlaps) {
           // The boss takes the strike but ignores the Taunt and Attack Down
           // stays meaningful: bosses DO read ATK stat mods.
-          const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+          const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
           damageBoss(boss, dmg);
           ctx.addDamageDealt(dmg);
           if (debuffs) applyStatMod(boss, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });

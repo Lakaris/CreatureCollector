@@ -22,6 +22,8 @@
 import { aChebDist, bossOccupies } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { applyStatMod, healReceivedMultiplier, applyBlind } from "../status.js";
+// Aliased: this module already exports a healUnit of its own that wraps this one.
+import { healUnit as applyHeal } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -52,10 +54,13 @@ function canBeHealed(u) {
   return (u.healImmuneTicks || 0) <= 0;
 }
 
+// Applies this line's own Heal Block guard and Healing Down scaling, then
+// hands the final amount to the engine's heal chokepoint so Overheal sees the
+// overflow like it does for every other healer (see battle/hp.js).
 function healUnit(target, amount) {
   if (!canBeHealed(target)) return 0;
   const amt = Math.max(1, Math.round(amount * healReceivedMultiplier(target)));
-  target.hp = Math.min(target.maxHp, target.hp + amt);
+  applyHeal(target, amt);
   return amt;
 }
 

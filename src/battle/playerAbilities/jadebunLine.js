@@ -22,7 +22,7 @@ import { attackCooldown } from "../damage.js";
 import { aChebDist } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS } from "../constants.js";
 import { speedPenalty, isStunned, applyStatMod, healReceivedMultiplier } from "../status.js";
-import { applyShield } from "../hp.js";
+import { applyShield, healUnit } from "../hp.js";
 
 /** Absolute heal per basic level (the ability text's HEAL badge values). */
 const BASIC_HEAL_BY_LEVEL = [10, 12, 14, 17, 20];
@@ -75,7 +75,7 @@ export function makeJadebunModule(cfg) {
       if (unit.atkCd > 0 || isStunned(unit)) return;
 
       const heal = basicHealByLevel[abilityIdx(unit, "basic")];
-      tgt.hp = Math.min(tgt.maxHp, tgt.hp + healFor(tgt, heal));
+      healUnit(tgt, healFor(tgt, heal));
       unit.atkCd = attackCooldown(unit, speedPenalty(unit));
       newFx.push({ id: now + "hp" + unit.uid, row: tgt.row, col: tgt.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
@@ -93,7 +93,7 @@ export function makeJadebunModule(cfg) {
       const heal = specialHealByLevel[idx];
       const tgt = [...alive].sort((a, z) => a.hp - z.hp)[0];
 
-      if (canBeHealed(tgt)) tgt.hp = Math.min(tgt.maxHp, tgt.hp + healFor(tgt, heal));
+      if (canBeHealed(tgt)) healUnit(tgt, healFor(tgt, heal));
       if (tgt.hp > tgt.maxHp * DRAUGHT_HP_FRAC) {
         applyStatMod(tgt, { kind: "atk", pct: ATK_UP_PCT, src: unit.uid, ticks: STATUS_TICKS });
       } else {

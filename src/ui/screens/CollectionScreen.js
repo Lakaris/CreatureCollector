@@ -182,8 +182,10 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Type"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
+          // Emoji only -- the eight type names together overran the row on
+          // narrow screens. The name stays in the tooltip and the aria-label.
           ALL_TYPES.map(t=>
-            React.createElement("button",{key:t,className:"filter-chip"+(activeTypes.has(t)?" active":""),onClick:()=>toggleType(t)},t)
+            React.createElement("button",{key:t,className:"filter-chip type-chip"+(activeTypes.has(t)?" active":""),onClick:()=>toggleType(t),title:t,"aria-label":t},TYPE_EMOJI[t])
           )
         )
       ),

@@ -10,9 +10,32 @@
 .badge-legendary{background:#FAC775;color:#412402}
 
 /* Stat rows */
-.stat-row{display:flex;flex-direction:column;align-items:center;flex:1;padding:6px 4px;background:#f5f5f5;border-radius:6px}
-.stat-label{font-size:9px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-.stat-val{font-size:13px;color:#222;font-weight:700;line-height:1}
+
+/* The block of stat pills (creature page, flair page) -- see StatStrip.js and
+   STAT_LAYOUT for which stats land in which group. Two groups side by side:
+   Health/Attack/Defense stacked large on the left, the four secondary stats in
+   a smaller 2x2 on the right. Both stretch to the same height, so the columns
+   end level despite holding three pills and four.
+
+   Grid, not flex: `flex:1` gives each pill a 0 basis but no flex item shrinks
+   below its own min-content width, so a flex row silently overflowed its card
+   once there were more than five stats to show. `minmax(0,...)` tracks let the
+   pills actually shrink to their share instead of being floored by their text. */
+.stat-strip{display:grid;gap:6px;align-items:stretch}
+.stat-strip-group{display:grid;gap:4px}
+/* A group that doesn't set the strip's height sizes to its content and rides
+   the middle of the taller one beside it, so its pills stay smaller rather
+   than stretching past the ones they're meant to sit below in the hierarchy. */
+.stat-strip-group--center{align-content:center}
+.stat-row{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:6px 4px;background:#f5f5f5;border-radius:6px;overflow:hidden}
+.stat-label{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;text-align:center;line-height:1.15}
+.stat-val{font-size:16px;color:#222;font-weight:700;line-height:1}
+/* The secondary group (Speed/Haste, Crit Chance/Crit Damage) reads as a tier
+   below the statline the creature is balanced on, so its pills are smaller in
+   every dimension -- width comes from STAT_LAYOUT's weights, the rest here. */
+.stat-strip-group--sm .stat-row{padding:3px 3px}
+.stat-strip-group--sm .stat-label{font-size:8px;letter-spacing:0;margin-bottom:1px}
+.stat-strip-group--sm .stat-val{font-size:11px}
 
 /* Buttons */
 .btn{display:block;width:100%;padding:10px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#000;transition:all .15s;text-align:center;margin-bottom:8px}
@@ -78,6 +101,11 @@
 .no-scrollbar::-webkit-scrollbar{display:none}
 .filter-chip{padding:4px 11px;border:0.5px solid rgba(0,0,0,0.1);border-radius:20px;font-size:11px;cursor:pointer;background:transparent;color:#666;white-space:nowrap;flex-shrink:0}
 .filter-chip.active{background:#534AB7;color:#fff;border-color:#534AB7}
+/* Type chips carry only their emoji, so they trade side padding for a glyph
+   big enough to read. Selection still shows through the active background.
+   The uniform min-width keeps all eight on one line at 375px -- the row
+   scrolls with a hidden scrollbar, so anything past the edge is invisible. */
+.filter-chip.type-chip{padding:3px 4px;min-width:30px;font-size:14px;line-height:1.25;text-align:center}
 
 /* Abilities */
 .xp-row{background:#fff;border:0.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:8px 12px;margin-bottom:12px}
@@ -131,7 +159,11 @@
 .dev-title{color:#FAC775;font-size:13px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .dev-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .dev-label{color:#B4B2A9;font-size:12px;width:80px;flex-shrink:0}
-.dev-input{flex:1;background:#444441;border:0.5px solid #5F5E5A;border-radius:6px;padding:6px 8px;color:#F1EFE8;font-size:12px;outline:none}
+/* min-width:0 or the row overflows: an <input> reports its default `size`
+   (~20 characters) as its min-content width, and flex items don't shrink past
+   that, so `flex:1` held the field at ~190px and pushed Set/+Add off the right
+   edge of a phone-width panel. */
+.dev-input{flex:1;min-width:0;background:#444441;border:0.5px solid #5F5E5A;border-radius:6px;padding:6px 8px;color:#F1EFE8;font-size:12px;outline:none}
 .dev-btn{background:#534AB7;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;white-space:nowrap}
 
 /* Skins */

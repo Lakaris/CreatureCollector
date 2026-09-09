@@ -33,7 +33,7 @@ function stubUnit(creatureId, abilityLevels) {
     creatureId,
     row: 0, col: 0, prevRow: 0, prevCol: 0,
     lastMoveTime: 0, lastAttackTime: 0, deathTime: 0,
-    hp: 1, maxHp: 1, atk: 1, def: 1, spd: 1,
+    hp: 1, maxHp: 1, atk: 1, def: 1, spd: 1, crit: 0, critDmg: 0,
     isRanged: def?.attackType === "Ranged",
     atkCd: 0,
     abilitySpeed: 1, abilCharge: 0, abilChargeMax: 1,

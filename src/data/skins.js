@@ -90,8 +90,9 @@ export const SKIN_SETS=[
   {id:"abird_night",name:"Nightfall",tier:"rare",chain:["aurorabird","radiancebird","celestbird"],appearances:{aurorabird:{emoji:"🌙"},radiancebird:{emoji:"⭐"},celestbird:{emoji:"🌌"}}},
   {id:"abird_shadow",name:"Shadow",tier:"epic",chain:["aurorabird","radiancebird","celestbird"],appearances:{aurorabird:{emoji:"🌑"},radiancebird:{emoji:"💀"},celestbird:{emoji:"🕳️"}}},
   {id:"abird_solar",name:"Solar",tier:"legendary",chain:["aurorabird","radiancebird","celestbird"],appearances:{aurorabird:{emoji:"☀️"},radiancebird:{emoji:"🌟"},celestbird:{emoji:"💫"}}},
-  // prismcrab / spectrumcrab / rainbowshell
-  {id:"prism_gilded",name:"Gilded",tier:"rare",chain:["prismcrab","spectrumcrab","rainbowshell"],appearances:{prismcrab:{emoji:"🦀"},spectrumcrab:{emoji:"🥇"},rainbowshell:{emoji:"🌟"}}},
+  // prismcrab / spectrumcrab / rainbowshell -- ids kept from the retired
+  // Prismcrab line; these are now the Oathcub paladin-bear chain.
+  {id:"prism_gilded",name:"Gilded",tier:"rare",chain:["prismcrab","spectrumcrab","rainbowshell"],appearances:{prismcrab:{emoji:"🐻"},spectrumcrab:{emoji:"🥇"},rainbowshell:{emoji:"🌟"}}},
   {id:"prism_void",name:"Void",tier:"epic",chain:["prismcrab","spectrumcrab","rainbowshell"],appearances:{prismcrab:{emoji:"🌑"},spectrumcrab:{emoji:"💀"},rainbowshell:{emoji:"🌌"}}},
   {id:"prism_aurora",name:"Aurora",tier:"legendary",chain:["prismcrab","spectrumcrab","rainbowshell"],appearances:{prismcrab:{emoji:"🌈"},spectrumcrab:{emoji:"✨"},rainbowshell:{emoji:"🌠"}}},
   // holymoth / radiantmoth / celestimoth

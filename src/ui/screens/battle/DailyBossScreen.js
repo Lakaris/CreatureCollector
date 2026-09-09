@@ -17,6 +17,7 @@ import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
+import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
@@ -24,7 +25,7 @@ import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
 import { isAppNarrow } from "../../../ui/uiScale.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
-import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE } from "../../../battle/constants.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
 
 /**
  * Every Daily Boss runs the same generic kit (see battle/bosses/daily.js),
@@ -193,6 +194,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     battle.boss={row:BOSS_START_ROW,col:BOSS_START_COL,prevRow:BOSS_START_ROW,prevCol:BOSS_START_COL,
       lastMoveTime:Date.now()-moveAnimMsRef.current,
       hp:bossStats.hp,maxHp:bossStats.hp,atkCd:0,moveCd:0,specialCd:10,atk:bossStats.atk,
+      crit:bossStats.crit,critDmg:bossStats.critDmg,
       // Daily Boss always runs the shared generic kit (daily.js), never the
       // dungeon's unique per-element boss modules -- same kit, different element.
       _bossKey:"daily"};
@@ -551,6 +553,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             })).flat()
           ),
           // attack effects — CSS animations handle smoothness independently of React renders
+          renderHazardField(bRef.current && bRef.current.hazards, TILE),
           atkEffects.map(e=>{
             const color=e.isBoss?"#ef4444":"#a78bfa";
             if(e.isShockwave){
@@ -573,6 +576,21 @@ function DailyBossScreen({onBack,onViewCreature}){
                 boxShadow:"inset 0 0 8px rgba(22,163,74,0.9)",
                 animation:"splashWave 0.7s ease-out forwards",
                 pointerEvents:"none",zIndex:21,
+              }});
+            }
+            // Water Hazard triggers and missed swings -- this screen renders
+            // everything else itself, but never had these two.
+            if(e.isFrost||e.isMiss)return renderTileFx(e,TILE);
+            // Fire: Burn ticks, Fire Hazards, and cone breath (Dread Howl).
+            if(e.isBurn){
+              return React.createElement("div",{key:e.id,style:{
+                position:"absolute",
+                left:e.col*TILE,top:e.row*TILE,
+                width:TILE,height:TILE,
+                background:"rgba(249,115,22,0.5)",
+                boxShadow:"inset 0 0 8px rgba(234,88,12,0.9)",
+                animation:"pillarFlame 0.7s ease-out forwards",
+                pointerEvents:"none",zIndex:20,
               }});
             }
             if(e.isPillar){

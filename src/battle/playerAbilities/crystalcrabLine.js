@@ -71,7 +71,7 @@ export function makeCrystalcrabModule(cfg) {
       const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
       if (bd <= MELEE_RANGE && bd < bestD) {
         // Boss takes the hit; Taunt has no effect on bosses.
-        const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         damageBoss(boss, dmg);
         ctx.addDamageDealt(dmg);
         newFx.push({ id: now + "ts" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
@@ -79,7 +79,7 @@ export function makeCrystalcrabModule(cfg) {
       }
       if (!best) return;
 
-      const dmg = Math.max(1, Math.round(attackRoll(unit.atk) * mult));
+      const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
       damageUnit(best, dmg);
       ctx.addDamageDealt(dmg);
       best.tauntTicks = STATUS_TICKS;

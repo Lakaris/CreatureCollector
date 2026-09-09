@@ -15,6 +15,26 @@ export function rollDamage(atk, mult, base = 0.8, spread = 0.4) {
 }
 
 /**
+ * The boss's crit, folded into ctx.dmg below.
+ *
+ * ctx.dmg is the one place a boss's attack damage is rolled -- every module
+ * goes through it, and `boss.atk` appears nowhere else in bosses/ except
+ * cooldown bookkeeping -- so rolling here covers every boss attack and cannot
+ * double up. Modules call it INSIDE their per-target loop, so an area attack
+ * rolls per victim rather than critting on everyone at once, matching how
+ * creature specials behave (battle/damage.js).
+ *
+ * Deliberately not applied to what a boss does outside ctx.dmg: Burn and DoT
+ * ticks, and effects sized as a percentage of the victim's own Health. Those
+ * aren't attacks, and creatures' DoTs don't crit either.
+ */
+function bossCritMultiplier(boss) {
+  const chance = (boss && boss.crit) || 0;
+  if (!(Math.random() * 100 < chance)) return 1;
+  return 1 + ((boss && boss.critDmg) || 0) / 100;
+}
+
+/**
  * Runtime context handed to basic()/special()/onInit()/onStatusTick().
  * Mutating ctx.boss, ctx.aliveP, ctx.allOcc and pushing to ctx.newFx is the
  * expected way for a boss to act -- this matches how the engine already works.
@@ -22,8 +42,10 @@ export function rollDamage(atk, mult, base = 0.8, spread = 0.4) {
 export function makeBossContext({ boss, aliveP, aliveE, allOcc, newFx, now, gridRows, gridCols }) {
   const ctx = {
     boss, aliveP, aliveE, allOcc, newFx, now, gridRows, gridCols,
-    /** Damage roll against this boss's attack stat (reduced while the boss is ATK-debuffed, e.g. Starlit's Radiant Exchange). */
-    dmg: (mult, base, spread) => rollDamage(boss.atk * statModMultiplier(boss, "atk"), mult, base, spread),
+    /** Damage roll against this boss's attack stat (reduced while the boss is
+     * ATK-debuffed, e.g. Starlit's Radiant Exchange), times its crit. */
+    dmg: (mult, base, spread) =>
+      Math.max(1, Math.round(rollDamage(boss.atk * statModMultiplier(boss, "atk"), mult, base, spread) * bossCritMultiplier(boss))),
     /** Chebyshev distance from a cell to the boss body. */
     distToBoss: (r, c) => distToBoss(boss, r, c),
     /** True when the cell is inside the boss body. */

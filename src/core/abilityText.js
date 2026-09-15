@@ -116,7 +116,7 @@ export function formatAbilityStep(text, prevText) {
 // "Effects" pill. Cone is here as a shape rather than a picker because it IS
 // the ability's targeting -- the other shapes (Line, Splash, Nearby,
 // Horizontal Row) stay inside the Effects pill, where they already were.
-export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest", "beside", "cone"]);
+export const TARGETING_TAGS = new Set(["closest", "farthest", "weakest", "beside", "cone", "fork"]);
 
 /** Split an ability's tags into standalone targeting pills and collapsed effects. */
 export function splitAbilityTags(tags) {
@@ -187,21 +187,17 @@ export const ABILITY_TAG_DEFS = {
   // Crits are stats (crit chance x critDmg -- see battle/constants.js); this
   // tag marks the abilities that skip the chance roll entirely.
   guaranteedcrit: { label: "Guaranteed Crit", description: "This attack always lands a Critical Hit." },
-  // Summoned creatures carry their own type line and kit, rendered as a
-  // miniature ability card by AbilityTagPopup.
+  // One tag for every summoning ability, whatever it calls -- so the Effects
+  // filter has a single "Summon" tile rather than one per summoned creature.
+  // What the summon actually does lives with the summon itself (the Wisp's
+  // kit is in data/creatures.js under "__wisp", and its module in
+  // battle/playerAbilities/doomshadeLine.js). A tag may still carry `profile`
+  // and `kit` to render a miniature card (see summonKit in AbilityTagPills);
+  // this generic one deliberately does not.
   //
-  // Implementation note for Ghostly Step: the Wisp teleports to an EMPTY
+  // Implementation note for the Wisp's Ghostly Step: it teleports to an EMPTY
   // tile beside its target -- never onto an occupied one.
-  wisp: {
-    label: "Wisp",
-    description: "A spectral ally that fights on its own.",
-    profile: "Dark / Tank / Melee",
-    kit: [
-      { key: "Basic", text: "Taunt an enemy." },
-      { key: "Special", text: "Teleport beside a random enemy." },
-      { key: "Passive", text: "Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health. Goes away when the Summoner is defeated." },
-    ],
-  },
+  summon: { label: "Summon", description: "A temporary ally." },
   attackup: { label: "Attack Up", description: "Increases the creature's Attack.", stacking: [15, 30, 45, 60, 75] },
   // The positive twin of Defense Down, on the same per-source stacking rules
   // as Attack Up. Its magnitudes match Attack Up's rather than Defense Down's
@@ -226,6 +222,30 @@ export const ABILITY_TAG_DEFS = {
   // (each is its own field, not stacks of one effect), and one ends the moment
   // the creature emitting it is defeated.
   aura: { label: "Aura", description: "An area around this creature; allies inside it gain its effect." },
+  // A spread pattern that follows enemies rather than tiles -- unlike Line,
+  // Cone or Splash. The extra target takes the attack's full effects, not a
+  // reduced echo of them.
+  chain: { label: "Chain", description: "This attack also hits 1 additional enemy adjacent to its target, with the same effects." },
+  // A debuff spent by the hits it amplifies, one stack per hit -- so it is
+  // a store of bonus damage the target is carrying, not a lasting weakness.
+  // Deliberately distinct from Defense Down (a stat drop for a duration).
+  expose: { label: "Expose", description: "The next damage this creature takes is increased by 20% and removes 1 stack." },
+  // Two diagonal rays from the creature, opening toward the enemy side -- the
+  // V-shaped sibling of Line (one ray) and Cone (the filled wedge). Rows are
+  // the battle axis, so "ahead" means along rows, as it does for Cone.
+  fork: { label: "Fork", description: "Hits every tile on the two diagonals ahead of this creature, all the way to the arena's edge." },
+  // The threshold is the ability's to state (Sickle Cut's is 20%). A kill,
+  // not damage: it needs no Shield to chew through, and Immortal's floor
+  // beats it the way it beats everything else.
+  execute: { label: "Execute", description: "Instantly defeats an enemy below the ability's Health threshold. Goes through Shields; nullified by effects such as Immortal." },
+  // The first ability to take damageUnit's pierceShield path -- the policy
+  // note in battle/hp.js asks that the text say so, and Unfettered's does.
+  bypassshield: { label: "Bypass Shield", description: "This creature's attacks ignore Shields." },
+  bypasstaunt: { label: "Bypass Taunt", description: "This creature ignores Taunt and keeps attacking its own target." },
+  // A resource, not a status: it has no effect of its own and no timer. The
+  // abilities that build it and the ones that read or spend it are what give
+  // it meaning, and each kit sets its own cap in its text.
+  charge: { label: "Charge", description: "Interacts with this creature's abilities." },
   healdown: { label: "Healing Down", description: "Reduces the creature's healing received.", stacking: [20, 40, 60, 80, 100] },
   stun: { label: "Stun", description: "Can not attack or gain ability charge." },
   root: { label: "Root", description: "Can not move. Attacks and abilities still work." },
@@ -251,6 +271,9 @@ export const ABILITY_TAG_DEFS = {
   shock: { label: "Shock", description: "This creature attacks half as often." },
   healimmunity: { label: "Heal Block", description: "Can not be healed." },
   hastedown: { label: "Haste Down", description: "Reduces the creature's Haste.", stacking: [5, 10, 15, 20, 25] },
+  // The positive twin of Haste Down, on its magnitudes -- Haste compounds
+  // into every ability charge, so it is tuned far tighter than Attack Up.
+  hasteup: { label: "Haste Up", description: "Increases the creature's Haste.", stacking: [5, 10, 15, 20, 25] },
   speeddown: { label: "Speed Down", description: "Reduces the creature's Speed.", stacking: [5, 10, 15, 20, 25] },
   attackdown: { label: "Attack Down", description: "Reduces the creature's Attack.", stacking: [15, 20, 25, 30, 40] },
   defensedown: { label: "Defense Down", description: "Reduces the creature's Defense.", stacking: [15, 20, 25, 30, 40] },
@@ -444,6 +467,37 @@ const FRILLET_PHRASES = {
   basic: null,
 };
 
+// Sicklewing (mantis) line, root id "galephoenix": Sickle Cut is a plain hit on
+// the generic phrase; Twin Reap rides its own Fork phrase, with the max tier's
+// Stun appended as a rider. Unfettered is written out per tier.
+const SICKLEWING_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to all enemies in a Fork" },
+};
+
+// Cinderbill (pelican) line, root id "magmavore": Lava Spit is a plain hit on
+// the generic phrase. Magma Mantle
+// carries its Heal Over Time total as a leading "Heal N HP" (the same shape
+// as Shared Flame), rendered as a HEAL badge beside a fixed sentence; the max
+// tier's third Protect stack is a sentence change, so it uses phraseByLevel.
+// Forgeheart is written out per tier.
+const MAGMAVORE_PHRASES = {
+  basic: null,
+  special: {
+    heal: true,
+    phrase: "All Beside allies gain 2 stacks of Protect and Heal Over Time",
+    phraseByLevel: { 4: "All Beside allies gain 3 stacks of Protect and Heal Over Time" },
+  },
+};
+
+// Sparkshell line: Static Zap is a plain hit on the generic phrase (its Chain
+// is the tag's job to explain). Discharge and Battery Shell carry no leading
+// damage number and render exactly as written.
+const SPARKSHELL_PHRASES = {
+  basic: null,
+  special: null,
+};
+
 // Auravast line: Twin Radiance splits one swing across two hits, so it needs
 // its own phrase rather than the generic "Deal damage to an enemy" -- the card
 // number is the TOTAL, same rule every multi-hit follows. Sovereign Call and
@@ -561,6 +615,16 @@ const PLAIN_ABILITY_PHRASES = {
   chromatarch: OATHCUB_PHRASES,
   holydragon: AURAVAST_PHRASES,
   celestialdragon: AURAVAST_PHRASES,
+  voltail: SPARKSHELL_PHRASES,
+  stormclaw: SPARKSHELL_PHRASES,
+  arcstorm: SPARKSHELL_PHRASES,
+  ionarch: SPARKSHELL_PHRASES,
+  magmavore: MAGMAVORE_PHRASES,
+  pyroclaw: MAGMAVORE_PHRASES,
+  cindercolosus: MAGMAVORE_PHRASES,
+  calderarch: MAGMAVORE_PHRASES,
+  galephoenix: SICKLEWING_PHRASES,
+  skyphoenix: SICKLEWING_PHRASES,
 };
 
 export function usesPlainAbilityLevels(creatureId, key) {
@@ -590,7 +654,10 @@ export function formatPlainAbilityLevel(creatureId, key, text, idx) {
   if (cfg && cfg.heal) {
     const m = LEADING_HEAL_RE.exec(text);
     if (!m) return { label: text, amount: null, healAmt: null };
-    return { label: cfg.phrase + text.slice(m[0].length), amount: null, healAmt: Number(m[1]) };
+    // phraseByLevel works here too, for a max tier whose change is in the
+    // sentence rather than the number (Magma Mantle's third Protect stack).
+    const healPhrase = (cfg.phraseByLevel && cfg.phraseByLevel[idx]) || cfg.phrase;
+    return { label: healPhrase + text.slice(m[0].length), amount: null, healAmt: Number(m[1]) };
   }
   if (cfg && cfg.healDamage) {
     const h = /Heal\s+(\d+)\s*HP/i.exec(text);
@@ -765,6 +832,51 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // stance, and the same cast dispels everything else.
     if (key === "special") tags.push("rootundispellable");
   }
+  // The Sicklewing mantises -- root id inherited from the retired Aetherwing.
+  const isSicklewingLine = getRootDef(creatureId)?.id === "galephoenix";
+  if (isSicklewingLine) {
+    // Sickle Cut only Executes from its 4th upgrade on; Twin Reap only Stuns
+    // from its 4th on -- the Fork is its shape at every tier. Unfettered
+    // bypasses Shields from tier 1 and Taunt only at max.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("execute");
+    }
+    if (key === "special") {
+      tags.push("fork");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("stun");
+    }
+    if (key === "unique") {
+      tags.push("bypassshield");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("bypasstaunt");
+    }
+  }
+  // The Cinderbill pelicans -- root id inherited from the retired Magmavore.
+  const isMagmavoreLine = getRootDef(creatureId)?.id === "magmavore";
+  if (isMagmavoreLine) {
+    // Lava Spit only Exposes from its 4th upgrade on. Magma Mantle grants
+    // Protect and Heal Over Time at every tier (the max tier only adds a
+    // stack). Forgeheart is a damage bonus keyed on Protect, not an effect
+    // of its own, so it carries no pills.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("expose");
+    }
+    if (key === "special") tags.push("beside", "protect", "healovertime");
+  }
+  const isSparkshellLine = getRootDef(creatureId)?.id === "voltail";
+  if (isSparkshellLine) {
+    // Static Zap Chains from tier 1 (the max tier only widens it). Discharge
+    // reads Charge and raises an Aura at every tier; the Speed Up / Speed Down
+    // it grants are its whole effect, so they carry pills too. Battery Shell
+    // only grants Haste Up from its 4th upgrade on.
+    if (key === "basic") tags.push("closest", "chain", "charge");
+    if (key === "special") tags.push("charge", "aura", "speedup", "speeddown");
+    if (key === "unique") {
+      tags.push("charge");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("hasteup");
+    }
+  }
   const isAuravastLine = getRootDef(creatureId)?.id === "holydragon";
   if (isAuravastLine) {
     // Twin Radiance only shaves Defense from its 4th upgrade on; Sovereign
@@ -907,8 +1019,9 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("damageovertime");
     }
     if (key === "special") tags.push("closest");
-    // The Wisp tag carries what a Wisp actually does; the abilities just summon them.
-    if (key === "unique") tags.push("wisp");
+    // Lantern Keeper summons Wisps; the generic Summon tag is what the
+    // Effects filter groups every summoner under.
+    if (key === "unique") tags.push("summon");
   }
   const isEmberchirpLine = getRootDef(creatureId)?.id === "emberchirp";
   if (isEmberchirpLine) {

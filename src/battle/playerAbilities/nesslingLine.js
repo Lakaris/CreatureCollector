@@ -21,7 +21,7 @@
 import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
+import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind, applyTaunt } from "../status.js";
 import { damageUnit, healUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -89,7 +89,8 @@ export function makeNesslingModule(cfg) {
 
       if (best.isBoss) {
         // Bosses take the hit but skip Haste Down: their cast timers don't
-        // read unit charge speed (same immunity policy as Taunt/Stun).
+        // read unit charge speed (the CC-immunity policy, which only Taunt
+        // is exempt from).
         const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
         damageBoss(boss, dmg);
         ctx.addDamageDealt(dmg);
@@ -144,8 +145,7 @@ export function makeNesslingModule(cfg) {
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
-        e.tauntTicks = STATUS_TICKS;
-        e.tauntSourceUid = unit.uid;
+        applyTaunt(e, unit);
         if (debuffs) applyStatMod(e, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
         newFx.push({ id: now + "dse" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
@@ -155,11 +155,13 @@ export function makeNesslingModule(cfg) {
           if (bossOccupies(boss, unit.row + dr, frontCol)) overlaps = true;
         }
         if (overlaps) {
-          // The boss takes the strike but ignores the Taunt and Attack Down
-          // stays meaningful: bosses DO read ATK stat mods.
+          // The boss takes the strike, the Taunt AND the Attack Down: Taunt
+          // is the one control effect a boss obeys, and bosses have always
+          // read ATK stat mods.
           const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
           damageBoss(boss, dmg);
           ctx.addDamageDealt(dmg);
+          applyTaunt(boss, unit);
           if (debuffs) applyStatMod(boss, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
           newFx.push({ id: now + "dsb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         }

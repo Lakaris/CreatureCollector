@@ -11,8 +11,11 @@
 // Never subtract from `.hp` directly anywhere else.
 //
 // An ability may bypass the Shield ONLY when its own displayed text says so,
-// by passing {pierceShield: true}. Nothing does today; adding one means
-// writing it in the ability's text first.
+// by passing {pierceShield: true}. Two things do today, both from the
+// Sicklewing line and both written on its cards: Unfettered ("its attacks
+// bypass Shields" -- the attack loop passes the flag for it), and Sickle
+// Cut's Execute, which is a kill rather than damage and so has no Shield to
+// chew through. Adding another means writing it in the ability's text first.
 //
 // The boss's own separate shield pool is handled by damageBoss in damage.js.
 //

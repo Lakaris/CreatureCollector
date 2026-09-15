@@ -108,9 +108,10 @@ function hasExtras(def) {
 }
 
 /**
- * Summoned-creature tags (Wisp) carry their own type line and three-ability
- * kit, shown as a miniature ability card under the tag's description so the
- * summon's behavior lives in one place instead of in every summoning ability.
+ * A tag may carry a `profile` line and a three-ability `kit`, shown as a
+ * miniature ability card under its description. Nothing uses it today -- the
+ * generic Summon tag deliberately carries neither -- but it stays available
+ * for a tag that wants to describe a specific summoned creature in place.
  */
 export function summonKit(def) {
   if (!def.profile && !def.kit) return null;

@@ -16,9 +16,9 @@
 // on-expiry cleanup the engine does). A fast-forwarded DoT also skips the
 // damage that tick would have dealt -- expiring faster means hurting less.
 
-import { aChebDist } from "../geometry.js";
+import { aChebDist, distToBoss } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { tickStatMods } from "../status.js";
+import { tickStatMods, applyTaunt } from "../status.js";
 import { applyShield } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -84,17 +84,22 @@ export function makePebbitModule(cfg) {
     /**
      * Boulder Hunker: Taunt every enemy on a surrounding tile and shield up.
      * Uses the default in-range special gate (melee range), so the charge
-     * holds until something is actually beside the toad; an adjacent boss
-     * opens the gate too -- it ignores the Taunt, but the Shield still lands.
+     * holds until something is actually beside the toad -- an adjacent boss
+     * opens the gate and is Taunted along with everything else.
      */
     special(unit, ctx) {
-      const { aliveE, newFx, now } = ctx;
+      const { aliveE, boss, newFx, now } = ctx;
 
       for (const e of aliveE) {
         if (aChebDist(unit.row, unit.col, e.row, e.col) > TAUNT_RANGE) continue;
-        e.tauntTicks = STATUS_TICKS;
-        e.tauntSourceUid = unit.uid;
+        applyTaunt(e, unit);
         newFx.push({ id: now + "bh" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+      }
+      // Taunt is the one control effect a boss obeys, so a boss standing
+      // against the toad gets pulled onto it like any minion.
+      if (boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= TAUNT_RANGE) {
+        applyTaunt(boss, unit);
+        newFx.push({ id: now + "bh" + unit.uid + "boss", row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
 
       const pct = shieldPctByLevel[abilityIdx(unit, "special")];

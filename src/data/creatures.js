@@ -420,20 +420,20 @@ export const CREATURES=[
      special:{name:"Blizzard Howl",charge:8,upgrades:["Chills enemies in radius 3","Chills radius 4","Chills radius 5","Chills radius 6","Fully freezes all chilled enemies in range"]},
      unique:{name:"Permafrost Aura",upgrades:["Passive: nearby enemies are slowed 25% and take +8% ice damage","Nearby enemies slowed 32%; +12% ice damage taken","Nearby enemies slowed 40%; +16% ice damage taken; every 6s they are frozen for 1s","Nearby enemies slowed 48%; +20% ice damage; frozen for 1.5s every 5s","Nearby enemies slowed 55%; +25% ice damage; frozen for 2s every 4s; being unfrozen deals 20 shatter damage"]}
    },role:"Support",attackType:"Melee",evolutionOf:"frostfang",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"frostwyvern"},
-  {id:"voltail",name:"Monovolt",emoji:"🦎",type:"Electric",rarity:"common",description:"A golden hatchling with one head and the unshakeable confidence of something expecting to grow two more. Storms follow it around, mostly out of curiosity.",
-   stats:{hp:63,atk:64,def:35,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+  {id:"voltail",name:"Sparkshell",emoji:"🐢",type:"Electric",rarity:"common",description:"A tortoise hatchling whose shell holds a static charge it did not ask for. Anything that pokes it gets a small, indignant shock and learns nothing.",
+   stats:{hp:70,atk:34,def:58,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Static Zap",upgrades:["14 dmg","19 dmg","25 dmg","32 dmg","Arcs to 1 nearby foe for 50% damage"]},
-     special:{name:"Charge Up",charge:22,upgrades:["Next ability +20% dmg","Next +30%","Next +40%","Next +55%","Also grants a charge shield absorbing 20 dmg"]},
-     unique:{name:"Static Body",upgrades:["Passive: every 5th hit received, zaps the attacker for 15 electric dmg","Every 4th hit zaps for 22 electric dmg","Every 3rd hit zaps for 30 electric dmg","Every 3rd hit zaps for 40 electric dmg and briefly stuns the attacker","Every 2nd hit zaps for 50 electric dmg, stuns the attacker, and arcs to one nearby enemy for 25 dmg"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"stormclaw"},
-  {id:"stormclaw",name:"Duovolt",emoji:"🐍",type:"Electric",rarity:"common",description:"The second head arrived last spring. The two of them have not agreed on anything since, which is why it flies in a spiral.",
-   stats:{hp:99,atk:103,def:56,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+     basic:{name:"Static Zap",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg. For each 10 Charge on this creature, this attack Chains to 1 additional enemy"]},
+     special:{name:"Discharge",charge:16,upgrades:["Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +5% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +10% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste. Aura size +1 for each 10 Charge consumed"]},
+     unique:{name:"Battery Shell",upgrades:["Gain 1 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 2 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge. At max Charge, this creature gains Haste Up"]}
+   },role:"Tank",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"stormclaw"},
+  {id:"stormclaw",name:"Capacitort",emoji:"🐢",type:"Electric",rarity:"common",description:"The shell has organised itself into proper cells. It has worked out that being hit is a way of eating, and now stands in front of things on purpose.",
+   stats:{hp:111,atk:54,def:93,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Static Zap",upgrades:["14 dmg","19 dmg","25 dmg","32 dmg","Arcs to 1 nearby foe for 50% damage"]},
-     special:{name:"Charge Up",charge:22,upgrades:["Next ability +20% dmg","Next +30%","Next +40%","Next +55%","Also grants a charge shield absorbing 20 dmg"]},
-     unique:{name:"Living Conductor",upgrades:["Passive: every hit received zaps the attacker for 35 electric dmg","Every hit zaps for 50 electric dmg","Every hit zaps for 65 electric dmg and arcs to 1 nearby enemy","Every hit zaps for 80 electric dmg, arcs to 2 nearby enemies, and briefly stuns them","Every hit zaps for 100 electric dmg, arcs to 3 nearby enemies, stuns them, and generates a small charge shield (max 1 active)"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"voltail",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"arcstorm"},
+     basic:{name:"Static Zap",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg. For each 10 Charge on this creature, this attack Chains to 1 additional enemy"]},
+     special:{name:"Discharge",charge:16,upgrades:["Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +5% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +10% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste. Aura size +1 for each 10 Charge consumed"]},
+     unique:{name:"Battery Shell",upgrades:["Gain 1 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 2 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge. At max Charge, this creature gains Haste Up"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"voltail",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"arcstorm"},
   {id:"tideclaw",name:"Tideclaw",emoji:"🦞",type:"Water",rarity:"epic",description:"Commands the tides with its claws. Extremely grumpy before breakfast.",
    stats:{hp:70,atk:55,def:62,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -699,20 +699,20 @@ export const CREATURES=[
      unique:{name:"Eye of the Storm",upgrades:["Passive: immune to ground/wind; +42% dodge; wind dmg +30%","Dodge +48%; +38%","Dodge +55%; +46%","Dodge +62%; +56%","Dodge +70%; +68%; Hurricaneel is invisible at max speed; first hit per second is always a crit"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"stormeel",shardsToAscend:28,ascensionsToEvolve:null},
   // Electric stage 3
-  {id:"arcstorm",name:"Trivolt",emoji:"🐲",type:"Electric",rarity:"common",description:"Three heads, three opinions, one shared lightning supply. Disputes are settled by whichever head charges fastest.",
-   stats:{hp:127,atk:132,def:73,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+  {id:"arcstorm",name:"Dynashell",emoji:"🔋",type:"Electric",rarity:"common",description:"Its shell reads as industrial equipment on every instrument pointed at it. Two survey teams have tried to file it as infrastructure.",
+   stats:{hp:143,atk:70,def:119,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Static Zap",upgrades:["14 dmg; arc 1 foe 50%","19 dmg","25 dmg","32 dmg","Arc to 2 foes; stun each 0.5s"]},
-     special:{name:"Arc Surge",charge:8,upgrades:["Teleport+75 dmg+stun 1s","90 dmg","108 dmg","130 dmg","Stun 1.5s; shockwave 50 dmg nearby on arrival"]},
-     unique:{name:"Arc Sovereign",upgrades:["Passive: every hit arcs to 3 foes 60% dmg; electric +22%","Arc to 4 foes 70%; +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%; arcs stun 0.5s; Trivolt immune to paralysis+stun"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"stormclaw",shardsToAscend:22,ascensionsToEvolve:45,evolutionId:"ionarch"},
-  {id:"ionarch",name:"Aurivern",emoji:"🐉",type:"Electric",rarity:"common",description:"Fully grown, gold-scaled and finally of one mind. Its three heads now argue only about which of them gets to end the storm.",
-   stats:{hp:166,atk:172,def:95,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+     basic:{name:"Static Zap",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg. For each 10 Charge on this creature, this attack Chains to 1 additional enemy"]},
+     special:{name:"Discharge",charge:16,upgrades:["Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +5% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +10% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste. Aura size +1 for each 10 Charge consumed"]},
+     unique:{name:"Battery Shell",upgrades:["Gain 1 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 2 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge. At max Charge, this creature gains Haste Up"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"stormclaw",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"ionarch"},
+  {id:"ionarch",name:"Accumulith",emoji:"⚡",type:"Electric",rarity:"common",description:"A tortoise carrying a power station. It discharges once, politely, and the field is quiet afterwards.",
+   stats:{hp:186,atk:91,def:156,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Ion Zap",upgrades:["18 dmg; arc 2 foes 60%","24 dmg","31 dmg","40 dmg","Arc to 3 foes; stun each 0.5s"]},
-     special:{name:"Ion Cascade",charge:8,upgrades:["Teleport+95 dmg+stun 1s","114 dmg","138 dmg","165 dmg","Stun 2s; shockwave 70 dmg nearby on arrival"]},
-     unique:{name:"Storm Singularity",upgrades:["Passive: every hit arcs to 4 foes 70% dmg; electric +28%","Arc 5 foes 80%; +34%","Arc 6 foes 90%; +42%","Arc 8 foes 100%; +50%","Arc all foes 110%; +60%; arcs stun 0.5s; Aurivern immune to paralysis+stun"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"arcstorm",shardsToAscend:28,ascensionsToEvolve:null},
+     basic:{name:"Static Zap",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg. For each 10 Charge on this creature, this attack Chains to 1 additional enemy"]},
+     special:{name:"Discharge",charge:16,upgrades:["Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +5% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +10% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -5% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste","Remove 50% of this creature's current Charge and gain an Aura. Allies within it gain Speed Up and +15% Haste; enemies within it are inflicted with Speed Down and -15% Haste. Aura size +1 for each 10 Charge consumed"]},
+     unique:{name:"Battery Shell",upgrades:["Gain 1 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 2 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 0.5% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge","Gain 3 Charge (max 60) whenever this creature gains a buff or receives damage. Gain 1% Attack and Defense for each stack of Charge. At max Charge, this creature gains Haste Up"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"arcstorm",shardsToAscend:18,ascensionsToEvolve:null},
   // Electric line 2
   {id:"zapfrog",name:"Zapfrog",emoji:"🐸",type:"Electric",rarity:"common",description:"A neon frog whose skin conducts lethal voltage. Its croak causes nearby electronics to malfunction.",
    stats:{hp:55,atk:58,def:34,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -896,26 +896,37 @@ export const CREATURES=[
      special:{name:"Pollen Veil",charge:12,upgrades:["Heal 24 HP","Heal 30 HP","Heal 38 HP","Heal 48 HP","Heal 48 HP and Blind"]},
      unique:{name:"Moonlit Scales",upgrades:["Heal 6 HP","Heal 8 HP","Heal 11 HP","Heal 14 HP","Heal 14 HP and they gain Speed Up"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"gloamwing",shardsToAscend:18,ascensionsToEvolve:null},
-  {id:"magmavore",name:"Magmavore",emoji:"🌋",type:"Fire",rarity:"epic",description:"Born inside a volcano, it feeds on molten rock and spits lava at those who dare approach.",
-   stats:{hp:100,atk:70,def:75,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+  // Pelican line (ids kept from the retired Magmavore volcano-beasts): Common,
+  // 4 stages, one kit shared verbatim across every stage. A fire pelican that
+  // mantles its allies -- the "pelican in her piety" of the old emblem.
+  {id:"magmavore",name:"Cinderbill",emoji:"🐣",type:"Fire",rarity:"common",description:"A pelican chick whose bill is already too big for it and already too warm to hold. It practises scooping on puddles, which steam.",
+   stats:{hp:58,atk:28,def:48,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Lava Spit",upgrades:["22 dmg + burn pool","30 dmg","38 dmg","50 dmg","Pool lasts 5s and deals 12 dmg/s"]},
-     special:{name:"Eruption Shield",charge:18,upgrades:["Ring deals 25 dmg","Ring 35 dmg","Ring 45 dmg","Ring 55 dmg","Ring also grants +25 DEF while active"]},
-     unique:{name:"Molten Hide",upgrades:["Passive: attackers take 10 fire dmg on hit","Attackers take 16 fire dmg on hit","Attackers take 22 fire dmg on hit; Magmavore resists earth damage by 15%","Attackers take 30 fire dmg on hit and are briefly burned (4 dmg/s for 2s)","Attackers take 40 fire dmg, burned for 3s; Magmavore resists earth damage by 30% and heals 5 HP from each burn tick dealt"]}
-   },role:"Tank",attackType:"Ranged",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"pyroclaw"},
-  {id:"pyroclaw",name:"Pyroclaw",emoji:"🌋",type:"Fire",rarity:"epic",description:"Magmavore's molten middle form. Its claws bore through bedrock for fun. Geologists call the aftermath 'intimate.'",
-   stats:{hp:138,atk:95,def:102,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+     basic:{name:"Lava Spit",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Expose"]},
+     special:{name:"Magma Mantle",charge:18,upgrades:["Heal 8 HP","Heal 10 HP","Heal 13 HP","Heal 16 HP","Heal 16 HP"]},
+     unique:{name:"Forgeheart",upgrades:["Allies with Protect from this creature deal 3% more damage","Allies with Protect from this creature deal 6% more damage","Allies with Protect from this creature deal 9% more damage","Allies with Protect from this creature deal 12% more damage","Allies with Protect from this creature deal 15% more damage"]}
+   },role:"Tank",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"pyroclaw"},
+  {id:"pyroclaw",name:"Emberpouch",emoji:"🐦",type:"Fire",rarity:"common",description:"The pouch has learned to hold lava without complaint. It has not yet learned to hold anything else, which has made fishing complicated.",
+   stats:{hp:94,atk:46,def:78,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Lava Spit",upgrades:["22 dmg + burn pool","30 dmg","38 dmg","50 dmg","Pool lasts 5s and deals 12 dmg/s"]},
-     special:{name:"Eruption Shield",charge:18,upgrades:["Ring deals 25 dmg","Ring 35 dmg","Ring 45 dmg","Ring 55 dmg","Ring also grants +25 DEF while active"]},
-     unique:{name:"Pyroclastic Claws",upgrades:["Passive: attackers take 22 fire dmg; each attack leaves a 2s burn pool","Attackers 30 fire; pool 3s","Attackers 40 fire; pool 3s 10/s","Attackers 52 fire; pool 4s 14/s","Attackers 68 fire; pool 4s 18/s; Pyroclaw immune to fire; every 5 attacks erupts 80 dmg all nearby"]}
-   },role:"Tank",attackType:"Ranged",evolutionOf:"magmavore",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"cindercolosus"},  {id:"cindercolosus",name:"Cindercolosus",emoji:"🧱",type:"Fire",rarity:"epic",description:"Magmavore evolved. Its body is a living volcano. The ground cracks beneath it.",
-   stats:{hp:162,atk:112,def:121,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+     basic:{name:"Lava Spit",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Expose"]},
+     special:{name:"Magma Mantle",charge:18,upgrades:["Heal 8 HP","Heal 10 HP","Heal 13 HP","Heal 16 HP","Heal 16 HP"]},
+     unique:{name:"Forgeheart",upgrades:["Allies with Protect from this creature deal 3% more damage","Allies with Protect from this creature deal 6% more damage","Allies with Protect from this creature deal 9% more damage","Allies with Protect from this creature deal 12% more damage","Allies with Protect from this creature deal 15% more damage"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"magmavore",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"cindercolosus"},
+  {id:"cindercolosus",name:"Kilnwing",emoji:"🦢",type:"Fire",rarity:"common",description:"Its wings run kiln-hot along the leading edge. Anything it settles over comes out the far side warm, rested, and faintly glazed.",
+   stats:{hp:133,atk:65,def:109,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Lava Spit",upgrades:["22 dmg + burn pool","30 dmg","38 dmg","50 dmg","Pool lasts 5s and deals 12 dmg/s"]},
-     special:{name:"Eruption Shield",charge:18,upgrades:["Ring deals 25 dmg","Ring 35 dmg","Ring 45 dmg","Ring 55 dmg","Ring also grants +25 DEF while active"]},
-     unique:{name:"Volcanic Core",upgrades:["Passive: every 10s erupts, dealing 30 fire dmg to nearby enemies","Every 8s erupts for 44 fire dmg","Every 7s erupts for 60 fire dmg and creates a burn pool","Every 6s erupts for 78 fire dmg, burn pool lasts 3s","Every 5s erupts for 100 fire dmg, burn pool lasts 4s; enemies hit are knocked back"]}
-   },role:"Tank",attackType:"Ranged",evolutionOf:"pyroclaw",shardsToAscend:20,ascensionsToEvolve:null},
+     basic:{name:"Lava Spit",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Expose"]},
+     special:{name:"Magma Mantle",charge:18,upgrades:["Heal 8 HP","Heal 10 HP","Heal 13 HP","Heal 16 HP","Heal 16 HP"]},
+     unique:{name:"Forgeheart",upgrades:["Allies with Protect from this creature deal 3% more damage","Allies with Protect from this creature deal 6% more damage","Allies with Protect from this creature deal 9% more damage","Allies with Protect from this creature deal 12% more damage","Allies with Protect from this creature deal 15% more damage"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"pyroclaw",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"calderarch"},
+  {id:"calderarch",name:"Pyrelican",emoji:"🔥",type:"Fire",rarity:"common",description:"The pelican of the old emblem, feeding its brood from its own heart and finding this a reasonable arrangement. Nothing under its wing has ever been left cold.",
+   stats:{hp:175,atk:85,def:143,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+   abilities:{
+     basic:{name:"Lava Spit",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Expose"]},
+     special:{name:"Magma Mantle",charge:18,upgrades:["Heal 8 HP","Heal 10 HP","Heal 13 HP","Heal 16 HP","Heal 16 HP"]},
+     unique:{name:"Forgeheart",upgrades:["Allies with Protect from this creature deal 3% more damage","Allies with Protect from this creature deal 6% more damage","Allies with Protect from this creature deal 9% more damage","Allies with Protect from this creature deal 12% more damage","Allies with Protect from this creature deal 15% more damage"]}
+   },role:"Tank",attackType:"Ranged",evolutionOf:"cindercolosus",shardsToAscend:18,ascensionsToEvolve:null},
   {id:"shadowstrike",name:"Shadowstrike",emoji:"🐈‍⬛",type:"Dark",rarity:"epic",description:"A wraith-like cat that phases through walls and strikes from the shadows.",
    stats:{hp:80,atk:83,def:47,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1595,20 +1606,22 @@ export const CREATURES=[
      unique:{name:"Wyrm Sovereign",upgrades:["Passive: heartbeat 150 dmg all every 1s; -38 all dmg; shockwave 100 dmg each attack; DEF-8%/hit; CC immune; absorb 40% ally dmg","Heartbeat 188 dmg; -48; shockwave 125; -10%/hit; absorb 50%","Heartbeat 235; -60; shockwave 156; -12%/hit; absorb 62%","Heartbeat 294; -76; shockwave 195; -15%/hit; absorb 76%","Heartbeat 368; -96; shockwave 244; -19%/hit; absorb 94%; Quakewyrm revives 3 times each as a continental collapse 600 dmg all"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"seismicdrake",shardsToAscend:30,ascensionsToEvolve:null},
   // Wind line 2
-  {id:"galephoenix",name:"Aetherwing",emoji:"🕊️",type:"Wind",rarity:"legendary",description:"A phoenix reborn in the eye of a hurricane. It considers Category 5 storms 'brisk.' ",
+  // Mantis line (ids kept from the retired Aetherwing phoenixes): Legendary,
+  // 2 stages, one kit shared verbatim. A Wind mantis that cuts.
+  {id:"galephoenix",name:"Sicklewing",emoji:"🦗",type:"Wind",rarity:"legendary",description:"A mantis that learned the wind would carry it and stopped flying under its own power. It waits with its forelegs folded and the air around them thin.",
    stats:{hp:103,atk:106,def:57,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Gale Feather",upgrades:["24 dmg+push+slow 32% 2.5s; arc 3 foes","30 dmg","38 dmg","48 dmg","Slow 48%; arc all; each arc pushes back; leave cyclone 2s 20/s"]},
-     special:{name:"Hurricane Rebirth",charge:18,upgrades:["Become wind; emerge 3.5s later full HP+4s invincible; 100 dmg hurricane on emerge","Emerge 125 dmg","Emerge 156 dmg","Emerge 195 dmg","Emerge 244 dmg; hurricane 5s 50/s; all enemies -55% SPD; allies gain +45 SPD"]},
-     unique:{name:"Storm Phoenix",upgrades:["Passive: revives endlessly (3x); each revival: stronger +35% ATK+full SPD; hurricane 6s 45/s on each revival; enemies -55% SPD around revival point","Revival +44% ATK; hurricane 7s 58/s","Revival +55%; 8s 74/s","Revival +68%; 9s 94/s","Revival +84%; 10s 118/s; 3rd revival: permanent storm form+untargetable for 4s every 8s; enemies always -40% SPD"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"skyphoenix"},
-  {id:"skyphoenix",name:"Skyphoenix",emoji:"✨",type:"Wind",rarity:"legendary",description:"Galephoenix's true form. A creature of pure atmospheric power that rewrites the rules of weather by existing.",
+     basic:{name:"Sickle Cut",upgrades:["30 dmg","34 dmg","38 dmg","43 dmg","43 dmg. Execute enemies below 20% Health"]},
+     special:{name:"Twin Reap",charge:10,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and briefly Stun all enemies hit"]},
+     unique:{name:"Unfettered",upgrades:["This creature gains 5% Speed and its attacks bypass Shields","This creature gains 10% Speed and its attacks bypass Shields","This creature gains 15% Speed and its attacks bypass Shields","This creature gains 20% Speed and its attacks bypass Shields","This creature gains 20% Speed and its attacks bypass Shields and bypass Taunt"]}
+   },role:"Attacker",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"skyphoenix"},
+  {id:"skyphoenix",name:"Galescythe",emoji:"🌪️",type:"Wind",rarity:"legendary",description:"It moves once and the argument is over. Nobody has seen the claws open; the consensus is that they never close.",
    stats:{hp:123,atk:127,def:68,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Sky Feather",upgrades:["38 dmg+push+slow 55% 3.5s; arc all; each arc also pushes+slows; cyclone 3s 35/s at landing","48 dmg","60 dmg","74 dmg","Slow 72%; cyclone 4s 50/s; cyclone stuns 1s on enter; strip 2 buffs per arc"]},
-     special:{name:"Sky Rebirth",charge:18,upgrades:["Become sky itself; emerge 4.5s later full HP+8s invincible; 160 dmg F10 hurricane on emerge; all enemies trapped","Emerge 200 dmg","Emerge 250 dmg","Emerge 312 dmg","Emerge 390 dmg; hurricane 8s 80/s; allies immune to wind+gain +65 SPD+50% dodge permanently in fight"]},
-     unique:{name:"Sky Sovereign",upgrades:["Passive: revives endlessly; each revival: +48% ATK+full SPD; permanent world storm 80/s; immune to all targeting between attacks; enemies always -65% SPD","Revival +60%; storm 100/s","Revival +75%; storm 125/s","Revival +94%; storm 156/s","Revival +118%; storm 195/s; Skyphoenix becomes permanently airborne and untargetable unless attacking; crits always hit"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"galephoenix",shardsToAscend:30,ascensionsToEvolve:null},
+     basic:{name:"Sickle Cut",upgrades:["30 dmg","34 dmg","38 dmg","43 dmg","43 dmg. Execute enemies below 20% Health"]},
+     special:{name:"Twin Reap",charge:10,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and briefly Stun all enemies hit"]},
+     unique:{name:"Unfettered",upgrades:["This creature gains 5% Speed and its attacks bypass Shields","This creature gains 10% Speed and its attacks bypass Shields","This creature gains 15% Speed and its attacks bypass Shields","This creature gains 20% Speed and its attacks bypass Shields","This creature gains 20% Speed and its attacks bypass Shields and bypass Taunt"]}
+   },role:"Attacker",attackType:"Melee",evolutionOf:"galephoenix",shardsToAscend:30,ascensionsToEvolve:null},
   // Wind line 3
   {id:"cyclonedrake",name:"Maelstrake",emoji:"🦅",type:"Wind",rarity:"legendary",description:"A drake born inside a cyclone and raised by the wind. It has never once touched the ground and considers this normal.",
    stats:{hp:96,atk:99,def:53,spd:1,abilitySpeed:1,crit:4,critDmg:30},

@@ -29,9 +29,9 @@
 // a summoner's Wisps vanish when the summoner is defeated.
 
 import { attackCooldown } from "../damage.js";
-import { unitDist } from "../geometry.js";
+import { unitDist, distToBoss } from "../geometry.js";
 import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { isIntangible, isStunned, speedPenalty, applyDot } from "../status.js";
+import { isIntangible, isStunned, speedPenalty, applyDot, applyTaunt } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -134,7 +134,9 @@ export const wispModule = {
    * Beckon: walk at the closest targetable enemy and Taunt it (tauntTicks +
    * tauntSourceUid, replace-on-reapply per policy). Owns targeting and
    * movement like other basicAttack overrides -- the Wisp never deals
-   * attack damage. With no minions left it walks at the boss and soaks.
+   * attack damage. With no minions left it walks at the boss and Taunts that
+   * instead: Taunt is the one control effect a boss obeys, so the Wisp can
+   * hold a boss's attention exactly as it holds a minion's.
    */
   basicAttack(unit, ctx) {
     const { aliveE, boss, newFx, now } = ctx;
@@ -144,16 +146,15 @@ export const wispModule = {
       const d = unitDist(unit, e);
       if (d < bestD) { bestD = d; best = e; }
     }
-    if (!best) {
-      if (boss && boss.hp > 0) ctx.stepToward(boss.row, boss.col);
-      return;
-    }
+    const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
+    const onBoss = bd < bestD;
+    if (onBoss) { best = boss; bestD = bd; }
+    if (!best) return;
     if (bestD > MELEE_RANGE) { ctx.stepToward(best.row, best.col); return; }
     if (unit.atkCd > 0 || isStunned(unit)) return;
-    best.tauntTicks = STATUS_TICKS;
-    best.tauntSourceUid = unit.uid;
+    applyTaunt(best, unit);
     unit.atkCd = attackCooldown(unit, speedPenalty(unit));
-    newFx.push({ id: now + "bk" + unit.uid, row: best.row, col: best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+    newFx.push({ id: now + "bk" + unit.uid, row: onBoss ? best.row + 0.5 : best.row, col: onBoss ? best.col + 0.5 : best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
   },
 
   /** Ghostly Step is an engage tool: any foe on the field opens the gate. */

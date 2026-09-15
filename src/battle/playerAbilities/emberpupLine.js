@@ -128,7 +128,7 @@ export function makeEmberpupModule(cfg) {
 
       const scent = scentMult(unit, best.burning);
       if (best.isBoss) {
-        // Bosses take the bite but can not be Rooted -- same CC-immunity
+        // Bosses take the bite but can not be Rooted -- the CC-immunity
         // policy as Taunt.
         const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult * scent));
         damageBoss(boss, dmg);

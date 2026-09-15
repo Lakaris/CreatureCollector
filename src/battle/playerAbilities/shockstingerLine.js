@@ -13,7 +13,7 @@
 // Stuns it (can't attack, gains no special charge -- see isStunned), and
 // consumes every Restrained stack on it. At max level the cast also grants this
 // creature Speed Up. Bosses can't be Restrained, so the gate never opens on
-// a boss -- same CC-immunity policy as Taunt.
+// a boss -- the CC-immunity policy, which Taunt is the sole exception to.
 //
 // Static Grip doesn't act on its own: it sets how hard this creature's
 // Restrained slows its carrier (restrainedSlowPct, read by attackCooldown

@@ -176,8 +176,12 @@ export function tickSpecialCharge(u) {
   }
   // Stunned units don't work towards their special (see Overload Sting).
   if (isStunned(u)) return;
-  // Haste Down/Up stacks scale the charge rate (statModMultiplier "haste").
-  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1) * statModMultiplier(u, "haste"));
+  // Haste Down/Up stacks scale the charge rate (statModMultiplier "haste"),
+  // and so does any aura the unit is standing in (a flat percentage, summed
+  // across auras -- see refreshAuraFields). Floored so a stacked drain can
+  // slow a charge to a crawl but never run it backwards.
+  const auraHaste = Math.max(0, 1 + (u._auraHastePct || 0) / 100);
+  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1) * statModMultiplier(u, "haste") * auraHaste);
 }
 
 export function specialChargeReady(u) {
@@ -265,6 +269,10 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
 
 /** The foe this unit is Taunt-forced onto (e.g. by Taunting Snap), or null. */
 function tauntedFoe(u, foes) {
+  // Bypass Taunt (Unfettered): the Taunt still lands and still ticks -- the
+  // creature simply refuses to let it pick its target. Flag is set by the
+  // creature's own module each tick.
+  if (u._ignoreTaunt) return null;
   if ((u.tauntTicks || 0) <= 0 || !u.tauntSourceUid) return null;
   return foes.find((f) => f.uid === u.tauntSourceUid && f.hp > 0 && !isIntangible(f)) || null;
 }
@@ -535,7 +543,10 @@ export function runBattleTick(state, config) {
           let basicDmg = 0, passiveDmg = 0;
           for (let i = 0; i < hits && tgt.hp > 0; i++) {
             const dmg = Math.max(1, Math.round(basicUnitDamage(u, tgt) * dmgMultVs(tgt) / hits));
-            const dealt = damageUnit(tgt, dmg);
+            // Bypass Shield (Unfettered): a creature whose module sets the flag
+        // swings straight through to Health. Per the policy in hp.js, the
+        // ability's card text says so.
+        const dealt = damageUnit(tgt, dmg, { pierceShield: !!u._pierceShield });
             basicDmg += dealt;
             // Protect may have handed this hit to a guardian: the on-hit
             // effects, the dodge check, and the defender's reflect all belong
@@ -639,7 +650,10 @@ export function runBattleTick(state, config) {
     if (dist <= range && u.atkCd <= 0) {
       for (let i = 0; i < hits && tgt.hp > 0; i++) {
         const dmg = Math.max(1, Math.round(basicUnitDamage(u, tgt) * dmgMultVs(tgt) / hits));
-        const dealt = damageUnit(tgt, dmg);
+        // Bypass Shield (Unfettered): a creature whose module sets the flag
+        // swings straight through to Health. Per the policy in hp.js, the
+        // ability's card text says so.
+        const dealt = damageUnit(tgt, dmg, { pierceShield: !!u._pierceShield });
         // Protect may have handed this hit to a guardian: the on-hit effects,
         // the dodge check, and the defender's reflect all belong to whoever
         // actually took it (see Protect in hp.js).
@@ -678,9 +692,10 @@ export function runBattleTick(state, config) {
   // ── 4. Status effects ────────────────────────────────────────────────────
   // Auras are fields, not buffs written onto the units they help, so what each
   // creature is standing in is recomputed here rather than tracked as anyone
-  // moves. Per side: an aura only ever lifts its emitter's own allies.
-  refreshAuraFields(aliveP);
-  refreshAuraFields(aliveE);
+  // moves. Each side is lifted by its own emitters and hindered by the other
+  // side's (see the two faces of an aura in status.js).
+  refreshAuraFields(aliveP, aliveE);
+  refreshAuraFields(aliveE, aliveP);
 
   tickStatusEffects(aliveP, boss, newFx, now);
 

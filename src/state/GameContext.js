@@ -146,6 +146,11 @@ export function GameProvider({ children }) {
   // no-scroll, no-dev-tools treatment as Hatch/Farm, since it's a sub-view
   // of the "equipment" tab rather than a tab of its own.
   const [equipmentDetailOpen, setEquipmentDetailOpen] = useState(false);
+  // Same idea for the Effect Filters page, which fills exactly one viewport
+  // with its own scrolling tile list (see EffectFilterScreen). Set by that
+  // component itself on mount/unmount rather than by its openers, since both
+  // the Collection and the Dex open it.
+  const [effectFilterOpen, setEffectFilterOpen] = useState(false);
   const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
@@ -559,6 +564,7 @@ export function GameProvider({ children }) {
     flairGuideStep, setFlairGuideStep,
     farmGuideStep, setFarmGuideStep,
     equipmentDetailOpen, setEquipmentDetailOpen,
+    effectFilterOpen, setEffectFilterOpen,
     candyGuideStep, setCandyGuideStep,
     featuredCreatureId, setFeaturedCreatureId,
     username, setUsername, profileEmoji, setProfileEmoji,

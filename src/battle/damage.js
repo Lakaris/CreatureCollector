@@ -35,9 +35,20 @@ function critMultiplier(unit) {
   return 1 + critDmgOf(unit) / 100;
 }
 
-/** Attack multiplier from any aura the unit is standing in (see status.js). */
+/**
+ * Attack multiplier from any aura the unit is standing in (see status.js),
+ * plus `_passiveAtkPct`: a flat bonus a creature's own passive recomputes
+ * each tick from some running state (Battery Shell's Charge). Kept apart from
+ * stat mods on purpose -- a per-stack percentage that changes every tick has
+ * no place in a five-stack table with a duration.
+ */
 function auraAtkMultiplier(unit) {
-  return 1 + ((unit && unit._auraAtkPct) || 0) / 100;
+  return 1 + (((unit && unit._auraAtkPct) || 0) + ((unit && unit._passiveAtkPct) || 0)) / 100;
+}
+
+/** The Defense twin of `_passiveAtkPct`; auras carry no Defense face today. */
+function passiveDefMultiplier(unit) {
+  return 1 + ((unit && unit._passiveDefPct) || 0) / 100;
 }
 
 /**
@@ -87,7 +98,7 @@ export function unitDamage(attacker, defender) {
   // Frostbite: Water attackers hit the carrier harder (5% per stack).
   const water = CREATURE_MAP[attacker.creatureId]?.type === "Water";
   const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker);
-  const def = (defender.def || 20) * statModMultiplier(defender, "def") * dartShredMultiplier(defender);
+  const def = (defender.def || 20) * statModMultiplier(defender, "def") * passiveDefMultiplier(defender) * dartShredMultiplier(defender);
   const roll = 0.8 + Math.random() * 0.4;
   return Math.max(1, Math.round(mitigatedDamage(atk, def) * roll * critMultiplier(attacker) * frostbiteMultiplier(water, defender)));
 }

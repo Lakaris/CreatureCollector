@@ -37,6 +37,27 @@ export function coneCells(row, col, dir, depth = 3) {
   return out;
 }
 
+/**
+ * The [row, col] cells of a Fork: the two diagonal rays ahead of (row, col),
+ * running to the grid's edge. `dir` is the facing along rows (-1 for player
+ * units, +1 for the enemy side), the same convention coneCells uses -- so a
+ * Fork is Cone's outline with the middle left out: step d ahead lands on
+ * (row + dir*d, col - d) and (row + dir*d, col + d), nothing between them.
+ * Already clipped to the grid, since each ray stops where the board does.
+ */
+export function forkCells(row, col, dir, gridRows, gridCols) {
+  const out = [];
+  for (let d = 1; ; d++) {
+    const r = row + dir * d;
+    if (r < 0 || r >= gridRows) break;
+    const left = col - d, right = col + d;
+    if (left < 0 && right >= gridCols) break;
+    if (left >= 0) out.push([r, left]);
+    if (right < gridCols) out.push([r, right]);
+  }
+  return out;
+}
+
 /** 8-directional distance. This is the range metric attacks use. */
 export function aChebDist(r1, c1, r2, c2) {
   return Math.max(Math.abs(r1 - r2), Math.abs(c1 - c2));

@@ -206,6 +206,7 @@ function App() {
     candyGuideStep, setCandyGuideStep,
     farmGuideStep, setFarmGuideStep,
     equipmentDetailOpen,
+    effectFilterOpen,
   } = useGame();
 
   const contentRef = React.useRef(null);
@@ -632,7 +633,7 @@ function App() {
     React.createElement("h2", { className: "sr-only" }, "Creature Collector"),
     React.createElement(
       "div",
-      { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" || (tab === "equipment" && equipmentDetailOpen) ? { overflow: "hidden" } : undefined },
+      { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" || (tab === "equipment" && equipmentDetailOpen) || effectFilterOpen ? { overflow: "hidden" } : undefined },
       tab === "home" && React.createElement(HomeScreen),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
       tab === "collection" &&
@@ -644,11 +645,12 @@ function App() {
         }),
       tab === "store" && React.createElement(StoreScreen),
       tab === "equipment" && React.createElement(EquipmentScreen),
-      // Dev tools are excluded on Hatch, and on an open Equipment item's
-      // detail page -- both are laid out to fill exactly one viewport with
-      // no scrolling, and the dev panel's height would blow past that.
-      tab !== "home" && tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && DEV_MODE && React.createElement(DevPanel),
-      tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && React.createElement("div", { style: { height: 12 } })
+      // Dev tools are excluded on Hatch, on an open Equipment item's detail
+      // page, and on the Effect Filters page -- all laid out to fill exactly
+      // one viewport with their own scrolling, and the dev panel's height
+      // would blow past that.
+      tab !== "home" && tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && !effectFilterOpen && DEV_MODE && React.createElement(DevPanel),
+      tab !== "hatch" && !(tab === "equipment" && equipmentDetailOpen) && !effectFilterOpen && React.createElement("div", { style: { height: 12 } })
     ),
     React.createElement(NavBar, {
       tab,

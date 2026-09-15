@@ -22,8 +22,9 @@ export const SKIN_SETS=[
   {id:"frost_ember",name:"Ember",tier:"common",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🦊"},glacierwulf:{emoji:"🔥"},frostwyvern:{emoji:"🐊"}}},
   {id:"frost_shadow",name:"Nightfall",tier:"rare",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🌑"},glacierwulf:{emoji:"🌚"},frostwyvern:{emoji:"👻"}}},
   {id:"frost_blizzard",name:"Blizzard",tier:"legendary",chain:["frostfang","glacierwulf","frostwyvern"],appearances:{frostfang:{emoji:"🌨️"},glacierwulf:{emoji:"🧊"},frostwyvern:{emoji:"❄️"}}},
-  // voltail / stormclaw / arcstorm (Monovolt / Duovolt / Trivolt)
-  {id:"volt_ember",name:"Ember",tier:"common",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🦎"},stormclaw:{emoji:"🦅"},arcstorm:{emoji:"🔥"}}},
+  // voltail / stormclaw / arcstorm -- ids kept from the retired Monovolt
+  // dragons; these are now the Sparkshell battery-tortoise chain.
+  {id:"volt_ember",name:"Ember",tier:"common",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🐢"},stormclaw:{emoji:"🐢"},arcstorm:{emoji:"🔥"}}},
   {id:"volt_neon",name:"Neon",tier:"epic",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🔋"},stormclaw:{emoji:"💡"},arcstorm:{emoji:"✨"}}},
   {id:"volt_apex",name:"Apex",tier:"legendary",chain:["voltail","stormclaw","arcstorm"],appearances:{voltail:{emoji:"🌟"},stormclaw:{emoji:"☄️"},arcstorm:{emoji:"💫"}}},
   // Tideclaw
@@ -31,8 +32,11 @@ export const SKIN_SETS=[
   {id:"tide_coral",name:"Coral",tier:"epic",chain:["tideclaw","tidalcrusher","abyssking"],appearances:{tideclaw:{emoji:"🦀"},tidalcrusher:{emoji:"🌺"},abyssking:{emoji:"🐠"}}},
   {id:"tide_leviathan",name:"Leviathan",tier:"legendary",chain:["tideclaw","tidalcrusher","abyssking"],appearances:{tideclaw:{emoji:"🐙"},tidalcrusher:{emoji:"🦑"},abyssking:{emoji:"🐬"}}},
   // Magmavore / Cindercolosus
-  {id:"mag_glacier",name:"Glacier",tier:"rare",chain:["magmavore","cindercolosus"],appearances:{magmavore:{emoji:"🏔️"},cindercolosus:{emoji:"🗻"}}},
-  {id:"mag_shadow",name:"Obsidian",tier:"epic",chain:["magmavore","cindercolosus"],appearances:{magmavore:{emoji:"🐉"},cindercolosus:{emoji:"🦖"}}},
+  // magmavore / cindercolosus -- ids kept from the retired Magmavore volcano
+  // line; these are now the Cinderbill fire-pelican chain, so the looks are
+  // birds rather than mountains, dragons and dinosaurs.
+  {id:"mag_glacier",name:"Glacier",tier:"rare",chain:["magmavore","cindercolosus"],appearances:{magmavore:{emoji:"🐧"},cindercolosus:{emoji:"❄️"}}},
+  {id:"mag_shadow",name:"Obsidian",tier:"epic",chain:["magmavore","cindercolosus"],appearances:{magmavore:{emoji:"🐦‍⬛"},cindercolosus:{emoji:"🐦‍⬛"}}},
   {id:"mag_primordial",name:"Primordial",tier:"legendary",chain:["magmavore","cindercolosus"],appearances:{magmavore:{emoji:"🌋"},cindercolosus:{emoji:"💥"}}},
   // Shadowstrike
   {id:"shadow_siamese",name:"Siamese",tier:"common",chain:["shadowstrike","nightwraith"],appearances:{shadowstrike:{emoji:"🐱"},nightwraith:{emoji:"🐈"}}},

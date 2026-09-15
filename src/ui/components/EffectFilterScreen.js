@@ -8,7 +8,8 @@
 // its description. Selection is the purple fill; the focused tile carries an
 // outline so you can read an effect without losing track of what's selected.
 
-import React, { useMemo, useState } from "../../react.js";
+import React, { useMemo, useState, useEffect } from "../../react.js";
+import { useGame } from "../../state/GameContext.js";
 import { ALL_DEX_FORMS } from "../../data/creatures.js";
 import { ABILITY_TAG_DEFS, TARGETING_TAGS, getCreatureEffectLabels } from "../../core/abilityText.js";
 import { undispellableNote, maxStacksNote, stackingLine, summonKit } from "./AbilityTagPills.js";
@@ -43,18 +44,35 @@ export function effectFilterCatalog() {
     if (key === "energy") continue;
     if (!defs.has(def.label)) defs.set(def.label, def);
   }
+  // Ground effects get a section of their own: they are terrain a creature
+  // leaves behind rather than a status it inflicts, and grouping them keeps
+  // the Effects list to things that live on a creature.
+  const hazardLabels = new Set(
+    ["firehazard", "waterhazard"].map((k) => ABILITY_TAG_DEFS[k]?.label).filter(Boolean)
+  );
   const carried = new Set();
   for (const def of ALL_DEX_FORMS) {
     for (const label of getCreatureEffectLabels(def.id)) carried.add(label);
   }
-  const targeting = [], effects = [];
-  for (const label of carried) (targetingLabels.has(label) ? targeting : effects).push(label);
+  const targeting = [], hazards = [], effects = [];
+  for (const label of carried) {
+    if (targetingLabels.has(label)) targeting.push(label);
+    else if (hazardLabels.has(label)) hazards.push(label);
+    else effects.push(label);
+  }
   targeting.sort();
+  hazards.sort();
   effects.sort();
-  return (catalogCache = { targeting, effects, defs });
+  return (catalogCache = { targeting, hazards, effects, defs });
 }
 
 const SECTION_LABEL_STYLE = { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", textAlign: "left", margin: "10px 0 4px" };
+
+// Height the pinned description block always holds, so the tiles sit in the
+// same place before and after the first tap. Sized for the common shape --
+// a label line plus a two-line description at these font sizes -- and
+// measured rather than guessed; see the note at the block itself.
+const PIN_MIN_HEIGHT = 84;
 
 // Uniform square tiles filling the page's width; auto-fill keeps every tile
 // in a row the same size at any screen width. The fixed height fits the
@@ -72,18 +90,12 @@ function EffectFilterScreen({ active, onToggle, onClear, onBack }) {
   const [focused, setFocused] = useState(null);
   const focusedDef = focused ? catalog.defs.get(focused) : null;
 
-  // The description pins at EXACTLY its natural resting position -- the
-  // sticky header's height plus its bottom margin -- so scrolling never
-  // moves it, not even the first few pixels. Measured off the header itself
-  // (the sticky div's previous sibling) because the header's height is
-  // font-rendering dependent and a hardcoded offset drifts by a few pixels.
-  const [pinTop, setPinTop] = useState(64);
-  const measurePin = (el) => {
-    const header = el && el.previousElementSibling;
-    if (!header) return;
-    const gap = header.getBoundingClientRect().height + (parseFloat(getComputedStyle(header).marginBottom) || 0);
-    if (Math.abs(gap - pinTop) > 0.5) setPinTop(gap);
-  };
+  // Tell App.js this page is up, so it drops the dev panel and outer scroll
+  // for as long as it is -- this screen fills exactly one viewport and does
+  // its own scrolling, and anything mounted beneath it only adds a second
+  // scrollbar that drags the description off the top. Cleared on unmount.
+  const { setEffectFilterOpen } = useGame();
+  useEffect(() => { setEffectFilterOpen(true); return () => setEffectFilterOpen(false); }, []);
 
   const tile = (label) =>
     React.createElement("button", {
@@ -93,7 +105,14 @@ function EffectFilterScreen({ active, onToggle, onClear, onBack }) {
       onClick: () => { setFocused(label); onToggle(label); },
     }, label);
 
-  return React.createElement("div", null,
+  // The screen is a column that fills its scroll container (.app-content)
+  // exactly: header, then the description, then the tile list -- and ONLY the
+  // tile list scrolls, in a region of its own below the other two. That is
+  // what makes the description hold still at the top without ever sitting on
+  // top of a tile: nothing is sticky, so nothing has anything to slide under.
+  // (The earlier sticky version pinned the same block over the list, and an
+  // empty pinned band then rode down over the tiles.)
+  return React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column", minHeight: 0 } },
     React.createElement(ScreenHeader, { title: "Effect Filters", onBack, right:
       React.createElement("button", {
         className: "btn btn-sm",
@@ -102,28 +121,33 @@ function EffectFilterScreen({ active, onToggle, onClear, onBack }) {
         style: { marginBottom: 0, padding: "4px 12px", lineHeight: 1.2, opacity: active.size === 0 ? 0.5 : 1, cursor: active.size === 0 ? "not-allowed" : "pointer" },
       }, "Clear (" + active.size + ")"),
     }),
-    // The description area: plain text (no card) pinned directly under the
-    // sticky ScreenHeader (~53px), so it holds still while the tile list
-    // scrolls beneath it. The wrapper carries the page background so tiles
-    // slide under cleanly, and a tall definition (Wisp's kit) scrolls inside
-    // its own capped height rather than eating the screen. Selection state
-    // needs no text here -- the tile's purple fill says it. Nothing renders
-    // until an effect has been tapped.
-    // The negative-offset box shadow paints the page background over the
-    // header's bottom-margin band above the pinned block, so tiles cannot
-    // peek through the gap while scrolling underneath.
-    focusedDef && React.createElement("div", { ref: measurePin, style: { position: "sticky", top: pinTop, zIndex: 4, background: "#f5f5f5", boxShadow: "0 -14px 0 0 #f5f5f5", padding: "6px 2px 8px", maxHeight: "calc(32 * var(--vh))", overflowY: "auto" } },
-      React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 6 } },
+    // The description area: plain text (no card), always rendered at a
+    // reserved minimum height so the first tap fills space that was already
+    // there instead of pushing the tiles down. The reserve fits a label plus
+    // a two-line description -- the common shape -- so only the few
+    // definitions with a stacking table grow past it, and a tall one scrolls
+    // inside its own capped height rather than eating the screen. Selection
+    // state needs no text here -- the tile's purple fill says it.
+    // A rule along its bottom edge marks where the description ends and the
+    // scrolling list begins -- otherwise the two share a background and the
+    // boundary is only visible once a tile is clipped against it.
+    React.createElement("div", { style: { flexShrink: 0, padding: "6px 2px 8px", minHeight: PIN_MIN_HEIGHT, maxHeight: "calc(32 * var(--vh))", overflowY: "auto", borderBottom: "1px solid rgba(0,0,0,0.12)" } },
+      focusedDef && React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 6 } },
         focusedDef.label, undispellableNote(focusedDef), maxStacksNote(focusedDef)),
-      React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.5 } }, focusedDef.description),
-      stackingLine(focusedDef),
-      summonKit(focusedDef)
+      focusedDef && React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.5 } }, focusedDef.description),
+      focusedDef && stackingLine(focusedDef),
+      focusedDef && summonKit(focusedDef)
     ),
-    // Below: the full-width tile list, scrolling under the pinned description.
-    React.createElement("div", { style: SECTION_LABEL_STYLE }, "Targeting"),
-    React.createElement("div", { style: TILE_GRID_STYLE }, catalog.targeting.map(tile)),
-    React.createElement("div", { style: SECTION_LABEL_STYLE }, "Effects"),
-    React.createElement("div", { style: TILE_GRID_STYLE }, catalog.effects.map(tile))
+    // The tile list: the one part of the screen that scrolls. min-height: 0
+    // lets a flex child shrink below its content so overflow can kick in.
+    React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "auto", paddingBottom: 16 } },
+      React.createElement("div", { style: SECTION_LABEL_STYLE }, "Targeting"),
+      React.createElement("div", { style: TILE_GRID_STYLE }, catalog.targeting.map(tile)),
+      React.createElement("div", { style: SECTION_LABEL_STYLE }, "Hazards"),
+      React.createElement("div", { style: TILE_GRID_STYLE }, catalog.hazards.map(tile)),
+      React.createElement("div", { style: SECTION_LABEL_STYLE }, "Effects"),
+      React.createElement("div", { style: TILE_GRID_STYLE }, catalog.effects.map(tile))
+    )
   );
 }
 

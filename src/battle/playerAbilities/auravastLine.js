@@ -27,11 +27,11 @@
 // refreshes Sovereign Call outright, so a fresh mark is immediately followed
 // by a fresh Taunt.
 
-import { aChebDist } from "../geometry.js";
-import { basicUnitDamage } from "../damage.js";
+import { aChebDist, distToBoss } from "../geometry.js";
+import { basicUnitDamage, basicDamageToBoss, damageBoss } from "../damage.js";
 import { STATUS_TICKS, ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyStatMod, applyAura, isIntangible } from "../status.js";
+import { applyStatMod, applyAura, applyTaunt, isTauntable } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -65,10 +65,8 @@ function abilityIdx(unit, key) {
   return Math.min(lvl, MAX_IDX);
 }
 
-/** A creature the Taunt can actually land on: alive, reachable, not already held. */
-function tauntable(e) {
-  return e && e.hp > 0 && !isIntangible(e) && (e.tauntTicks || 0) <= 0;
-}
+// Tauntability now lives in status.js (isTauntable) so the boss and creatures
+// answer the same question -- a boss obeys Taunt like anything else.
 
 export function makeAuravastModule(cfg) {
   const { basicDmgByLevel, auraAtkByLevel, auraCritDmgByLevel, guardDmgByLevel } = cfg;
@@ -141,15 +139,25 @@ export function makeAuravastModule(cfg) {
 
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
-        if (!tauntable(e)) continue;
+        if (!isTauntable(e)) continue;
         const d = aChebDist(unit.row, unit.col, e.row, e.col);
         if (d < bestD) { bestD = d; best = e; }
       }
+      // A boss is a Taunt target like anything else, and competes on distance
+      // with the minions rather than being a fallback.
+      const boss = ctx.boss;
+      if (isTauntable(boss)) {
+        const bd = distToBoss(boss, unit.row, unit.col);
+        if (bd < bestD) { bestD = bd; best = boss; }
+      }
 
       if (best) {
-        best.tauntTicks = STATUS_TICKS;
-        best.tauntSourceUid = unit.uid;
-        newFx.push({ id: now + "sc" + unit.uid + best.uid, row: best.row, col: best.col, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        const onBoss = best === boss;
+        // A boss sits on a 2x2 body, so its marker goes at the body's centre.
+        const fxRow = onBoss ? best.row + 0.5 : best.row;
+        const fxCol = onBoss ? best.col + 0.5 : best.col;
+        applyTaunt(best, unit);
+        newFx.push({ id: now + "sc" + unit.uid + (onBoss ? "boss" : best.uid), row: fxRow, col: fxCol, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
         // Max tier: pull a nearby ally in to swing at the same target.
         if (idx >= MAX_IDX) {
@@ -160,12 +168,15 @@ export function makeAuravastModule(cfg) {
             if (d <= ASSIST_RANGE && d < helperD) { helperD = d; helper = a; }
           }
           if (helper && best.hp > 0) {
-            const dmg = Math.max(1, Math.round(basicUnitDamage(helper, best)));
-            const dealt = damageUnit(best, dmg);
+            // A boss takes damage through damageBoss and its own shield pool,
+            // never damageUnit (see battle/hp.js).
+            const dealt = onBoss
+              ? damageBoss(best, Math.max(1, Math.round(basicDamageToBoss(helper, best, aliveP))))
+              : damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best))));
             // Credited to the dragon: this damage is Sovereign Call's doing,
             // and the chart tracks the ability that caused it.
-            ctx.addDamageDealt(dealt);
-            newFx.push({ id: now + "sca" + helper.uid + best.uid, row: best.row, col: best.col, t: now, fromRow: helper.row, fromCol: helper.col, isEnemy: !!ctx.isEnemySide });
+            ctx.addDamageDealt(dealt || 0);
+            newFx.push({ id: now + "sca" + helper.uid + (onBoss ? "boss" : best.uid), row: fxRow, col: fxCol, t: now, fromRow: helper.row, fromCol: helper.col, isEnemy: !!ctx.isEnemySide });
           }
         }
         return;

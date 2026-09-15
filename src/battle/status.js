@@ -5,6 +5,8 @@
 
 import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit } from "./hp.js";
 import { aChebDist } from "./geometry.js";
+// constants.js imports nothing, so this cannot cycle.
+import { STATUS_TICKS } from "./constants.js";
 
 /** Damage per tick for Burn, as a fraction of boss attack. Damage Over Time
  * and Poison scale off the victim instead -- see DOT_HEALTH_PCT below. */
@@ -220,6 +222,29 @@ export function tickStatMods(u, negativeOnly = false) {
  * tick from each unit loop.
  */
 /**
+ * POLICY: every Taunt goes through applyTaunt.
+ *
+ * Works on a boss as well as a creature -- Taunt is the ONE control effect a
+ * boss obeys (see tauntedTarget in bosses/context.js for why), and the boss's
+ * tauntTicks expires through the same tickTimedMods timer everything else
+ * uses. Every other CC still bounces off a boss.
+ *
+ * A new Taunt replaces the old outright rather than stacking, matching the
+ * control-effect policy.
+ */
+export function applyTaunt(target, source, ticks = STATUS_TICKS) {
+  if (!target || !source || target.hp <= 0 || source.uid == null) return false;
+  target.tauntTicks = ticks;
+  target.tauntSourceUid = source.uid;
+  return true;
+}
+
+/** True when this creature or boss can still be given a Taunt. */
+export function isTauntable(target) {
+  return !!target && target.hp > 0 && !isIntangible(target) && (target.tauntTicks || 0) <= 0;
+}
+
+/**
  * AURAS. A field a creature emits around itself, not a buff written onto the
  * creatures it helps -- which is what makes it behave the way an aura should.
  *
@@ -234,10 +259,23 @@ export function tickStatMods(u, negativeOnly = false) {
  *
  * Size and contents are per-ability: an aura names its own `range` and the
  * bonuses it carries, so a future aura can be any shape of help at all.
+ *
+ * An aura has two faces. `ally` is what the emitter's own side gains inside
+ * it; `enemy` is what the OTHER side suffers inside it (Discharge slows and
+ * drains the enemies it reaches). Either may be omitted. Magnitudes on both
+ * faces are written POSITIVE -- the enemy face is applied as a penalty by
+ * refreshAuraFields, so {hastePct: 5} on `enemy` reads "-5% Haste". Each
+ * face may carry:
+ *   atkPct / critDmgPct / hastePct   flat percentages, summed across auras
+ *   spdPct                           a Speed Up (ally) or Speed Down (enemy)
+ *                                    stack, held for as long as the unit stays
+ *                                    inside -- see refreshAuraFields
+ * The older flat form ({atkPct, critDmgPct}) still works and means `ally`.
  */
-export function applyAura(source, { range, atkPct = 0, critDmgPct = 0, ticks = STATUS_TICKS }) {
+export function applyAura(source, { range, ticks = STATUS_TICKS, ally, enemy, atkPct, critDmgPct }) {
   if (!source || !(range > 0)) return;
-  source.aura = { range, atkPct, critDmgPct, ticks };
+  const own = ally || { atkPct: atkPct || 0, critDmgPct: critDmgPct || 0 };
+  source.aura = { range, ticks, ally: own, enemy: enemy || null };
 }
 
 /** Drop an emitter's aura outright (buff removal, or the emitter dying). */
@@ -245,30 +283,47 @@ export function clearAura(u) {
   if (u) u.aura = null;
 }
 
+/** How long an aura's Speed stack outlives the unit stepping out of it. Two
+ * ticks: it survives to the next refresh while inside, and drops on the tick
+ * after leaving instead of lingering a full status duration. */
+const AURA_SPEED_TICKS = 2;
+
 /**
- * Recompute every unit's aura totals for this tick. Call once per side, with
- * that side's whole roster: auras help allies, so a unit is only ever lifted
- * by an emitter on its own list. The emitter counts as standing in its own
- * field.
+ * Recompute one side's aura totals for this tick. `units` is the side being
+ * updated and `foes` the other: a unit is lifted by its own side's emitters
+ * (their `ally` face) and hindered by the other side's (their `enemy` face).
+ * Call it twice per tick, once per side. The emitter counts as standing in
+ * its own field.
  *
- * Results land on `_auraAtkPct` / `_auraCritDmgPct`, which damage.js reads --
- * see unitDamage and critMultiplier there.
+ * Flat percentages land on `_auraAtkPct` / `_auraCritDmgPct` (read by
+ * damage.js) and `_auraHastePct` (read by the charge step in tick.js).
+ * Speed rides on the ordinary stat-mod system instead, one stack per aura,
+ * re-stamped every tick a unit is inside and left to expire when it leaves --
+ * so it stacks per source and shows in the info panel like any Speed Up.
  */
-export function refreshAuraFields(units) {
+export function refreshAuraFields(units, foes) {
   if (!units || !units.length) return;
   for (const u of units) {
     u._auraAtkPct = 0;
     u._auraCritDmgPct = 0;
+    u._auraHastePct = 0;
   }
-  for (const src of units) {
-    const a = src.aura;
-    if (!a || src.hp <= 0 || (a.ticks || 0) <= 0) continue;
+  const paint = (src, face, sign) => {
+    if (!face) return;
     for (const u of units) {
       if (u.hp <= 0) continue;
-      if (aChebDist(src.row, src.col, u.row, u.col) > a.range) continue;
-      u._auraAtkPct += a.atkPct;
-      u._auraCritDmgPct += a.critDmgPct;
+      if (aChebDist(src.row, src.col, u.row, u.col) > src.aura.range) continue;
+      u._auraAtkPct += sign * (face.atkPct || 0);
+      u._auraCritDmgPct += sign * (face.critDmgPct || 0);
+      u._auraHastePct += sign * (face.hastePct || 0);
+      if (face.spdPct) applyStatMod(u, { kind: "spd", pct: sign * face.spdPct, src: "aura" + src.uid, ticks: AURA_SPEED_TICKS });
     }
+  };
+  for (const src of units) {
+    if (src.aura && src.hp > 0 && (src.aura.ticks || 0) > 0) paint(src, src.aura.ally, 1);
+  }
+  for (const src of foes || []) {
+    if (src.aura && src.hp > 0 && (src.aura.ticks || 0) > 0) paint(src, src.aura.enemy, -1);
   }
 }
 

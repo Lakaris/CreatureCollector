@@ -53,6 +53,7 @@ function hasDebuff(u) {
     (u.tauntTicks || 0) > 0 ||
     (u.stunTicks || 0) > 0 || (u.markedTicks || 0) > 0 || !!u.blinded ||
     (u.frostbiteTicks || 0) > 0 || (u.dartShredTicks || 0) > 0 || (u.critShredTicks || 0) > 0 ||
+    (u.exposeTicks || 0) > 0 || !!u.seeded ||
     hasNegativeStatMods(u)
   );
 }

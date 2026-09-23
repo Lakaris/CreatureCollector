@@ -20,8 +20,9 @@ import {
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
   cellsOf, unitDist, unitCardinalDist, attackRangeOf,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields, stealBuff } from "./status.js";
-import { damageUnit, onHitLanded, addStackingShield } from "./hp.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields, stealBuff, onUnitMoved, applyTimedDebuff } from "./status.js";
+import { damageUnit, onHitLanded, addStackingShield, applyProtect } from "./hp.js";
+import { abilityHasTag } from "./abilityTags.js";
 import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster } from "./applier.js";
 import { isSpecialSealed } from "./charge.js";
 import { tickMinionSpecials } from "./minions.js";
@@ -36,6 +37,11 @@ import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown } from "
 function castSpecial(abilMod, u, ctx) {
   withActiveAbility(u, "special", () => abilMod.special(u, ctx));
   if (u.gear?.echoSpecialPct && u.hp > 0) asEcho(u, () => abilMod.special(u, ctx));
+  // Jetstream Sigil / Galeforce Band: every Special cast (the echo is part of
+  // the same cast) adds Attack / Speed for the rest of the battle, capped.
+  const g = u.gear;
+  if (g?.specialAtkPct) u._specialAtkPct = Math.min(g.specialAtkMaxPct ?? Infinity, (u._specialAtkPct || 0) + g.specialAtkPct);
+  if (g?.specialSpdPct) u._specialSpdPct = Math.min(g.specialSpdMaxPct ?? Infinity, (u._specialSpdPct || 0) + g.specialSpdPct);
 }
 
 /** The running tick's state, for the per-attack pass below -- it runs from
@@ -49,6 +55,16 @@ function startOfBattleGear(u) {
   u._gearStarted = true;
   const pct = u.gear?.startStackShieldPct || 0;
   if (pct) asPassive(u, () => addStackingShield(u, shieldAmount((u.maxHp * pct) / 100), Infinity));
+  // Bastion Plate: Protect stacks, with this creature as the guardian, on
+  // every ally Adjacent to it (the 8 surrounding tiles) as the battle opens.
+  const protect = u.gear?.startProtectAdjacent || 0;
+  if (protect && tickCtx) {
+    const side = tickCtx.state.playerUnits.includes(u) ? tickCtx.state.playerUnits : tickCtx.state.enemyUnits;
+    for (const a of side) {
+      if (a === u || a.hp <= 0 || aChebDist(a.row, a.col, u.row, u.col) > 1) continue;
+      asPassive(u, () => applyProtect(a, u, protect));
+    }
+  }
 }
 
 /**
@@ -84,7 +100,7 @@ function settleBasicAttack(u) {
   if (!hits || !hits.length || u._attackRiders) return;
   u._basicAttacks = (u._basicAttacks || 0) + 1;
   const gear = u.gear;
-  if (!gear || u.hp <= 0 || !tickCtx) return;
+  if (!gear || u.hp <= 0 || !tickCtx) { u._movedSinceAttack = false; return; }
   const n = u._basicAttacks;
   const target = hits[0].target;
   const onTarget = hits.filter((h) => h.target === target);
@@ -106,9 +122,24 @@ function settleBasicAttack(u) {
         for (const e of foesBeside(u, target, new Set([target]))) riderHit(u, e, attackDmg * pct, false);
       }
       if (gear.stealBuffEvery && n % gear.stealBuffEvery === 0) stealBuff(target, u);
+      // Quake Brand: every Nth attack also lands, with its effects, on every
+      // enemy Adjacent to the target (skipping any this attack already hit).
+      if (gear.adjacentEvery && n % gear.adjacentEvery === 0) {
+        for (const e of foesBeside(u, target, struck)) {
+          struck.add(e);
+          riderHit(u, e, attackDmg, true);
+        }
+      }
+      // Voltaic Fang: every Nth attack briefly Stuns its target (not a boss --
+      // a boss obeys no control effect but Taunt).
+      if (gear.stunEvery && n % gear.stunEvery === 0 && target.uid != null && target.hp > 0) {
+        applyTimedDebuff(target, "stunTicks", Math.max(target.stunTicks || 0, gear.stunEveryTicks || 2));
+      }
     }));
   } finally {
     u._attackRiders = false;
+    // Charger's Greaves' bonus rode this whole attack, riders included; spent.
+    u._movedSinceAttack = false;
   }
 }
 
@@ -213,6 +244,7 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       unit.row = nr;
       unit.col = nc;
       allOcc.add(nr + "," + nc);
+      onUnitMoved(unit);
       return true;
     },
     /** Add a freshly-summoned unit (e.g. Doomshade's Wisp) to the acting
@@ -229,8 +261,11 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
     addHazard(cells, ticks, dmg, kind) {
       // A hazard laid by an echoed Special hurts at the echo's effectiveness
       // (its later ticks run with no applier, so it is baked in here).
-      dmg = Math.max(1, Math.round(dmg * effectiveness()));
-      (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide });
+      // Flarebrand Ring / Springwell Ring: the layer's hazards of that kind are
+      // more potent -- more damage, and (water) a deeper Haste Down.
+      const potency = 1 + ((kind === "fire" ? unit.gear?.fireHazardPct : kind === "water" ? unit.gear?.waterHazardPct : 0) || 0) / 100;
+      dmg = Math.max(1, Math.round(dmg * effectiveness() * potency));
+      (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide, hasteDownPct: HAZARD_HASTE_DOWN_PCT * potency });
     },
     /** Is a Hazard of this kind covering (row,col)? For passives that read the
      * ground -- Cinder Scent hunts whatever is standing in fire. */
@@ -314,7 +349,10 @@ export function tickSpecialCharge(u) {
   // across auras -- see refreshAuraFields). Floored so a stacked drain can
   // slow a charge to a crawl but never run it backwards.
   const auraHaste = Math.max(0, 1 + (u._auraHastePct || 0) / 100);
-  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1) * statModMultiplier(u, "haste") * auraHaste);
+  // Brineplate: a Special tagged Displace has a shorter cooldown -- the bar
+  // fills that much faster (20% less time = 1 / 0.8 the rate).
+  const displace = u.gear?.displaceCooldownPct && abilityHasTag(u, "special", "displace") ? 1 / (1 - u.gear.displaceCooldownPct / 100) : 1;
+  u.abilCharge = Math.min(u.abilChargeMax, (u.abilCharge || 0) + (u.abilitySpeed || 1) * statModMultiplier(u, "haste") * auraHaste * displace);
 }
 
 export function specialChargeReady(u) {
@@ -397,6 +435,7 @@ function stepUnit(u, tr, tc, blocked, allOcc, now, tick) {
   u.col = nc;
   for (const cell of cellsOf(u)) allOcc.add(cell);
   u._lastStepTick = tick;
+  onUnitMoved(u);
   return true;
 }
 
@@ -934,7 +973,7 @@ export function runBattleTick(state, config) {
         for (const u of [...aliveP, ...aliveE]) {
           if (hz.cells.has(u.row + "," + u.col)) {
             // Terrain, not an inflicted debuff: debuff immunity lets it by.
-            applyStatMod(u, { kind: "haste", pct: -HAZARD_HASTE_DOWN_PCT, src: "hazard", ticks: HAZARD_HASTE_TICKS, environmental: true });
+            applyStatMod(u, { kind: "haste", pct: -(hz.hasteDownPct || HAZARD_HASTE_DOWN_PCT), src: "hazard", ticks: HAZARD_HASTE_TICKS, environmental: true });
           }
         }
       }

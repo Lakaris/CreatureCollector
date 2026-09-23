@@ -117,11 +117,14 @@ export const STAT_SUFFIX={crit:"%",critDmg:"%"};
  * of a base of 4, which is 0.168 -- visible as 4.0 -> 4.2, and invisible
  * without it.
  *
+ * Haste shows two: it sits at a base of 1, and "Haste +5%" gear is worth
+ * 0.05 of it -- at one decimal that rounds to the same 0.1 as "Haste +10%".
+ *
  * Anything absent keeps whole numbers (Health, Attack, Defense) or the default
- * single decimal that only appears once it is non-zero (Speed, Haste, Crit
- * Damage -- whose flairs are worth whole points and register easily).
+ * single decimal that only appears once it is non-zero (Speed, Crit Damage --
+ * whose flairs are worth whole points and register easily).
  */
-export const STAT_DECIMALS={crit:1};
+export const STAT_DECIMALS={crit:1,abilitySpeed:2};
 
 /** A stat value as it should read to a player, its % suffix included. */
 export function formatStat(stat,value){

@@ -9,6 +9,7 @@ import { MELEE_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { bossOutOfBounds, bossBlocked } from "../geometry.js";
 import { damageUnit } from "../hp.js";
 import { applyTimedDebuff } from "../status.js";
+import { resistsDisplacement } from "../immobilize.js";
 
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
@@ -73,16 +74,24 @@ export default {
       else if (stepC === 1) lane.sort((a, z) => z.col - a.col);
       else lane.sort((a, z) => a.col - z.col);
 
-      lane.forEach((u, i) => {
-        allOcc.delete(u.row + "," + u.col);
-        u.prevRow = u.row;
-        u.prevCol = u.col;
-        u.lastMoveTime = now;
-        if (stepR === 1) u.row = gridRows - 1 - i;
-        else if (stepR === -1) u.row = i;
-        else if (stepC === 1) u.col = gridCols - 1 - i;
-        else u.col = i;
-        allOcc.add(u.row + "," + u.col);
+      // `next` walks from the wall back toward the boss: each shoved unit
+      // takes the next free tile. A unit that can't be moved (Anchor Charm)
+      // stays put and becomes the new wall for everyone behind it.
+      const axis = stepR !== 0 ? "row" : "col";
+      const dir = stepR || stepC;
+      let next = dir === 1 ? (axis === "row" ? gridRows : gridCols) - 1 : 0;
+      lane.forEach((u) => {
+        if (resistsDisplacement(u)) {
+          next = u[axis] - dir;
+        } else {
+          allOcc.delete(u.row + "," + u.col);
+          u.prevRow = u.row;
+          u.prevCol = u.col;
+          u.lastMoveTime = now;
+          u[axis] = next;
+          next -= dir;
+          allOcc.add(u.row + "," + u.col);
+        }
         damageUnit(u, ctx.dmg(0.22));
         applyTimedDebuff(u, "slowTicks", STATUS_TICKS);
         newFx.push({ id: now + "chg" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });

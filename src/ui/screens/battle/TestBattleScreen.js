@@ -28,7 +28,7 @@ import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import { equipBonus, equipBonusStr, equippedStatBonuses, gearBattleBonus } from "../../../core/equipment.js";
 import { calcStats, getSpecialChargeAt } from "../../../core/creatures.js";
-import { computeCombatStats } from "../../../core/stats.js";
+import { computeCombatStats, statPctGain } from "../../../core/stats.js";
 import { STAT_SUFFIX } from "../../../data/rarity.js";
 
 const COLS = ARENA_GRID_COLS, ROWS = ARENA_GRID_ROWS, TILE = ARENA_TILE;
@@ -310,7 +310,7 @@ function TestBattleScreen({ onBack }) {
     const pcts = equippedStatBonuses(oc);
     const delta = {};
     for (const stat of ["hp", "atk", "def", "spd", "abilitySpeed", "crit", "critDmg"]) {
-      const pct = pcts.filter((b) => b.stat === stat).reduce((acc, b) => acc + Math.ceil((base[stat] || 0) * (b.pct / 100)), 0);
+      const pct = pcts.filter((b) => b.stat === stat).reduce((acc, b) => acc + statPctGain(stat, base[stat], b.pct), 0);
       delta[stat] = (flat[stat] || 0) + pct;
     }
     return delta;

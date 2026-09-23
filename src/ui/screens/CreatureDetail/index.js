@@ -8,6 +8,7 @@ import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
+import { statPctGain, flairStatGain, roundFractional } from "../../../core/stats.js";
 import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel, isExclusive, itemFitsCreature, exclusivityCaption } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
@@ -37,37 +38,9 @@ function equipBonusLines(bonuses){
   return Object.entries(bonuses).map(([s,v])=>formatStatBonus(s,v));
 }
 
-/** Stats where a percentage of the base is meaningfully fractional, so gains keep their decimals
- * instead of being rounded up to a whole unit: Speed and Haste sit at a base of 1, Crit Chance at
- * 4 and Crit Damage at 30, and their flairs are worth fractions of a percent of that. Rounding
- * those up would multiply them many times over -- the whole Crit Chance set is worth 0.168 between
- * them, which as a whole 1 would read as six times what the labels promise. HP/ATK/DEF stay whole:
- * they're discrete counts in the UI, and a percentage of a three-digit stat loses nothing. */
-const FRACTIONAL_STATS=new Set(["spd","abilitySpeed","crit","critDmg"]);
-
-/** Rounding step for a fractional stat: one decimal unless STAT_DECIMALS asks
- * for finer. Rounding a gain away before it reaches the display is the same
- * thing as not showing it, so the two have to agree. */
-function roundFractional(stat,raw){
-  const f=Math.pow(10,STAT_DECIMALS[stat]??1);
-  return Math.round(raw*f)/f;
-}
-
-/** Percent-of-base gain for a stat bonus (equip effect / flair / ability). */
-function statPctGain(stat,base,pct){
-  const raw=base*pct/100;
-  if(FRACTIONAL_STATS.has(stat))return roundFractional(stat,raw);
-  return Math.ceil(raw);
-}
-
-/** Sums every flair buff's raw (unrounded) contribution to a stat before rounding once,
- * so a pile of small percentages (e.g. many 0.2% Speed flairs) doesn't get zeroed out by
- * rounding each source individually. */
-function flairStatGain(stat,base,buffs){
-  const raw=buffs.filter(b=>b.stat===stat).reduce((acc,b)=>acc+base*b.pct/100,0);
-  if(FRACTIONAL_STATS.has(stat))return roundFractional(stat,raw);
-  return Math.ceil(raw);
-}
+// Percent-of-base stat gains (equip effects, flair, ability bonuses) use the
+// shared rule in core/stats.js -- the same one battle uses, so the numbers on
+// this page are the numbers a creature fights with.
 
 function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSwipeNav}){
   const { owned, currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards, equipmentLevels, setEquipmentLevels, equipmentAscensions, setEquipmentAscensions, equipmentCopies, setEquipmentCopies, equipFavorites, setEquipFavorites, setDexOverlay, tutorialRestricted, tutorialStep, setTutorialStep, setPetLevelUps, setEquipLevelUps, flairGuideStep, setFlairGuideStep, candyGuideStep, setCandyGuideStep } = useGame();

@@ -71,7 +71,7 @@ export function makeIgletModule(cfg) {
     onHit(unit, target, dealt) {
       if (abilityIdx(unit, "basic") >= MAX_IDX && dealt > 0 && unit.hp > 0 && canBeHealed(unit)) {
         const heal = Math.round(dealt * LIFESTEAL_FRAC * healReceivedMultiplier(unit));
-        if (heal > 0) healUnit(unit, heal);
+        if (heal > 0) healUnit(unit, heal, { lifesteal: true });
       }
       return 0;
     },

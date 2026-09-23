@@ -46,6 +46,62 @@
 //   reviveHpPct               revive once at this % of max Health                 (battle/hp.js)
 //   lifestealPct              heal this % of damage dealt                         (battle/status.js)
 //   healDonePct               +% healing done                                     (battle/hp.js)
+//   healReceivedPct           +% healing received                                 (battle/hp.js)
+//   regenPctPerTick           permanent regen, % of max Health per tick           (battle/status.js)
+//   seedDrainPct /
+//   seedHealPct               Seeded: drain % of victim / heal % of self per tick (battle/status.js)
+//   slowOnHitChancePct        % chance per damaging hit to Slow                   (battle/status.js)
+//   moveAtkSpdPct             +% Attack and Speed (a buff) on moving              (battle/status.js)
+//   exposeWhenHitChancePct    % chance to Expose an enemy ability that hits it    (battle/status.js)
+//   newDebuffHealPct          heal % of max Health per NEW debuff it inflicts     (battle/status.js)
+//   vsLastAttackerDmgPct      +% damage to whoever last damaged it                (battle/hp.js)
+//   lowHpTargetDmgPct /
+//   lowHpTargetBelowPct       +% damage to targets below that % Health            (battle/hp.js)
+//   defPerDebuffPct           +% Defense per debuff worn                          (battle/damage.js)
+//   missingHpDmgRatio         +% damage per 1% of its own missing Health          (battle/hp.js)
+//   besideAllyDmgReductionPct allies beside it take this % less damage            (battle/hp.js)
+//   fullHpDmgReductionPct     takes this % less damage at full Health             (battle/hp.js)
+//   rangedDmgReductionPct     takes this % less damage from Ranged attackers      (battle/hp.js)
+//   meleeLifestealPct         heal % of damage dealt, if it fights in Melee       (battle/status.js)
+//   afterMoveAttackDmgPct     +% on the first Basic attack after moving           (battle/hp.js)
+//   focusEvery / focusDmgPct  +% on every Nth Basic attack                        (battle/hp.js)
+//   moveHastePct              +% Haste (a buff) on moving                         (battle/status.js)
+//   rangeBonus                +N attack range                                     (battle/geometry.js)
+//   unmovable                 enemies can't push or pull it                       (battle/immobilize.js)
+//   resist<Type>Pct           takes % less damage from that type's creatures      (battle/hp.js)
+//   allDmgReductionPct        takes % less damage                                 (battle/hp.js)
+//   protectDmgReductionPct    takes % less of the hits it guards via Protect      (battle/hp.js)
+//   reduceEveryNthHit / ...Pct  every Nth hit taken deals % less                  (battle/hp.js)
+//   firstHitsReduced / ...Pct   the first N instances of damage deal % less       (battle/hp.js)
+//   dodgeEvery                Dodge every Nth ability hit (the Dodge tag)         (battle/hp.js)
+//   shieldDmgPct              +% damage against Shields                           (battle/hp.js)
+//   perBurnStackDmgPct        +% per Burn stack on the target                     (battle/hp.js)
+//   vsSlowStunDmgPct          +% against Slowed or Stunned targets                (battle/hp.js)
+//   farthestDmgPct            +% from abilities TAGGED "farthest"                 (battle/hp.js)
+//   loneDmgPct / loneDefPct   +% damage / Defense with no ally Nearby             (battle/hp.js, damage.js)
+//   duelPct                   +% Attack and Defense vs the first creature it hits (battle/damage.js)
+//   alwaysCritBelowPct        always crit targets below that % Health             (battle/damage.js)
+//   specialAtkPct / ...MaxPct +% Attack per Special cast, for the battle          (battle/damage.js)
+//   specialSpdPct / ...MaxPct +% Speed per Special cast, for the battle           (battle/damage.js)
+//   atkPerTenthSpdPct         +% Attack per 0.1 Speed                             (battle/damage.js)
+//   thornsDefPct              hit it, take % of its Defense back                  (battle/damage.js)
+//   dischargeEvery            every Nth hit taken, Basic damage to Nearby foes    (battle/damage.js)
+//   displaceCooldownPct       -% cooldown on abilities TAGGED "displace"          (battle/tick.js, damage.js)
+//   specialHitHealPct         heal % of max Health per enemy a Special damages    (battle/status.js)
+//   struckHastePct            +% Haste (a buff) when hit by an enemy ability      (battle/status.js)
+//   executeBelowPct           Execute non-boss targets below that % Health        (battle/status.js)
+//   newDebuffShieldDefPct     Shield of % Defense per NEW debuff it receives      (battle/status.js)
+//   healDispelDebuffs         dispel N debuffs from an ally it heals              (battle/status.js)
+//   healedBuffPct             Attack Up and Critical Damage Up when healed        (battle/status.js)
+//   seedPotencyPct            +% to the Seeded it inflicts                        (battle/status.js)
+//   lifestealOverhealPct      lifesteal past max Health becomes a stacking Shield (battle/hp.js)
+//   extraAllyTargets          its heals and buffs on an ally also reach N more    (battle/applier.js)
+//   fireHazardPct / waterHazardPct  +% potency of hazards it lays                 (battle/tick.js)
+//   startProtectAdjacent      N Protect stacks to adjacent allies, first turn     (battle/tick.js)
+//   adjacentEvery             every Nth attack also hits enemies Adjacent to it   (battle/tick.js)
+//   stunEvery / stunEveryTicks  every Nth attack Stuns the target                 (battle/tick.js)
+// (Flat "Gain X% more STAT" effects -- Sigils, "Haste +X%" -- use `statBonus`
+// instead, applied to the creature's stats before battle by core/stats.js.)
 //   Per Basic ATTACK (a whole swing, however many hits) -- settleBasicAttack in battle/tick.js:
 //   extraHitEvery             1 extra hit every Nth attack
 //   chainTargets              Chain to N enemies beside the target
@@ -96,45 +152,45 @@ export const EQUIPMENT_DEFS=[
   // the weakest rung of each effect family -- the Epic/Legendary versions of
   // the same idea should always read as clear upgrades.
   // Rare type-exclusives (2 per element)
-  {id:"rar_typ_fire_atk",    name:"Kindled Charm",   emoji:"🔥", rarity:"rare", element:"Fire",    stats:{atk:13},       effect:"Fire abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_fire_hp_atk", name:"Ashen Pendant",   emoji:"🪔", rarity:"rare", element:"Fire",    stats:{hp:5,atk:6},   effect:"Attacks have 10% chance to Burn for 1 turn"},
-  {id:"rar_typ_water_hp",    name:"Dewdrop Charm",   emoji:"💧", rarity:"rare", element:"Water",   stats:{hp:13},        effect:"Restore 1% HP whenever a Water move hits"},
-  {id:"rar_typ_water_hp_def",name:"Coral Band",      emoji:"🪸", rarity:"rare", element:"Water",   stats:{hp:6,def:5},   effect:"Water abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_nat_hp",      name:"Sprout Locket",   emoji:"🌱", rarity:"rare", element:"Nature",  stats:{hp:13},        effect:"Regenerate 1% HP each turn"},
-  {id:"rar_typ_nat_def_atk", name:"Thorn Ring",      emoji:"🌵", rarity:"rare", element:"Nature",  stats:{def:6,atk:5},  effect:"Nature abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_ear_def",     name:"Pebble Talisman", emoji:"🪨", rarity:"rare", element:"Earth",   stats:{def:13},       effect:"Earth abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_ear_hp_def",  name:"Clay Bangle",     emoji:"🏺", rarity:"rare", element:"Earth",   stats:{hp:5,def:6},   effect:"Earth moves have 10% chance to Slow for 1 turn"},
-  {id:"rar_typ_wind_atk",    name:"Breeze Feather",  emoji:"🪶", rarity:"rare", element:"Wind",    stats:{atk:13},       effect:"Wind moves deal 8% more damage"},
-  {id:"rar_typ_wind_hp_atk", name:"Zephyr Knot",     emoji:"💨", rarity:"rare", element:"Wind",    stats:{hp:5,atk:6},   effect:"Abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_elec_def",    name:"Capacitor Charm", emoji:"🔋", rarity:"rare", element:"Electric",stats:{def:13},       effect:"When struck, 10% chance to Shock the attacker for 1 turn"},
-  {id:"rar_typ_elec_atk_def",name:"Copper Coil",     emoji:"🧲", rarity:"rare", element:"Electric",stats:{atk:5,def:6},  effect:"Electric abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_light_hp",    name:"Sunbeam Locket",  emoji:"🌞", rarity:"rare", element:"Light",   stats:{hp:13},        effect:"Healing received is 10% stronger"},
-  {id:"rar_typ_light_hp_def",name:"Glow Band",       emoji:"✨", rarity:"rare", element:"Light",   stats:{hp:6,def:5},   effect:"Light abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_dark_atk",    name:"Duskfang Charm",  emoji:"🦇", rarity:"rare", element:"Dark",    stats:{atk:13},       effect:"Dark abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_typ_dark_hp_atk", name:"Umbral Thread",   emoji:"🕸️", rarity:"rare", element:"Dark",    stats:{hp:6,atk:5},   effect:"Recover 1% HP each time you apply a debuff to an enemy"},
+  // "Haste +X%" items grant X% of the creature's base Haste through
+  // `statBonus` -- the same percent-of-base path as the Sigils, shown on the
+  // creature page and rounded by the shared rule in core/stats.js.
+  {id:"rar_typ_fire_atk",    name:"Kindled Charm",   emoji:"🔥", rarity:"rare", element:"Fire",    stats:{atk:13},       effect:"Haste +5%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:5}},
+  // 0.2% of max Health per tick = 0.4% per second.
+  {id:"rar_typ_water_hp",    name:"Dewdrop Charm",   emoji:"💧", rarity:"rare", element:"Water",   stats:{hp:13},        effect:"Gain a small Heal Over Time that lasts forever (0.4% of Max Health per second)", battle:{regenPctPerTick:0.2}},
+  {id:"rar_typ_water_hp_def",name:"Coral Band",      emoji:"🪸", rarity:"rare", element:"Water",   stats:{hp:6,def:5},   effect:"Haste +5%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:5}},
+  {id:"rar_typ_nat_def_atk", name:"Thorn Ring",      emoji:"🌵", rarity:"rare", element:"Nature",  stats:{def:6,atk:5},  effect:"Haste +5%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:5}},
+  {id:"rar_typ_ear_def",     name:"Pebble Talisman", emoji:"🪨", rarity:"rare", element:"Earth",   stats:{def:13},       effect:"Haste +10%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:10}},
+  {id:"rar_typ_ear_hp_def",  name:"Clay Bangle",     emoji:"🏺", rarity:"rare", element:"Earth",   stats:{hp:5,def:6},   effect:"Damaging abilities have a 10% chance to Slow", battle:{slowOnHitChancePct:10}},
+  {id:"rar_typ_wind_atk",    name:"Breeze Feather",  emoji:"🪶", rarity:"rare", element:"Wind",    stats:{atk:13},       effect:"Temporarily gain 10% Attack and Speed whenever this creature moves", speedEffect:true, battle:{moveAtkSpdPct:10}},
+  {id:"rar_typ_wind_hp_atk", name:"Zephyr Knot",     emoji:"💨", rarity:"rare", element:"Wind",    stats:{hp:5,atk:6},   effect:"Haste +10%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:10}},
+  {id:"rar_typ_elec_def",    name:"Capacitor Charm", emoji:"🔋", rarity:"rare", element:"Electric",stats:{def:13},       effect:"10% chance to inflict Expose whenever this creature is damaged by an enemy ability", battle:{exposeWhenHitChancePct:10}},
+  {id:"rar_typ_elec_atk_def",name:"Copper Coil",     emoji:"🧲", rarity:"rare", element:"Electric",stats:{atk:5,def:6},  effect:"Haste +10%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:10}},
+  {id:"rar_typ_light_hp",    name:"Sunbeam Locket",  emoji:"🌞", rarity:"rare", element:"Light",   stats:{hp:13},        effect:"Healing received is 10% stronger", battle:{healReceivedPct:10}},
+  {id:"rar_typ_light_hp_def",name:"Glow Band",       emoji:"✨", rarity:"rare", element:"Light",   stats:{hp:6,def:5},   effect:"Haste +10%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:10}},
+  {id:"rar_typ_dark_atk",    name:"Duskfang Charm",  emoji:"🦇", rarity:"rare", element:"Dark",    stats:{atk:13},       effect:"Haste +10%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:10}},
+  {id:"rar_typ_dark_hp_atk", name:"Umbral Thread",   emoji:"🕸️", rarity:"rare", element:"Dark",    stats:{hp:6,atk:5},   effect:"Recover 5% Health whenever a new debuff is inflicted onto an enemy", battle:{newDebuffHealPct:5}},
   // Rare role-exclusives (2 per role)
-  {id:"rar_role_atk_edge",   name:"Duelist's Edge",  emoji:"🗡️", rarity:"rare", role:"Attacker", stats:{atk:6,def:5},  effect:"[Attacker] Abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_role_atk_hunter", name:"Hunter's Mark",   emoji:"🎯", rarity:"rare", role:"Attacker", stats:{atk:13},       effect:"[Attacker] Deal 8% more damage to enemies below 50% HP"},
-  {id:"rar_role_tank_plate", name:"Squire's Plate",  emoji:"🛡️", rarity:"rare", role:"Tank",     stats:{hp:6,def:5},   effect:"[Tank] Abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_role_tank_grit",  name:"Grit Band",       emoji:"💪", rarity:"rare", role:"Tank",     stats:{def:13},       effect:"[Tank] Gain +8% DEF when below 50% HP"},
+  {id:"rar_role_atk_edge",   name:"Duelist's Edge",  emoji:"🗡️", rarity:"rare", role:"Attacker", stats:{atk:6,def:5},  effect:"Deal 10% more damage to the enemy that last damaged this creature", battle:{vsLastAttackerDmgPct:10}},
+  {id:"rar_role_atk_hunter", name:"Hunter's Mark",   emoji:"🎯", rarity:"rare", role:"Attacker", stats:{atk:13},       effect:"Deal 10% more damage to enemies below 50% Health", battle:{lowHpTargetDmgPct:10, lowHpTargetBelowPct:50}},
+  {id:"rar_role_tank_plate", name:"Squire's Plate",  emoji:"🛡️", rarity:"rare", role:"Tank",     stats:{hp:6,def:5},   effect:"Gain 3% Defense for each debuff on this creature", battle:{defPerDebuffPct:3}},
+  {id:"rar_role_tank_grit",  name:"Grit Band",       emoji:"💪", rarity:"rare", role:"Tank",     stats:{def:13},       effect:"Deal 0.5% more damage for each 1% of missing Health (up to 50%)", battle:{missingHpDmgRatio:0.5}},
   {id:"rar_role_sup_charm",  name:"Mender's Charm",  emoji:"💚", rarity:"rare", role:"Support",  stats:{hp:13},        effect:"[Support] Healing applied by this creature is 10% stronger"},
-  {id:"rar_role_sup_bell",   name:"Chorus Bell",     emoji:"🔔", rarity:"rare", role:"Support",  stats:{hp:5,def:6},   effect:"[Support] Adjacent allies take 4% less damage"},
+  {id:"rar_role_sup_bell",   name:"Chorus Bell",     emoji:"🔔", rarity:"rare", role:"Support",  stats:{hp:5,def:6},   effect:"Beside allies take 5% less damage", battle:{besideAllyDmgReductionPct:5}},
   // Rare range-exclusives (2 per attack type)
-  {id:"rar_rng_melee_grip",   name:"Brawler's Grip",   emoji:"🤜", rarity:"rare", attackType:"Melee",  stats:{hp:6,atk:5},  effect:"[Melee] Abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_rng_melee_greaves",name:"Charger's Greaves",emoji:"🥾", rarity:"rare", attackType:"Melee",  stats:{def:5,atk:6}, effect:"[Melee] After moving, your next attack deals 6% more damage"},
-  {id:"rar_rng_ranged_scope", name:"Keen Scope",       emoji:"🔭", rarity:"rare", attackType:"Ranged", stats:{atk:13},      effect:"[Ranged] Abilities recharge 10% faster", hasteEffect:true},
-  {id:"rar_rng_ranged_quiver",name:"Light Quiver",     emoji:"🏹", rarity:"rare", attackType:"Ranged", stats:{hp:5,atk:6},  effect:"[Ranged] Attacks have 10% chance to push the target back 1 tile"},
+  {id:"rar_rng_melee_grip",   name:"Brawler's Grip",   emoji:"🤜", rarity:"rare", attackType:"Melee",  stats:{hp:6,atk:5},  effect:"Recover 10% of the damage dealt when using Melee abilities", battle:{meleeLifestealPct:10}},
+  {id:"rar_rng_melee_greaves",name:"Charger's Greaves",emoji:"🥾", rarity:"rare", attackType:"Melee",  stats:{def:5,atk:6}, effect:"After moving, your next attack deals 15% more damage", battle:{afterMoveAttackDmgPct:15}},
+  {id:"rar_rng_ranged_scope", name:"Keen Scope",       emoji:"🔭", rarity:"rare", attackType:"Ranged", stats:{atk:13},      effect:"Range +1", battle:{rangeBonus:1}},
+  {id:"rar_rng_ranged_quiver",name:"Light Quiver",     emoji:"🏹", rarity:"rare", attackType:"Ranged", stats:{hp:5,atk:6},  effect:"+10% Speed", speedEffect:true, statBonus:{stat:"spd", pct:10}},
   // Rare general effect items (equippable by anyone)
-  {id:"rar_gen_hp_shield",   name:"Vitality Bead",   emoji:"❤️", rarity:"rare", stats:{hp:13},        effect:"Start each battle with a shield equal to 5% of max HP"},
-  {id:"rar_gen_atk_focus",   name:"Focus Band",      emoji:"🧿", rarity:"rare", stats:{atk:13},       effect:"Every 5th attack deals 25% bonus damage"},
-  {id:"rar_gen_def_moss",    name:"Mossy Charm",     emoji:"🍀", rarity:"rare", stats:{def:13},       effect:"Reduce damage from adjacent enemies by 5%"},
-  {id:"rar_gen_hp_atk_leech",name:"Leech Ring",      emoji:"🪱", rarity:"rare", stats:{hp:5,atk:6},   effect:"Recover 2% of all damage dealt as HP"},
-  {id:"rar_gen_hp_def_cloak",name:"Traveler's Cloak",emoji:"🧣", rarity:"rare", stats:{hp:6,def:5},   effect:"Take 6% less damage while at full HP"},
-  {id:"rar_gen_atk_def_spike",name:"Spiked Pauldron",emoji:"🦔", rarity:"rare", stats:{atk:5,def:6},  effect:"Counter-attack for 5% ATK when struck"},
-  {id:"rar_gen_hp_coin",     name:"Lucky Coin",      emoji:"🪙", rarity:"rare", stats:{hp:13},        effect:"5% chance to take half damage from a hit"},
-  {id:"rar_gen_def_sentry",  name:"Sentry Emblem",   emoji:"🗿", rarity:"rare", stats:{def:13},       effect:"Reduce incoming projectile damage by 6%"},
-  {id:"rar_gen_def_anchor",  name:"Anchor Charm",    emoji:"⚓", rarity:"rare", stats:{def:13},       effect:"Cannot be pushed or pulled"},
-  {id:"rar_gen_atk_def_haste",name:"Runner's Band",  emoji:"🏃", rarity:"rare", stats:{atk:5,def:5},  effect:"Abilities recharge 8% faster", hasteEffect:true},
+  {id:"rar_gen_atk_focus",   name:"Focus Band",      emoji:"🧿", rarity:"rare", stats:{atk:13},       effect:"Every 5th attack deals 20% bonus damage", battle:{focusEvery:5, focusDmgPct:20}},
+  {id:"rar_gen_hp_atk_leech",name:"Leech Ring",      emoji:"🪱", rarity:"rare", stats:{hp:5,atk:6},   effect:"Recover 5% of all damage dealt as Health", battle:{lifestealPct:5}},
+  {id:"rar_gen_hp_def_cloak",name:"Traveler's Cloak",emoji:"🧣", rarity:"rare", stats:{hp:6,def:5},   effect:"Take 20% less damage while at full Health", battle:{fullHpDmgReductionPct:20}},
+  // +20% of the creature's base Critical Chance (percent-of-base, like "Haste +X%").
+  {id:"rar_gen_hp_coin",     name:"Lucky Coin",      emoji:"🪙", rarity:"rare", stats:{atk:13},       effect:"+20% Critical Chance", statBonus:{stat:"crit", pct:20}},
+  {id:"rar_gen_def_sentry",  name:"Sentry Emblem",   emoji:"🗿", rarity:"rare", stats:{def:13},       effect:"Take 10% less damage from Ranged enemies", battle:{rangedDmgReductionPct:10}},
+  {id:"rar_gen_def_anchor",  name:"Anchor Charm",    emoji:"⚓", rarity:"rare", stats:{hp:6,def:5},   effect:"Can not be moved by enemies", battle:{unmovable:true}},
+  {id:"rar_gen_atk_def_haste",name:"Runner's Band",  emoji:"🏃", rarity:"rare", stats:{atk:5,def:5},  effect:"Temporarily gain 10% Haste after moving", hasteEffect:true, battle:{moveHastePct:10}},
   // Rare battle-effect gear (see BATTLE EFFECTS at the top of this file). Same
   // costing as the other Rare effect items: 5/6 two-stat, 13 single-stat, and
   // a crit stat at 8 in place of a 6. Epic rungs of these families are below.
@@ -143,7 +199,7 @@ export const EQUIPMENT_DEFS=[
   {id:"rar_gen_hp_atk_wax",   name:"Wax Cell",       emoji:"🐝", rarity:"rare", stats:{hp:6,atk:5},   effect:"Healing past Max Health becomes a Shield (up to 5% of Max Health, stacks)",  battle:{overhealLayerPct:5}},
   {id:"rar_gen_atk_crit_chirp",name:"Cricket Chirp", emoji:"🦗", rarity:"rare", stats:{atk:5,crit:8},  effect:"Critical hits from a Basic ability grant 2% Special charge",  battle:{basicCritChargePct:2}},
   {id:"rar_gen_hp_molt",      name:"Molted Skin",    emoji:"🐍", rarity:"rare", stats:{hp:13},        effect:"Immune to the first debuff inflicted",  battle:{debuffImmunity:1}},
-  {id:"rar_gen_atk_cdmg_hydra",name:"Hydra Tooth",   emoji:"🐉", rarity:"rare", stats:{atk:5,critDmg:8}, effect:"Multi-hit abilities deal 20% more damage",  battle:{multiHitDmgPct:20}},
+  {id:"rar_gen_atk_cdmg_hydra",name:"Hydra Tooth",   emoji:"🐉", rarity:"rare", stats:{atk:5,critDmg:8}, effect:"Multi-hit abilities deal 10% more damage",  battle:{multiHitDmgPct:10}},
   // Formerly a Legendary (id kept for saves). Gained on the wearer's first
   // turn of each battle; lasts until broken.
   {id:"eff_hp_def_barrier",   name:"Crest of Conquest",emoji:"🏰", rarity:"rare", stats:{hp:6,def:5},   effect:"Gain a Shield (stacking) equal to 10% of this creature's Max Health", battle:{startStackShieldPct:10}},
@@ -156,58 +212,68 @@ export const EQUIPMENT_DEFS=[
   {id:"cre_atk", name:"Fury Crest",   emoji:"⚔️", rarity:"epic",      stats:{atk:25},          effect:"Gain 15% more ATK",   statBonus:{stat:"atk",         pct:15}},
   {id:"cre_def", name:"Iron Crest",   emoji:"🛡️", rarity:"epic",      stats:{def:25},          effect:"Gain 15% more DEF",   statBonus:{stat:"def",         pct:15}},
   // Element Epic items — HP+DEF base 11, element resistance
-  {id:"res_fire",   name:"Cinder Ward",    emoji:"🛡️", rarity:"epic", stats:{def:11,crit:21}, effect:"Fire moves deal 20% less damage",   element:"Fire"},
-  {id:"res_water",  name:"Tide Guard",     emoji:"🌊", rarity:"epic", stats:{def:11,critDmg:21}, effect:"Water moves deal 20% less damage",  element:"Water"},
-  {id:"res_nature", name:"Bark Shield",    emoji:"🌿", rarity:"epic", stats:{hp:11,def:11}, effect:"Nature moves deal 20% less damage", element:"Nature"},
-  {id:"res_earth",  name:"Stone Bulwark",  emoji:"⛰️", rarity:"epic", stats:{hp:11,def:11}, effect:"Earth moves deal 20% less damage",  element:"Earth"},
-  {id:"res_wind",   name:"Gale Barrier",   emoji:"🌪️", rarity:"epic", stats:{hp:11,def:11}, effect:"Wind moves deal 20% less damage",   element:"Wind"},
-  {id:"res_dark",   name:"Shadow Veil",    emoji:"🌑", rarity:"epic", stats:{hp:11,def:11}, effect:"Dark moves deal 20% less damage",   element:"Dark"},
-  {id:"res_light",  name:"Radiant Aegis",  emoji:"☀️", rarity:"epic", stats:{hp:11,def:11}, effect:"Light moves deal 20% less damage",  element:"Light"},
+  // Element wards: universal (anyone can wear them). "X moves" are the
+  // abilities of X-type creatures, the matching boss included.
+  {id:"res_fire",   name:"Cinder Ward",    emoji:"🛡️", rarity:"epic", stats:{def:11,crit:21}, effect:"Fire moves deal 20% less damage",   battle:{resistFirePct:20}},
+  {id:"res_water",  name:"Tide Guard",     emoji:"🌊", rarity:"epic", stats:{def:11,critDmg:21}, effect:"Water moves deal 20% less damage",  battle:{resistWaterPct:20}},
+  {id:"res_nature", name:"Bark Shield",    emoji:"🌿", rarity:"epic", stats:{hp:11,def:11}, effect:"Nature moves deal 20% less damage", battle:{resistNaturePct:20}},
+  {id:"res_earth",  name:"Stone Bulwark",  emoji:"⛰️", rarity:"epic", stats:{hp:11,def:11}, effect:"Earth moves deal 20% less damage",  battle:{resistEarthPct:20}},
+  {id:"res_wind",   name:"Gale Barrier",   emoji:"🌪️", rarity:"epic", stats:{hp:11,def:11}, effect:"Wind moves deal 20% less damage",   battle:{resistWindPct:20}},
+  {id:"res_dark",   name:"Shadow Veil",    emoji:"🌑", rarity:"epic", stats:{hp:11,def:11}, effect:"Dark moves deal 20% less damage",   battle:{resistDarkPct:20}},
+  {id:"res_light",  name:"Radiant Aegis",  emoji:"☀️", rarity:"epic", stats:{hp:11,def:11}, effect:"Light moves deal 20% less damage",  battle:{resistLightPct:20}},
   // Type-specific Epic items (non-Speed/Haste survivors)
-  {id:"typ_fire_hp_atk",   name:"Scorchmantle",      emoji:"🧥", rarity:"epic", element:"Fire",    stats:{atk:8,critDmg:21},           effect:"Deal 5% bonus damage for each turn a Burn debuff is active on any enemy"},
-  {id:"typ_water_hp_def",  name:"Tideweave Wrap",    emoji:"🌊", rarity:"epic", element:"Water",   stats:{hp:9,def:8},           effect:"Restore 3% HP whenever a Water move hits"},
-  {id:"typ_water_atk_def", name:"Brineplate",        emoji:"🪸", rarity:"epic", element:"Water",   stats:{atk:8,def:9},          effect:"Counter-attack for 10% ATK when struck by a non-Water move"},
-  {id:"typ_nat_hp_def",    name:"Thornback Vest",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:8,def:9},           effect:"Gain +6% DEF for each ally still standing (Auto Battler)"},
-  {id:"typ_ear_hp_def",    name:"Bedrock Slab",      emoji:"🪨", rarity:"epic", element:"Earth",   stats:{hp:9,def:9},           effect:"Reduce all damage taken by 5% when below 50% HP"},
-  {id:"typ_ear_atk_def",   name:"Quake Brand",       emoji:"💥", rarity:"epic", element:"Earth",   stats:{atk:8,def:9},          effect:"Every 4th attack sends a shockwave dealing 15% ATK to all adjacent enemies"},
-  {id:"typ_elec_def_atk",  name:"Capacitor Plate",   emoji:"🔌", rarity:"epic", element:"Electric",stats:{def:8,atk:9},          effect:"When struck, store charge; every 3 charges release a 20% ATK electric burst"},
-  {id:"typ_elec_hp_def",   name:"Stormshell Mantle", emoji:"🌩️", rarity:"epic", element:"Electric",stats:{hp:8,def:8},           effect:"Electric attacks that hit shielded enemies deal 25% bonus damage, piercing 10% of defense"},
-  {id:"typ_light_hp_def",  name:"Radiant Shroud",    emoji:"🛡️", rarity:"epic", element:"Light",   stats:{hp:8,def:8},           effect:"When healed, also cleanse 1 debuff"},
-  {id:"typ_dark_hp_atk",   name:"Voidthread Cloak",  emoji:"🕷️", rarity:"epic", element:"Dark",    stats:{hp:8,atk:8},           effect:"Recover 4% HP each time you apply a debuff to an enemy"},
-  {id:"typ_wind_atk_def",  name:"Galeforce Band",    emoji:"💨", rarity:"epic", element:"Wind",    stats:{atk:8,def:8},          effect:"Wind attacks increase SPD by 5% per hit, stacking up to +20%", speedEffect:true},
-  {id:"typ_wind_hp_atk",   name:"Slipstream Blade",  emoji:"🌬️", rarity:"epic", element:"Wind",    stats:{hp:8,atk:9},           effect:"Attacks against Slowed or Stunned enemies deal 15% bonus damage"},
-  {id:"typ_wind_hp_def",   name:"Featherweight Wrap",emoji:"🪶", rarity:"epic", element:"Wind",    stats:{hp:9,def:8},           effect:"Reduce incoming projectile damage by 10%"},
-  {id:"typ_wind_def_atk",  name:"Cyclone Guard",     emoji:"🌀", rarity:"epic", element:"Wind",    stats:{def:8,atk:8},          effect:"After taking a hit, gain +10% SPD until your next turn", speedEffect:true},
-  {id:"typ_wind_hp_atk2",  name:"Jetstream Sigil",   emoji:"⚡", rarity:"epic", element:"Wind",    stats:{hp:8,atk:8},           effect:"Using an ability grants +8% ATK until the end of the turn (Turn Based)"},
+  {id:"typ_fire_hp_atk",   name:"Scorchmantle",      emoji:"🧥", rarity:"epic", element:"Fire",    stats:{atk:8,critDmg:21},           effect:"Deal 5% more damage for each stack of Burn on an enemy", battle:{perBurnStackDmgPct:5}},
+  {id:"typ_water_hp_def",  name:"Tideweave Wrap",    emoji:"🌊", rarity:"epic", element:"Water",   stats:{hp:9,def:8},           effect:"Recover 4% Health whenever a Special ability damages an enemy", battle:{specialHitHealPct:4}},
+  {id:"typ_water_atk_def", name:"Brineplate",        emoji:"🪸", rarity:"epic", element:"Water",   stats:{atk:8,def:9},          effect:"Moves that Displace enemies have a 20% reduced cooldown", battle:{displaceCooldownPct:20}},
+  // 15% of this creature's Defense, as effect damage to whoever hit it.
+  {id:"typ_nat_hp_def",    name:"Thornback Vest",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:8,def:9},           effect:"Whenever this creature is damaged, deal damage based off of this creature's Defense", battle:{thornsDefPct:15}},
+  // A Shield of 20% of this creature's Defense, standard duration.
+  {id:"typ_ear_hp_def",    name:"Bedrock Slab",      emoji:"🪨", rarity:"epic", element:"Earth",   stats:{def:19},               effect:"Gain a Shield based off of this creature's Defense whenever a new debuff is inflicted onto this creature", battle:{newDebuffShieldDefPct:20}},
+  {id:"typ_ear_atk_def",   name:"Quake Brand",       emoji:"💥", rarity:"epic", element:"Earth",   stats:{atk:8,def:9},          effect:"Every 4th attack also affects Adjacent enemies", battle:{adjacentEvery:4}},
+  // The discharge is this creature's Basic damage, to each Nearby enemy.
+  {id:"typ_elec_def_atk",  name:"Capacitor Plate",   emoji:"🔌", rarity:"epic", element:"Electric",stats:{def:8,atk:9},          effect:"Whenever this creature is damaged 3 times by enemy abilities, deal damage to all Nearby enemies", battle:{dischargeEvery:3}},
+  {id:"typ_elec_hp_def",   name:"Stormshell Mantle", emoji:"🌩️", rarity:"epic", element:"Electric",stats:{hp:8,def:8},           effect:"Deal 30% more damage to Shields", battle:{shieldDmgPct:30}},
+  {id:"typ_light_hp_def",  name:"Radiant Shroud",    emoji:"🛡️", rarity:"epic", element:"Light",   stats:{hp:8,def:8},           effect:"Whenever this creature heals an ally, dispel 1 debuff", battle:{healDispelDebuffs:1}},
+  {id:"typ_dark_hp_atk",   name:"Voidthread Cloak",  emoji:"🕷️", rarity:"epic", element:"Dark",    stats:{hp:8,atk:8},           effect:"Recover 5% Health whenever this creature inflicts a new debuff onto an enemy", battle:{newDebuffHealPct:5}},
+  {id:"typ_wind_atk_def",  name:"Galeforce Band",    emoji:"💨", rarity:"epic", element:"Wind",    stats:{atk:8,crit:14},        effect:"Using a Special ability increases this creature's Speed by 3% for the rest of the battle (max 30%)", speedEffect:true, battle:{specialSpdPct:3, specialSpdMaxPct:30}},
+  {id:"typ_wind_hp_atk",   name:"Slipstream Blade",  emoji:"🌬️", rarity:"epic", element:"Wind",    stats:{hp:8,atk:9},           effect:"Deal 20% increased damage to Slowed or Stunned enemies", battle:{vsSlowStunDmgPct:20}},
+  {id:"typ_wind_hp_def",   name:"Featherweight Wrap",emoji:"🪶", rarity:"epic", element:"Wind",    stats:{atk:9,def:8},          effect:"Dodge every 6th instance of damage", battle:{dodgeEvery:6}},
+  {id:"typ_wind_def_atk",  name:"Cyclone Guard",     emoji:"🌀", rarity:"epic", element:"Wind",    stats:{def:8,atk:8},          effect:"Whenever this creature is damaged by an enemy ability, temporarily gain 10% Haste", hasteEffect:true, battle:{struckHastePct:10}},
+  {id:"typ_wind_hp_atk2",  name:"Jetstream Sigil",   emoji:"⚡", rarity:"epic", element:"Wind",    stats:{hp:8,atk:8},           effect:"Using a Special ability increases this creature's Attack by 3% for the rest of the battle (max 30%)", battle:{specialAtkPct:3, specialAtkMaxPct:30}},
   // Epic effect items, second wave. Same costing as the type-exclusive Epics
   // above (two-stat 8/9 vs plain 11/11; single-stat 19 vs the Crests' 25).
   // Each effect is the middle rung of its family: stronger than the Rare
   // version, clearly weaker than the Legendary one.
   // Epic type-exclusives (1 per element)
-  {id:"epi_typ_fire_atk",    name:"Flarebrand Ring",  emoji:"🔥", rarity:"epic", element:"Fire",    stats:{atk:19},       effect:"Fire moves deal 12% more damage"},
-  {id:"epi_typ_water_hp",    name:"Springwell Charm", emoji:"⛲", rarity:"epic", element:"Water",   stats:{hp:19},        effect:"Recover 5% of damage dealt by Water moves as HP"},
-  {id:"epi_typ_nat_hp_def",  name:"Verdant Weave",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:9,def:8},   effect:"Regenerate 2% HP each turn"},
-  {id:"epi_typ_ear_def",     name:"Basalt Ward",      emoji:"⛰️", rarity:"epic", element:"Earth",   stats:{def:19},       effect:"Reduce all damage taken by 4%"},
-  {id:"epi_typ_wind_atk_def",name:"Tailwind Talon",   emoji:"🌬️", rarity:"epic", element:"Wind",    stats:{atk:9,def:8},  effect:"Abilities recharge 15% faster", hasteEffect:true},
-  {id:"epi_typ_elec_atk",    name:"Voltaic Fang",     emoji:"⚡", rarity:"epic", element:"Electric",stats:{atk:19},       effect:"Attacks have 20% chance to Shock for 1 turn"},
-  {id:"epi_typ_light_hp",    name:"Dawnlight Halo",   emoji:"😇", rarity:"epic", element:"Light",   stats:{hp:19},        effect:"Healing received is 20% stronger"},
-  {id:"epi_typ_dark_hp_atk", name:"Gloomreaper Chain",emoji:"⛓️", rarity:"epic", element:"Dark",    stats:{hp:8,atk:9},   effect:"Deal 15% more damage to enemies below 40% HP"},
+  // Formerly a Rare (id kept for saves); Epic single-stat budget.
+  {id:"rar_typ_nat_hp",      name:"Sprout Locket",    emoji:"🌱", rarity:"epic", element:"Nature",  stats:{hp:19},        effect:"Inflict Seeded on the first enemy damaged by this creature. Only 1 creature can be Seeded by this equipment at any time", battle:{seedDrainPct:0.5, seedHealPct:0.5}},
+  // Hazard potency: +25% to the hazards this creature lays -- a Fire
+  // Hazard's damage, a Water Hazard's damage and its Haste Down.
+  {id:"epi_typ_fire_atk",    name:"Flarebrand Ring",  emoji:"🔥", rarity:"epic", element:"Fire",    stats:{atk:19},       effect:"Fire Hazards are more potent", battle:{fireHazardPct:25}},
+  {id:"epi_typ_water_hp",    name:"Springwell Ring",  emoji:"⛲", rarity:"epic", element:"Water",   stats:{atk:19},       effect:"Water Hazards are more potent", battle:{waterHazardPct:25}},
+  {id:"epi_typ_nat_hp_def",  name:"Verdant Weave",    emoji:"🌿", rarity:"epic", element:"Nature",  stats:{hp:9,def:8},   effect:"Seeded effects are 50% stronger", battle:{seedPotencyPct:50}},
+  {id:"epi_typ_ear_def",     name:"Basalt Ward",      emoji:"⛰️", rarity:"epic", element:"Earth",   stats:{def:19},       effect:"Reduce all damage taken by 5%", battle:{allDmgReductionPct:5}},
+  {id:"epi_typ_wind_atk_def",name:"Tailwind Talon",   emoji:"🌬️", rarity:"epic", element:"Wind",    stats:{atk:9,def:8},  effect:"Gain 1% Attack for each 0.1 Speed on this creature", battle:{atkPerTenthSpdPct:1}},
+  // "Briefly" = 2 ticks (1 second).
+  {id:"epi_typ_elec_atk",    name:"Voltaic Fang",     emoji:"⚡", rarity:"epic", element:"Electric",stats:{atk:19},       effect:"Every 10th attack briefly Stuns", battle:{stunEvery:10, stunEveryTicks:2}},
+  // A +10% Attack Up and a +10 Critical Damage Up, standard duration.
+  {id:"epi_typ_light_hp",    name:"Dawnlight Halo",   emoji:"😇", rarity:"epic", element:"Light",   stats:{hp:19},        effect:"Gain Attack Up and Critical Damage Up whenever this creature is healed", battle:{healedBuffPct:10}},
+  {id:"epi_typ_dark_hp_atk", name:"Gloomreaper Chain",emoji:"⛓️", rarity:"epic", element:"Dark",    stats:{critDmg:14,atk:9}, effect:"Execute enemies below 15% Health", battle:{executeBelowPct:15}},
   // Epic role-exclusives (1 per role)
-  {id:"epi_role_atk_slayer", name:"Slayer's Band",    emoji:"⚔️", rarity:"epic", role:"Attacker", stats:{atk:9,hp:8},   effect:"[Attacker] After defeating an enemy, gain +10% ATK until end of battle"},
-  {id:"epi_role_tank_bastion",name:"Bastion Plate",   emoji:"🛡️", rarity:"epic", role:"Tank",     stats:{hp:9,def:8},   effect:"[Tank] At the start of each battle, gain a barrier equal to 12% of max HP"},
-  {id:"epi_role_sup_cantor", name:"Cantor's Beads",   emoji:"📿", rarity:"epic", role:"Support",  stats:{hp:19},        effect:"[Support] All healing and buffs applied by this creature are 15% stronger"},
-  // Epic range-exclusives (1 per attack type)
-  {id:"epi_rng_melee_vanguard",name:"Vanguard Gauntlet",emoji:"🥊", rarity:"epic", attackType:"Melee",  stats:{atk:8,def:9}, effect:"[Melee] Deal 12% bonus damage while adjacent to 2 or more enemies"},
-  {id:"epi_rng_ranged_lens",   name:"Longshot Lens",    emoji:"🔍", rarity:"epic", attackType:"Ranged", stats:{atk:19},      effect:"[Ranged] Deal 12% bonus damage to enemies 3 or more tiles away"},
+  {id:"epi_role_atk_slayer", name:"Slayer's Band",    emoji:"⚔️", rarity:"epic", role:"Attacker", stats:{atk:9,hp:8},   effect:"Attacks against enemies below 40% Health always critically hit", battle:{alwaysCritBelowPct:40}},
+  // Granted on the wearer's first turn of each battle.
+  {id:"epi_role_tank_bastion",name:"Bastion Plate",   emoji:"🛡️", rarity:"epic", role:"Tank",     stats:{hp:9,def:8},   effect:"Adjacent allies gain 2 stacks of Protect", battle:{startProtectAdjacent:2}},
+  {id:"epi_role_sup_cantor", name:"Cantor's Beads",   emoji:"📿", rarity:"epic", role:"Support",  stats:{hp:19},        effect:"This creature's Healing and Buffs affect 1 additional ally", battle:{extraAllyTargets:1}},
+  // Epic range-exclusives (Melee twins: one for damage, one for Defense)
+  {id:"epi_rng_melee_vanguard",name:"Vanguard Gauntlet",emoji:"🥊", rarity:"epic", attackType:"Melee",  stats:{atk:8,def:9}, effect:"Deal 30% more damage when there is no allied creature Nearby", battle:{loneDmgPct:30}},
+  {id:"epi_rng_melee_vanguard_def",name:"Vanguard Pauldron",emoji:"🦾", rarity:"epic", attackType:"Melee", stats:{hp:8,def:9}, effect:"Gain 30% Defense when there is no allied creature Nearby", battle:{loneDefPct:30}},
+  {id:"epi_rng_ranged_lens",   name:"Longshot Lens",    emoji:"🔍", rarity:"epic", attackType:"Ranged", stats:{atk:19},      effect:"Deal 20% more damage when targeting Farthest enemies", battle:{farthestDmgPct:20}},
   // Epic general effect items (equippable by anyone)
-  {id:"epi_gen_hp_atk_vamp", name:"Vampiric Band",    emoji:"🧛", rarity:"epic", stats:{hp:8,atk:9},   effect:"Recover 4% of all damage dealt as HP"},
-  {id:"epi_gen_atk_def_retort",name:"Retort Mail",    emoji:"⚙️", rarity:"epic", stats:{atk:8,def:9},  effect:"Counter-attack for 8% ATK when struck"},
-  {id:"epi_gen_hp_def_aegis",name:"Aegis Charm",      emoji:"🔰", rarity:"epic", stats:{hp:9,def:8},   effect:"Start each battle with a shield equal to 10% of max HP"},
-  {id:"epi_gen_atk_oath",    name:"Duelist's Oath",   emoji:"🤺", rarity:"epic", stats:{atk:19},       effect:"Your first attack each battle deals 40% bonus damage"},
-  {id:"epi_gen_hp_idol",     name:"Guardian Idol",    emoji:"🪬", rarity:"epic", stats:{hp:19},        effect:"Take 10% less damage while below 30% HP"},
-  {id:"epi_gen_def_bulwark", name:"Bulwark Sigil",    emoji:"🏛️", rarity:"epic", stats:{def:19},       effect:"Every 4th hit taken deals half damage"},
-  {id:"epi_gen_def_nettle",  name:"Nettle Guard",     emoji:"🌾", rarity:"epic", stats:{def:19},       effect:"Enemies that strike you lose 3% ATK for the rest of the battle, up to -15%"},
-  {id:"epi_gen_def_sentinel",name:"Sentinel Idol",    emoji:"🗿", rarity:"epic", stats:{def:19},       effect:"Gain +12% DEF for the first 3 turns of each battle"},
+  {id:"epi_gen_hp_atk_vamp", name:"Vampiric Band",    emoji:"🧛", rarity:"epic", stats:{hp:8,atk:9},   effect:"Lifesteal effects Overheal (max 20%)", battle:{lifestealOverhealPct:20}},
+  {id:"epi_gen_atk_oath",    name:"Duelist's Oath",   emoji:"🤺", rarity:"epic", stats:{atk:8,crit:14}, effect:"Gain 20% Attack and Defense against the first targeted creature", battle:{duelPct:20}},
+  {id:"epi_gen_hp_idol",     name:"Guardian Idol",    emoji:"🪬", rarity:"epic", stats:{hp:19},        effect:"Receive 30% less damage when receiving damage from Protect", battle:{protectDmgReductionPct:30}},
+  {id:"epi_gen_def_bulwark", name:"Bulwark Sigil",    emoji:"🏛️", rarity:"epic", stats:{def:19},       effect:"Every 5th hit taken deals 50% less damage", battle:{reduceEveryNthHit:5, reduceEveryNthHitPct:50}},
+  {id:"epi_gen_def_sentinel",name:"Sentinel Idol",    emoji:"🗿", rarity:"epic", stats:{def:19},       effect:"Receive 50% less damage from the first 3 instances of damage", battle:{firstHitsReduced:3, firstHitsReducedPct:50}},
   // Epic battle-effect gear (see BATTLE EFFECTS at the top of this file).
   // Costed like the Epic effect items above: 8/9 two-stat, a crit stat at 14.
   // Pearl Lacquer's `shieldPct` also feeds kits that scale off their own

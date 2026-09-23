@@ -27,7 +27,7 @@
 import { aChebDist, forkCells, bossOccupies } from "../geometry.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { damageUnit } from "../hp.js";
+import { damageUnit, canBeExecuted } from "../hp.js";
 import { applyWhileActiveStatMod, applyTimedDebuff, isIntangible } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -81,7 +81,8 @@ export function makeSicklewingModule(cfg) {
      * one-shot save), exactly as the card says.
      */
     onHit(unit, target) {
-      if (!target || target.uid == null || target.hp <= 0) return 0;
+      // Never a boss, Labyrinth Boss creatures included (see canBeExecuted).
+      if (!canBeExecuted(target)) return 0;
       if (abilityIdx(unit, "basic") < MAX_IDX) return 0;
       if (target.hp * 100 >= (target.maxHp || target.hp) * EXECUTE_BELOW_PCT) return 0;
       const dealt = damageUnit(target, target.hp, { pierceShield: true });

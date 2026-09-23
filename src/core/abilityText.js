@@ -234,6 +234,7 @@ export const ABILITY_TAG_DEFS = {
   // a store of bonus damage the target is carrying, not a lasting weakness.
   // Deliberately distinct from Defense Down (a stat drop for a duration).
   expose: { label: "Expose", description: "The next damage this creature takes is increased by 20% and removes 1 stack." },
+  seeded: { label: "Seeded", description: "Drains a share of this creature's Max Health every tick and heals whoever Seeded it. Ends if either is defeated." },
   // Two diagonal rays from the creature, opening toward the enemy side -- the
   // V-shaped sibling of Line (one ray) and Cone (the filled wedge). Rows are
   // the battle axis, so "ahead" means along rows, as it does for Cone.
@@ -241,7 +242,11 @@ export const ABILITY_TAG_DEFS = {
   // The threshold is the ability's to state (Sickle Cut's is 20%). A kill,
   // not damage: it needs no Shield to chew through, and Immortal's floor
   // beats it the way it beats everything else.
-  execute: { label: "Execute", description: "Instantly defeats an enemy below the ability's Health threshold. Goes through Shields; nullified by effects such as Immortal." },
+  execute: { label: "Execute", description: "Instantly defeats an enemy below the ability's Health threshold. Goes through Shields; nullified by effects such as Immortal. Doesn't affect bosses." },
+  // THE classification of an ability that forcibly moves an enemy (a push,
+  // pull, or knockback) -- the general term, as Immobilized is for effects
+  // that stop movement. Gear keyed on Displace (Brineplate) reads this tag.
+  displace: { label: "Displace", description: "Forcefully moves the enemy it hits." },
   // The first ability to take damageUnit's pierceShield path -- the policy
   // note in battle/hp.js asks that the text say so, and Unfettered's does.
   bypassshield: { label: "Bypass Shield", description: "This creature's attacks ignore Shields." },

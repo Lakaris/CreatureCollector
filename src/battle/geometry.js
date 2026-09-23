@@ -9,11 +9,12 @@ import { BOSS_SIZE, MELEE_RANGE, RANGED_RANGE } from "./constants.js";
 /**
  * How far a unit can reach with a basic attack, in tiles. Ranged creatures
  * start at RANGED_RANGE and melee at MELEE_RANGE; `rangeBonus` extends either
- * (Siegefin's Deepsight). Every range check in the engine goes through here so
- * a bonus applies to targeting and attacking alike, never one without the other.
+ * (Siegefin's Deepsight), and so does range gear (Keen Scope). Every range
+ * check in the engine goes through here so a bonus applies to targeting and
+ * attacking alike, never one without the other.
  */
 export function attackRangeOf(u) {
-  return (u.isRanged ? RANGED_RANGE : MELEE_RANGE) + (u.rangeBonus || 0);
+  return (u.isRanged ? RANGED_RANGE : MELEE_RANGE) + (u.rangeBonus || 0) + (u.gear?.rangeBonus || 0);
 }
 
 /**

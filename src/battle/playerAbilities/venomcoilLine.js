@@ -79,7 +79,7 @@ export function makeVenomcoilModule(cfg) {
       const pct = lifestealPctByLevel[abilityIdx(unit, "basic")];
       const raw = (dealt * pct) / 100;
       const heal = Math.max(1, Math.round(raw * healReceivedMultiplier(unit)));
-      healUnit(unit, heal);
+      healUnit(unit, heal, { lifesteal: true });
       return 0;
     },
 

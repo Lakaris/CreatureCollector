@@ -31,6 +31,8 @@ export const DEBUFF_DEFS = [
   { key: "immortalTicks", icon: "🌕", label: "Immortal" },
   { key: "dartShredTicks", icon: "🪶", label: "Defense Shredded" },
   { key: "critShredTicks", icon: "💎", label: "Armor Shattered" },
+  { key: "exposeStacks", icon: "🎯", label: "Exposed" },
+  { key: "seeded", icon: "🌰", label: "Seeded" },
   { key: "hotTicks", icon: "💗", label: "Heal Over Time" },
 ];
 
@@ -48,6 +50,7 @@ const STAT_MOD_ROWS = [
   { kind: "heal", negative: true, icon: "💔", label: "Healing Down" },
   { kind: "haste", negative: false, icon: "⚡", label: "Haste Up" },
   { kind: "haste", negative: true, icon: "⏳", label: "Haste Down" },
+  { kind: "critDmg", negative: false, icon: "💥", label: "Critical Damage Up" },
 ];
 
 /** Build the status list UnitInfoPanel expects from a unit's raw tick fields. */

@@ -23,7 +23,8 @@
 // timer, or in damage.js beside the damage formulas) so that status.js and
 // damage.js can both use it without an import cycle.
 
-import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster } from "./applier.js";
+import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread } from "./applier.js";
+import { CREATURE_MAP } from "../data/creatures.js";
 import { abilityHasTag } from "./abilityTags.js";
 import { gainSpecialCharge } from "./charge.js";
 import { isImmobilized } from "./immobilize.js";
@@ -51,6 +52,8 @@ export function announceHit(target, info) {
   const attacker = currentApplier();
   if (!attacker || attacker === target) return;
   info.ability = activeAbilityOf(attacker);
+  // Who last damaged this creature (Duelist's Edge reads it).
+  target._lastAttacker = attacker;
   for (const fn of hitListeners) fn(attacker, target, info);
 }
 
@@ -88,7 +91,131 @@ export function attackerDamageMultiplier(target, { effectDamage = false } = {}) 
   if (gear.immobilizedDmgPct && isImmobilized(target)) mult *= 1 + gear.immobilizedDmgPct / 100;
   if (gear.multiHitDmgPct && abilityHasTag(attacker, ability, "multihit")) mult *= 1 + gear.multiHitDmgPct / 100;
   if (gear.basicDmgPct && ability === "basic") mult *= 1 + gear.basicDmgPct / 100;
+  // Duelist's Edge: the enemy that last damaged the attacker (see announceHit).
+  if (gear.vsLastAttackerDmgPct && attacker._lastAttacker === target) mult *= 1 + gear.vsLastAttackerDmgPct / 100;
+  // Hunter's Mark: a target below a share of its Health.
+  if (gear.lowHpTargetDmgPct && target.hp < (target.maxHp * (gear.lowHpTargetBelowPct || 0)) / 100) mult *= 1 + gear.lowHpTargetDmgPct / 100;
+  if (ability === "basic") {
+    // Focus Band: every Nth Basic attack. The attack in progress is the one
+    // after those already finished -- except for a finished attack's own
+    // riders (settleBasicAttack), which already counted it.
+    if (gear.focusEvery) {
+      const n = (attacker._basicAttacks || 0) + (attacker._attackRiders ? 0 : 1);
+      if (n % gear.focusEvery === 0) mult *= 1 + (gear.focusDmgPct || 0) / 100;
+    }
+    // Charger's Greaves: the first Basic attack after moving (the flag is set
+    // by onUnitMoved and spent when that attack ends).
+    if (gear.afterMoveAttackDmgPct && attacker._movedSinceAttack) mult *= 1 + gear.afterMoveAttackDmgPct / 100;
+  }
+  // Scorchmantle: per stack of Burn on the target.
+  if (gear.perBurnStackDmgPct && (target.burnTicks || 0) > 0) mult *= 1 + (gear.perBurnStackDmgPct * (target.burnStacks || 0)) / 100;
+  // Slipstream Blade: a Slowed or Stunned target.
+  if (gear.vsSlowStunDmgPct && ((target.slowTicks || 0) > 0 || (target.stunTicks || 0) > 0)) mult *= 1 + gear.vsSlowStunDmgPct / 100;
+  // Longshot Lens: abilities tagged Farthest (the targeting tag is the classification).
+  if (gear.farthestDmgPct && abilityHasTag(attacker, ability, "farthest")) mult *= 1 + gear.farthestDmgPct / 100;
+  // Vanguard Gauntlet: no ally Nearby.
+  if (gear.loneDmgPct && !hasAllyNearby(attacker)) mult *= 1 + gear.loneDmgPct / 100;
+  // Grit Band: a share of a percent per percent of the attacker's missing Health.
+  if (gear.missingHpDmgRatio && attacker.maxHp > 0) {
+    const missingPct = Math.max(0, 100 - (attacker.hp / attacker.maxHp) * 100);
+    mult *= 1 + (missingPct * gear.missingHpDmgRatio) / 100;
+  }
   return mult;
+}
+
+/** A creature's type ("Fire", ...) -- a boss's is its element key. */
+function creatureTypeOf(u) {
+  if (u.uid == null) return u._bossKey ? u._bossKey[0].toUpperCase() + u._bossKey.slice(1) : null;
+  return CREATURE_MAP[u.creatureId]?.type || null;
+}
+
+/** "Nearby" (the 8 surrounding tiles) holds a living ally of `u`. */
+export function hasAllyNearby(u) {
+  for (const a of battleRoster()) {
+    if (a === u || a.hp <= 0 || !sameSide(a, u)) continue;
+    if (Math.max(Math.abs(a.row - u.row), Math.abs(a.col - u.col)) <= 1) return true;
+  }
+  return false;
+}
+
+/**
+ * POLICY: an Execute -- an instant defeat below a Health threshold -- never
+ * lands on a boss: not the Dungeon/Daily boss, and not a Labyrinth Boss
+ * creature (a 2x2 body). Every Execute checks this (Sickle Cut, Gloomreaper
+ * Chain), and the Execute tag's text says so.
+ */
+export function canBeExecuted(u) {
+  return !!u && u.uid != null && !((u.size || 1) > 1) && u.hp > 0;
+}
+
+/**
+ * POLICY: the TARGET's damage-reduction gear, in one place (damageUnit):
+ *   - Traveler's Cloak: less while at full Health.
+ *   - Sentry Emblem: less from a Ranged attacker's abilities.
+ *   - Chorus Bell: less while an ally wearing it stands beside (the Beside
+ *     tag: the 8 surrounding tiles). Several Bells nearby don't add up --
+ *     the strongest applies.
+ */
+export function defenderDamageMultiplier(target, { effectDamage = false, redirected = false } = {}) {
+  let mult = 1;
+  const gear = target.gear;
+  const attacker = currentApplier();
+  if (gear) {
+    const cut = (pct) => { mult *= 1 - pct / 100; };
+    if (gear.fullHpDmgReductionPct && target.hp >= target.maxHp) cut(gear.fullHpDmgReductionPct);
+    if (gear.rangedDmgReductionPct && !effectDamage && attacker?.isRanged) cut(gear.rangedDmgReductionPct);
+    // Element wards: damage from a creature (or boss) of that type.
+    const type = attacker && attacker !== target ? creatureTypeOf(attacker) : null;
+    if (type && gear["resist" + type + "Pct"]) cut(gear["resist" + type + "Pct"]);
+    // Basalt Ward: everything.
+    if (gear.allDmgReductionPct) cut(gear.allDmgReductionPct);
+    // Guardian Idol: a hit this creature took for an ally via Protect.
+    if (gear.protectDmgReductionPct && redirected) cut(gear.protectDmgReductionPct);
+    // Bulwark Sigil: every Nth ability hit taken.
+    if (gear.reduceEveryNthHit && !effectDamage) {
+      target._hitsForBulwark = (target._hitsForBulwark || 0) + 1;
+      if (target._hitsForBulwark % gear.reduceEveryNthHit === 0) cut(gear.reduceEveryNthHitPct || 0);
+    }
+    // Sentinel Idol: the first N instances of damage of the battle.
+    if (gear.firstHitsReduced && (target._instancesTaken || 0) < gear.firstHitsReduced) {
+      target._instancesTaken = (target._instancesTaken || 0) + 1;
+      cut(gear.firstHitsReducedPct || 0);
+    }
+  }
+  if (target.uid != null) {
+    let bell = 0;
+    for (const a of battleRoster()) {
+      const pct = a.gear?.besideAllyDmgReductionPct || 0;
+      if (!pct || a === target || a.hp <= 0 || a.uid?.[0] !== target.uid[0]) continue;
+      if (Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col)) <= 1) bell = Math.max(bell, pct);
+    }
+    if (bell) mult *= 1 - bell / 100;
+  }
+  return mult;
+}
+
+/**
+ * Expose (a debuff; applied by applyExpose in status.js): the next ability
+ * hit its carrier takes deals 20% more and spends one stack. Effect damage
+ * (DoTs, reflects, hazards) neither benefits nor spends a stack -- otherwise a
+ * Burn tick would eat every stack before a real hit ever landed. Returns the
+ * multiplier for this hit and spends the stack. Shared by damageUnit and
+ * damageBoss.
+ */
+export const EXPOSE_DMG_PCT = 20;
+export function spendExpose(target, effectDamage) {
+  if (effectDamage || !((target.exposeTicks || 0) > 0) || !((target.exposeStacks || 0) > 0)) return 1;
+  if (!--target.exposeStacks) target.exposeTicks = 0;
+  return 1 + EXPOSE_DMG_PCT / 100;
+}
+
+/** End a Seeded debuff (see applySeeded in status.js) and free its seeder to
+ * Seed again. Lives here because a defeat -- onDefeated below -- must end it. */
+export function clearSeeded(u) {
+  if (!u) return;
+  if (u.seededBy && u.seededBy._seedTarget === u) u.seededBy._seedTarget = null;
+  u.seeded = 0;
+  u.seededBy = null;
 }
 
 /**
@@ -101,6 +228,10 @@ export function attackerDamageMultiplier(target, { effectDamage = false } = {}) 
  *     either side, gains Attack (read by gearAtkMultiplier in damage.js).
  */
 export function onDefeated(target) {
+  // Seeded ends the moment either side of it falls -- the fallen creature
+  // takes no more turns, so it can't wait for its own next tick to clear.
+  if (target.seeded) clearSeeded(target);
+  if (target._seedTarget && target._seedTarget.seededBy === target) clearSeeded(target._seedTarget);
   const killer = currentApplier();
   if (killer && killer !== target && killer.hp > 0) {
     const pct = killer.gear?.killChargePct || 0;
@@ -169,6 +300,8 @@ export function applyProtect(target, guard, stacks = 1) {
   // the same way a new Taunt replaces the old.
   const carried = target.protect && target.protect.src === guard ? target.protect.stacks : 0;
   target.protect = { src: guard, stacks: Math.min(PROTECT_STACK_CAP, carried + buffStacks(target, stacks)) };
+  const extra = extraAllyFor(target);
+  if (extra && extra !== guard) asSpread(() => applyProtect(extra, guard, stacks));
 }
 
 /** Stacks currently carried, 0 when nothing is guarding this unit. */
@@ -206,6 +339,8 @@ export function clearProtect(u) {
 export function applyShield(u, amount, ticks) {
   // Shield gear on whoever grants it (see battle/applier.js), applied before
   // the keep-the-larger comparison so a strengthened Shield competes at size.
+  const extra = extraAllyFor(u);
+  if (extra) asSpread(() => applyShield(extra, amount, ticks));
   const shield = Math.max(1, Math.round(shieldAmount(amount)));
   const layer = stackLayer(u);
   if (shield < (u.shield || 0) - layer) return false;
@@ -288,9 +423,9 @@ function overhealLayer(u) {
  * as the receiver (healUnit wraps it), so the receiver's Pearl Lacquer
  * enlarges both the layer and its cap, and its duration gear the timer.
  */
-function addOverhealLayer(u, excess) {
+function addOverhealLayer(u, excess, capPct) {
   const boost = shieldAmount(1);
-  const cap = (u.maxHp || 0) * (u.gear?.overhealLayerPct || 0) / 100 * boost;
+  const cap = (u.maxHp || 0) * capPct / 100 * boost;
   const room = Math.floor(cap - overhealLayer(u));
   if (room <= 0) return 0;
   const add = addStackingShield(u, Math.min(Math.round(excess * boost), room), buffTicks(u, OVERHEAL_SHIELD_TICKS));
@@ -331,11 +466,34 @@ export function healDoneMultiplier() {
   return 1 + (currentApplier()?.gear?.healDonePct || 0) / 100;
 }
 
-export function healUnit(u, amount) {
+/**
+ * HEAL LISTENERS: every heal that lands is announced as (healer, target,
+ * healed), the healer being the current applier (null for a Heal Over Time
+ * tick or regen). Registered by status.js for Radiant Shroud and Dawnlight
+ * Halo, the same way hit listeners are.
+ */
+const healListeners = [];
+export function onHealed(fn) {
+  healListeners.push(fn);
+}
+
+/**
+ * `lifesteal`: this heal is a lifesteal effect -- healing from damage dealt
+ * (Bloodthirster-style gear, Venom Fang, Iglet's lifesteal). Vampiric Band
+ * lets those Overheal into the stacking layer.
+ */
+export function healUnit(u, amount, { lifesteal = false } = {}) {
   if (!u || !(amount > 0) || u.hp <= 0) return 0;
-  // The healer's gear: Lifebinder Pendant's healing done, and an echoed
-  // Special's (Echo Conch) reduced effectiveness.
-  amount = Math.max(1, Math.round(amount * healDoneMultiplier() * effectiveness()));
+  // Cantor's Beads: a heal on an ally also heals one more (the raw amount,
+  // so that ally's own healing-received gear applies to it).
+  const extra = extraAllyFor(u);
+  if (extra) asSpread(() => healUnit(extra, amount, { lifesteal }));
+  const healer = currentApplier();
+  // The healer's gear -- Lifebinder Pendant's healing done, an echoed
+  // Special's (Echo Conch) reduced effectiveness -- and the receiver's:
+  // Sunbeam Locket's healing received.
+  const received = 1 + (u.gear?.healReceivedPct || 0) / 100;
+  amount = Math.max(1, Math.round(amount * healDoneMultiplier() * effectiveness() * received));
   const before = u.hp;
   u.hp = Math.min(u.maxHp, u.hp + amount);
   const healed = u.hp - before;
@@ -343,9 +501,11 @@ export function healUnit(u, amount) {
   // Overheal is the RECEIVER's own passive, so its Shield is the receiver's
   // to strengthen -- not whichever healer happened to overflow it.
   let left = excess;
-  if (left > 0 && (u.gear?.overhealLayerPct || 0) > 0) {
-    left -= asPassive(u, () => addOverhealLayer(u, left));
+  const layerCap = Math.max(u.gear?.overhealLayerPct || 0, lifesteal ? u.gear?.lifestealOverhealPct || 0 : 0);
+  if (left > 0 && layerCap > 0) {
+    left -= asPassive(u, () => addOverhealLayer(u, left, layerCap));
   }
+  for (const fn of healListeners) fn(healer, u, healed);
   if (left > 0 && (u.overhealPct || 0) > 0) {
     const cap = ((u.def || 0) * u.overhealPct) / 100;
     if (cap > 0) asPassive(u, () => applyShield(u, Math.min(left, cap), OVERHEAL_SHIELD_TICKS));
@@ -357,10 +517,14 @@ export function healUnit(u, amount) {
  * Burn `dmg` through a unit's Shield pool first -- temporary bonus Health
  * from e.g. Pebbit's Boulder Hunker or Morusk's Blubber Wall. Returns
  * whatever damage is left over for Health.
+ *
+ * `vsShield` (Stormshell Mantle): the hit counts for that much more against
+ * the Shield only -- whatever gets through to Health is back at normal size.
  */
-export function absorbShield(u, dmg) {
+export function absorbShield(u, dmg, vsShield = 1) {
   if ((u.shield || 0) <= 0 || dmg <= 0) return dmg;
-  const absorbed = Math.min(u.shield, dmg);
+  const absorbed = Math.min(u.shield, dmg * vsShield);
+  const leftover = Math.max(0, dmg - absorbed / vsShield);
   // The stacking layer is the outermost part of the Shield, and the overheal
   // share the outermost part of that: both are spent first.
   const layer = stackLayer(u);
@@ -370,7 +534,13 @@ export function absorbShield(u, dmg) {
     u.overhealLayer = Math.min(Math.max(0, (u.overhealLayer || 0) - absorbed), u.stackShield);
     if (!u.stackShield) u.stackShieldTicks = 0;
   }
-  return dmg - absorbed;
+  return Math.round(leftover);
+}
+
+/** Stormshell Mantle: the current attacker's bonus against Shields. */
+export function shieldBreakMultiplier(effectDamage) {
+  if (effectDamage) return 1;
+  return 1 + (currentApplier()?.gear?.shieldDmgPct || 0) / 100;
 }
 
 /**
@@ -410,14 +580,24 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   }
   // Dodge: every Nth ability hit misses outright. Checked before Fortify so a
   // dodged swing does not also burn a Fortify stack.
-  if (!effectDamage && (target.dodgeEvery || 0) > 0) {
+  // A creature's own Dodge (Cragling) or Dodge gear (Featherweight Wrap):
+  // the more frequent of the two, on one shared tally.
+  const dodgeEvery = Math.min(target.dodgeEvery || Infinity, target.gear?.dodgeEvery || Infinity);
+  if (!effectDamage && dodgeEvery < Infinity) {
     target.dodgeCounter = (target.dodgeCounter || 0) + 1;
-    if (target.dodgeCounter >= target.dodgeEvery) {
+    if (target.dodgeCounter >= dodgeEvery) {
       target.dodgeCounter = 0;
       target._dodgedHit = true;
       return 0;
     }
   }
+  // Expose: checked here, after Protect and Dodge, so only a hit this creature
+  // actually takes spends a stack (a redirected hit spends the guardian's).
+  const exposed = spendExpose(target, effectDamage);
+  if (exposed !== 1) dmg = Math.max(1, Math.round(dmg * exposed));
+  // The target's own damage-reduction gear (see defenderDamageMultiplier).
+  const guarded = defenderDamageMultiplier(target, { effectDamage, redirected });
+  if (guarded !== 1) dmg = Math.max(1, Math.round(dmg * guarded));
   // Fortify: ability damage only. Halve it, then spend the stack that did it.
   if (!effectDamage && (target.fortifyStacks || 0) > 0) {
     dmg = Math.max(1, Math.round((dmg * (100 - FORTIFY_REDUCTION_PCT)) / 100));
@@ -428,7 +608,7 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   if ((target.windbreakTicks || 0) > 0 && (target.windbreakPct || 0) > 0) {
     dmg = Math.max(1, Math.round((dmg * (100 - target.windbreakPct)) / 100));
   }
-  let toHealth = pierceShield ? dmg : absorbShield(target, dmg);
+  let toHealth = pierceShield ? dmg : absorbShield(target, dmg, shieldBreakMultiplier(effectDamage));
   // Immortal (Silver Draught): Health can not be reduced below 1 -- the
   // clamp beats everything, shield-piercing damage included.
   const floor = (target.immortalTicks || 0) > 0 ? 1 : 0;

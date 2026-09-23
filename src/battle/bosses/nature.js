@@ -7,6 +7,7 @@
 import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyPoison, applyRoot } from "../status.js";
+import { resistsDisplacement } from "../immobilize.js";
 
 export default {
   key: "nature",
@@ -23,7 +24,7 @@ export default {
       // Shove one row down the grid, if that tile is free.
       const newRow = Math.min(gridRows - 1, u.row + 1);
       const key = newRow + "," + u.col;
-      if (!allOcc.has(key) || newRow === u.row) {
+      if (!resistsDisplacement(u) && (!allOcc.has(key) || newRow === u.row)) {
         allOcc.delete(u.row + "," + u.col);
         u.prevRow = u.row;
         u.prevCol = u.col;

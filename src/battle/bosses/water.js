@@ -4,6 +4,7 @@
 import { RANGED_RANGE } from "../constants.js";
 import { randomOf } from "../../core/random.js";
 import { damageUnit } from "../hp.js";
+import { resistsDisplacement } from "../immobilize.js";
 
 export default {
   key: "water",
@@ -16,7 +17,7 @@ export default {
     const sorted = ctx.targetsWithin(RANGED_RANGE).sort((a, z) => z.row - a.row);
     for (const u of sorted) {
       let pushed = false;
-      while (true) {
+      while (!resistsDisplacement(u)) {
         const nr = u.row + 1;
         if (nr >= gridRows) break;
         const key = nr + "," + u.col;

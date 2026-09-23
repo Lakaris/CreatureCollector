@@ -3,11 +3,11 @@
 // DoT magnitudes scale off the boss's attack, so a level-10 boss's burn hurts
 // more than a level-1 boss's. When the boss is dead they fall back to a flat 2.
 
-import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit, clearShield, applyShield, onHitLanded, tickShieldTimers, healDoneMultiplier } from "./hp.js";
+import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit, clearShield, applyShield, onHitLanded, tickShieldTimers, healDoneMultiplier, clearSeeded, onHealed, canBeExecuted } from "./hp.js";
 import { aChebDist } from "./geometry.js";
 // constants.js imports nothing, so this cannot cycle.
 import { STATUS_TICKS } from "./constants.js";
-import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive } from "./applier.js";
+import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, sameSide, extraAllyFor, asSpread } from "./applier.js";
 
 /** Damage per tick for Burn, as a fraction of boss attack. Damage Over Time
  * and Poison scale off the victim instead -- see DOT_HEALTH_PCT below. */
@@ -76,6 +76,7 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
 export const BURN_STACK_CAP = 10;
 export function applyBurn(target, sourceAtk) {
   if (resistsDebuff(target)) return;
+  debuffLanded(target, !((target.burnTicks || 0) > 0));
   target.burnTicks = debuffTicks(target, STATUS_TICKS);
   target.burnStacks = Math.min((target.burnStacks || 0) + debuffStacks(target, 1), BURN_STACK_CAP);
   target.burnSourceAtk = sourceAtk;
@@ -92,8 +93,246 @@ export function applyBurn(target, sourceAtk) {
  */
 export function applyTimedDebuff(u, field, ticks, { stretch = false } = {}) {
   if (!u || resistsDebuff(u)) return false;
+  debuffLanded(u, !((u[field] || 0) > 0));
   u[field] = stretch ? debuffTicks(u, ticks) : ticks;
   return true;
+}
+
+/**
+ * POLICY: every debuff helper reports what it landed here, `isNew` when the
+ * target didn't already carry it -- a fresh debuff, or a new stack -- rather
+ * than a refresh. The one place gear that reacts to debuffing reads from:
+ * Umbral Thread heals the creature that inflicted a new debuff on an enemy.
+ */
+function debuffLanded(target, isNew) {
+  // "New" = the target didn't already carry this debuff at all: a refresh, or
+  // one more stack of something already on it, is not a new debuff.
+  if (!isNew) return;
+  const a = currentApplier();
+  if (a === target) return; // self-inflicted: neither side's gear reacts
+  // The receiving side -- Bedrock Slab: a Shield from its own Defense.
+  const shieldPct = target.gear?.newDebuffShieldDefPct || 0;
+  if (shieldPct && target.hp > 0 && target.uid != null) {
+    asPassive(target, () => applyShield(target, ((target.def || 0) * shieldPct) / 100, STATUS_TICKS));
+  }
+  // The inflicting side -- Umbral Thread / Voidthread Cloak: a heal.
+  if (!a || a.uid == null || a.hp <= 0) return;
+  const pct = a.gear?.newDebuffHealPct || 0;
+  if (!pct || (a.healImmuneTicks || 0) > 0) return;
+  const amount = Math.round(((a.maxHp * pct) / 100) * healReceivedMultiplier(a));
+  if (amount > 0) asPassive(a, () => healUnit(a, amount));
+}
+
+/**
+ * Expose: each stack makes the next ability hit this creature takes deal 20%
+ * more, spending the stack (spendExpose in hp.js). Stacks like the other
+ * stacking debuffs -- +N per application, one shared refreshing timer,
+ * capped -- and is dispellable.
+ */
+export const EXPOSE_STACK_CAP = 5;
+export function applyExpose(u, stacks = 1) {
+  if (!u || resistsDebuff(u)) return;
+  debuffLanded(u, !((u.exposeTicks || 0) > 0));
+  u.exposeStacks = Math.min(EXPOSE_STACK_CAP, ((u.exposeTicks || 0) > 0 ? u.exposeStacks || 0 : 0) + debuffStacks(u, stacks));
+  u.exposeTicks = debuffTicks(u, STATUS_TICKS);
+}
+
+/**
+ * Seeded (Sprout Locket): a Leech-Seed style debuff. Every tick it drains a
+ * share of the carrier's max Health and heals whoever Seeded it for a share
+ * of THEIR OWN max Health -- both percentages, so it hits a big-Health boss
+ * harder but never heals the seeder more for it. It has no timer: it lasts
+ * until dispelled (it is an ordinary dispellable debuff), until the carrier
+ * falls, or until the seeder does. A seeder keeps ONE Seeded target at a
+ * time (see the listener below).
+ *
+ * `seededBy` holds the seeder itself (like Protect's guardian), so the tick
+ * can heal it and notice when it is gone; `seeded` is the flag the info
+ * panel and the debuff count read.
+ */
+export function applySeeded(victim, seeder) {
+  if (!victim || !seeder || victim === seeder || resistsDebuff(victim)) return false;
+  debuffLanded(victim, !victim.seeded);
+  victim.seeded = 1;
+  victim.seededBy = seeder;
+  seeder._seedTarget = victim;
+  return true;
+}
+
+/** One Seeded tick on its carrier (from tickTimedMods). Runs as the seeder,
+ * so a defeat it lands is the seeder's. */
+function tickSeeded(u) {
+  if (!u.seeded) return;
+  const seeder = u.seededBy;
+  if (!seeder || seeder.hp <= 0 || u.hp <= 0) { clearSeeded(u); return; }
+  const gear = seeder.gear || {};
+  // Verdant Weave: the seeder's Seeded drains and heals that much more.
+  const potency = 1 + (gear.seedPotencyPct || 0) / 100;
+  const drain = Math.max(1, Math.round(((u.maxHp || 0) * (gear.seedDrainPct || 0) * potency) / 100));
+  withApplier(seeder, () => {
+    if (u.uid == null) damageBossHp(u, drain);
+    else damageUnit(u, drain, { effectDamage: true });
+  });
+  if ((seeder.healImmuneTicks || 0) <= 0) {
+    const heal = Math.round(((seeder.maxHp * (gear.seedHealPct || 0) * potency) / 100) * healReceivedMultiplier(seeder));
+    if (heal > 0) asPassive(seeder, () => healUnit(seeder, heal));
+  }
+  if (u.hp <= 0) clearSeeded(u);
+}
+
+/** A boss's Health pool has its own shield and no damageUnit; Seeded drains
+ * it the way the bosses' own damage-over-time ticks do (straight to the
+ * pool, shield first). */
+function damageBossHp(boss, dmg) {
+  if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - dmg);
+  else boss.hp = Math.max(0, boss.hp - dmg);
+}
+
+/** Sprout Locket: the first enemy this creature damages is Seeded; once
+ * that one is free (dispelled, fallen), the next enemy it damages is. */
+onHitLanded((attacker, target) => {
+  if (!attacker.gear?.seedDrainPct || attacker.hp <= 0 || target.hp <= 0) return;
+  const cur = attacker._seedTarget;
+  if (cur && cur.seeded && cur.seededBy === attacker && cur.hp > 0) return;
+  applySeeded(target, attacker);
+});
+
+/** Tideweave Wrap: each enemy a Special damages heals the caster. */
+onHitLanded((attacker, target, info) => {
+  const pct = attacker.gear?.specialHitHealPct || 0;
+  if (!pct || info.ability !== "special" || info.effectDamage || attacker.uid == null || attacker.hp <= 0) return;
+  if ((attacker.healImmuneTicks || 0) > 0) return;
+  const amount = Math.round(((attacker.maxHp * pct) / 100) * healReceivedMultiplier(attacker));
+  if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount));
+});
+
+/** Cyclone Guard: hit by an enemy's ability, a Haste Up (one stack from this
+ * source, refreshed by further hits, standard duration). */
+onHitLanded((attacker, target, info) => {
+  const pct = target.gear?.struckHastePct || 0;
+  if (!pct || info.effectDamage || target.hp <= 0) return;
+  withApplier(target, () => applyStatMod(target, { kind: "haste", pct, src: target.uid + ":struck", ticks: STATUS_TICKS }));
+});
+
+/** Gloomreaper Chain: an ability hit that leaves an enemy below the
+ * threshold Executes it (never a boss -- see canBeExecuted in hp.js). */
+onHitLanded((attacker, target, info) => {
+  const below = attacker.gear?.executeBelowPct || 0;
+  if (!below || info.effectDamage || !canBeExecuted(target)) return;
+  if (target.hp * 100 >= target.maxHp * below) return;
+  damageUnit(target, target.hp, { pierceShield: true });
+});
+
+/** Duelist's Oath: the first creature this one damages becomes its duel
+ * target for the battle (read by gearAtkMultiplier / gearDefMultiplier). */
+onHitLanded((attacker, target, info) => {
+  if (!attacker.gear?.duelPct || attacker._duelTarget || info.effectDamage) return;
+  attacker._duelTarget = target;
+});
+
+/** Radiant Shroud: healing an ally also dispels debuffs from it. */
+onHealed((healer, target, healed) => {
+  const n = healer?.gear?.healDispelDebuffs || 0;
+  if (!n || healer === target || !(healed > 0) || !sameSide(healer, target)) return;
+  for (let i = 0; i < n; i++) if (!dispelOneDebuff(target)) break;
+});
+
+/** Dawnlight Halo: being healed grants an Attack Up and a Critical Damage Up
+ * (one stack each from this source, refreshed, standard duration). */
+onHealed((healer, target, healed) => {
+  const pct = target.gear?.healedBuffPct || 0;
+  if (!pct || !(healed > 0) || target.hp <= 0) return;
+  withApplier(target, () => {
+    applyStatMod(target, { kind: "atk", pct, src: target.uid + ":healed", ticks: STATUS_TICKS });
+    applyStatMod(target, { kind: "critDmg", pct, src: target.uid + ":healed", ticks: STATUS_TICKS });
+  });
+});
+
+/**
+ * Remove ONE random dispellable debuff (the Cleanse rules -- see
+ * dispelDebuffs: Restrained and a self-applied stance Root stay). A negative
+ * stat mod goes one stack at a time. Returns whether anything was removed.
+ */
+export function dispelOneDebuff(u) {
+  const options = [];
+  for (const m of u.statMods || []) if (m.pct < 0) options.push(() => u.statMods.splice(u.statMods.indexOf(m), 1));
+  const timers = {
+    burnTicks: () => { u.burnTicks = 0; u.burnStacks = 0; u.burnSourceAtk = 0; },
+    dotTicks: () => { u.dotTicks = 0; u.dotStacks = 0; },
+    poisonTicks: () => { u.poisonTicks = 0; u.poisonStacks = 0; },
+    fearTicks: () => { u.fearTicks = 0; u.fearSourceUid = null; },
+    tauntTicks: () => { u.tauntTicks = 0; u.tauntSourceUid = null; },
+    frostbiteTicks: () => { u.frostbiteTicks = 0; u.frostbiteStacks = 0; },
+    dartShredTicks: () => { u.dartShredTicks = 0; u.dartShredPct = 0; },
+    critShredTicks: () => { u.critShredTicks = 0; u.critShredPct = 0; },
+    exposeTicks: () => { u.exposeTicks = 0; u.exposeStacks = 0; },
+  };
+  for (const [field, clear] of Object.entries(timers)) if ((u[field] || 0) > 0) options.push(clear);
+  for (const field of ["weakTicks", "healImmuneTicks", "slowTicks", "shockTicks", "stunTicks", "markedTicks"]) {
+    if ((u[field] || 0) > 0) options.push(() => { u[field] = 0; });
+  }
+  if ((u.rootTicks || 0) > 0 && !u.rootUndispellable) options.push(() => { u.rootTicks = 0; });
+  if (u.blinded) options.push(() => { u.blinded = false; });
+  if (u.seeded) options.push(() => clearSeeded(u));
+  if (!options.length) return false;
+  options[Math.floor(Math.random() * options.length)]();
+  return true;
+}
+
+/** Clay Bangle: each damaging ability hit has a chance to Slow its target. */
+onHitLanded((attacker, target, info) => {
+  const pct = attacker.gear?.slowOnHitChancePct || 0;
+  if (!pct || info.effectDamage || target.uid == null || target.hp <= 0) return;
+  if (Math.random() * 100 < pct) applyTimedDebuff(target, "slowTicks", STATUS_TICKS);
+});
+
+/** Capacitor Charm: hit by an enemy's ability, a chance to Expose the attacker. */
+onHitLanded((attacker, target, info) => {
+  const pct = target.gear?.exposeWhenHitChancePct || 0;
+  if (!pct || info.effectDamage || target.hp <= 0) return;
+  if (Math.random() * 100 < pct) withApplier(target, () => applyExpose(attacker));
+});
+
+/**
+ * Gear that reacts to a creature MOVING itself -- a step or a teleport.
+ * tick.js calls this from the two places a creature moves itself (being
+ * pushed or pulled by an enemy doesn't count). Buffs from here are one stack
+ * per source, refreshed rather than piled by further moves, for the standard
+ * duration.
+ */
+export function onUnitMoved(u) {
+  const gear = u?.gear;
+  if (!gear || u.hp <= 0) return;
+  // Charger's Greaves: the next Basic attack is stronger (hp.js reads this;
+  // settleBasicAttack in tick.js spends it).
+  if (gear.afterMoveAttackDmgPct) u._movedSinceAttack = true;
+  withApplier(u, () => {
+    // Breeze Feather: Attack Up and Speed Up.
+    if (gear.moveAtkSpdPct) {
+      applyStatMod(u, { kind: "atk", pct: gear.moveAtkSpdPct, src: u.uid + ":moved", ticks: STATUS_TICKS });
+      applyStatMod(u, { kind: "spd", pct: gear.moveAtkSpdPct, src: u.uid + ":moved", ticks: STATUS_TICKS });
+    }
+    // Runner's Band: Haste Up.
+    if (gear.moveHastePct) applyStatMod(u, { kind: "haste", pct: gear.moveHastePct, src: u.uid + ":moved", ticks: STATUS_TICKS });
+  });
+}
+
+/**
+ * How many debuffs a creature is carrying: each negative stat-mod stack, plus
+ * one per other debuff active on it. Read by Squire's Plate.
+ */
+export function countDebuffs(u) {
+  let n = 0;
+  if (u.statMods) for (const m of u.statMods) if (m.pct < 0) n++;
+  for (const f of ["burnTicks", "dotTicks", "poisonTicks", "rootTicks", "fearTicks", "weakTicks", "healImmuneTicks",
+    "slowTicks", "shockTicks", "tauntTicks", "stunTicks", "markedTicks", "frostbiteTicks", "dartShredTicks",
+    "critShredTicks", "exposeTicks"]) {
+    if ((u[f] || 0) > 0) n++;
+  }
+  if (u.blinded) n++;
+  if (u.seeded) n++;
+  if ((u.restrainedStacks || 0) > 0) n++;
+  return n;
 }
 
 /**
@@ -160,11 +399,14 @@ export function stealBuff(from, to) {
  * own Lifebinder Pendant grows it, like any heal it would receive.
  */
 onHitLanded((attacker, target, info) => {
-  const pct = attacker.gear?.lifestealPct || 0;
+  // Bloodthirster / Leech Ring: all damage. Brawler's Grip: on top of that,
+  // the damage of its abilities when it fights in Melee (a Melee creature).
+  const melee = !info.effectDamage && !attacker.isRanged ? attacker.gear?.meleeLifestealPct || 0 : 0;
+  const pct = (attacker.gear?.lifestealPct || 0) + melee;
   if (!pct || attacker.uid == null || attacker.hp <= 0 || !(info.dmg > 0)) return;
   if ((attacker.healImmuneTicks || 0) > 0) return;
   const amount = Math.round(((info.dmg * pct) / 100) * healReceivedMultiplier(attacker));
-  if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount));
+  if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount, { lifesteal: true }));
 });
 
 /**
@@ -185,6 +427,7 @@ onHitLanded((attacker, target, info) => {
  */
 export function applyCritShred(u, pct, maxPct) {
   if (resistsDebuff(u)) return;
+  debuffLanded(u, !((u.critShredTicks || 0) > 0));
   u.critShredPct = Math.min(maxPct, (u.critShredPct || 0) + pct * debuffStacks(u, 1));
   u.critShredTicks = debuffTicks(u, STATUS_TICKS);
 }
@@ -232,6 +475,7 @@ export function isRooted(u) {
  */
 export function applyFear(u, sourceUid, ticks) {
   if (!u || u.uid == null || resistsDebuff(u)) return;
+  debuffLanded(u, !((u.fearTicks || 0) > 0));
   u.fearTicks = ticks;
   u.fearSourceUid = sourceUid;
 }
@@ -312,8 +556,16 @@ export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = fals
   const debuff = pct < 0;
   if (!holdDuration) ticks = debuff ? debuffTicks(u, ticks) : buffTicks(u, ticks);
   const stacks = debuff ? debuffStacks(u, 1) : buffStacks(u, 1);
-  pushStatMod(u, kind, pct, src, ticks);
-  for (let i = 1; i < stacks; i++) pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks);
+  const had = !!u.statMods && u.statMods.some((m) => sameEffect(m, kind, pct));
+  let added = pushStatMod(u, kind, pct, src, ticks);
+  for (let i = 1; i < stacks; i++) added = pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks) || added;
+  if (debuff) debuffLanded(u, added && !had);
+  // Cantor's Beads: a buff on an ally reaches one more (never a while-active
+  // stack -- those are re-stamped every tick and would never fall off).
+  if (!debuff && !holdDuration) {
+    const extra = extraAllyFor(u);
+    if (extra) asSpread(() => applyStatMod(extra, { kind, pct, src, ticks, holdDuration: true }));
+  }
 }
 
 /**
@@ -329,18 +581,20 @@ export function applyWhileActiveStatMod(u, { kind, pct, src }) {
   applyStatMod(u, { kind, pct, src, ticks: WHILE_ACTIVE_TICKS, holdDuration: true });
 }
 
-/** One source's stack: refresh it if present, else add it within the cap. */
+/** One source's stack: refresh it if present, else add it within the cap.
+ * Returns true when a NEW stack landed (not a refresh, not refused at cap). */
 function pushStatMod(u, kind, pct, src, ticks) {
   const mods = (u.statMods ||= []);
   const mine = mods.find((m) => sameEffect(m, kind, pct) && m.src === src);
-  if (mine) { mine.pct = pct; mine.ticks = ticks; return; }
+  if (mine) { mine.pct = pct; mine.ticks = ticks; return false; }
   const stacks = mods.filter((m) => sameEffect(m, kind, pct));
   if (stacks.length >= STAT_MOD_STACK_CAP) {
     const weakest = stacks.reduce((a, b) => (Math.abs(a.pct) <= Math.abs(b.pct) ? a : b));
-    if (Math.abs(pct) <= Math.abs(weakest.pct)) return;
+    if (Math.abs(pct) <= Math.abs(weakest.pct)) return false;
     mods.splice(mods.indexOf(weakest), 1);
   }
   mods.push({ kind, pct, src, ticks });
+  return true;
 }
 
 /**
@@ -414,6 +668,7 @@ export function tickStatMods(u, negativeOnly = false) {
 export function applyTaunt(target, source, ticks = STATUS_TICKS) {
   if (!target || !source || target.hp <= 0 || source.uid == null) return false;
   if (resistsDebuff(target)) return false;
+  debuffLanded(target, !((target.tauntTicks || 0) > 0));
   target.tauntTicks = ticks;
   target.tauntSourceUid = source.uid;
   return true;
@@ -537,6 +792,16 @@ export function tickTimedMods(u) {
   }
   if ((u.immortalTicks || 0) > 0) u.immortalTicks--;
   if ((u.critShredTicks || 0) > 0 && !--u.critShredTicks) u.critShredPct = 0;
+  if ((u.exposeTicks || 0) > 0 && !--u.exposeTicks) u.exposeStacks = 0;
+  tickSeeded(u);
+  // Dewdrop Charm: a permanent Heal Over Time of its own -- kept apart from
+  // the Heal Over Time buff, whose one shared slot would otherwise make any
+  // ally's timed HoT permanent too. Heal Block and Healing Down apply.
+  const regen = u.gear?.regenPctPerTick || 0;
+  if (regen && u.hp > 0 && u.hp < u.maxHp && (u.healImmuneTicks || 0) <= 0) {
+    const amt = Math.max(1, Math.round(((u.maxHp * regen) / 100) * healReceivedMultiplier(u)));
+    asPassive(u, () => healUnit(u, amt));
+  }
   if ((u.dartShredTicks || 0) > 0) {
     u.dartShredTicks--;
     if (!u.dartShredTicks) u.dartShredPct = 0;
@@ -568,6 +833,7 @@ export function tickTimedMods(u) {
 export const DART_SHRED_CAP_PCT = 50;
 export function applyDartShred(u, pct) {
   if (resistsDebuff(u)) return;
+  debuffLanded(u, !((u.dartShredTicks || 0) > 0));
   u.dartShredPct = Math.min(DART_SHRED_CAP_PCT, (u.dartShredPct || 0) + pct * debuffStacks(u, 1));
   u.dartShredTicks = debuffTicks(u, 6);
 }
@@ -588,6 +854,7 @@ export function dartShredMultiplier(u) {
  */
 export function applyBlind(u) {
   if (resistsDebuff(u)) return;
+  debuffLanded(u, !u.blinded);
   u.blinded = true;
 }
 
@@ -634,6 +901,7 @@ export const OVER_TIME_FLAVORS = {
 export function applyOverTime(u, flavor, stacks = 1) {
   if (resistsDebuff(u)) return;
   const f = OVER_TIME_FLAVORS[flavor];
+  debuffLanded(u, !((u[f.ticks] || 0) > 0));
   u[f.stacks] = Math.min(DOT_STACK_CAP, (u[f.stacks] || 0) + debuffStacks(u, stacks));
   u[f.ticks] = debuffTicks(u, OVER_TIME_TICKS);
 }
@@ -691,6 +959,7 @@ export const clearPoison = (u) => clearOverTime(u, "poison");
 export const FROSTBITE_STACK_CAP = 5;
 export function applyFrostbite(u) {
   if (resistsDebuff(u)) return;
+  debuffLanded(u, !((u.frostbiteTicks || 0) > 0));
   u.frostbiteStacks = Math.min(FROSTBITE_STACK_CAP, (u.frostbiteStacks || 0) + debuffStacks(u, 1));
   u.frostbiteTicks = debuffTicks(u, 6);
 }
@@ -710,6 +979,8 @@ export function frostbiteMultiplier(attackerIsWater, defender) {
  * something does (dispelDebuffs clears debuffs and must never touch it).
  */
 export function applyFortify(u, stacks) {
+  const extra = extraAllyFor(u);
+  if (extra) asSpread(() => applyFortify(extra, stacks));
   u.fortifyStacks = Math.min(FORTIFY_STACK_CAP, (u.fortifyStacks || 0) + buffStacks(u, stacks));
 }
 
@@ -742,6 +1013,8 @@ export function applyWindbreak(u, pct, tickKey) {
  * per-tick amount and the longer remaining duration, never stacks.
  */
 export function applyHealOverTime(u, perTick, ticks = 6) {
+  const extra = extraAllyFor(u);
+  if (extra) asSpread(() => applyHealOverTime(extra, perTick, ticks));
   // The healer's gear, baked in now (the ticks later run with no applier):
   // Lifebinder Pendant's healing done, and an echo's reduced effectiveness.
   perTick = Math.max(1, Math.round(perTick * healDoneMultiplier() * effectiveness()));
@@ -764,6 +1037,7 @@ export function applyHealOverTime(u, perTick, ticks = 6) {
 export function applyRoot(u, ticks, { undispellable = false } = {}) {
   // A self-applied stance Root is not inflicted, so resistsDebuff lets it by.
   if (resistsDebuff(u)) return;
+  debuffLanded(u, !((u.rootTicks || 0) > 0));
   u.rootTicks = Math.max(u.rootTicks || 0, ticks);
   u.rootUndispellable = !!undispellable;
 }
@@ -816,6 +1090,9 @@ export function dispelDebuffs(u) {
   u.dartShredPct = 0;
   u.critShredTicks = 0;
   u.critShredPct = 0;
+  u.exposeTicks = 0;
+  u.exposeStacks = 0;
+  clearSeeded(u);
   clearNegativeStatMods(u);
 }
 
@@ -864,6 +1141,7 @@ function syncRestrained(u) {
  */
 export function applyRestrained(target, srcUid, stacks, slowPct, range) {
   if (!target || target.uid == null || resistsDebuff(target)) return;
+  debuffLanded(target, !((target.restrainedStacks || 0) > 0));
   const list = target.restrained || (target.restrained = []);
   let entry = list.find((r) => r.src === srcUid);
   if (!entry) list.push((entry = { src: srcUid, stacks: 0, pct: 0, range }));

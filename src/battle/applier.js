@@ -81,6 +81,43 @@ export function battleRoster() {
   return roster;
 }
 
+/** True when two units fight on the same side (uids start "p" / "e"). */
+export function sameSide(a, b) {
+  return !!a?.uid && !!b?.uid && a.uid[0] === b.uid[0];
+}
+
+/**
+ * Cantor's Beads: "This creature's Healing and Buffs affect 1 additional
+ * ally." POLICY: every heal and buff helper that lands something on an ally
+ * asks this for the extra ally and repeats itself on it -- healUnit,
+ * applyShield, applyProtect (hp.js); applyStatMod, applyHealOverTime,
+ * applyFortify (status.js). The extra ally is the lowest-Health ally (by
+ * share of max Health) that isn't the target or the giver. Only what the
+ * wearer gives an ALLY spreads -- not what it gives itself -- and the repeat
+ * never spreads again.
+ */
+let spreading = false;
+export function extraAllyFor(target) {
+  const giver = current;
+  if (spreading || !giver || giver === target || !(giver.gear?.extraAllyTargets > 0)) return null;
+  if (!sameSide(giver, target)) return null;
+  let best = null;
+  for (const a of roster) {
+    if (a === giver || a === target || a.hp <= 0 || !sameSide(a, giver)) continue;
+    if (!best || a.hp / a.maxHp < best.hp / best.maxHp) best = a;
+  }
+  return best;
+}
+export function asSpread(fn) {
+  const prev = spreading;
+  spreading = true;
+  try {
+    return fn();
+  } finally {
+    spreading = prev;
+  }
+}
+
 /** The ability `unit` is using right now, or null. */
 export function activeAbilityOf(unit) {
   return active && unit && active.unit === unit ? active.key : null;

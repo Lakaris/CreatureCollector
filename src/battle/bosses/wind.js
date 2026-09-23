@@ -8,6 +8,7 @@
 import { MELEE_RANGE } from "../constants.js";
 import { aStepToward } from "../geometry.js";
 import { damageUnit } from "../hp.js";
+import { resistsDisplacement } from "../immobilize.js";
 
 /** Bonus damage multiplier when a knockback/pull is blocked by something. */
 const COLLISION_MULT = 0.5;
@@ -30,6 +31,8 @@ function pushGustFx(u, fromR, fromC, ctx) {
 
 /** Push `u` one tile directly away from the boss's center; collides if blocked. */
 function knockAway(u, ctx) {
+  // Can't be moved (Anchor Charm): no knockback, so nothing to collide with.
+  if (resistsDisplacement(u)) return;
   const { boss, allOcc, now, gridRows, gridCols } = ctx;
   const cr = boss.row + 0.5, cc = boss.col + 0.5;
   const dr = u.row - cr, dc = u.col - cc;
@@ -54,6 +57,7 @@ function knockAway(u, ctx) {
 
 /** Pull `u` up to `tiles` steps toward the boss's center; collides if blocked partway. */
 function pullToward(u, tiles, ctx) {
+  if (resistsDisplacement(u)) return;
   const { boss, allOcc, now, gridRows, gridCols } = ctx;
   const cr = boss.row + 0.5, cc = boss.col + 0.5;
   const fromR = u.row, fromC = u.col;

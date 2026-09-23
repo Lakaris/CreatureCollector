@@ -1,10 +1,12 @@
 // Damage formulas.
 
-import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier, critShredMultiplier, countBuffs } from "./status.js";
+import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier, critShredMultiplier, countBuffs, countDebuffs } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1, BASIC_ATTACK_DMG_MULT } from "./constants.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { isUsingBasic, currentApplier, withApplier, withActiveAbility, battleRoster } from "./applier.js";
-import { onDefeated, announceHit, onHitLanded, attackerDamageMultiplier, damageUnit } from "./hp.js";
+import { onDefeated, announceHit, onHitLanded, attackerDamageMultiplier, damageUnit, spendExpose, hasAllyNearby, shieldBreakMultiplier } from "./hp.js";
+import { abilityHasTag } from "./abilityTags.js";
+import { distToBoss } from "./geometry.js";
 import { gainSpecialCharge } from "./charge.js";
 
 /**
@@ -25,7 +27,10 @@ import { gainSpecialCharge } from "./charge.js";
  */
 /** critDmg plus whatever aura the unit is standing in (see status.js). */
 function critDmgOf(unit) {
-  return ((unit && unit.critDmg) || 0) + ((unit && unit._auraCritDmgPct) || 0);
+  // Critical Damage Up / Down stat mods (kind "critDmg") add their percent as
+  // points of Critical Damage, the same way an aura's critDmgPct does.
+  const mods = unit ? (statModMultiplier(unit, "critDmg") - 1) * 100 : 0;
+  return ((unit && unit.critDmg) || 0) + ((unit && unit._auraCritDmgPct) || 0) + mods;
 }
 
 function critMultiplier(unit) {
@@ -78,19 +83,40 @@ function auraAtkMultiplier(unit) {
  *     banked by onDefeated in hp.js).
  *   - Warbuff Plate: a share per buff currently worn (countBuffs).
  */
-export function gearAtkMultiplier(unit) {
+export function gearAtkMultiplier(unit, target = null) {
   if (!unit || !unit.gear) return 1;
-  const perBuff = unit.gear.atkPerBuffPct || 0;
-  return 1 + ((unit._defeatAtkPct || 0) + (perBuff ? perBuff * countBuffs(unit) : 0)) / 100;
+  const gear = unit.gear;
+  let pct = (unit._defeatAtkPct || 0) + (unit._specialAtkPct || 0);
+  if (gear.atkPerBuffPct) pct += gear.atkPerBuffPct * countBuffs(unit);
+  // Tailwind Talon: a share per 0.1 of the creature's current Speed.
+  if (gear.atkPerTenthSpdPct) pct += gear.atkPerTenthSpdPct * (effectiveSpeed(unit) / 0.1);
+  // Duelist's Oath: against the first creature it damaged.
+  if (gear.duelPct && target && unit._duelTarget === target) pct += gear.duelPct;
+  return 1 + pct / 100;
+}
+
+/** Speed after every multiplier that shapes attack cadence (not Slow/Shock,
+ * which lengthen the cooldown rather than lowering Speed). */
+function effectiveSpeed(unit) {
+  const gearSpd = 1 + ((unit.gear?.spdPct || 0) + (unit._specialSpdPct || 0)) / 100;
+  return (unit.spd || 1) * gearSpd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit);
 }
 
 /**
- * Gear that raises Defense mid-battle, read by unitDamage's Defense:
- * Last Stand Crown, while its wearer is below its Health threshold.
+ * Gear that raises Defense mid-battle, read by unitDamage's Defense.
  */
-export function gearDefMultiplier(unit) {
-  const pct = unit?.gear?.lowHpDefPct || 0;
-  if (!pct || !(unit.hp < (unit.maxHp * (unit.gear.lowHpDefBelowPct || 0)) / 100)) return 1;
+export function gearDefMultiplier(unit, attacker = null) {
+  const gear = unit?.gear;
+  if (!gear) return 1;
+  let pct = 0;
+  // Last Stand Crown: while below its Health threshold.
+  if (gear.lowHpDefPct && unit.hp < (unit.maxHp * (gear.lowHpDefBelowPct || 0)) / 100) pct += gear.lowHpDefPct;
+  // Squire's Plate: a share per debuff currently worn.
+  if (gear.defPerDebuffPct) pct += gear.defPerDebuffPct * countDebuffs(unit);
+  // Vanguard Pauldron: no ally Nearby.
+  if (gear.loneDefPct && !hasAllyNearby(unit)) pct += gear.loneDefPct;
+  // Duelist's Oath: against the first creature it damaged.
+  if (gear.duelPct && attacker && unit._duelTarget === attacker) pct += gear.duelPct;
   return 1 + pct / 100;
 }
 
@@ -121,8 +147,8 @@ export function withGuaranteedCrit(unit, fn) {
  * Takes the whole attacker rather than a bare ATK number -- it needs the
  * unit's crit chance, and every call site already had the unit in hand.
  */
-export function attackRoll(attacker) {
-  return attacker.atk * gearAtkMultiplier(attacker) * (0.8 + Math.random() * 0.4) * critMultiplier(attacker);
+export function attackRoll(attacker, target = null) {
+  return attacker.atk * gearAtkMultiplier(attacker, target) * (0.8 + Math.random() * 0.4) * critMultiplier(attacker);
 }
 
 /**
@@ -145,11 +171,18 @@ export function mitigatedDamage(atk, def) {
 export function unitDamage(attacker, defender) {
   // Frostbite: Water attackers hit the carrier harder (5% per stack).
   const water = CREATURE_MAP[attacker.creatureId]?.type === "Water";
-  const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker) * gearAtkMultiplier(attacker);
+  const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker) * gearAtkMultiplier(attacker, defender);
   const def = (defender.def || 20) * statModMultiplier(defender, "def") * passiveDefMultiplier(defender) * dartShredMultiplier(defender)
-    * critShredMultiplier(defender) * gearDefMultiplier(defender);
+    * critShredMultiplier(defender) * gearDefMultiplier(defender, attacker);
   const roll = 0.8 + Math.random() * 0.4;
-  return Math.max(1, Math.round(mitigatedDamage(atk, def) * roll * critMultiplier(attacker) * frostbiteMultiplier(water, defender)));
+  const crit = sureCritAgainst(attacker, defender) ? withGuaranteedCrit(attacker, () => critMultiplier(attacker)) : critMultiplier(attacker);
+  return Math.max(1, Math.round(mitigatedDamage(atk, def) * roll * crit * frostbiteMultiplier(water, defender)));
+}
+
+/** Slayer's Band: a target below its Health threshold is always crit. */
+function sureCritAgainst(attacker, target) {
+  const below = attacker?.gear?.alwaysCritBelowPct || 0;
+  return !!below && !!target && target.hp > 0 && target.hp < (target.maxHp * below) / 100;
 }
 
 /**
@@ -163,7 +196,8 @@ export function unitDamage(attacker, defender) {
  * Crit comes in through attackRoll, not from a second roll here.
  */
 export function playerDamageToBoss(attacker, boss, aliveP) {
-  let dmg = Math.max(1, Math.round(attackRoll(attacker) * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker)));
+  const roll = sureCritAgainst(attacker, boss) ? withGuaranteedCrit(attacker, () => attackRoll(attacker, boss)) : attackRoll(attacker, boss);
+  let dmg = Math.max(1, Math.round(roll * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker)));
   if (boss._bossKey === "dark") {
     const debuffed = aliveP.filter(
       (p) => (p.dotTicks || 0) > 0 || (p.weakTicks || 0) > 0 || (p.healImmuneTicks || 0) > 0
@@ -199,9 +233,10 @@ export function damageBoss(boss, dmg, { effectDamage = false } = {}) {
   const crit = !!attacker?._critLanded;
   if (attacker) attacker._critLanded = false;
   const baseDmg = dmg;
-  dmg = Math.max(1, Math.round(dmg * attackerDamageMultiplier(boss, { effectDamage })));
+  dmg = Math.max(1, Math.round(dmg * attackerDamageMultiplier(boss, { effectDamage }) * spendExpose(boss, effectDamage)));
   const wasAlive = boss.hp > 0;
-  if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - dmg);
+  // Stormshell Mantle counts extra against the boss's shield pool too.
+  if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - Math.round(dmg * shieldBreakMultiplier(effectDamage)));
   else boss.hp = Math.max(0, boss.hp - dmg);
   if (wasAlive && boss.hp <= 0) onDefeated(boss);
   announceHit(boss, { baseDmg, dmg, crit, effectDamage });
@@ -214,8 +249,9 @@ export function attackCooldown(unit, penalty = 1) {
   // Floor of 2 ticks (1s). It was 3, which at the old 12-tick base was a
   // distant 4x ceiling; against a 4-tick base it would cap Speed at 1.33x
   // and make the stat nearly worthless.
-  const gearSpd = 1 + (unit.gear?.spdPct || 0) / 100;
-  return Math.max(2, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * gearSpd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit))) * penalty));
+  // Brineplate: a Basic tagged Displace comes around sooner.
+  const displace = unit.gear?.displaceCooldownPct && abilityHasTag(unit, "basic", "displace") ? 1 - unit.gear.displaceCooldownPct / 100 : 1;
+  return Math.max(2, Math.round((COOLDOWN_TICKS_AT_SPD_1 / effectiveSpeed(unit)) * penalty * displace));
 }
 
 /**
@@ -226,6 +262,44 @@ export function attackCooldown(unit, penalty = 1) {
  * can't loop. Boss hits count too (tick.js names the boss as the applier
  * for its turn).
  */
+/** Deal `dmg` as `source`'s effect damage (never countered, reflected, or
+ * dodged) to a creature or a boss. Shared by the retaliation gear below. */
+function retaliate(source, victim, dmg) {
+  withApplier(source, () => withActiveAbility(source, "unique", () => {
+    if (victim.uid == null) damageBoss(victim, dmg, { effectDamage: true });
+    else damageUnit(victim, dmg, { effectDamage: true });
+  }));
+}
+
+/** Thornback Vest: every ability hit taken, whoever landed it takes a share
+ * of this creature's Defense back. */
+onHitLanded((attacker, target, info) => {
+  const pct = target.gear?.thornsDefPct || 0;
+  if (!pct || info.effectDamage || target.hp <= 0 || !(attacker.hp > 0)) return;
+  retaliate(target, attacker, Math.max(1, Math.round(((target.def || 0) * pct) / 100)));
+});
+
+/** Capacitor Plate: every Nth ability hit taken, discharge its Basic damage
+ * into every enemy Nearby (the 8 surrounding tiles; a boss whose body
+ * touches them counts). */
+onHitLanded((attacker, target, info) => {
+  const every = target.gear?.dischargeEvery || 0;
+  if (!every || info.effectDamage || target.hp <= 0) return;
+  target._hitsForDischarge = (target._hitsForDischarge || 0) + 1;
+  if (target._hitsForDischarge < every) return;
+  target._hitsForDischarge = 0;
+  const players = battleRoster().filter((u) => u.hp > 0 && u.uid?.[0] === "p");
+  for (const e of battleRoster()) {
+    if (e.hp <= 0 || !e.uid || e.uid[0] === target.uid[0]) continue;
+    if (Math.max(Math.abs(e.row - target.row), Math.abs(e.col - target.col)) > 1) continue;
+    retaliate(target, e, Math.max(1, Math.round(basicUnitDamage(target, e))));
+  }
+  // The boss is an enemy of the player side only, and not in the roster.
+  if (target.uid[0] === "p" && attacker.uid == null && attacker.hp > 0 && distToBoss(attacker, target.row, target.col) <= 1) {
+    retaliate(target, attacker, Math.max(1, Math.round(basicDamageToBoss(target, attacker, players))));
+  }
+});
+
 onHitLanded((attacker, target, info) => {
   const every = target.gear?.counterEvery || 0;
   if (!every || info.effectDamage || target.hp <= 0 || !(attacker.hp > 0)) return;

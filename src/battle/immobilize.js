@@ -13,3 +13,15 @@
 export function isImmobilized(u) {
   return !!u && (u.rootTicks || 0) > 0;
 }
+
+/**
+ * POLICY: every enemy effect that forcibly MOVES a creature -- a push, a
+ * pull, a knockback, a charge that shoves it along -- asks this first, and
+ * leaves the creature where it stands when it returns true (Anchor Charm: "Can
+ * not be moved by enemies"). Only the movement is cancelled: the attack's
+ * damage and other effects still land. A creature's own movement (walking,
+ * teleporting) is never affected.
+ */
+export function resistsDisplacement(u) {
+  return !!u?.gear?.unmovable;
+}

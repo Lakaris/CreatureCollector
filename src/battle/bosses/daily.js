@@ -8,6 +8,7 @@
 
 import { MELEE_RANGE } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { resistsDisplacement } from "../immobilize.js";
 
 const NOVA_RANGE = 2;
 const FURY_INTERVAL_TICKS = 15;
@@ -27,7 +28,7 @@ export default {
       const dc = Math.sign(u.col - (boss.col + 0.5)) || 0;
       const nr = u.row + dr, nc = u.col + dc;
       const key = nr + "," + nc;
-      if (nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols && !allOcc.has(key) && !ctx.bossOcc(nr, nc)) {
+      if (!resistsDisplacement(u) && nr >= 0 && nr < gridRows && nc >= 0 && nc < gridCols && !allOcc.has(key) && !ctx.bossOcc(nr, nc)) {
         allOcc.delete(u.row + "," + u.col);
         u.prevRow = u.row;
         u.prevCol = u.col;

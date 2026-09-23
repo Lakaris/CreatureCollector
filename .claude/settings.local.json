@@ -184,7 +184,8 @@
       "PowerShell(& \"$env:LOCALAPPDATA\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\e65cb812-c36f-4871-8f02-238534f6c8b0\\\\scratchpad\\\\patch-tags.ps1\")",
       "Bash(grep -oE 'id:\"[a-z]+\",name:\"[^\"]*\"|stats:\\\\{hp:[0-9]+,atk:[0-9]+,def:[0-9]+|role:\"[^\"]*\",attackType:\"[^\"]*\"|shardsToAscend:[0-9]+,ascensionsToEvolve:\\(null|[0-9]+\\)')",
       "Bash(grep -oE 'id:\"[a-z]+\",name:\"[^\"]*\",emoji:\"[^\"]*\"|stats:\\\\{hp:[0-9]+,atk:[0-9]+,def:[0-9]+|role:\"[^\"]*\",attackType:\"[^\"]*\"|shardsToAscend:[0-9]+,ascensionsToEvolve:\\(null|[0-9]+\\)|evolutionId:\"[a-z]+\"')",
-      "Bash(grep -o 'charge: { label: \"Charge\", description: \"[^\"]*\"' src/core/abilityText.js)"
+      "Bash(grep -o 'charge: { label: \"Charge\", description: \"[^\"]*\"' src/core/abilityText.js)",
+      "Bash(python - C:/Users/Annie/Desktop/Stuff/CreatureCollector/src/battle/status.js)"
     ]
   }
 }

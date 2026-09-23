@@ -23,7 +23,7 @@ import { RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { unitDist, distToBoss } from "../geometry.js";
 import { healUnit } from "../hp.js";
 import {
-  applyFortify, hasFortify, applyWindbreak, applyFrostbite,
+  applyFortify, hasFortify, applyWindbreak, applyFrostbite, auraRange,
   dispelDebuffs, healReceivedMultiplier,
 } from "../status.js";
 
@@ -93,7 +93,7 @@ export function makeIgletModule(cfg) {
     onTick(unit, ctx) {
       const pct = windbreakPctByLevel[abilityIdx(unit, "unique")] * (hasFortify(unit) ? 2 : 1);
       for (const a of ctx.aliveP) {
-        if (a.hp > 0 && unitDist(unit, a) <= NEARBY_RANGE) applyWindbreak(a, pct, ctx.now);
+        if (a.hp > 0 && unitDist(unit, a) <= auraRange(unit, NEARBY_RANGE)) applyWindbreak(a, pct, ctx.now);
       }
 
       const stacks = unit.fortifyStacks || 0;
@@ -120,7 +120,7 @@ export function makeIgletModule(cfg) {
       // cast itself rather than from the next tick.
       const pct = windbreakPctByLevel[abilityIdx(unit, "unique")] * 2;
       for (const a of ctx.aliveP) {
-        if (a.hp > 0 && unitDist(unit, a) <= NEARBY_RANGE) applyWindbreak(a, pct, ctx.now);
+        if (a.hp > 0 && unitDist(unit, a) <= auraRange(unit, NEARBY_RANGE)) applyWindbreak(a, pct, ctx.now);
       }
       unit._fortifyWas = unit.fortifyStacks || 0;
       ctx.newFx.push({ id: ctx.now + "hk" + unit.uid, row: unit.row, col: unit.col, t: ctx.now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });

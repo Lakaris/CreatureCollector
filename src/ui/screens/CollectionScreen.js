@@ -220,7 +220,7 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     filtered.length===0
       ?React.createElement("div",{style:{textAlign:"center",padding:"40px 20px",color:"#666"}},
           React.createElement("i",{className:"ti ti-egg",style:{fontSize:40,display:"block",marginBottom:8,opacity:.3}}),
-          React.createElement("p",{style:{fontSize:13}},(activeRarities.size===0&&activeTypes.size===0&&!search.trim())?"No creatures yet — hatch some eggs!":"No creatures match your filters")
+          React.createElement("p",{style:{fontSize:13}},(activeRarities.size===0&&activeTypes.size===0&&!search.trim())?"No creatures yet":"No creatures match your filters")
         )
       :React.createElement("div",{className:"creature-grid",style:(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")?{marginTop:34}:undefined},
           filtered.map(({owned:o,def:d},idx)=>{

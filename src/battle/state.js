@@ -5,6 +5,8 @@ import { computeCombatStats } from "../core/stats.js";
 import { calcStats, getSpecialCharge, getSpecialChargeAt, MAX_ABILITY_LEVEL } from "../core/creatures.js";
 import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
+import { gearBattleBonus } from "../core/equipment.js";
+import { withApplier } from "./applier.js";
 
 /**
  * Player HP is multiplied by this so fights last a reasonable number of ticks.
@@ -109,6 +111,9 @@ export function makeArenaBattle(
       abilCharge: 0,
       abilChargeMax: getSpecialChargeAt(cdef, oc?.abilityLevels?.special || 0),
       abilityLevels: oc?.abilityLevels ? { ...oc.abilityLevels } : { basic: 0, special: 0, unique: 0 },
+      // `gear`: every battle effect the equipped items grant, read by the engine
+      // as unit.gear?.<key> (keys listed in data/equipment.js).
+      ...gearBattleBonus(oc?.equipped),
     };
   });
 
@@ -116,7 +121,7 @@ export function makeArenaBattle(
   // after every unit exists, so ally-presence checks see the full roster.
   for (const u of playerUnits) {
     const mod = getPlayerAbilityModule(u.creatureId);
-    if (mod?.onBattleStart) mod.onBattleStart(u, playerUnits);
+    if (mod?.onBattleStart) withApplier(u, () => mod.onBattleStart(u, playerUnits));
   }
 
   const { hpMult, atkMult, defMult } = difficultyOverride || {
@@ -180,7 +185,7 @@ export function makeArenaBattle(
   // battle-start passives see the enemy roster as "allUnits".
   for (const u of enemyUnits) {
     const mod = getPlayerAbilityModule(u.creatureId);
-    if (mod?.onBattleStart) mod.onBattleStart(u, enemyUnits);
+    if (mod?.onBattleStart) withApplier(u, () => mod.onBattleStart(u, enemyUnits));
   }
 
   return { playerUnits, enemyUnits, tick: 0 };

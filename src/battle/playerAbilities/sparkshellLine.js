@@ -27,7 +27,7 @@ import { aChebDist, distToBoss } from "../geometry.js";
 import { basicUnitDamage, basicDamageToBoss, damageBoss } from "../damage.js";
 import { ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyStatMod, applyAura, isIntangible } from "../status.js";
+import { applyWhileActiveStatMod, applyAura, isIntangible, countBuffs } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -71,22 +71,12 @@ function gainCharge(unit, n) {
 
 /**
  * How many buffs the unit is wearing, for Battery Shell's "gains a buff"
- * trigger. Counted rather than hooked: there is no engine-wide "buff applied"
- * event, and a per-tick count that went UP is the same thing observed from
- * the other end. Refreshing a buff already held does not count.
+ * trigger -- the shared count in status.js. Counted rather than hooked: there
+ * is no engine-wide "buff applied" event, and a per-tick count that went UP
+ * is the same thing observed from the other end. Refreshing a buff already
+ * held does not count.
  */
-function buffCount(u) {
-  let n = 0;
-  if (u.statMods) for (const m of u.statMods) if (m.pct > 0) n++;
-  if ((u.shield || 0) > 0) n++;
-  if ((u.fortifyStacks || 0) > 0) n++;
-  if (u.protect && u.protect.stacks > 0) n++;
-  if (u.aura) n++;
-  if ((u.immortalTicks || 0) > 0) n++;
-  if ((u.intangibleTicks || 0) > 0) n++;
-  if ((u.windbreakTicks || 0) > 0) n++;
-  return n;
-}
+const buffCount = countBuffs;
 
 export function makeSparkshellModule(cfg) {
   const { basicDmgByLevel, chargeGainByLevel, statPerChargeByLevel, allyHasteByLevel, enemyHasteByLevel } = cfg;
@@ -141,7 +131,7 @@ export function makeSparkshellModule(cfg) {
       // Max level: a full battery hums. Re-stamped each tick it stays full, so
       // the stack expires on its own once Charge is spent.
       if (uIdx >= MAX_IDX && (unit.charge || 0) >= CHARGE_CAP) {
-        applyStatMod(unit, { kind: "haste", pct: HASTE_UP_PCT, src: unit.uid, ticks: 2 });
+        applyWhileActiveStatMod(unit, { kind: "haste", pct: HASTE_UP_PCT, src: unit.uid });
       }
 
       // Static Zap's chain fires from onHit, which sees no context -- stash

@@ -30,6 +30,7 @@ export const DEBUFF_DEFS = [
   { key: "frostbiteTicks", icon: "❄️", label: "Frostbite" },
   { key: "immortalTicks", icon: "🌕", label: "Immortal" },
   { key: "dartShredTicks", icon: "🪶", label: "Defense Shredded" },
+  { key: "critShredTicks", icon: "💎", label: "Armor Shattered" },
   { key: "hotTicks", icon: "💗", label: "Heal Over Time" },
 ];
 

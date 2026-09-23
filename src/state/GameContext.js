@@ -18,6 +18,7 @@
 import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "../react.js";
 import { DUNGEON_BOSSES, ARENA_TABS, ARENA_TAB_TYPE } from "../data/bosses.js";
 import { CREATURE_MAP } from "../data/creatures.js";
+import { EQUIPMENT_MAP } from "../data/equipment.js";
 import { isPastEasternNoon, easternNoonDayKey } from "../core/dates.js";
 import { DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, DUNGEON_PASS_OVERFLOW_MULT } from "../battle/constants.js";
 
@@ -71,6 +72,27 @@ function nestPlanGridByKey(saved, keys, allow) {
   ]));
 }
 
+/**
+ * Items removed from the catalog (e.g. Mourning Band) are dropped from a save
+ * on load: unequipped from every creature, and their copies, levels,
+ * ascensions, and favourite flag forgotten. Generic -- any id no longer in
+ * EQUIPMENT_MAP goes -- so retiring an item needs nothing but deleting it
+ * from data/equipment.js.
+ */
+function stripRetiredEquipment(parsed) {
+  const known = (id) => !!EQUIPMENT_MAP[id];
+  for (const rec of Object.values(parsed.owned || {})) {
+    if (Array.isArray(rec?.equipped)) rec.equipped = rec.equipped.map((id) => (id && !known(id) ? null : id));
+  }
+  for (const field of ["equipmentCopies", "equipmentLevels", "equipmentAscensions"]) {
+    const map = parsed[field];
+    if (map && typeof map === "object") for (const id of Object.keys(map)) if (!known(id)) delete map[id];
+  }
+  if (parsed.equipFavorites instanceof Set) {
+    for (const id of [...parsed.equipFavorites]) if (!known(id)) parsed.equipFavorites.delete(id);
+  }
+}
+
 function loadSave() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -93,6 +115,7 @@ function loadSave() {
         c && c.cropKey === "ascensionMelonRare" ? { ...c, cropKey: "ascensionMelonEpic" } : c
       );
     }
+    stripRetiredEquipment(parsed);
     return parsed;
   } catch {
     return null;

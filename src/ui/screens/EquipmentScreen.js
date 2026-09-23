@@ -220,7 +220,7 @@ function EquipmentScreen() {
     items.length === 0
       ? React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#666" } },
           React.createElement("i", { className: "ti ti-tool", style: { fontSize: 40, display: "block", marginBottom: 8, opacity: .3 } }),
-          React.createElement("p", { style: { fontSize: 13 } }, "No gear yet — earn some from battles and treasure!")
+          React.createElement("p", { style: { fontSize: 13 } }, "No gear yet")
         )
       : React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } },
           items.map((item) => {

@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { STAT_LABELS } from "../../../data/rarity.js";
+import { STAT_LABELS, formatStatBonus } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
@@ -430,7 +430,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
       rewards.map((item,i)=>{
         const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ");
+        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
         return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
           React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
@@ -465,7 +465,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
       rewards.map((item,i)=>{
         const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ");
+        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
         return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
           React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),

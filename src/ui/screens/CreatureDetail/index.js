@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, shortStatLabel } from "../../../data/rarity.js";
+import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
@@ -34,7 +34,7 @@ const TUTORIAL_ITEM_ID="com_hp_atk";
 
 /** Equipped-slot stat bonuses, one stat per line (unlike equipBonusStr's "·"-joined string). */
 function equipBonusLines(bonuses){
-  return Object.entries(bonuses).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]);
+  return Object.entries(bonuses).map(([s,v])=>formatStatBonus(s,v));
 }
 
 /** Stats where a percentage of the base is meaningfully fractional, so gains keep their decimals

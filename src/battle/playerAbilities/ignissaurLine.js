@@ -12,13 +12,14 @@
 // Stoked Flames is a passive damage amplifier: both attacks deal +1%..+5%
 // damage per stack of Burn currently active on the target being hit.
 //
-// Burn numbers mirror Emberstar's Burning Bond (same duration, stack cap,
-// and source-ATK-scaled damage-over-time, ticked by the engine).
+// Burn is the shared one (applyBurn in status.js): same duration, stack cap,
+// and source-ATK-scaled damage-over-time as Emberstar's Burning Bond.
 
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies, aCardinalDist } from "../geometry.js";
-import { BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { BOSS_SIZE, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { applyBurn } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -26,10 +27,6 @@ const BASIC_DMG_BY_LEVEL = [30, 34, 38, 43, 43];
 const SPECIAL_DMG_BY_LEVEL = [55, 62, 70, 80, 80];
 /** Stoked Flames: +damage% per stack of Burn on the target, by unique level. */
 const STOKED_PCT_BY_LEVEL = [1, 2, 3, 4, 5];
-
-/** Burn numbers match Emberstar's Burning Bond (see emberstarLine.js). */
-const BURN_DURATION_TICKS = STATUS_TICKS;
-const BURN_STACK_CAP = 10;
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -39,11 +36,6 @@ function abilityIdx(unit, key) {
   return Math.min(lvl, MAX_IDX);
 }
 
-function applyBurn(unit, target) {
-  target.burnTicks = BURN_DURATION_TICKS;
-  target.burnStacks = Math.min((target.burnStacks || 0) + 1, BURN_STACK_CAP);
-  target.burnSourceAtk = unit.atk;
-}
 
 /** Stoked Flames multiplier vs this target: stacks only count while its Burn is active. */
 function stokedMult(unit, target) {
@@ -73,7 +65,7 @@ export function makeIgnissaurModule(cfg) {
 
     /** Magma Fang lvl 5: every landed hit inflicts a stack of Burn. */
     onHit(unit, target) {
-      if (abilityIdx(unit, "basic") >= MAX_IDX) applyBurn(unit, target);
+      if (abilityIdx(unit, "basic") >= MAX_IDX) applyBurn(target, unit.atk);
       return 0;
     },
 
@@ -122,13 +114,13 @@ export function makeIgnissaurModule(cfg) {
           const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, minion)));
           damageUnit(minion, dmg);
           totalDmg += dmg;
-          if (burns) applyBurn(unit, minion);
+          if (burns) applyBurn(minion, unit.atk);
         }
         if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
           const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, boss)));
           damageBoss(boss, dmg);
           totalDmg += dmg;
-          if (burns) applyBurn(unit, boss);
+          if (burns) applyBurn(boss, unit.atk);
           hitBoss = true;
         }
         r += dir.dr;

@@ -8,6 +8,7 @@
 import { MELEE_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { bossOutOfBounds, bossBlocked } from "../geometry.js";
 import { damageUnit } from "../hp.js";
+import { applyTimedDebuff } from "../status.js";
 
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
@@ -83,7 +84,7 @@ export default {
         else u.col = i;
         allOcc.add(u.row + "," + u.col);
         damageUnit(u, ctx.dmg(0.22));
-        u.slowTicks = STATUS_TICKS;
+        applyTimedDebuff(u, "slowTicks", STATUS_TICKS);
         newFx.push({ id: now + "chg" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
       });
     }
@@ -105,7 +106,7 @@ export default {
     if (boss.row === startR && boss.col === startC) {
       for (const u of ctx.targetsWithin(2)) {
         damageUnit(u, ctx.dmg(0.28));
-        u.slowTicks = STATUS_TICKS;
+        applyTimedDebuff(u, "slowTicks", STATUS_TICKS);
         newFx.push({ id: now + "bts" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
       }
       newFx.push({ id: now + "empslam", row: boss.row + 0.5, col: boss.col + 0.5, t: now, isEmpSlam: true });
@@ -123,7 +124,7 @@ export default {
     if (adj.length > 0 && boss.atkCd <= 0) {
       for (const u of adj) {
         damageUnit(u, ctx.dmg(0.14));
-        u.slowTicks = STATUS_TICKS;
+        applyTimedDebuff(u, "slowTicks", STATUS_TICKS);
         newFx.push({ id: now + "ebs" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
       }
       boss.atkCd = Math.max(5, 12 - hasteBonus);

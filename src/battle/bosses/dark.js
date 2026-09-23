@@ -6,6 +6,7 @@
 
 import { STATUS_TICKS } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { applyTimedDebuff } from "../status.js";
 
 export default {
   key: "dark",
@@ -16,8 +17,8 @@ export default {
 
     for (const u of aliveP) {
       damageUnit(u, ctx.dmg(0.1));
-      u.weakTicks = STATUS_TICKS;
-      u.healImmuneTicks = STATUS_TICKS;
+      applyTimedDebuff(u, "weakTicks", STATUS_TICKS);
+      applyTimedDebuff(u, "healImmuneTicks", STATUS_TICKS);
       newFx.push({ id: now + "cvl" + u.uid, row: u.row, col: u.col, t: now, isDark: true });
     }
     boss.specialCd = 22;
@@ -29,7 +30,7 @@ export default {
 
     for (const u of aliveP) {
       damageUnit(u, ctx.dmg(0.11));
-      u.dotTicks = STATUS_TICKS;
+      applyTimedDebuff(u, "dotTicks", STATUS_TICKS);
       newFx.push({ id: now + "drk" + u.uid, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     }
     // The sweep visually covers the whole grid.

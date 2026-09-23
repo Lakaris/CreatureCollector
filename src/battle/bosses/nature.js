@@ -6,7 +6,7 @@
 
 import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyPoison } from "../status.js";
+import { applyPoison, applyRoot } from "../status.js";
 
 export default {
   key: "nature",
@@ -31,7 +31,7 @@ export default {
         u.row = newRow;
         allOcc.add(key);
       }
-      u.rootTicks = STATUS_TICKS;
+      applyRoot(u, STATUS_TICKS);
       applyPoison(u);
       newFx.push({ id: now + 99993 + i, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row, fromCol: boss.col + 0.5, isEnemy: true });
     });

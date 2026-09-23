@@ -129,6 +129,10 @@ export function splitAbilityTags(tags) {
 /** Small mechanic tags shown on ability cards (e.g. Emberstar's Charging Pierce); click opens a definition popup. */
 export const ABILITY_TAG_DEFS = {
   pierce: { label: "Pierce", description: "Deal damage to all enemies this attack passes through." },
+  // THE classification of a multi-hit ability: gear that buffs multi-hit
+  // abilities (Hydra Tooth) reads this tag in battle (battle/abilityTags.js),
+  // so tagging an ability here is all it takes to include it.
+  multihit: { label: "Multi-hit", description: "Strikes several times in one use." },
   closest: { label: "Closest", description: "Targets the closest enemy in range." },
   farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range." },
   burn: { label: "Burn", description: "Deals damage over time." },
@@ -749,7 +753,8 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // Charging Pierce only leaves its trail from the 4th upgrade on.
     if (abilityLevel == null || abilityLevel >= 4) tags.push("firehazard");
   }
-  if (key === "basic" && isEmberstarLine) tags.push("closest");
+  // Twin Barb: 2-4 hits per swing at every tier.
+  if (key === "basic" && isEmberstarLine) tags.push("closest", "multihit");
   if (key === "unique" && isEmberstarLine) tags.push("burn");
   if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
   if (key === "special" && isStarlitLine) tags.push("closest");
@@ -883,7 +888,8 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // Call only pulls in an Assist from its 4th on. The Aura is the ability's
     // fallback at every tier, so it carries no gate.
     if (key === "basic") {
-      tags.push("closest");
+      // Twin Radiance strikes twice at every tier.
+      tags.push("closest", "multihit");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
     }
     if (key === "special") {

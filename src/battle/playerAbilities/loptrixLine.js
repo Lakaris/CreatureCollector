@@ -23,7 +23,7 @@
 import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
 import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
 import { BOSS_SIZE, MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { speedPenalty, isStunned, isIntangible, applyStatMod, dispelDebuffs, consumeBlind } from "../status.js";
+import { speedPenalty, isStunned, isIntangible, applyStatMod, dispelDebuffs, consumeBlind, applyTimedDebuff } from "../status.js";
 import { damageUnit } from "../hp.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -183,7 +183,7 @@ export function makeLoptrixModule(cfg) {
         } else {
           const dealt = damageUnit(cand.unit, dmg);
           if (dealt) ctx.addDamageDealt(dealt);
-          cand.unit.markedTicks = STATUS_TICKS;
+          applyTimedDebuff(cand.unit, "markedTicks", STATUS_TICKS, { stretch: true });
         }
 
         const tr = cand.isBossCandidate ? cand.boss.row + 0.5 : cand.unit.row;

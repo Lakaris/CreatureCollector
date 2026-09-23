@@ -11,6 +11,48 @@
 // items yet; the axis exists so one can be added by setting the field and
 // nothing else -- every screen already reads it. See core/equipment.js, which
 // owns the checks and the "X exclusive" captions for all four axes.
+//
+// BATTLE EFFECTS. An item's in-battle behaviour is declared as
+// `battle: { key: value }`. gearBattleBonus (core/equipment.js) merges the
+// worn items' keys onto the unit as `unit.gear` -- numbers take the largest,
+// booleans OR -- and the engine reads `unit.gear?.<key>` at ONE place per key:
+//   debuffTicks / buffTicks   extra ticks on debuffs/buffs this creature applies  (battle/applier.js)
+//   extraDebuffStack /
+//   extraBuffStack            +1 stack per stackable debuff/buff it applies       (battle/applier.js)
+//   shieldPct                 Shields it grants are this % larger                 (battle/applier.js)
+//   basicCritChargePct        Special charge % per Basic-ability crit             (battle/damage.js)
+//   overhealLayerPct          stacking Overheal Layer cap, % of max Health        (battle/hp.js)
+//   immobilizedDmgPct         +% damage to Immobilized targets                    (battle/hp.js)
+//   killChargePct             Special charge % on defeating an enemy              (battle/hp.js)
+//   lowHpIntangibleTicks      Intangible for N ticks on first drop below 50% HP   (battle/hp.js)
+//   debuffImmunity            the first N debuffs inflicted are ignored           (battle/applier.js)
+//   auraRange                 +N tiles on every aura it emits                     (battle/status.js)
+//   multiHitDmgPct            +% damage from abilities TAGGED "multihit"          (battle/hp.js)
+//                             -- the tag in core/abilityText.js is the classification
+//   echoSpecialPct            recast the Special at this % effectiveness          (battle/tick.js)
+//   sealSpecial               the Special never charges or casts                  (battle/charge.js)
+//   spdPct                    +% Speed                                            (battle/damage.js)
+//   basicDmgPct               +% damage from the Basic ability                    (battle/hp.js)
+//   startStackShieldPct       stacking Shield, % of max Health, until broken      (battle/tick.js)
+//   defeatAtkPct /
+//   defeatAtkMaxPct           +% Attack per defeat on the field, up to a cap      (battle/hp.js, damage.js)
+//   atkPerBuffPct             +% Attack per buff worn                             (battle/damage.js)
+//   lowHpDefPct /
+//   lowHpDefBelowPct          +% Defense while below that % of max Health         (battle/damage.js)
+//   critShredPct /
+//   critShredMaxPct           Defense shred per crit, up to a cap                 (battle/status.js)
+//   counterEvery              Counter every Nth hit taken                         (battle/damage.js)
+//   cheatDeathImmortalTicks   negate the first fatal hit, then Immortal N ticks   (battle/hp.js)
+//   reviveHpPct               revive once at this % of max Health                 (battle/hp.js)
+//   lifestealPct              heal this % of damage dealt                         (battle/status.js)
+//   healDonePct               +% healing done                                     (battle/hp.js)
+//   Per Basic ATTACK (a whole swing, however many hits) -- settleBasicAttack in battle/tick.js:
+//   extraHitEvery             1 extra hit every Nth attack
+//   chainTargets              Chain to N enemies beside the target
+//   splashEvery /
+//   splashLessPct             every Nth attack Splashes for that % less damage
+//   stealBuffEvery            steal a buff every Nth attack
+// A new effect = a new key here + the one engine line that reads it.
 
 /**
  * `color` must stay a SIX-digit hex. Card and slot borders across the app build
@@ -93,6 +135,18 @@ export const EQUIPMENT_DEFS=[
   {id:"rar_gen_def_sentry",  name:"Sentry Emblem",   emoji:"🗿", rarity:"rare", stats:{def:13},       effect:"Reduce incoming projectile damage by 6%"},
   {id:"rar_gen_def_anchor",  name:"Anchor Charm",    emoji:"⚓", rarity:"rare", stats:{def:13},       effect:"Cannot be pushed or pulled"},
   {id:"rar_gen_atk_def_haste",name:"Runner's Band",  emoji:"🏃", rarity:"rare", stats:{atk:5,def:5},  effect:"Abilities recharge 8% faster", hasteEffect:true},
+  // Rare battle-effect gear (see BATTLE EFFECTS at the top of this file). Same
+  // costing as the other Rare effect items: 5/6 two-stat, 13 single-stat, and
+  // a crit stat at 8 in place of a 6. Epic rungs of these families are below.
+  {id:"rar_gen_atk_def_tar",  name:"Tar Droplet",    emoji:"🍯", rarity:"rare", stats:{def:6,atk:5},  effect:"Debuffs you apply last longer",  battle:{debuffTicks:1}},
+  {id:"rar_gen_hp_def_amber", name:"Amber Bead",     emoji:"🔶", rarity:"rare", stats:{hp:6,def:5},   effect:"Buffs you apply last longer",    battle:{buffTicks:1}},
+  {id:"rar_gen_hp_atk_wax",   name:"Wax Cell",       emoji:"🐝", rarity:"rare", stats:{hp:6,atk:5},   effect:"Healing past Max Health becomes a Shield (up to 5% of Max Health, stacks)",  battle:{overhealLayerPct:5}},
+  {id:"rar_gen_atk_crit_chirp",name:"Cricket Chirp", emoji:"🦗", rarity:"rare", stats:{atk:5,crit:8},  effect:"Critical hits from a Basic ability grant 2% Special charge",  battle:{basicCritChargePct:2}},
+  {id:"rar_gen_hp_molt",      name:"Molted Skin",    emoji:"🐍", rarity:"rare", stats:{hp:13},        effect:"Immune to the first debuff inflicted",  battle:{debuffImmunity:1}},
+  {id:"rar_gen_atk_cdmg_hydra",name:"Hydra Tooth",   emoji:"🐉", rarity:"rare", stats:{atk:5,critDmg:8}, effect:"Multi-hit abilities deal 20% more damage",  battle:{multiHitDmgPct:20}},
+  // Formerly a Legendary (id kept for saves). Gained on the wearer's first
+  // turn of each battle; lasts until broken.
+  {id:"eff_hp_def_barrier",   name:"Crest of Conquest",emoji:"🏰", rarity:"rare", stats:{hp:6,def:5},   effect:"Gain a Shield (stacking) equal to 10% of this creature's Max Health", battle:{startStackShieldPct:10}},
   // Epic (base 11 per stat)
   {id:"epi_hp_atk",  name:"Warlord's Seal",   emoji:"🔥",  rarity:"epic",      stats:{hp:11,crit:21}},
   {id:"epi_hp_def",  name:"Citadel Core",     emoji:"🏰",  rarity:"epic",      stats:{hp:11,critDmg:21}},
@@ -154,6 +208,23 @@ export const EQUIPMENT_DEFS=[
   {id:"epi_gen_def_bulwark", name:"Bulwark Sigil",    emoji:"🏛️", rarity:"epic", stats:{def:19},       effect:"Every 4th hit taken deals half damage"},
   {id:"epi_gen_def_nettle",  name:"Nettle Guard",     emoji:"🌾", rarity:"epic", stats:{def:19},       effect:"Enemies that strike you lose 3% ATK for the rest of the battle, up to -15%"},
   {id:"epi_gen_def_sentinel",name:"Sentinel Idol",    emoji:"🗿", rarity:"epic", stats:{def:19},       effect:"Gain +12% DEF for the first 3 turns of each battle"},
+  // Epic battle-effect gear (see BATTLE EFFECTS at the top of this file).
+  // Costed like the Epic effect items above: 8/9 two-stat, a crit stat at 14.
+  // Pearl Lacquer's `shieldPct` also feeds kits that scale off their own
+  // Shield (Radiant Smite), since they read the Shield after raising it.
+  {id:"epi_gen_hp_atk_silk",  name:"Spider Silk Spool",emoji:"🕸️", rarity:"epic", stats:{hp:8,atk:9},   effect:"Debuffs you apply last even longer", battle:{debuffTicks:2}},
+  {id:"epi_gen_hp_def_cocoon",name:"Cocoon Wrap",      emoji:"🐛", rarity:"epic", stats:{hp:9,def:8},   effect:"Buffs you apply last even longer",   battle:{buffTicks:2}},
+  {id:"epi_gen_hp_atk_honey",  name:"Honeycomb Flask", emoji:"🍯", rarity:"epic", stats:{hp:9,atk:8},   effect:"Healing past Max Health becomes a Shield (up to 10% of Max Health, stacks)", battle:{overhealLayerPct:10}},
+  {id:"epi_gen_hp_crit_fork",  name:"Tuning Fork",     emoji:"🎐", rarity:"epic", stats:{hp:8,crit:14},  effect:"Critical hits from a Basic ability grant 4% Special charge", battle:{basicCritChargePct:4}},
+  {id:"epi_gen_hp_def_lacquer",name:"Pearl Lacquer",   emoji:"🪞", rarity:"epic", stats:{hp:9,def:8},   effect:"Shields you grant are 20% stronger", battle:{shieldPct:20}},
+  {id:"epi_gen_atk_cdmg_snare",name:"Hunter's Snare",  emoji:"🪤", rarity:"epic", stats:{atk:9,critDmg:14}, effect:"Deal 15% more damage to enemies that are Immobilized", battle:{immobilizedDmgPct:15}},
+  {id:"epi_gen_hp_crit_antler",name:"Beacon Antler",   emoji:"🦌", rarity:"epic", stats:{hp:9,crit:14},  effect:"Aura +1 range", battle:{auraRange:1}},
+  // "Briefly" = 2 ticks (1 second).
+  // Formerly Legendaries (ids kept for saves).
+  {id:"eff_atk_def_rampage",  name:"Warlord's Trophy", emoji:"🏆", rarity:"epic", stats:{atk:9,def:8},   effect:"Gain 5% Attack whenever an ally or enemy is defeated (max 50%)", battle:{defeatAtkPct:5, defeatAtkMaxPct:50}},
+  {id:"eff_def_hp_last",      name:"Last Stand Crown", emoji:"👑", rarity:"epic", stats:{hp:9,def:8},    effect:"When below 30% Health, increase Defense by 50%", battle:{lowHpDefPct:50, lowHpDefBelowPct:30}},
+  {id:"eff_hp_atk_heal",      name:"Lifebinder Pendant",emoji:"💚", rarity:"epic", stats:{hp:9,atk:8},   effect:"Increase all healing done by this creature by 30%", battle:{healDonePct:30}},
+  {id:"epi_gen_atk_crit_cicada",name:"Cicada Husk",    emoji:"🦗", rarity:"epic", stats:{atk:9,crit:14}, effect:"After falling below 50% Health, briefly become Intangible (once per battle)", battle:{lowHpIntangibleTicks:2}},
   // Stat Relics — Legendary single-stat (base 35), +25% that stat
   {id:"rel_hp",  name:"Life Relic",   emoji:"❤️", rarity:"legendary", stats:{hp:35},           effect:"Gain 25% more HP",    statBonus:{stat:"hp",          pct:25}},
   {id:"rel_atk", name:"Fury Relic",   emoji:"⚔️", rarity:"legendary", stats:{atk:35},          effect:"Gain 25% more ATK",   statBonus:{stat:"atk",         pct:25}},
@@ -162,28 +233,31 @@ export const EQUIPMENT_DEFS=[
   {id:"leg_hp_atk",  name:"Divine Colossus",  emoji:"👑",  rarity:"legendary", stats:{hp:17,crit:30}},
   {id:"leg_hp_def",  name:"Eternal Fortress", emoji:"🏯",  rarity:"legendary", stats:{def:17,critDmg:30}},
   {id:"leg_atk_def", name:"Dragon's Claw",    emoji:"🐉",  rarity:"legendary", stats:{atk:17,crit:30}},
-  // Legendary effect items — user-specified (base 17 per stat)
-  {id:"eff_atk_hp_berserk",  name:"Berserk Core",        emoji:"🔴", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Special attacks are sealed. Basic attacks deal 100% more damage"},
-  {id:"eff_atk_def_double",  name:"Twin Fang",           emoji:"🗡️", rarity:"legendary", stats:{atk:17,def:17},          effect:"Basic attacks hit 1 additional time"},
-  // Auto Battler focused (additional)
-  {id:"eff_hp_def_barrier",  name:"Crest of Conquest",   emoji:"🏰", rarity:"legendary", stats:{hp:17, def:17},          effect:"Gain a barrier absorbing 15% of max HP at the start of each battle"},
-  {id:"eff_hp_atk_shock",    name:"Shockwave Gauntlet",  emoji:"💥", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Every 5th attack releases a shockwave dealing 40% ATK to all enemies"},
-  {id:"eff_atk_def_pierce",  name:"Arrowsplit",          emoji:"🏹", rarity:"legendary", stats:{atk:17,def:17},          effect:"Attacks hit a second random enemy for 40% of the original damage"},
-  {id:"eff_atk_def_rampage", name:"Warlord's Trophy",    emoji:"🏆", rarity:"legendary", stats:{atk:17,def:17},          effect:"Gain +5% ATK permanently each time an enemy is defeated, up to +50%"},
-  // Auto Battler focused
-  {id:"eff_hp_atk_mourn",    name:"Mourning Band",       emoji:"🖤", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Gain +10% ATK permanently each time an ally is defeated"},
-  {id:"eff_def_atk_counter", name:"Thornback Plate",     emoji:"🌵", rarity:"legendary", stats:{atk:17,def:17},          effect:"Counter-attack for 25% ATK when struck"},
-  {id:"eff_hp_def_immune",   name:"Last Breath Core",    emoji:"💙", rarity:"legendary", stats:{hp:17, def:17},          effect:"When HP drops below 30%, negate the next hit entirely"},
-  // Turn Based focused
-  {id:"eff_def_hp_last",     name:"Last Stand Crown",    emoji:"👑", rarity:"legendary", stats:{hp:17, def:17},          effect:"When below 30% HP, reduce all incoming damage by 40%"},
-  {id:"eff_atk_def_crit",    name:"Shattercrit Ring",    emoji:"💎", rarity:"legendary", stats:{atk:17,def:17},          effect:"Critical hits shatter the target's armor, reducing their DEF by 20% for 3s"},
-  {id:"eff_hp_atk_heal",     name:"Lifebinder Pendant",  emoji:"💚", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Increase all healing received by 40%"},
-  // General / Mixed
-  {id:"eff_hp_def_revive",   name:"Phoenix Core",        emoji:"🔥", rarity:"legendary", stats:{hp:17, def:17},          effect:"Revive once per battle at 20% HP"},
-  {id:"eff_atk_hp_lifesteal",name:"Bloodthirster",       emoji:"🩸", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Recover 8% of all damage dealt as HP"},
+  // Legendary effect items (base 17 per stat; a crit stat at 30). Their
+  // battle effects are declared under `battle` (see BATTLE EFFECTS above).
+  // Ids are kept from earlier versions of these items so saves carry over.
+  {id:"eff_atk_hp_berserk",  name:"Berserk Core",        emoji:"🔴", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Special abilities are sealed. Gain 30% Speed and Basic attacks deal 30% more damage", speedEffect:true, battle:{sealSpecial:true, spdPct:30, basicDmgPct:30}},
+  {id:"eff_atk_def_double",  name:"Twin Fang",           emoji:"🗡️", rarity:"legendary", stats:{atk:17,def:17},          effect:"Basic attacks hit 1 additional time every 3 attacks", battle:{extraHitEvery:3}},
+  {id:"eff_hp_atk_shock",    name:"Shockwave Gauntlet",  emoji:"💥", rarity:"legendary", stats:{hp:17, critDmg:30},      effect:"Every 5th attack Splashes, dealing 50% less damage", battle:{splashEvery:5, splashLessPct:50}},
+  {id:"eff_atk_def_pierce",  name:"Arrowsplit",          emoji:"🏹", rarity:"legendary", stats:{hp:17, def:17},          effect:"Attacks Chain twice", battle:{chainTargets:2}},
+  {id:"eff_def_atk_counter", name:"Thornback Plate",     emoji:"🌵", rarity:"legendary", stats:{crit:30,def:17},         effect:"Counter-attack every 4th attack", battle:{counterEvery:4}},
+  // "Briefly" = 2 ticks (1 second).
+  {id:"eff_hp_def_immune",   name:"Last Breath Core",    emoji:"💙", rarity:"legendary", stats:{hp:17, def:17},          effect:"Negate the next fatal instance of damage and briefly gain Immortal", battle:{cheatDeathImmortalTicks:2}},
+  {id:"eff_atk_def_crit",    name:"Shattercrit Ring",    emoji:"💎", rarity:"legendary", stats:{hp:17, crit:30},         effect:"Critical hits reduce the enemy's Defense by 0.5% (stacking, max 25%)", battle:{critShredPct:0.5, critShredMaxPct:25}},
+  {id:"eff_hp_def_revive",   name:"Phoenix Core",        emoji:"🔥", rarity:"legendary", stats:{atk:17, def:17},         effect:"Revive once per battle at 50% Health", battle:{reviveHpPct:50}},
+  {id:"eff_atk_hp_lifesteal",name:"Bloodthirster",       emoji:"🩸", rarity:"legendary", stats:{crit:30, atk:17},        effect:"Recover 20% of all damage dealt as Health", battle:{lifestealPct:20}},
+  // Legendary battle-effect gear (see BATTLE EFFECTS at the top of this file).
+  // 17/17 two-stat, a crit stat at 30. The chalices put the whole 34-point
+  // budget in Health; their extra stack is the one exception to a stat mod's
+  // "one stack per source" rule, and non-stacking effects are untouched.
+  {id:"eff_hp_wyrmblood",    name:"Wyrmblood Chalice",   emoji:"🍷", rarity:"legendary", stats:{hp:34},                  effect:"Stackable debuffs are extra effective", battle:{extraDebuffStack:true}},
+  {id:"eff_hp_ambrosia",     name:"Ambrosia Chalice",    emoji:"🥂", rarity:"legendary", stats:{hp:34},                  effect:"Stackable buffs are extra effective",   battle:{extraBuffStack:true}},
+  {id:"eff_hp_atk_magpie",   name:"Magpie Brooch",       emoji:"🐦‍⬛", rarity:"legendary", stats:{hp:17, atk:17},          effect:"Steal 1 buff every 5 Basic ability attacks", battle:{stealBuffEvery:5}},
+  {id:"eff_hp_crit_echo",    name:"Echo Conch",          emoji:"🐚", rarity:"legendary", stats:{hp:17, crit:30},         effect:"Your Special ability is cast again at 50% effectiveness", battle:{echoSpecialPct:50}},
+  {id:"eff_atk_cdmg_mantis", name:"Mantis Scythe",       emoji:"🪲", rarity:"legendary", stats:{atk:17,critDmg:30},      effect:"Gain 30% Special charge when defeating an enemy", battle:{killChargePct:30}},
   // Additional user-specified legendaries
-  {id:"eff_hp_atk_bleed",    name:"Sanguine Fang",       emoji:"🩸", rarity:"legendary", stats:{atk:17,critDmg:30},                                    effect:"Whenever you inflict damage, also inflict Bleed and Burn"},
-  {id:"eff_def_atk_buffstk", name:"Warbuff Plate",       emoji:"📈", rarity:"legendary", stats:{def:17,atk:17},                                     effect:"Gain +10% ATK and DEF when gaining a buff, up to +50%"},
+  {id:"eff_hp_atk_bleed",    name:"Sanguine Fang",       emoji:"🩸", rarity:"legendary", stats:{atk:17,hp:17},                                         effect:"Whenever you inflict damage, also inflict Bleed and Burn"},
+  {id:"eff_def_atk_buffstk", name:"Warbuff Plate",       emoji:"📈", rarity:"legendary", stats:{critDmg:30,atk:17},                                    effect:"Gain 5% Attack for each buff on this creature", battle:{atkPerBuffPct:5}},
   // Dungeon-exclusive elemental legendaries (non-Speed/Haste survivors)
   {id:"dng_fire_hp_atk",   name:"Ember Brand",       emoji:"🔥", rarity:"legendary", stats:{hp:17, atk:17},          element:"Fire",     effect:"Fire attacks inflict Burn on hit"},
   {id:"dng_fire_atk_def",  name:"Scorched Plates",   emoji:"♨️", rarity:"legendary", stats:{atk:17,def:17},          element:"Fire",     effect:"Burning enemies take 15% more damage from Fire attacks"},

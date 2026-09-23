@@ -28,7 +28,7 @@ import { aChebDist, forkCells, bossOccupies } from "../geometry.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyStatMod, isIntangible } from "../status.js";
+import { applyWhileActiveStatMod, applyTimedDebuff, isIntangible } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -42,8 +42,8 @@ const EXECUTE_BELOW_PCT = 20;
 const STUN_TICKS = 3;
 /** Unfettered: flat Speed by unique level. */
 const SPEED_PCT_BY_LEVEL = [5, 10, 15, 20, 20];
-/** Re-stamped every tick, so it lapses at once if the module ever stops. */
-const SPEED_BUFF_TICKS = 2;
+// Unfettered's Speed is a while-active stack (applyWhileActiveStatMod in
+// status.js), re-stamped every tick.
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -67,7 +67,7 @@ export function makeSicklewingModule(cfg) {
      */
     onTick(unit, ctx) {
       const idx = abilityIdx(unit, "unique");
-      applyStatMod(unit, { kind: "spd", pct: speedPctByLevel[idx], src: unit.uid, ticks: SPEED_BUFF_TICKS });
+      applyWhileActiveStatMod(unit, { kind: "spd", pct: speedPctByLevel[idx], src: unit.uid });
       unit._pierceShield = true;
       unit._ignoreTaunt = idx >= MAX_IDX;
       // Execute lands from onHit, which sees no context; stash the credit.
@@ -114,7 +114,7 @@ export function makeSicklewingModule(cfg) {
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         ctx.addDamageDealt(dealt);
-        if (stuns && !e._dodgedHit) e.stunTicks = Math.max(e.stunTicks || 0, STUN_TICKS);
+        if (stuns && !e._dodgedHit) applyTimedDebuff(e, "stunTicks", Math.max(e.stunTicks || 0, STUN_TICKS));
       }
       // A boss whose body crosses either ray takes the hit; no Stun, since
       // bosses obey no control effect but Taunt.

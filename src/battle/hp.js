@@ -23,6 +23,96 @@
 // timer, or in damage.js beside the damage formulas) so that status.js and
 // damage.js can both use it without an import cycle.
 
+import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster } from "./applier.js";
+import { abilityHasTag } from "./abilityTags.js";
+import { gainSpecialCharge } from "./charge.js";
+import { isImmobilized } from "./immobilize.js";
+
+/**
+ * HIT HOOKS. Every hit that lands -- on a creature (damageUnit) or a boss
+ * (damageBoss in damage.js) -- is announced here as (attacker, target, info),
+ * where the attacker is the current applier and `info` carries:
+ *   ability      "basic" / "special" / "unique" (null if unknown)
+ *   baseDmg      the hit before the attacker's damage gear
+ *   dmg          the hit as dealt (after that gear and the target's defenses)
+ *   crit         whether it was a critical hit
+ *   effectDamage DoT / reflect / counter / hazard damage
+ * Gear that reacts to hits registers a listener instead of being written into
+ * the damage path: Magpie Brooch, Bloodthirster, Shattercrit Ring (status.js),
+ * Thornback Plate (damage.js), and the per-attack gear -- Twin Fang, Chain,
+ * Splash (tick.js). Listeners live in the modules that have their tools; they
+ * register at load, which is how this module avoids importing them (cycles).
+ */
+const hitListeners = [];
+export function onHitLanded(fn) {
+  hitListeners.push(fn);
+}
+export function announceHit(target, info) {
+  const attacker = currentApplier();
+  if (!attacker || attacker === target) return;
+  info.ability = activeAbilityOf(attacker);
+  for (const fn of hitListeners) fn(attacker, target, info);
+}
+
+/**
+ * Crit bookkeeping for hit listeners: critMultiplier (damage.js) flags the
+ * roller when it crits, and the next hit that roller lands claims the flag.
+ * Claimed at the top of every hit -- dodged and blocked ones too -- so a crit
+ * whose hit never lands can't leak onto a later one.
+ */
+function claimCrit(attacker) {
+  if (!attacker || !attacker._critLanded) return false;
+  attacker._critLanded = false;
+  return true;
+}
+
+/**
+ * POLICY: the attacker's damage gear, in one place -- damageUnit and
+ * damageBoss (damage.js) both apply it, once per hit:
+ *   - Echo Conch: everything dealt during an echo, at its effectiveness
+ *     (the caster's own self-damage included).
+ *   - Hunter's Snare: + against an Immobilized target (see immobilize.js).
+ *   - Hydra Tooth: + when the ability the hit came from is tagged Multi-hit
+ *     (see abilityTags.js) -- the tag is the classification, so any ability
+ *     tagged there is covered, Basic or Special alike.
+ *   - Berserk Core: + on the Basic ability.
+ * Effect damage (DoTs, reflects, hazards) takes only the echo scaling.
+ */
+export function attackerDamageMultiplier(target, { effectDamage = false } = {}) {
+  let mult = effectiveness();
+  const attacker = currentApplier();
+  if (!attacker || attacker === target || effectDamage) return mult;
+  const gear = attacker.gear;
+  if (!gear) return mult;
+  const ability = activeAbilityOf(attacker);
+  if (gear.immobilizedDmgPct && isImmobilized(target)) mult *= 1 + gear.immobilizedDmgPct / 100;
+  if (gear.multiHitDmgPct && abilityHasTag(attacker, ability, "multihit")) mult *= 1 + gear.multiHitDmgPct / 100;
+  if (gear.basicDmgPct && ability === "basic") mult *= 1 + gear.basicDmgPct / 100;
+  return mult;
+}
+
+/**
+ * `target` was just defeated. Shared by damageUnit and damageBoss so every
+ * killing blow pays the same way:
+ *   - Mantis Scythe: the creature that landed it gains Special charge.
+ *     Damage over time and hazards tick between turns with no applier, so
+ *     they credit nobody.
+ *   - Warlord's Trophy: EVERY other creature on the field wearing it, on
+ *     either side, gains Attack (read by gearAtkMultiplier in damage.js).
+ */
+export function onDefeated(target) {
+  const killer = currentApplier();
+  if (killer && killer !== target && killer.hp > 0) {
+    const pct = killer.gear?.killChargePct || 0;
+    if (pct && killer.abilChargeMax) gainSpecialCharge(killer, (killer.abilChargeMax * pct) / 100);
+  }
+  for (const u of battleRoster()) {
+    const step = u.gear?.defeatAtkPct || 0;
+    if (!step || u === target || u.hp <= 0) continue;
+    u._defeatAtkPct = Math.min(u.gear.defeatAtkMaxPct ?? Infinity, (u._defeatAtkPct || 0) + step);
+  }
+}
+
 /**
  * Fortify (Iglet's Hunker In) lives here rather than in status.js because
  * damageUnit below is what spends it, and status.js already imports this
@@ -78,7 +168,7 @@ export function applyProtect(target, guard, stacks = 1) {
   // One guardian at a time -- a newer Protect replaces an older one outright,
   // the same way a new Taunt replaces the old.
   const carried = target.protect && target.protect.src === guard ? target.protect.stacks : 0;
-  target.protect = { src: guard, stacks: Math.min(PROTECT_STACK_CAP, carried + stacks) };
+  target.protect = { src: guard, stacks: Math.min(PROTECT_STACK_CAP, carried + buffStacks(target, stacks)) };
 }
 
 /** Stacks currently carried, 0 when nothing is guarding this unit. */
@@ -101,21 +191,111 @@ export function clearProtect(u) {
  * shrinks the pool nor refreshes the duration). An equal one does replace,
  * so a creature recasting its own Shield still refreshes it.
  *
- * A Shield may stack ONLY when its own displayed text says so. The one thing
- * that does today is the Light boss's Holy Radiance -- its description reads
- * "stackable" -- so it adds to its pool directly (battle/bosses/light.js) and
- * deliberately does not come through here. Bulwark, that boss's passive, adds
- * to the same pool for the same reason: the boss's Shield is one plain number
- * with no timer, spent by damageBoss in damage.js, not a unit Shield at all.
+ * A Shield may stack ONLY when its own displayed text says so. The Light
+ * boss's Holy Radiance ("stackable") adds to the boss's own pool directly
+ * (battle/bosses/light.js) -- that pool is one plain number with no timer,
+ * spent by damageBoss in damage.js, not a unit Shield at all. On creatures,
+ * stacking Shields form the STACKING LAYER below.
+ *
+ * The keep-the-larger comparison is against the Shield WITHOUT the stacking
+ * layer, and the layer is kept on top of the winner: a stacking Shield never
+ * blocks a normal one from being recast or refreshed.
  *
  * Returns true when this Shield was the one kept.
  */
 export function applyShield(u, amount, ticks) {
-  const shield = Math.max(1, Math.round(amount));
-  if (shield < (u.shield || 0)) return false;
-  u.shield = shield;
-  u.shieldTicks = ticks;
+  // Shield gear on whoever grants it (see battle/applier.js), applied before
+  // the keep-the-larger comparison so a strengthened Shield competes at size.
+  const shield = Math.max(1, Math.round(shieldAmount(amount)));
+  const layer = stackLayer(u);
+  if (shield < (u.shield || 0) - layer) return false;
+  u.shield = shield + layer;
+  // Duration gear on whoever granted it (see battle/applier.js).
+  u.shieldTicks = buffTicks(u, ticks);
   return true;
+}
+
+/**
+ * THE STACKING LAYER. `u.shield` is one pool -- the number damage spends and
+ * the UI and Radiant Smite read -- made of two parts:
+ *   - the ordinary Shield (keep-the-larger, timer `shieldTicks`), and
+ *   - the stacking layer (`stackShield`, timer `stackShieldTicks`): Shields
+ *     whose text says they stack. They ADD to it, it is spent FIRST (it is the
+ *     outermost part), and it keeps its own timer -- Infinity for one that
+ *     lasts until broken -- so neither part's expiry takes the other with it.
+ * Two sources feed it today: Crest of Conquest (a battle-start Shield, until
+ * broken) and the Overheal Layer (Wax Cell / Honeycomb Flask), whose own cap
+ * is tracked as the `overhealLayer` share of the stacking layer.
+ */
+function stackLayer(u) {
+  return Math.min(u.stackShield || 0, u.shield || 0);
+}
+
+/** The ordinary (non-stacking) part of a unit's Shield -- what Blubber Wall
+ * watches to tell its own wall breaking from the stacking layer. */
+export function baseShield(u) {
+  return Math.max(0, (u.shield || 0) - stackLayer(u));
+}
+
+/** Add `amount` (final, already gear-scaled) to the stacking layer, lasting
+ * at least `ticks` (Infinity = until broken). Returns what was added. */
+export function addStackingShield(u, amount, ticks) {
+  const add = Math.round(amount);
+  if (!u || add <= 0) return 0;
+  u.stackShield = stackLayer(u) + add;
+  u.shield = (u.shield || 0) + add;
+  u.stackShieldTicks = Math.max(u.stackShieldTicks || 0, ticks);
+  return add;
+}
+
+/**
+ * Drop a unit's whole Shield, stacking layer included (buff dispel, a
+ * stolen Shield). Every place that zeroes a Shield goes through here so no
+ * part of it can outlive the rest.
+ */
+export function clearShield(u) {
+  u.shield = 0;
+  u.shieldTicks = 0;
+  u.stackShield = 0;
+  u.stackShieldTicks = 0;
+  u.overhealLayer = 0;
+}
+
+/** One expiry tick for both parts of the Shield (see tickTimedMods). */
+export function tickShieldTimers(u) {
+  if ((u.shieldTicks || 0) > 0 && !--u.shieldTicks) {
+    u.shield = stackLayer(u); // the ordinary Shield lapses; the layer stays
+  }
+  if ((u.stackShieldTicks || 0) > 0 && !--u.stackShieldTicks) {
+    u.shield = Math.max(0, (u.shield || 0) - stackLayer(u));
+    u.stackShield = 0;
+    u.overhealLayer = 0;
+  }
+}
+
+/**
+ * The Overheal Layer (Wax Cell / Honeycomb Flask): overhealing with that gear
+ * banks into the stacking layer, holding at most `gear.overhealLayerPct` of
+ * max Health of it, and refills as it is chipped away.
+ */
+function overhealLayer(u) {
+  return Math.min(u.overhealLayer || 0, stackLayer(u));
+}
+
+/**
+ * Bank up to `excess` overheal into the layer. Returns how much of the excess
+ * it used, so whatever is left can still feed Reliquary's own Overheal. Runs
+ * as the receiver (healUnit wraps it), so the receiver's Pearl Lacquer
+ * enlarges both the layer and its cap, and its duration gear the timer.
+ */
+function addOverhealLayer(u, excess) {
+  const boost = shieldAmount(1);
+  const cap = (u.maxHp || 0) * (u.gear?.overhealLayerPct || 0) / 100 * boost;
+  const room = Math.floor(cap - overhealLayer(u));
+  if (room <= 0) return 0;
+  const add = addStackingShield(u, Math.min(Math.round(excess * boost), room), buffTicks(u, OVERHEAL_SHIELD_TICKS));
+  u.overhealLayer = overhealLayer(u) + add;
+  return add / boost;
 }
 
 /**
@@ -130,11 +310,14 @@ export function applyShield(u, amount, ticks) {
  * Returns the Health actually restored, so callers keeping heal totals are
  * unaffected.
  *
- * Overheal (Oathcub's Reliquary): a unit carrying `overhealPct` turns the
- * discarded excess into a Shield, capped at that share of its Defense. It
- * goes through applyShield like every other Shield, so the no-stacking rule
- * still holds -- an Overheal Shield replaces a smaller one and is ignored by
- * a larger one, rather than accumulating over a fight.
+ * Overheal turns the discarded excess into a Shield. Two sources grant it:
+ *   - Wax Cell / Honeycomb Flask gear (`gear.overhealLayerPct`, a share of max
+ *     Health) bank it into the stacking Overheal Layer (addOverhealLayer).
+ *     This goes first.
+ *   - Oathcub's Reliquary (`overhealPct`, a share of Defense) turns whatever
+ *     excess is left into an ordinary Shield through applyShield, so the
+ *     no-stacking rule holds for it -- it replaces a smaller Shield and is
+ *     ignored by a larger one, rather than accumulating over a fight.
  *
  * The Light boss's self-heal deliberately does NOT come through here: a boss
  * keeps a separate shield pool spent by damageBoss (see damage.js), and
@@ -142,15 +325,30 @@ export function applyShield(u, amount, ticks) {
  */
 const OVERHEAL_SHIELD_TICKS = 6;
 
+/** Lifebinder Pendant: healing done by the current applier (the healer) --
+ * self-heals, lifesteal and Heal Over Time (applyHealOverTime) included. */
+export function healDoneMultiplier() {
+  return 1 + (currentApplier()?.gear?.healDonePct || 0) / 100;
+}
+
 export function healUnit(u, amount) {
   if (!u || !(amount > 0) || u.hp <= 0) return 0;
+  // The healer's gear: Lifebinder Pendant's healing done, and an echoed
+  // Special's (Echo Conch) reduced effectiveness.
+  amount = Math.max(1, Math.round(amount * healDoneMultiplier() * effectiveness()));
   const before = u.hp;
   u.hp = Math.min(u.maxHp, u.hp + amount);
   const healed = u.hp - before;
   const excess = amount - healed;
-  if (excess > 0 && (u.overhealPct || 0) > 0) {
+  // Overheal is the RECEIVER's own passive, so its Shield is the receiver's
+  // to strengthen -- not whichever healer happened to overflow it.
+  let left = excess;
+  if (left > 0 && (u.gear?.overhealLayerPct || 0) > 0) {
+    left -= asPassive(u, () => addOverhealLayer(u, left));
+  }
+  if (left > 0 && (u.overhealPct || 0) > 0) {
     const cap = ((u.def || 0) * u.overhealPct) / 100;
-    if (cap > 0) applyShield(u, Math.min(excess, cap), OVERHEAL_SHIELD_TICKS);
+    if (cap > 0) asPassive(u, () => applyShield(u, Math.min(left, cap), OVERHEAL_SHIELD_TICKS));
   }
   return healed;
 }
@@ -163,7 +361,15 @@ export function healUnit(u, amount) {
 export function absorbShield(u, dmg) {
   if ((u.shield || 0) <= 0 || dmg <= 0) return dmg;
   const absorbed = Math.min(u.shield, dmg);
+  // The stacking layer is the outermost part of the Shield, and the overheal
+  // share the outermost part of that: both are spent first.
+  const layer = stackLayer(u);
   u.shield -= absorbed;
+  if (layer) {
+    u.stackShield = Math.max(0, layer - absorbed);
+    u.overhealLayer = Math.min(Math.max(0, (u.overhealLayer || 0) - absorbed), u.stackShield);
+    if (!u.stackShield) u.stackShieldTicks = 0;
+  }
   return dmg - absorbed;
 }
 
@@ -172,11 +378,22 @@ export function absorbShield(u, dmg) {
  * dealt (including the shield-absorbed part) so callers can keep their damage
  * totals and charts unchanged.
  */
-export function damageUnit(target, dmg, { pierceShield = false, effectDamage = false, redirected = false } = {}) {
+export function damageUnit(target, dmg, { pierceShield = false, effectDamage = false, redirected = false, crit = false } = {}) {
   if (!target || dmg <= 0) return 0;
+  if (!redirected) crit = claimCrit(currentApplier());
   // Intangible (Deep Submerge): can not be damaged at all -- every damage
   // source routes through here, so the immunity is engine-wide by design.
   if ((target.intangibleTicks || 0) > 0) return 0;
+  // The attacker's gear, applied once at the top (never again on a Protect
+  // redirect). Echo Conch scales EVERYTHING dealt during an echo, the caster's
+  // own self-damage included; Hunter's Snare adds to its attacks on an
+  // Immobilized creature (effect damage -- DoTs, reflects, hazards -- aside).
+  const baseDmg = dmg;
+  if (!redirected) {
+    const mult = attackerDamageMultiplier(target, { effectDamage });
+    if (mult !== 1) dmg = Math.max(1, Math.round(dmg * mult));
+  }
+  const wasAlive = target.hp > 0;
   target._dodgedHit = false;
   target._redirectedTo = null;
   // Protect: hand the hit to the guardian before anything else resolves, so
@@ -188,7 +405,7 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
       target.protect.stacks--;
       if (target.protect.stacks <= 0) target.protect = null;
       target._redirectedTo = guard;
-      return damageUnit(guard, dmg, { pierceShield, effectDamage, redirected: true });
+      return damageUnit(guard, dmg, { pierceShield, effectDamage, redirected: true, crit });
     }
   }
   // Dodge: every Nth ability hit misses outright. Checked before Fortify so a
@@ -211,10 +428,18 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   if ((target.windbreakTicks || 0) > 0 && (target.windbreakPct || 0) > 0) {
     dmg = Math.max(1, Math.round((dmg * (100 - target.windbreakPct)) / 100));
   }
-  const toHealth = pierceShield ? dmg : absorbShield(target, dmg);
+  let toHealth = pierceShield ? dmg : absorbShield(target, dmg);
   // Immortal (Silver Draught): Health can not be reduced below 1 -- the
   // clamp beats everything, shield-piercing damage included.
   const floor = (target.immortalTicks || 0) > 0 ? 1 : 0;
+  // Last Breath Core: the first hit that would be fatal is negated outright,
+  // and the wearer is briefly Immortal. Once per battle.
+  const lastBreath = target.gear?.cheatDeathImmortalTicks || 0;
+  if (lastBreath && !floor && !target._lastBreathUsed && target.hp > 0 && toHealth >= target.hp) {
+    target._lastBreathUsed = true;
+    toHealth = 0;
+    target.immortalTicks = Math.max(target.immortalTicks || 0, lastBreath);
+  }
   target.hp = Math.max(floor, target.hp - toHealth);
   // Revive (Rekindle): a unit carrying the one-shot flag (set by its module
   // at battle start) returns at full Health the first time it would die.
@@ -223,6 +448,13 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   if (target.hp <= 0 && target._reviveReady) {
     target._reviveReady = false;
     target.hp = target.maxHp;
+  }
+  // Phoenix Core: the same, once per battle, at a share of max Health. A
+  // creature with both uses Rekindle first and keeps this for its next death.
+  const phoenix = target.gear?.reviveHpPct || 0;
+  if (target.hp <= 0 && phoenix && !target._gearReviveUsed) {
+    target._gearReviveUsed = true;
+    target.hp = Math.max(1, Math.round((target.maxHp * phoenix) / 100));
   }
   // Time of death, for defeat animations (ui/components/battleArtState.js).
   // Stamped here because every damage source routes through this function, and
@@ -233,5 +465,13 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   } else if (target.deathTime) {
     target.deathTime = 0;
   }
+  // Cicada Husk: the first time Health falls below half, slip away briefly.
+  const husk = target.gear?.lowHpIntangibleTicks || 0;
+  if (husk && target.hp > 0 && !target._huskUsed && target.hp < target.maxHp / 2) {
+    target._huskUsed = true;
+    target.intangibleTicks = Math.max(target.intangibleTicks || 0, husk);
+  }
+  if (wasAlive && target.hp <= 0) onDefeated(target);
+  announceHit(target, { baseDmg, dmg, crit, effectDamage });
   return dmg;
 }

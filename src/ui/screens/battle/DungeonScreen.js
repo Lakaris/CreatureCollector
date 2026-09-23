@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { STAT_LABELS } from "../../../data/rarity.js";
+import { STAT_LABELS, formatStatBonus } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../../data/equipment.js";
 import { isExclusive, exclusivityChip } from "../../../core/equipment.js";
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST, TYPE_ORDER } from "../../../data/types.js";
@@ -758,7 +758,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
       rewards.map((item,i)=>{
         const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ");
+        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
         return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
           React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
@@ -870,7 +870,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             exclusivityChip(previewItem)
           )
         ),
-        previewItem.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},Object.entries(previewItem.stats).map(([s,v])=>"+"+v+" "+STAT_LABELS[s]).join(" · ")),
+        previewItem.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},Object.entries(previewItem.stats).map(([s,v])=>formatStatBonus(s,v)).join(" · ")),
         previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
         React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
       )

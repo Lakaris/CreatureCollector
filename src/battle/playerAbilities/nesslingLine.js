@@ -23,6 +23,7 @@ import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind, applyTaunt } from "../status.js";
 import { damageUnit, healUnit } from "../hp.js";
+import { gainSpecialCharge } from "../charge.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -109,8 +110,7 @@ export function makeNesslingModule(cfg) {
     /** Stirring Depths: every attack hit taken feeds the charge bar. */
     onDamaged(unit, attacker, dmg) {
       if (dmg <= 0 || !unit.abilChargeMax || isStunned(unit)) return 0;
-      const gain = CHARGE_ON_DAMAGED_BY_LEVEL[abilityIdx(unit, "unique")];
-      unit.abilCharge = Math.min(unit.abilChargeMax, (unit.abilCharge || 0) + gain);
+      gainSpecialCharge(unit, CHARGE_ON_DAMAGED_BY_LEVEL[abilityIdx(unit, "unique")]);
       return 0; // no reflect damage
     },
 

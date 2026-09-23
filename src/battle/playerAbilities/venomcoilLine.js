@@ -24,7 +24,7 @@ import { aChebDist, distToBoss } from "../geometry.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, healUnit } from "../hp.js";
-import { applyRestrained, applyPoison, applyStatMod, healReceivedMultiplier } from "../status.js";
+import { applyRestrained, applyPoison, applyWhileActiveStatMod, healReceivedMultiplier } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -43,9 +43,8 @@ const RESTRAIN_STACKS = 1;
 /** The snake's Restrained carries no slow of its own -- that is Static Grip's
  * job, and this line has no equivalent. */
 const RESTRAIN_SLOW_PCT = 0;
-/** Short enough that the Speed lapses right after the grip breaks, long enough
- * that one refresh per tick keeps it up without flickering. */
-const GRIP_BUFF_TICKS = 2;
+// The grip's Speed is a while-active stack (applyWhileActiveStatMod in
+// status.js): it lapses right after the grip breaks.
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -147,7 +146,7 @@ export function makeVenomcoilModule(cfg) {
         if (d <= range && d < bestD) { bestD = d; target = e; }
       }
       if (!target || !isRestrained(target)) return;
-      applyStatMod(unit, { kind: "spd", pct, src: unit.uid, ticks: GRIP_BUFF_TICKS });
+      applyWhileActiveStatMod(unit, { kind: "spd", pct, src: unit.uid });
     },
   };
 }

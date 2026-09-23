@@ -15,7 +15,7 @@
 // aura also grants those allies a +10% ATK buff while they stay in range.
 
 import { aChebDist } from "../geometry.js";
-import { healReceivedMultiplier, applyStatMod, hasNegativeStatMods, dispelDebuffs } from "../status.js";
+import { healReceivedMultiplier, applyWhileActiveStatMod, hasNegativeStatMods, dispelDebuffs, auraRange } from "../status.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { healUnit } from "../hp.js";
 
@@ -33,8 +33,8 @@ const AURA_HEAL_PER_SEC_BY_LEVEL = [6, 8, 10, 13, 13];
 /** Chebyshev radius 1 = the 3x3 block around the unit. */
 const AURA_RANGE = 1;
 const AURA_ATK_PCT = 10;
-/** Refreshed every tick while in range, so 2 ticks ~= "until you step out". */
-const AURA_ATK_TICKS = 2;
+// The Grove's ATK Up is a while-active stack (applyWhileActiveStatMod in
+// status.js): refreshed every tick in range, gone once you step out.
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -52,7 +52,7 @@ function hasDebuff(u) {
     (u.slowTicks || 0) > 0 || (u.shockTicks || 0) > 0 ||
     (u.tauntTicks || 0) > 0 ||
     (u.stunTicks || 0) > 0 || (u.markedTicks || 0) > 0 || !!u.blinded ||
-    (u.frostbiteTicks || 0) > 0 || (u.dartShredTicks || 0) > 0 ||
+    (u.frostbiteTicks || 0) > 0 || (u.dartShredTicks || 0) > 0 || (u.critShredTicks || 0) > 0 ||
     hasNegativeStatMods(u)
   );
 }
@@ -99,7 +99,7 @@ export function makeBloomibisModule(cfg) {
       // ticks keeps HP integral while matching the displayed rate exactly.
       unit._groveGate = !unit._groveGate;
       for (const a of ctx.aliveP) {
-        if (aChebDist(unit.row, unit.col, a.row, a.col) > AURA_RANGE) continue;
+        if (aChebDist(unit.row, unit.col, a.row, a.col) > auraRange(unit, AURA_RANGE)) continue;
         if (unit._groveGate && a.hp < a.maxHp && canBeHealed(a)) {
           healUnit(a, Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
         }
@@ -107,7 +107,7 @@ export function makeBloomibisModule(cfg) {
           // One ATK Up stack per Bloomibis, refreshed every tick while the
           // ally stays in the aura; stacks freely with other sources (e.g.
           // Starlit's Radiant Exchange) under the per-source system.
-          applyStatMod(a, { kind: "atk", pct: AURA_ATK_PCT, src: unit.uid, ticks: AURA_ATK_TICKS });
+          applyWhileActiveStatMod(a, { kind: "atk", pct: AURA_ATK_PCT, src: unit.uid });
         }
       }
     },

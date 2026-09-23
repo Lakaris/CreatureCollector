@@ -23,7 +23,7 @@
 import { aChebDist } from "../geometry.js";
 import { STATUS_TICKS, ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyStatMod, applyRoot, dispelDebuffs, isRooted, isIntangible } from "../status.js";
+import { applyStatMod, applyWhileActiveStatMod, applyRoot, dispelDebuffs, isRooted, isIntangible } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js).
@@ -43,8 +43,8 @@ const HEAL_DOWN_PCT = 20;
 const SPLASH_RANGE = 1;
 /** Splash catches neighbours for the same damage the main hit landed. */
 const SPLASH_DMG_MULT = 1;
-/** Short enough that the Speed lapses the moment the anchor does. */
-const ANCHOR_BUFF_TICKS = 2;
+// The anchor's Speed is a while-active stack (applyWhileActiveStatMod in
+// status.js): it lapses the moment the anchor does.
 
 /** Levels are 0-based and cap at the table's last entry (level 5 == index 4). */
 const MAX_IDX = 4;
@@ -79,7 +79,7 @@ export function makeSiegefinModule(cfg) {
       unit._splashNow = ctx.now;
       unit._splashEnemySide = !!ctx.isEnemySide;
       if (isRooted(unit)) {
-        applyStatMod(unit, { kind: "spd", pct: anchorSpeedByLevel[abilityIdx(unit, "special")], src: unit.uid, ticks: ANCHOR_BUFF_TICKS });
+        applyWhileActiveStatMod(unit, { kind: "spd", pct: anchorSpeedByLevel[abilityIdx(unit, "special")], src: unit.uid });
       }
     },
 
@@ -114,7 +114,7 @@ export function makeSiegefinModule(cfg) {
       const idx = abilityIdx(unit, "special");
       dispelDebuffs(unit);
       applyRoot(unit, idx >= MAX_IDX ? ENDURING_TICKS : STATUS_TICKS, { undispellable: true });
-      applyStatMod(unit, { kind: "spd", pct: anchorSpeedByLevel[idx], src: unit.uid, ticks: ANCHOR_BUFF_TICKS });
+      applyWhileActiveStatMod(unit, { kind: "spd", pct: anchorSpeedByLevel[idx], src: unit.uid });
       newFx.push({ id: now + "hf" + unit.uid, row: unit.row, col: unit.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
 

@@ -95,7 +95,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
     ),
     entries.length === 0
       ? React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#666" } },
-          React.createElement("p", { style: { fontSize: 13 } }, isExclusive(item) ? "No eligible creatures for this gear yet." : "No creatures yet — hatch some eggs!")
+          React.createElement("p", { style: { fontSize: 13 } }, isExclusive(item) ? "No eligible creatures for this gear yet." : "No creatures yet")
         )
       : React.createElement("div", { className: "creature-grid" },
           // Card layout is CollectionScreen's, element for element: rarity-tinted

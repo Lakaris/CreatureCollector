@@ -23,7 +23,8 @@
 import { aChebDist, distToBoss } from "../geometry.js";
 import { damageBoss } from "../damage.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
-import { damageUnit, applyShield } from "../hp.js";
+import { damageUnit, applyShield, baseShield } from "../hp.js";
+import { isEchoCast } from "../applier.js";
 import { applyStatMod } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -94,12 +95,17 @@ export function makeMoruskModule(cfg) {
       const pct = shieldPctByLevel[abilityIdx(unit, "special")];
       // Arm the burst only if this wall is the Shield actually standing --
       // a bigger Shield from elsewhere is not Morusk's to detonate.
-      unit._wallArmed = applyShield(unit, (unit.maxHp * pct) / 100, STATUS_TICKS);
+      const kept = applyShield(unit, (unit.maxHp * pct) / 100, STATUS_TICKS);
+      // An echoed cast (Echo Conch) raises a weaker wall that is usually
+      // ignored -- it must not disarm the full-strength wall still standing.
+      unit._wallArmed = kept || (isEchoCast(unit) && !!unit._wallArmed);
     },
 
     /** Detect a broken wall (shield emptied while its timer still runs) and burst. */
     onTick(unit, ctx) {
-      if (!unit._wallArmed || (unit.shield || 0) > 0) return;
+      // The wall is the ordinary Shield; a stacking layer on top (Crest of
+      // Conquest, Overheal) is not the wall and doesn't keep it standing.
+      if (!unit._wallArmed || baseShield(unit) > 0) return;
       const broken = (unit.shieldTicks || 0) > 0;
       unit._wallArmed = false;
       unit.shieldTicks = 0;

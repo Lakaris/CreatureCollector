@@ -7,8 +7,9 @@
 import { getRootDef } from "../../core/creatures.js";
 import { attackRoll, damageBoss } from "../damage.js";
 import { bossOccupies } from "../geometry.js";
-import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { applyBurn } from "../status.js";
 
 /** Hits per attack, indexed by ability level (0-based, level 1 = index 0). */
 const HITS_BY_LEVEL = [2, 2, 3, 3, 4];
@@ -20,8 +21,7 @@ const HITS_BY_LEVEL = [2, 2, 3, 3, 4];
 const PER_HIT_DMG_BY_LEVEL = [15, 16, 12, 13, 11];
 const DMG_MULT_BY_LEVEL = PER_HIT_DMG_BY_LEVEL.map((d, i) => (d * HITS_BY_LEVEL[i]) / BASIC_DMG_BASELINE);
 
-const BURN_DURATION_TICKS = STATUS_TICKS;
-const BURN_STACK_CAP = 10;
+/** Burn itself (duration, stack cap) is shared -- see applyBurn in status.js. */
 /** Bonus flat damage per 5 Burn stacks on the target, as a fraction of Emberstar's ATK (unique lvl 5 only). */
 const BURN_BONUS_ATK_FRACTION = 0.08;
 
@@ -81,9 +81,7 @@ export function makeEmberstarModule(defBonusByLevel) {
 
     /** Burning Bond: every hit inflicts/refreshes Burn; lvl 5 adds bonus dmg per 5 stacks. */
     onHit(unit, target) {
-      target.burnTicks = BURN_DURATION_TICKS;
-      target.burnStacks = Math.min((target.burnStacks || 0) + 1, BURN_STACK_CAP);
-      target.burnSourceAtk = unit.atk;
+      applyBurn(target, unit.atk);
 
       if (abilityIdx(unit, "unique") >= defBonusByLevel.length - 1) {
         const stacksOf5 = Math.floor((target.burnStacks || 0) / 5);

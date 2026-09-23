@@ -1,8 +1,11 @@
 // Damage formulas.
 
-import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier } from "./status.js";
+import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier, critShredMultiplier, countBuffs } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1, BASIC_ATTACK_DMG_MULT } from "./constants.js";
 import { CREATURE_MAP } from "../data/creatures.js";
+import { isUsingBasic, currentApplier, withApplier, withActiveAbility, battleRoster } from "./applier.js";
+import { onDefeated, announceHit, onHitLanded, attackerDamageMultiplier, damageUnit } from "./hp.js";
+import { gainSpecialCharge } from "./charge.js";
 
 /**
  * POLICY: crit is rolled in exactly TWO places -- attackRoll and unitDamage --
@@ -29,10 +32,31 @@ function critMultiplier(unit) {
   // Guaranteed Crit (Solar Pounce): skip the chance roll and always pay out
   // critDmg. Still only the two roll sites -- the flag just makes them
   // certain -- and withGuaranteedCrit below is the only thing that sets it.
-  if (unit && unit._forceCrit) return 1 + critDmgOf(unit) / 100;
+  if (unit && unit._forceCrit) return landCrit(unit);
   const chance = (unit && unit.crit) || 0;
   if (!(Math.random() * 100 < chance)) return 1;
+  return landCrit(unit);
+}
+
+/** A crit happened: pay crit gear, and flag it for the hit it belongs to
+ * (claimed by damageUnit / damageBoss for hit listeners -- see hp.js). */
+function landCrit(unit) {
+  grantCritCharge(unit);
+  unit._critLanded = true;
   return 1 + critDmgOf(unit) / 100;
+}
+
+/**
+ * Cricket Chirp / Tuning Fork: a crit from the creature's Basic ability adds
+ * a share of the special charge bar. Lives here because critMultiplier is the
+ * one place a crit is decided (see the POLICY above); whether the roll came
+ * from the Basic ability is tracked by tick.js (see isUsingBasic in
+ * applier.js), so special and passive crits pay nothing.
+ */
+function grantCritCharge(unit) {
+  const pct = unit.gear?.basicCritChargePct;
+  if (!pct || !unit.abilChargeMax || !isUsingBasic(unit)) return;
+  gainSpecialCharge(unit, (unit.abilChargeMax * pct) / 100);
 }
 
 /**
@@ -44,6 +68,30 @@ function critMultiplier(unit) {
  */
 function auraAtkMultiplier(unit) {
   return 1 + (((unit && unit._auraAtkPct) || 0) + ((unit && unit._passiveAtkPct) || 0)) / 100;
+}
+
+/**
+ * POLICY: gear that raises Attack mid-battle, read wherever a formula takes a
+ * creature's Attack (attackRoll, unitDamage) -- so it reaches Basics and
+ * Specials alike:
+ *   - Warlord's Trophy: its running total from defeats (`_defeatAtkPct`,
+ *     banked by onDefeated in hp.js).
+ *   - Warbuff Plate: a share per buff currently worn (countBuffs).
+ */
+export function gearAtkMultiplier(unit) {
+  if (!unit || !unit.gear) return 1;
+  const perBuff = unit.gear.atkPerBuffPct || 0;
+  return 1 + ((unit._defeatAtkPct || 0) + (perBuff ? perBuff * countBuffs(unit) : 0)) / 100;
+}
+
+/**
+ * Gear that raises Defense mid-battle, read by unitDamage's Defense:
+ * Last Stand Crown, while its wearer is below its Health threshold.
+ */
+export function gearDefMultiplier(unit) {
+  const pct = unit?.gear?.lowHpDefPct || 0;
+  if (!pct || !(unit.hp < (unit.maxHp * (unit.gear.lowHpDefBelowPct || 0)) / 100)) return 1;
+  return 1 + pct / 100;
 }
 
 /** The Defense twin of `_passiveAtkPct`; auras carry no Defense face today. */
@@ -74,7 +122,7 @@ export function withGuaranteedCrit(unit, fn) {
  * unit's crit chance, and every call site already had the unit in hand.
  */
 export function attackRoll(attacker) {
-  return attacker.atk * (0.8 + Math.random() * 0.4) * critMultiplier(attacker);
+  return attacker.atk * gearAtkMultiplier(attacker) * (0.8 + Math.random() * 0.4) * critMultiplier(attacker);
 }
 
 /**
@@ -97,8 +145,9 @@ export function mitigatedDamage(atk, def) {
 export function unitDamage(attacker, defender) {
   // Frostbite: Water attackers hit the carrier harder (5% per stack).
   const water = CREATURE_MAP[attacker.creatureId]?.type === "Water";
-  const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker);
-  const def = (defender.def || 20) * statModMultiplier(defender, "def") * passiveDefMultiplier(defender) * dartShredMultiplier(defender);
+  const atk = attacker.atk * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker) * gearAtkMultiplier(attacker);
+  const def = (defender.def || 20) * statModMultiplier(defender, "def") * passiveDefMultiplier(defender) * dartShredMultiplier(defender)
+    * critShredMultiplier(defender) * gearDefMultiplier(defender);
   const roll = 0.8 + Math.random() * 0.4;
   return Math.max(1, Math.round(mitigatedDamage(atk, def) * roll * critMultiplier(attacker) * frostbiteMultiplier(water, defender)));
 }
@@ -139,16 +188,56 @@ export function basicDamageToBoss(attacker, boss, aliveP) {
   return playerDamageToBoss(attacker, boss, aliveP) * BASIC_ATTACK_DMG_MULT;
 }
 
-/** Apply damage to a boss, letting any shield soak it first. */
-export function damageBoss(boss, dmg) {
+/**
+ * Apply damage to a boss, letting any shield soak it first. The boss's twin
+ * of damageUnit for the attacker's gear (attackerDamageMultiplier in hp.js),
+ * Special charge on the defeat, and Basic-hit reactions. Returns the damage
+ * actually applied.
+ */
+export function damageBoss(boss, dmg, { effectDamage = false } = {}) {
+  const attacker = currentApplier();
+  const crit = !!attacker?._critLanded;
+  if (attacker) attacker._critLanded = false;
+  const baseDmg = dmg;
+  dmg = Math.max(1, Math.round(dmg * attackerDamageMultiplier(boss, { effectDamage })));
+  const wasAlive = boss.hp > 0;
   if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - dmg);
   else boss.hp = Math.max(0, boss.hp - dmg);
+  if (wasAlive && boss.hp <= 0) onDefeated(boss);
+  announceHit(boss, { baseDmg, dmg, crit, effectDamage });
+  return dmg;
 }
 
-/** Ticks until a unit can act again, slowed by Slow/Shock and sped up by Speed buffs. */
+/** Ticks until a unit can act again, slowed by Slow/Shock and sped up by
+ * Speed buffs -- and by Speed gear (Berserk Core), a flat share of the stat. */
 export function attackCooldown(unit, penalty = 1) {
   // Floor of 2 ticks (1s). It was 3, which at the old 12-tick base was a
   // distant 4x ceiling; against a 4-tick base it would cap Speed at 1.33x
   // and make the stat nearly worthless.
-  return Math.max(2, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit))) * penalty));
+  const gearSpd = 1 + (unit.gear?.spdPct || 0) / 100;
+  return Math.max(2, Math.round((COOLDOWN_TICKS_AT_SPD_1 / (unit.spd * gearSpd * statModMultiplier(unit, "spd") * restrainedSlowMultiplier(unit))) * penalty));
 }
+
+/**
+ * Thornback Plate: every Nth hit a creature takes from an enemy's ability,
+ * it Counters -- its Basic damage turned on whoever hit it (the Counter tag:
+ * "Attacks the creature that attacked it"). Lands as effect damage, like
+ * every counter and reflect, so it is never itself countered: two Thornbacks
+ * can't loop. Boss hits count too (tick.js names the boss as the applier
+ * for its turn).
+ */
+onHitLanded((attacker, target, info) => {
+  const every = target.gear?.counterEvery || 0;
+  if (!every || info.effectDamage || target.hp <= 0 || !(attacker.hp > 0)) return;
+  target._hitsTaken = (target._hitsTaken || 0) + 1;
+  if (target._hitsTaken < every) return;
+  target._hitsTaken = 0;
+  withApplier(target, () => withActiveAbility(target, "unique", () => {
+    if (attacker.uid == null) {
+      const players = battleRoster().filter((u) => u.hp > 0 && u.uid?.[0] === "p");
+      damageBoss(attacker, Math.max(1, Math.round(basicDamageToBoss(target, attacker, players))), { effectDamage: true });
+    } else {
+      damageUnit(attacker, Math.max(1, Math.round(basicUnitDamage(target, attacker))), { effectDamage: true });
+    }
+  }));
+});

@@ -22,8 +22,9 @@
 import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
 import { unitDist, distToBoss } from "../geometry.js";
 import { BOSS_SIZE, BASIC_DMG_BASELINE } from "../constants.js";
-import { isIntangible } from "../status.js";
+import { isIntangible, applyTimedDebuff } from "../status.js";
 import { damageUnit } from "../hp.js";
+import { gainSpecialCharge } from "../charge.js";
 
 /** Staff Strike's damage is flat across levels -- upgrades buy charge. */
 const BASIC_DMG = 20;
@@ -74,8 +75,7 @@ export function makeCraglingModule(cfg) {
      */
     onHit(unit, target, dealt) {
       if (dealt > 0 && unit.abilChargeMax) {
-        const gain = (unit.abilChargeMax * chargePctByLevel[abilityIdx(unit, "basic")]) / 100;
-        unit.abilCharge = Math.min(unit.abilChargeMax, (unit.abilCharge || 0) + gain);
+        gainSpecialCharge(unit, (unit.abilChargeMax * chargePctByLevel[abilityIdx(unit, "basic")]) / 100);
       }
       return 0;
     },
@@ -110,7 +110,7 @@ export function makeCraglingModule(cfg) {
         const dealt = damageUnit(e, dmg);
         total += dealt;
         // A dodged strike lands nothing -- the stun included.
-        if (stuns && !e._dodgedHit) e.stunTicks = MOMENTARY_STUN_TICKS;
+        if (stuns && !e._dodgedHit) applyTimedDebuff(e, "stunTicks", MOMENTARY_STUN_TICKS);
         newFx.push({ id: now + "rr" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isPillar: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
       if (bossAlive && col >= boss.col && col <= boss.col + BOSS_SIZE - 1) {

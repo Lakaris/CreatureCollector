@@ -23,7 +23,7 @@ import { aChebDist } from "../geometry.js";
 import { attackRoll } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { applyStatMod, applyRestrained, clearRestrained } from "../status.js";
+import { applyStatMod, applyRestrained, clearRestrained, applyTimedDebuff } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -101,7 +101,7 @@ export function makeShockstingerModule(cfg) {
       damageUnit(best, dmg);
       ctx.addDamageDealt(dmg);
 
-      best.stunTicks = BRIEF_STUN_TICKS;
+      applyTimedDebuff(best, "stunTicks", BRIEF_STUN_TICKS);
       // Spends every stack on the target, including any another Shockstinger
       // put there -- the gate counts them all, so the payment does too.
       clearRestrained(best);

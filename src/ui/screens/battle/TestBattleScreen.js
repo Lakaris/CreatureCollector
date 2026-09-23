@@ -26,7 +26,7 @@ import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import { ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { EQUIPMENT_DEFS, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
-import { equipBonus, equipBonusStr, equippedStatBonuses } from "../../../core/equipment.js";
+import { equipBonus, equipBonusStr, equippedStatBonuses, gearBattleBonus } from "../../../core/equipment.js";
 import { calcStats, getSpecialChargeAt } from "../../../core/creatures.js";
 import { computeCombatStats } from "../../../core/stats.js";
 import { STAT_SUFFIX } from "../../../data/rarity.js";
@@ -316,6 +316,9 @@ function TestBattleScreen({ onBack }) {
     return delta;
   }
   function applyGear(unit, def, baseOc, equipped) {
+    // Set unconditionally: the sandbox strips the saved gear, so this is the
+    // only place a placement's battle-effect gear reaches its unit.
+    Object.assign(unit, gearBattleBonus((equipped || []).map((s) => s && s.id)));
     if (!equipped || !equipped.some(Boolean)) return;
     const d = gearDelta(def, baseOc, equipped);
     const hpBonus = Math.round((d.hp || 0) * 4); // matches state.js's HP_SCALE

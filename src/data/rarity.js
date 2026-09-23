@@ -130,6 +130,15 @@ export function formatStat(stat,value){
   const shown=dp!=null&&Number.isFinite(n)?n.toFixed(dp):value;
   return shown+(STAT_SUFFIX[stat]||"");
 }
+/**
+ * A stat bonus as it should read to a player: "+12 Health", "+7.5% Critical
+ * Damage". Every "+value Stat" line on gear goes through here, so the
+ * percentage stats never lose their % sign.
+ */
+export function formatStatBonus(stat, value) {
+  return "+" + formatStat(stat, value) + " " + STAT_LABELS[stat];
+}
+
 /** Plain-language description shown when a stat is tapped on the creature detail page. */
 export const STAT_DESCRIPTIONS={
   hp:"Affects the creature's Max Health",

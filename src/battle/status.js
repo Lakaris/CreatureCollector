@@ -3,10 +3,11 @@
 // DoT magnitudes scale off the boss's attack, so a level-10 boss's burn hurts
 // more than a level-1 boss's. When the boss is dead they fall back to a flat 2.
 
-import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit } from "./hp.js";
+import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit, clearShield, applyShield, onHitLanded, tickShieldTimers, healDoneMultiplier } from "./hp.js";
 import { aChebDist } from "./geometry.js";
 // constants.js imports nothing, so this cannot cycle.
 import { STATUS_TICKS } from "./constants.js";
+import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive } from "./applier.js";
 
 /** Damage per tick for Burn, as a fraction of boss attack. Damage Over Time
  * and Poison scale off the victim instead -- see DOT_HEALTH_PCT below. */
@@ -46,7 +47,8 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
         : dotDamage(boss, DOT_RATES.burn);
       damageUnit(u, dmg, { effectDamage: true });
       u.burnTicks--;
-      if (!u.burnTicks) u.burnSourceAtk = 0;
+      // Expiry takes every stack with it, like the other over-time debuffs.
+      if (!u.burnTicks) { u.burnStacks = 0; u.burnSourceAtk = 0; }
       newFx.push({ id: now + "brn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     // Root's timer runs in tickTimedMods instead -- that one ticks BOTH
@@ -61,6 +63,154 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
     if ((u.weakTicks || 0) > 0) u.weakTicks--;
     if ((u.healImmuneTicks || 0) > 0) u.healImmuneTicks--;
   }
+}
+
+/**
+ * POLICY: every creature-inflicted Burn goes through applyBurn (Burning Bond,
+ * Magma Fang, Inferno Breath). Stacks like the other over-time debuffs -- +1
+ * per application, one shared refreshing timer, all stacks lost on expiry --
+ * and through here it picks up the applier's duration and extra-stack gear.
+ * The damage it ticks scales off `burnSourceAtk`, the latest applier's ATK.
+ * (The fire boss writes its own boss-ATK Burn directly; bosses wear no gear.)
+ */
+export const BURN_STACK_CAP = 10;
+export function applyBurn(target, sourceAtk) {
+  if (resistsDebuff(target)) return;
+  target.burnTicks = debuffTicks(target, STATUS_TICKS);
+  target.burnStacks = Math.min((target.burnStacks || 0) + debuffStacks(target, 1), BURN_STACK_CAP);
+  target.burnSourceAtk = sourceAtk;
+}
+
+/**
+ * POLICY: a plain timer debuff -- one field counted down by the engine, no
+ * stacks (Stun, Slow, Shock, Weaken, Heal Block, Marked, and the bosses'
+ * flat Burn / Damage Over Time) -- is written through here rather than by
+ * assigning the field, so every debuff passes resistsDebuff (Molted Skin).
+ * `stretch` opts it into duration gear (Marked); hard control leaves it off.
+ * The new timer replaces the old, per the control-effects-don't-stack policy.
+ * Returns false when the debuff was resisted.
+ */
+export function applyTimedDebuff(u, field, ticks, { stretch = false } = {}) {
+  if (!u || resistsDebuff(u)) return false;
+  u[field] = stretch ? debuffTicks(u, ticks) : ticks;
+  return true;
+}
+
+/**
+ * Magpie Brooch: every Nth Basic-ability hit steals one buff from whatever it
+ * hit -- dispels it off the target and gives it to the attacker, keeping its
+ * remaining duration/size. Picked at random from what the target carries
+ * that a buff dispel could strip (see dispelBuffs): a positive stat-mod
+ * stack, Shield, Fortify, Heal Over Time, Immortal. Undispellable buffs
+ * (Intangible) can't be stolen; nor can Protect, which is a bond to a
+ * specific guardian rather than something to carry off, or an aura, which
+ * belongs to the field its emitter projects. A hit on a target with nothing
+ * stealable still counts toward the next steal.
+ *
+ * The stolen buff lands with no gear applied (it is carried, not cast), so
+ * the thief's duration/stack/Shield gear leaves it as it was.
+ */
+function stealableBuffs(from) {
+  const out = [];
+  for (const m of from.statMods || []) {
+    if (m.pct > 0) out.push({ take: (to) => {
+      from.statMods.splice(from.statMods.indexOf(m), 1);
+      applyStatMod(to, { kind: m.kind, pct: m.pct, src: "stolen:" + m.kind, ticks: m.ticks, holdDuration: true });
+    } });
+  }
+  // The whole Shield, stacking layer and all, arrives as one ordinary Shield.
+  if ((from.shield || 0) > 0 && from.uid != null) out.push({ take: (to) => {
+    const amount = from.shield, ticks = from.shieldTicks || STATUS_TICKS;
+    clearShield(from);
+    applyShield(to, amount, ticks);
+  } });
+  if ((from.fortifyStacks || 0) > 0) out.push({ take: (to) => {
+    const stacks = from.fortifyStacks;
+    from.fortifyStacks = 0;
+    applyFortify(to, stacks);
+  } });
+  if ((from.hotTicks || 0) > 0) out.push({ take: (to) => {
+    const amount = from.hotAmount, ticks = from.hotTicks;
+    from.hotTicks = 0;
+    from.hotAmount = 0;
+    applyHealOverTime(to, amount, ticks);
+  } });
+  if ((from.immortalTicks || 0) > 0) out.push({ take: (to) => {
+    to.immortalTicks = Math.max(to.immortalTicks || 0, from.immortalTicks);
+    from.immortalTicks = 0;
+  } });
+  return out;
+}
+
+export function stealBuff(from, to) {
+  if (!from || !to || from === to) return false;
+  const options = stealableBuffs(from);
+  if (!options.length) return false;
+  const pick = options[Math.floor(Math.random() * options.length)];
+  withApplier(null, () => pick.take(to));
+  return true;
+}
+
+// Magpie Brooch counts Basic ATTACKS, so it fires from the per-attack pass
+// in tick.js (settleBasicAttack) rather than from a per-hit listener here.
+
+/**
+ * Bloodthirster: the attacker recovers a share of all damage it deals, as
+ * its own heal -- so Heal Block stops it, Healing Down shrinks it, and its
+ * own Lifebinder Pendant grows it, like any heal it would receive.
+ */
+onHitLanded((attacker, target, info) => {
+  const pct = attacker.gear?.lifestealPct || 0;
+  if (!pct || attacker.uid == null || attacker.hp <= 0 || !(info.dmg > 0)) return;
+  if ((attacker.healImmuneTicks || 0) > 0) return;
+  const amount = Math.round(((info.dmg * pct) / 100) * healReceivedMultiplier(attacker));
+  if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount));
+});
+
+/**
+ * Shattercrit Ring: every critical hit shreds the target's Defense a little
+ * more (see applyCritShred).
+ */
+onHitLanded((attacker, target, info) => {
+  const pct = attacker.gear?.critShredPct || 0;
+  if (!pct || !info.crit || info.effectDamage || target.uid == null) return;
+  applyCritShred(target, pct, attacker.gear.critShredMaxPct || pct);
+});
+
+/**
+ * Crit shred (Shattercrit Ring): a ramping Defense Down -- each application
+ * adds `pct`, up to `maxPct`, on one shared refreshing timer, all of it lost
+ * together on expiry. The Plume Dart shred's twin, kept separate so the two
+ * stack with each other rather than sharing a cap. A dispellable debuff.
+ */
+export function applyCritShred(u, pct, maxPct) {
+  if (resistsDebuff(u)) return;
+  u.critShredPct = Math.min(maxPct, (u.critShredPct || 0) + pct * debuffStacks(u, 1));
+  u.critShredTicks = debuffTicks(u, STATUS_TICKS);
+}
+export function critShredMultiplier(u) {
+  if ((u.critShredTicks || 0) <= 0) return 1;
+  return Math.max(0, 1 - (u.critShredPct || 0) / 100);
+}
+
+/**
+ * How many buffs a creature is wearing: each positive stat-mod stack, plus
+ * one each for a Shield, Fortify, Protect, Heal Over Time, an aura it
+ * emits, Immortal, Intangible, and Windbreak. Shared by Battery Shell's
+ * "gains a buff" trigger and Warbuff Plate's per-buff Attack.
+ */
+export function countBuffs(u) {
+  let n = 0;
+  if (u.statMods) for (const m of u.statMods) if (m.pct > 0) n++;
+  if ((u.shield || 0) > 0) n++;
+  if ((u.fortifyStacks || 0) > 0) n++;
+  if (u.protect && u.protect.stacks > 0) n++;
+  if ((u.hotTicks || 0) > 0) n++;
+  if (u.aura) n++;
+  if ((u.immortalTicks || 0) > 0) n++;
+  if ((u.intangibleTicks || 0) > 0) n++;
+  if ((u.windbreakTicks || 0) > 0) n++;
+  return n;
 }
 
 /**
@@ -81,7 +231,7 @@ export function isRooted(u) {
  * run. Rooted-and-feared means it simply cowers in place.
  */
 export function applyFear(u, sourceUid, ticks) {
-  if (!u || u.uid == null) return;
+  if (!u || u.uid == null || resistsDebuff(u)) return;
   u.fearTicks = ticks;
   u.fearSourceUid = sourceUid;
 }
@@ -150,8 +300,37 @@ function sameEffect(a, kind, pct) {
  * `src` is the applier's uid; anything falsy is treated as one shared
  * anonymous source.
  */
-export function applyStatMod(u, { kind, pct, src, ticks = 6 }) {
+export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false }) {
   if (!pct) return;
+  if (pct < 0 && resistsDebuff(u, { environmental })) return;
+  // Duration and extra-stack gear on whoever is applying this (see
+  // battle/applier.js). The Chalices' extra stack is the one exception to
+  // "one stack per source": it lands under its own sub-source, so it refreshes
+  // and competes for the cap exactly like a second creature's stack would.
+  // `holdDuration` opts out of duration gear only -- for while-inside stacks
+  // (auras) whose short timer IS the "you left the field" rule.
+  const debuff = pct < 0;
+  if (!holdDuration) ticks = debuff ? debuffTicks(u, ticks) : buffTicks(u, ticks);
+  const stacks = debuff ? debuffStacks(u, 1) : buffStacks(u, 1);
+  pushStatMod(u, kind, pct, src, ticks);
+  for (let i = 1; i < stacks; i++) pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks);
+}
+
+/**
+ * POLICY: a stat mod that lasts only WHILE some condition holds (standing in
+ * an aura, being anchored, gripping a foe, a full battery) goes through here
+ * rather than applyStatMod. It is re-stamped every tick the condition holds
+ * and its short timer is what makes it lapse the moment the condition ends --
+ * so duration gear must never stretch it, while extra-stack gear still
+ * applies like any other stack.
+ */
+export const WHILE_ACTIVE_TICKS = 2;
+export function applyWhileActiveStatMod(u, { kind, pct, src }) {
+  applyStatMod(u, { kind, pct, src, ticks: WHILE_ACTIVE_TICKS, holdDuration: true });
+}
+
+/** One source's stack: refresh it if present, else add it within the cap. */
+function pushStatMod(u, kind, pct, src, ticks) {
   const mods = (u.statMods ||= []);
   const mine = mods.find((m) => sameEffect(m, kind, pct) && m.src === src);
   if (mine) { mine.pct = pct; mine.ticks = ticks; return; }
@@ -234,6 +413,7 @@ export function tickStatMods(u, negativeOnly = false) {
  */
 export function applyTaunt(target, source, ticks = STATUS_TICKS) {
   if (!target || !source || target.hp <= 0 || source.uid == null) return false;
+  if (resistsDebuff(target)) return false;
   target.tauntTicks = ticks;
   target.tauntSourceUid = source.uid;
   return true;
@@ -275,7 +455,16 @@ export function isTauntable(target) {
 export function applyAura(source, { range, ticks = STATUS_TICKS, ally, enemy, atkPct, critDmgPct }) {
   if (!source || !(range > 0)) return;
   const own = ally || { atkPct: atkPct || 0, critDmgPct: critDmgPct || 0 };
-  source.aura = { range, ticks, ally: own, enemy: enemy || null };
+  source.aura = { range: auraRange(source, range), ticks: buffTicks(source, ticks), ally: own, enemy: enemy || null };
+}
+
+/**
+ * POLICY: every aura's reach goes through auraRange -- applyAura's fields and
+ * the passive auras that scan their own radius (Guardian Grove, Windbreak)
+ * alike -- so Beacon Antler's "+1 range" reaches all of them.
+ */
+export function auraRange(source, base) {
+  return base + ((source && source.gear?.auraRange) || 0);
 }
 
 /** Drop an emitter's aura outright (buff removal, or the emitter dying). */
@@ -283,10 +472,9 @@ export function clearAura(u) {
   if (u) u.aura = null;
 }
 
-/** How long an aura's Speed stack outlives the unit stepping out of it. Two
- * ticks: it survives to the next refresh while inside, and drops on the tick
- * after leaving instead of lingering a full status duration. */
-const AURA_SPEED_TICKS = 2;
+// An aura's Speed stack is a while-active stack (applyWhileActiveStatMod): it
+// survives to the next refresh while inside, and drops on the tick after
+// leaving instead of lingering a full status duration.
 
 /**
  * Recompute one side's aura totals for this tick. `units` is the side being
@@ -316,7 +504,10 @@ export function refreshAuraFields(units, foes) {
       u._auraAtkPct += sign * (face.atkPct || 0);
       u._auraCritDmgPct += sign * (face.critDmgPct || 0);
       u._auraHastePct += sign * (face.hastePct || 0);
-      if (face.spdPct) applyStatMod(u, { kind: "spd", pct: sign * face.spdPct, src: "aura" + src.uid, ticks: AURA_SPEED_TICKS });
+      // The emitter is the applier, so its extra-stack gear (the Chalices)
+      // applies; duration gear does not -- the aura's own timer already
+      // carries that (see applyAura), and this stack must drop on leaving.
+      if (face.spdPct) withApplier(src, () => applyWhileActiveStatMod(u, { kind: "spd", pct: sign * face.spdPct, src: "aura" + src.uid }));
     }
   };
   for (const src of units) {
@@ -334,10 +525,7 @@ export function tickTimedMods(u) {
     u.tauntTicks--;
     if (!u.tauntTicks) u.tauntSourceUid = null;
   }
-  if ((u.shieldTicks || 0) > 0) {
-    u.shieldTicks--;
-    if (!u.shieldTicks) u.shield = 0;
-  }
+  tickShieldTimers(u);
   if ((u.stunTicks || 0) > 0) u.stunTicks--;
   if ((u.rootTicks || 0) > 0 && !--u.rootTicks) u.rootUndispellable = false;
   if ((u.fearTicks || 0) > 0 && !--u.fearTicks) u.fearSourceUid = null;
@@ -348,6 +536,7 @@ export function tickTimedMods(u) {
     if (!u.frostbiteTicks) u.frostbiteStacks = 0;
   }
   if ((u.immortalTicks || 0) > 0) u.immortalTicks--;
+  if ((u.critShredTicks || 0) > 0 && !--u.critShredTicks) u.critShredPct = 0;
   if ((u.dartShredTicks || 0) > 0) {
     u.dartShredTicks--;
     if (!u.dartShredTicks) u.dartShredPct = 0;
@@ -378,8 +567,9 @@ export function tickTimedMods(u) {
  */
 export const DART_SHRED_CAP_PCT = 50;
 export function applyDartShred(u, pct) {
-  u.dartShredPct = Math.min(DART_SHRED_CAP_PCT, (u.dartShredPct || 0) + pct);
-  u.dartShredTicks = 6;
+  if (resistsDebuff(u)) return;
+  u.dartShredPct = Math.min(DART_SHRED_CAP_PCT, (u.dartShredPct || 0) + pct * debuffStacks(u, 1));
+  u.dartShredTicks = debuffTicks(u, 6);
 }
 export function dartShredMultiplier(u) {
   if ((u.dartShredTicks || 0) <= 0) return 1;
@@ -397,6 +587,7 @@ export function dartShredMultiplier(u) {
  * Scoped to basic attacks: specials are abilities, not attacks.
  */
 export function applyBlind(u) {
+  if (resistsDebuff(u)) return;
   u.blinded = true;
 }
 
@@ -441,9 +632,10 @@ export const OVER_TIME_FLAVORS = {
 };
 
 export function applyOverTime(u, flavor, stacks = 1) {
+  if (resistsDebuff(u)) return;
   const f = OVER_TIME_FLAVORS[flavor];
-  u[f.stacks] = Math.min(DOT_STACK_CAP, (u[f.stacks] || 0) + stacks);
-  u[f.ticks] = OVER_TIME_TICKS;
+  u[f.stacks] = Math.min(DOT_STACK_CAP, (u[f.stacks] || 0) + debuffStacks(u, stacks));
+  u[f.ticks] = debuffTicks(u, OVER_TIME_TICKS);
 }
 
 /** Stacks currently carried -- at least 1 while the effect is running at all. */
@@ -498,8 +690,9 @@ export const clearPoison = (u) => clearOverTime(u, "poison");
  */
 export const FROSTBITE_STACK_CAP = 5;
 export function applyFrostbite(u) {
-  u.frostbiteStacks = Math.min(FROSTBITE_STACK_CAP, (u.frostbiteStacks || 0) + 1);
-  u.frostbiteTicks = 6;
+  if (resistsDebuff(u)) return;
+  u.frostbiteStacks = Math.min(FROSTBITE_STACK_CAP, (u.frostbiteStacks || 0) + debuffStacks(u, 1));
+  u.frostbiteTicks = debuffTicks(u, 6);
 }
 export function frostbiteMultiplier(attackerIsWater, defender) {
   if (!attackerIsWater || (defender.frostbiteTicks || 0) <= 0) return 1;
@@ -517,7 +710,7 @@ export function frostbiteMultiplier(attackerIsWater, defender) {
  * something does (dispelDebuffs clears debuffs and must never touch it).
  */
 export function applyFortify(u, stacks) {
-  u.fortifyStacks = Math.min(FORTIFY_STACK_CAP, (u.fortifyStacks || 0) + stacks);
+  u.fortifyStacks = Math.min(FORTIFY_STACK_CAP, (u.fortifyStacks || 0) + buffStacks(u, stacks));
 }
 
 export function hasFortify(u) {
@@ -549,8 +742,11 @@ export function applyWindbreak(u, pct, tickKey) {
  * per-tick amount and the longer remaining duration, never stacks.
  */
 export function applyHealOverTime(u, perTick, ticks = 6) {
+  // The healer's gear, baked in now (the ticks later run with no applier):
+  // Lifebinder Pendant's healing done, and an echo's reduced effectiveness.
+  perTick = Math.max(1, Math.round(perTick * healDoneMultiplier() * effectiveness()));
   u.hotAmount = Math.max(u.hotAmount || 0, perTick);
-  u.hotTicks = Math.max(u.hotTicks || 0, ticks);
+  u.hotTicks = Math.max(u.hotTicks || 0, buffTicks(u, ticks));
 }
 
 /**
@@ -566,6 +762,8 @@ export function applyHealOverTime(u, perTick, ticks = 6) {
  * else without immediately undoing its own anchor.
  */
 export function applyRoot(u, ticks, { undispellable = false } = {}) {
+  // A self-applied stance Root is not inflicted, so resistsDebuff lets it by.
+  if (resistsDebuff(u)) return;
   u.rootTicks = Math.max(u.rootTicks || 0, ticks);
   u.rootUndispellable = !!undispellable;
 }
@@ -583,8 +781,7 @@ export function applyRoot(u, ticks, { undispellable = false } = {}) {
  */
 export function dispelBuffs(u) {
   clearPositiveStatMods(u);
-  u.shield = 0;
-  u.shieldTicks = 0;
+  clearShield(u);
   u.fortifyStacks = 0;
   clearProtect(u);
   u.hotTicks = 0;
@@ -617,6 +814,8 @@ export function dispelDebuffs(u) {
   u.frostbiteStacks = 0;
   u.dartShredTicks = 0;
   u.dartShredPct = 0;
+  u.critShredTicks = 0;
+  u.critShredPct = 0;
   clearNegativeStatMods(u);
 }
 
@@ -664,11 +863,11 @@ function syncRestrained(u) {
  * per entry so the leash check doesn't need to look the applier's kit back up.
  */
 export function applyRestrained(target, srcUid, stacks, slowPct, range) {
-  if (!target || target.uid == null) return;
+  if (!target || target.uid == null || resistsDebuff(target)) return;
   const list = target.restrained || (target.restrained = []);
   let entry = list.find((r) => r.src === srcUid);
   if (!entry) list.push((entry = { src: srcUid, stacks: 0, pct: 0, range }));
-  entry.stacks += stacks;
+  entry.stacks += debuffStacks(target, stacks);
   entry.pct = Math.max(entry.pct, slowPct);
   entry.range = range;
   syncRestrained(target);

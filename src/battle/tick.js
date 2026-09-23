@@ -20,10 +20,134 @@ import {
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
   cellsOf, unitDist, unitCardinalDist, attackRangeOf,
 } from "./geometry.js";
-import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields } from "./status.js";
-import { damageUnit } from "./hp.js";
+import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields, stealBuff } from "./status.js";
+import { damageUnit, onHitLanded, addStackingShield } from "./hp.js";
+import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster } from "./applier.js";
+import { isSpecialSealed } from "./charge.js";
 import { tickMinionSpecials } from "./minions.js";
 import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown } from "./damage.js";
+
+/**
+ * Cast a creature's Special. POLICY: the one place a Special fires, for both
+ * sides, so Echo Conch's recast rides every Special in the game: when the
+ * caster wears it, the Special runs a second time straight after, as an echo
+ * (see asEcho in applier.js) -- same targeting, at the echo's effectiveness.
+ */
+function castSpecial(abilMod, u, ctx) {
+  withActiveAbility(u, "special", () => abilMod.special(u, ctx));
+  if (u.gear?.echoSpecialPct && u.hp > 0) asEcho(u, () => abilMod.special(u, ctx));
+}
+
+/** The running tick's state, for the per-attack pass below -- it runs from
+ * applier.js's attack-end notification, outside runBattleTick's scope. */
+let tickCtx = null;
+
+/** Gear that fires once, the first time a creature acts in a battle:
+ * Crest of Conquest's stacking Shield, which lasts until broken. */
+function startOfBattleGear(u) {
+  if (u._gearStarted) return;
+  u._gearStarted = true;
+  const pct = u.gear?.startStackShieldPct || 0;
+  if (pct) asPassive(u, () => addStackingShield(u, shieldAmount((u.maxHp * pct) / 100), Infinity));
+}
+
+/**
+ * PER-ATTACK GEAR. A Basic ATTACK is one use of the Basic ability -- a whole
+ * swing, however many hits it lands (Twin Barb's 4 are one attack). Its hits
+ * are collected here as they land, from the default attack flow, a module's
+ * own basicAttack hook, or an Assist alike; when the attack ends (applier.js
+ * says so), settleBasicAttack counts it and runs the gear that acts per
+ * attack. An attack that landed nothing (Blinded, dodged) doesn't count.
+ */
+onHitLanded((attacker, target, info) => {
+  if (info.ability !== "basic" || info.effectDamage || attacker._attackRiders) return;
+  (attacker._attackHits || (attacker._attackHits = [])).push({ target, baseDmg: info.baseDmg });
+});
+setBasicAttackEndHandler(settleBasicAttack);
+
+/**
+ * One finished Basic attack. Its first target is the attack's target:
+ *   - Twin Fang: every Nth attack hits that target 1 more time (a repeat of
+ *     the attack's last hit, with its on-hit effects).
+ *   - Arrowsplit: every attack Chains to N enemies beside the target, with
+ *     the same damage and on-hit effects (the Chain tag).
+ *   - Shockwave Gauntlet: every Nth attack Splashes every enemy around the
+ *     target for less damage (the Splash tag; damage only).
+ *   - Magpie Brooch: every Nth attack steals a buff from the target.
+ * Rider damage starts from the attack's damage BEFORE the attacker's damage
+ * gear, which is then reapplied per new target (Snare reads its own target).
+ * Riders are Basic hits themselves but never start or count another attack.
+ */
+function settleBasicAttack(u) {
+  const hits = u._attackHits;
+  u._attackHits = null;
+  if (!hits || !hits.length || u._attackRiders) return;
+  u._basicAttacks = (u._basicAttacks || 0) + 1;
+  const gear = u.gear;
+  if (!gear || u.hp <= 0 || !tickCtx) return;
+  const n = u._basicAttacks;
+  const target = hits[0].target;
+  const onTarget = hits.filter((h) => h.target === target);
+  const attackDmg = onTarget.reduce((sum, h) => sum + h.baseDmg, 0);
+  const lastHitDmg = onTarget[onTarget.length - 1].baseDmg;
+  const struck = new Set(hits.map((h) => h.target));
+  u._attackRiders = true;
+  try {
+    withApplier(u, () => withActiveAbility(u, "basic", () => {
+      if (gear.extraHitEvery && n % gear.extraHitEvery === 0 && target.hp > 0) riderHit(u, target, lastHitDmg, true);
+      if (gear.chainTargets) {
+        for (const e of foesBeside(u, target, struck).slice(0, gear.chainTargets)) {
+          struck.add(e);
+          riderHit(u, e, attackDmg, true);
+        }
+      }
+      if (gear.splashEvery && n % gear.splashEvery === 0) {
+        const pct = 1 - (gear.splashLessPct || 0) / 100;
+        for (const e of foesBeside(u, target, new Set([target]))) riderHit(u, e, attackDmg * pct, false);
+      }
+      if (gear.stealBuffEvery && n % gear.stealBuffEvery === 0) stealBuff(target, u);
+    }));
+  } finally {
+    u._attackRiders = false;
+  }
+}
+
+/** Living, targetable foes of `u` beside `center` (Chebyshev 1; a boss's
+ * whole 2x2 body counts), nearest first. `exclude` are skipped. */
+function foesBeside(u, center, exclude) {
+  const { state } = tickCtx;
+  const playerSide = state.playerUnits.includes(u);
+  const foes = (playerSide ? state.enemyUnits : state.playerUnits).filter((e) => e.hp > 0 && !isIntangible(e) && !exclude.has(e));
+  const centerIsBoss = center.uid == null;
+  const dist = (e) => (centerIsBoss ? distToBoss(center, e.row, e.col) : aChebDist(center.row, center.col, e.row, e.col));
+  const out = foes.filter((e) => dist(e) <= 1).sort((a, b) => dist(a) - dist(b));
+  const boss = playerSide && state.boss && state.boss.hp > 0 ? state.boss : null;
+  if (boss && !centerIsBoss && !exclude.has(boss) && distToBoss(boss, center.row, center.col) <= 1) out.push(boss);
+  return out;
+}
+
+/** One rider hit of a Basic attack (see settleBasicAttack). */
+function riderHit(u, target, dmg, withOnHit) {
+  const { state, newFx, now } = tickCtx;
+  const isBoss = target.uid == null;
+  dmg = Math.max(1, Math.round(dmg));
+  const dealt = isBoss ? damageBoss(target, dmg) : damageUnit(target, dmg);
+  const hit = isBoss ? target : target._redirectedTo || target;
+  if (!isBoss && hit._dodgedHit) return;
+  let bonus = 0;
+  const mod = withOnHit ? getPlayerAbilityModule(u.creatureId) : null;
+  if (mod?.onHit) {
+    bonus = mod.onHit(u, hit, dealt) || 0;
+    if (bonus) withActiveAbility(u, "unique", () => (isBoss ? damageBoss(hit, bonus) : damageUnit(hit, bonus)));
+  }
+  const playerSide = state.playerUnits.includes(u);
+  if (playerSide) {
+    creditDamage(state, u.creatureId, dealt, "basic");
+    creditDamage(state, u.creatureId, bonus, "passive");
+  }
+  const size = hit.size || (isBoss ? 2 : 1);
+  newFx.push({ id: now + "rider" + u.uid + (hit.uid || "boss") + Math.random(), row: hit.row + (size - 1) / 2, col: hit.col + (size - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: !playerSide });
+}
 import { getBossModule } from "./bosses/registry.js";
 import { makeBossContext } from "./bosses/context.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
@@ -103,6 +227,9 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
     /** Ground Hazard. `kind` is "water" or "fire" -- see the Hazards pass in
      * runBattleTick for what each one does. `dmg` is per trigger. */
     addHazard(cells, ticks, dmg, kind) {
+      // A hazard laid by an echoed Special hurts at the echo's effectiveness
+      // (its later ticks run with no applier, so it is baked in here).
+      dmg = Math.max(1, Math.round(dmg * effectiveness()));
       (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide });
     },
     /** Is a Hazard of this kind covering (row,col)? For passives that read the
@@ -171,11 +298,17 @@ export function tickSpecialCharge(u) {
   // (see consumeSpecialCharge), now the recharge actually starts over.
   if (u.abilJustFired) {
     u.abilJustFired = false;
-    u.abilCharge = 0;
+    // Bonus charge earned on the tick the special fired (see
+    // gainSpecialCharge in charge.js) survives the reset instead of being
+    // wiped by it.
+    u.abilCharge = Math.min(u.abilChargeMax, u._pendingCharge || 0);
+    u._pendingCharge = 0;
     return;
   }
   // Stunned units don't work towards their special (see Overload Sting).
   if (isStunned(u)) return;
+  // A sealed Special (Berserk Core) never charges: the bar stays empty.
+  if (isSpecialSealed(u)) { u.abilCharge = 0; return; }
   // Haste Down/Up stacks scale the charge rate (statModMultiplier "haste"),
   // and so does any aura the unit is standing in (a flat percentage, summed
   // across auras -- see refreshAuraFields). Floored so a stacked drain can
@@ -185,7 +318,7 @@ export function tickSpecialCharge(u) {
 }
 
 export function specialChargeReady(u) {
-  return !!u.abilChargeMax && u.abilCharge >= u.abilChargeMax;
+  return !!u.abilChargeMax && u.abilCharge >= u.abilChargeMax && !isSpecialSealed(u);
 }
 
 /**
@@ -415,6 +548,8 @@ export function runBattleTick(state, config) {
   const boss = state.boss;
   const newFx = [];
   if (!aliveP.length) return { newFx, now, acted: false };
+  setBattleRoster([...state.playerUnits, ...state.enemyUnits]);
+  tickCtx = { state, newFx, now };
 
   const allOcc = new Set();
   for (const u of [...aliveP, ...aliveE]) for (const cell of cellsOf(u)) allOcc.add(cell);
@@ -428,9 +563,23 @@ export function runBattleTick(state, config) {
 
   // ── 1. Player units ──────────────────────────────────────────────────────
   for (const u of aliveP) {
+    // The previous creature's turn is over (this also closes its Basic
+    // attack -- see settleBasicAttack). Nobody is acting while this one's
+    // timers tick, so a Heal Over Time tick is nobody's heal.
+    setActiveAbility(null);
+    setApplier(null);
     u.atkCd = Math.max(0, u.atkCd - 1);
     tickSpecialCharge(u);
     tickTimedMods(u);
+    // Everything this creature applies from here to the end of its turn is
+    // its own, for duration gear (see battle/applier.js). Set AFTER its own
+    // timers tick so that expiry is never mistaken for an application.
+    setApplier(u);
+    // Which ability is in use, section by section (see setActiveAbility in
+    // applier.js): the always-on passive first; the Special and the Basic
+    // re-mark it below.
+    setActiveAbility(u, "unique");
+    startOfBattleGear(u);
     // Stunned units can't attack: hold the cooldown above zero so every
     // attack branch below (including custom basicAttack hooks, which check
     // atkCd themselves) stays closed. Movement and passives still run.
@@ -475,7 +624,7 @@ export function runBattleTick(state, config) {
     // then fires the moment a target closes in.
     // Chargeless specials (no `charge` in data, e.g. Overload Sting) skip the
     // bar entirely: they fire whenever their module's own gate passes.
-    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange);
+    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange) && !isSpecialSealed(u);
     if (specialChargeReady(u) || chargelessReady) {
       const rangeBoss = bossAlive ? boss : null;
       const inRange = abilMod?.specialInRange
@@ -488,13 +637,17 @@ export function runBattleTick(state, config) {
         // Rooted -- so the creature acts without ever leaving its tile.
         if (inRange) {
           const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "special", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
-          abilMod.special(u, specialCtx);
+          castSpecial(abilMod, u, specialCtx);
           consumeSpecialCharge(u);
         }
       } else if (inRange) {
         consumeSpecialCharge(u);
       }
     }
+
+    // Everything from here to the end of the turn is the Basic ability (the
+    // hook or the default flow), for gear keyed on which ability hit.
+    setActiveAbility(u, "basic");
 
     // A custom basicAttack hook (e.g. Starlit's piercing beam) fully replaces
     // the default "attack the nearest thing" flow below -- it owns targeting,
@@ -521,7 +674,9 @@ export function runBattleTick(state, config) {
           damageBoss(boss, dmgToBoss);
           basicDmg += dmgToBoss;
           const bonus = abilMod?.onHit ? abilMod.onHit(u, boss, dmgToBoss) : 0;
-          if (bonus) { damageBoss(boss, bonus); passiveDmg += bonus; }
+          // An on-hit rider is the Unique's damage (charted "passive"), not
+          // another Basic hit -- Basic- and tag-keyed gear leave it alone.
+          if (bonus) { withActiveAbility(u, "unique", () => damageBoss(boss, bonus)); passiveDmg += bonus; }
         }
         creditDamage(state, u.creatureId, basicDmg, "basic");
         creditDamage(state, u.creatureId, passiveDmg, "passive");
@@ -557,12 +712,14 @@ export function runBattleTick(state, config) {
             if (hit._dodgedHit) continue;
             const hitMod = getPlayerAbilityModule(hit.creatureId);
             const bonus = abilMod?.onHit ? abilMod.onHit(u, hit, dealt) : 0;
-            if (bonus) passiveDmg += damageUnit(hit, bonus);
+            if (bonus) passiveDmg += withActiveAbility(u, "unique", () => damageUnit(hit, bonus));
             // Reflect passives (e.g. Crystalcrab's Prism Shell): the defender
             // returns a slice of the hit to the attacker. Reflected damage is
             // never itself reflected, and counts as effect damage.
-            const reflect = hitMod?.onDamaged ? hitMod.onDamaged(hit, u, dmg + bonus) : 0;
-            if (reflect) damageUnit(u, reflect, { effectDamage: true });
+            // The defender's hook: anything it applies is the defender's.
+            const reflect = hitMod?.onDamaged ? withApplier(hit, () => hitMod.onDamaged(hit, u, dmg + bonus)) : 0;
+            // The reflect is the DEFENDER's damage (a defeat credits it).
+            if (reflect) withApplier(hit, () => damageUnit(u, reflect, { effectDamage: true }));
           }
           creditDamage(state, u.creatureId, basicDmg, "basic");
           creditDamage(state, u.creatureId, passiveDmg, "passive");
@@ -598,9 +755,14 @@ export function runBattleTick(state, config) {
   // the sides swapped: a module's `aliveP` is always the acting unit's own
   // side. Enemies never target their own boss, so hooks see `boss: null`.
   for (const u of aliveE) {
+    setActiveAbility(null);
+    setApplier(null);
     u.atkCd = Math.max(0, u.atkCd - 1);
     tickSpecialCharge(u);
     tickTimedMods(u);
+    setApplier(u);
+    setActiveAbility(u, "unique");
+    startOfBattleGear(u);
     if (isStunned(u)) u.atkCd = Math.max(u.atkCd, 1);
 
     const canMove = !isRooted(u);
@@ -620,7 +782,7 @@ export function runBattleTick(state, config) {
       continue;
     }
 
-    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange);
+    const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange) && !isSpecialSealed(u);
     if (specialChargeReady(u) || chargelessReady) {
       const inRange = abilMod?.specialInRange
         ? abilMod.specialInRange(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols })
@@ -628,7 +790,7 @@ export function runBattleTick(state, config) {
       if (abilMod?.special) {
         // Same as the player side: Rooted casts, it just can not relocate.
         if (inRange) {
-          abilMod.special(u, enemyCtx());
+          castSpecial(abilMod, u, enemyCtx());
           consumeSpecialCharge(u);
         }
       } else if (inRange) {
@@ -636,6 +798,7 @@ export function runBattleTick(state, config) {
       }
     }
 
+    setActiveAbility(u, "basic");
     if (abilMod?.basicAttack) {
       abilMod.basicAttack(u, enemyCtx());
       continue;
@@ -662,12 +825,12 @@ export function runBattleTick(state, config) {
         if (hit._dodgedHit) continue;
         const hitMod = getPlayerAbilityModule(hit.creatureId);
         const bonus = abilMod?.onHit ? abilMod.onHit(u, hit, dealt) : 0;
-        if (bonus) damageUnit(hit, bonus);
+        if (bonus) withActiveAbility(u, "unique", () => damageUnit(hit, bonus));
         // Reflect passives: a player-side defender's reflect counts toward
         // its damage chart, and counts as effect damage.
-        const reflect = hitMod?.onDamaged ? hitMod.onDamaged(hit, u, dmg + bonus) : 0;
+        const reflect = hitMod?.onDamaged ? withApplier(hit, () => hitMod.onDamaged(hit, u, dmg + bonus)) : 0;
         if (reflect) {
-          damageUnit(u, reflect, { effectDamage: true });
+          withApplier(hit, () => damageUnit(u, reflect, { effectDamage: true }));
           creditDamage(state, hit.creatureId, reflect, "passive");
         }
       }
@@ -685,6 +848,11 @@ export function runBattleTick(state, config) {
       stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
     }
   }
+
+  // Nobody's turn from here on: minion specials, auras, hazards, and the boss
+  // apply effects on no creature's behalf.
+  setApplier(null);
+  setActiveAbility(null);
 
   // ── 3. Minion specials ───────────────────────────────────────────────────
   tickMinionSpecials(aliveE, aliveP, newFx, now);
@@ -705,7 +873,8 @@ export function runBattleTick(state, config) {
     if ((u.burnTicks || 0) > 0) {
       const dmg = Math.max(1, Math.round((u.burnSourceAtk || 10) * PLAYER_BURN_RATE));
       damageUnit(u, dmg, { effectDamage: true });
-      u.burnTicks--;
+      // Expiry takes every stack with it (see applyBurn in status.js).
+      if (!--u.burnTicks) { u.burnStacks = 0; u.burnSourceAtk = 0; }
       newFx.push({ id: now + "pbrn" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     // Player-inflicted Damage Over Time (Carrion Rip, Spectral Rake) and
@@ -719,7 +888,7 @@ export function runBattleTick(state, config) {
   if (bossAlive && (boss.burnTicks || 0) > 0) {
     const dmg = Math.max(1, Math.round((boss.burnSourceAtk || 10) * PLAYER_BURN_RATE));
     damageBoss(boss, dmg);
-    boss.burnTicks--;
+    if (!--boss.burnTicks) { boss.burnStacks = 0; boss.burnSourceAtk = 0; }
     newFx.push({ id: now + "pbrn" + "boss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
   }
   if (bossAlive) {
@@ -764,7 +933,8 @@ export function runBattleTick(state, config) {
       if (hz.kind === "water") {
         for (const u of [...aliveP, ...aliveE]) {
           if (hz.cells.has(u.row + "," + u.col)) {
-            applyStatMod(u, { kind: "haste", pct: -HAZARD_HASTE_DOWN_PCT, src: "hazard", ticks: HAZARD_HASTE_TICKS });
+            // Terrain, not an inflicted debuff: debuff immunity lets it by.
+            applyStatMod(u, { kind: "haste", pct: -HAZARD_HASTE_DOWN_PCT, src: "hazard", ticks: HAZARD_HASTE_TICKS, environmental: true });
           }
         }
       }
@@ -827,8 +997,13 @@ export function runBattleTick(state, config) {
         boss._initDone = true;
       }
       if (mod.onStatusTick) mod.onStatusTick(ctx);
-      if (mod.special) mod.special(ctx);
-      if (mod.basic) mod.basic(ctx);
+      // The boss is the one acting now: hits it lands name it as the
+      // attacker (Thornback Plate counters it). It wears no gear, so nothing
+      // else about its turn changes.
+      withApplier(boss, () => {
+        if (mod.special) mod.special(ctx);
+        if (mod.basic) mod.basic(ctx);
+      });
     }
   }
 

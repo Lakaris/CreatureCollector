@@ -31,6 +31,7 @@ import { aChebDist, distToBoss } from "../geometry.js";
 import { basicUnitDamage, basicDamageToBoss, damageBoss } from "../damage.js";
 import { STATUS_TICKS, ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { asAssist } from "../applier.js";
 import { applyStatMod, applyAura, applyTaunt, isTauntable } from "../status.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
@@ -170,9 +171,11 @@ export function makeAuravastModule(cfg) {
           if (helper && best.hp > 0) {
             // A boss takes damage through damageBoss and its own shield pool,
             // never damageUnit (see battle/hp.js).
-            const dealt = onBoss
+            // An Assist is the helper's own Basic ability (see asAssist), so
+            // its Basic-crit gear pays out on this swing.
+            const dealt = asAssist(helper, () => onBoss
               ? damageBoss(best, Math.max(1, Math.round(basicDamageToBoss(helper, best, aliveP))))
-              : damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best))));
+              : damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best)))));
             // Credited to the dragon: this damage is Sovereign Call's doing,
             // and the chart tracks the ability that caused it.
             ctx.addDamageDealt(dealt || 0);

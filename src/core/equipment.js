@@ -5,7 +5,7 @@
 // upgrading an item upgrades it on every creature wearing it.
 
 import { EQUIPMENT_MAP, EQUIP_MAX_LEVEL, EQUIP_MAX_ASCENSION } from "../data/equipment.js";
-import { STAT_LABELS } from "../data/rarity.js";
+import { formatStatBonus } from "../data/rarity.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../data/types.js";
 
@@ -214,7 +214,7 @@ export function itemAffectsStat(item, stat) {
 /** Human-readable "+12 Health · +8 Attack" summary. */
 export function equipBonusStr(bonuses) {
   return Object.entries(bonuses)
-    .map(([s, v]) => "+" + v + " " + STAT_LABELS[s])
+    .map(([s, v]) => formatStatBonus(s, v))
     .join(" · ");
 }
 
@@ -234,6 +234,30 @@ export function totalEquipBonus(ownedData, equipmentLevels, equipmentAscensions)
     for (const stat in bonus) totals[stat] = (totals[stat] || 0) + bonus[stat];
   }
   return totals;
+}
+
+/**
+ * Every battle effect a creature's equipped items grant, merged into one
+ * `gear` object stamped on the battle unit (state.js) and read by the engine
+ * as `unit.gear?.<key>`.
+ *
+ * Items declare their effects as `battle: { key: value }` in data/equipment.js
+ * -- the full key list, and which engine file spends each, is documented
+ * there. This merge needs no per-key code: numbers take the LARGEST value
+ * across the worn items and booleans are true if any item sets them, so
+ * stacking copies of one family never runs past its top rung. Adding a new
+ * effect is a data key plus the one place in the engine that reads it.
+ */
+export function gearBattleBonus(itemIds) {
+  const gear = {};
+  for (const itemId of itemIds || []) {
+    const battle = itemId && EQUIPMENT_MAP[itemId]?.battle;
+    if (!battle) continue;
+    for (const [key, value] of Object.entries(battle)) {
+      gear[key] = typeof value === "boolean" ? gear[key] || value : Math.max(gear[key] || 0, value);
+    }
+  }
+  return { gear };
 }
 
 /**

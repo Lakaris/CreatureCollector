@@ -146,7 +146,7 @@ export const ABILITY_TAG_DEFS = {
   // a debuff spent by the swing it ruins, and deliberately not stackable.
   blind: { label: "Blind", description: "This creature's next attack misses; no damage and negative effects are dealt." },
   assist: { label: "Assist", description: "Called allies immediately use their Basic ability on the enemy this creature targeted." },
-  cleanse: { label: "Cleanse", description: "Removes all debuffs." },
+  dispeldebuff: { label: "Dispel Debuff", description: "Removes debuffs." },
   line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge." },
   horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row." },
   speedup: { label: "Speed Up", description: "Increases the creature's Speed.", stacking: [25, 50, 75, 100, 125] },
@@ -167,6 +167,7 @@ export const ABILITY_TAG_DEFS = {
   // side included -- slick ground does not take sides.
   waterhazard: { label: "Water Hazard", description: "Deals damage if a creature attempts to move while on it; -10% Haste when standing on it." },
   firehazard: { label: "Fire Hazard", description: "Deals damage if a creature attempts to move while on it; deals damage over time when standing on it." },
+  windhazard: { label: "Wind Hazard", description: "Deals damage if a creature attempts to move while on it; every few seconds it pushes the creatures standing on it back." },
   immortal: { label: "Immortal", description: "Health can not be reduced below 1." },
   healovertime: { label: "Heal Over Time", description: "Restores Health over time." },
   revive: { label: "Revive", description: "Returns to battle after being defeated." },
@@ -187,7 +188,7 @@ export const ABILITY_TAG_DEFS = {
   // never consumes a stack, so damage over time is the clean counter to a
   // stacked-up Fortify. Fortify is an ordinary dispellable buff.
   fortify: { label: "Fortify", maxStacks: 10, description: "Receive 50% less damage, remove 1 stack when damaged by an ability." },
-  dispel: { label: "Dispel", description: "Removes all debuffs." },
+  dispelbuff: { label: "Dispel Buff", description: "Removes buffs." },
   // Crits are stats (crit chance x critDmg -- see battle/constants.js); this
   // tag marks the abilities that skip the chance roll entirely.
   guaranteedcrit: { label: "Guaranteed Crit", description: "This attack always lands a Critical Hit." },
@@ -256,6 +257,8 @@ export const ABILITY_TAG_DEFS = {
   // it meaning, and each kit sets its own cap in its text.
   charge: { label: "Charge", description: "Interacts with this creature's abilities." },
   healdown: { label: "Healing Down", description: "Reduces the creature's healing received.", stacking: [20, 40, 60, 80, 100] },
+  // The Shield twin of Healing Down (Nightshade Bead), on the same magnitudes.
+  shielddown: { label: "Shielding Down", description: "Reduces the Shields the creature receives.", stacking: [20, 40, 60, 80, 100] },
   stun: { label: "Stun", description: "Can not attack or gain ability charge." },
   root: { label: "Root", description: "Can not move. Attacks and abilities still work." },
   // Same effect as Root, but self-inflicted as a stance, so Cleanse and Dispel
@@ -286,6 +289,9 @@ export const ABILITY_TAG_DEFS = {
   speeddown: { label: "Speed Down", description: "Reduces the creature's Speed.", stacking: [5, 10, 15, 20, 25] },
   attackdown: { label: "Attack Down", description: "Reduces the creature's Attack.", stacking: [15, 20, 25, 30, 40] },
   defensedown: { label: "Defense Down", description: "Reduces the creature's Defense.", stacking: [15, 20, 25, 30, 40] },
+  // Granted by equipment (Dawnlight Halo); no creature kit carries it, so it
+  // is listed in the Effect Filters for reading.
+  critdamageup: { label: "Critical Damage Up", description: "Increases the creature's Critical Damage." },
   intangible: { label: "Intangible", undispellable: true, description: "Can not be targeted or damaged. Enemies targeting this creature change targets." },
 };
 
@@ -636,6 +642,16 @@ const PLAIN_ABILITY_PHRASES = {
   skyphoenix: SICKLEWING_PHRASES,
 };
 
+/**
+ * THE classification of a healing ability: one whose card phrase is a heal
+ * (`heal: true` above). The battle engine reads it as the "heal" tag (see
+ * battle/abilityTags.js) -- Amplifier Prism hastens healing abilities -- so
+ * marking a new healing ability's phrase is all it takes to include it.
+ */
+export function isHealingAbility(creatureId, key) {
+  return !!PLAIN_ABILITY_PHRASES[creatureId]?.[key]?.heal;
+}
+
 export function usesPlainAbilityLevels(creatureId, key) {
   const perCreature = PLAIN_ABILITY_PHRASES[creatureId];
   return !!perCreature && key in perCreature;
@@ -768,10 +784,10 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   if (key === "unique" && isBloomibisLine) tags.push("nearby");
   if (key === "special" && isBloomibisLine) {
     tags.push("weakest");
-    // Soothing Hoot only cleanses from its 4th upgrade on; when the caller
+    // Soothing Hoot only dispels debuffs from its 4th upgrade on; when the caller
     // passes the displayed tier (the owned-creature screen), hide the tag
     // below that. Level-less contexts (dex, gacha) show the full kit.
-    if (abilityLevel == null || abilityLevel >= 4) tags.push("cleanse");
+    if (abilityLevel == null || abilityLevel >= 4) tags.push("dispeldebuff");
   }
   const isIgnissaurLine = getRootDef(creatureId)?.id === "ignisdragon";
   if (isIgnissaurLine && (key === "basic" || key === "special")) {
@@ -828,7 +844,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") {
       tags.push("closest", "guaranteedcrit");
       // Solar Pounce only strips buffs from its 4th upgrade on.
-      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispel");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispelbuff");
     }
   }
   const isSiegefinLine = getRootDef(creatureId)?.id === "sylvandragon";
@@ -839,8 +855,8 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("healdown");
     }
     // Holdfast's Root is the undispellable twin -- it is the creature's own
-    // stance, and the same cast dispels everything else.
-    if (key === "special") tags.push("rootundispellable");
+    // stance, and the same cast dispels everything else -- at every tier.
+    if (key === "special") tags.push("rootundispellable", "dispeldebuff");
   }
   // The Sicklewing mantises -- root id inherited from the retired Aetherwing.
   const isSicklewingLine = getRootDef(creatureId)?.id === "galephoenix";
@@ -1013,7 +1029,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       tags.push("fortify");
       // Hunker In only dispels from its 4th upgrade on -- same level-gating
       // rule as the other final-tier effects.
-      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispel");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispeldebuff");
     }
     if (key === "unique") {
       // Fortify is listed here too: Windbreak's text keys off it, and the

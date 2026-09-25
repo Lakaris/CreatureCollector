@@ -25,3 +25,18 @@ export function isImmobilized(u) {
 export function resistsDisplacement(u) {
   return !!u?.gear?.unmovable;
 }
+
+/**
+ * POLICY: every successful Displace -- a creature forcibly moved by a push,
+ * pull or knockback, whoever caused it (a creature's ability via
+ * displaceUnit, a boss, a Wind Hazard) -- is announced here once, so gear
+ * that reacts to displacement (Cyclone Ring) sees every one. `source` is the
+ * creature that caused it, when there is one.
+ */
+const displacedListeners = [];
+export function onDisplaced(fn) {
+  displacedListeners.push(fn);
+}
+export function announceDisplaced(u, source = null) {
+  for (const fn of displacedListeners) fn(u, source);
+}

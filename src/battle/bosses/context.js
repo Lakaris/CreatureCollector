@@ -97,6 +97,8 @@ export function makeBossContext({ boss, aliveP, aliveE, allOcc, newFx, now, grid
      * to overlap anything. Returns true if it actually moved.
      */
     moveToward(target, cooldown) {
+      // Nothing targetable (every player Intangible): hold position.
+      if (!target) return false;
       const [nr, nc] = aStepToward(boss.row, boss.col, target.row, target.col);
       const br = Math.max(0, Math.min(gridRows - BOSS_SIZE, nr));
       const bc = Math.max(0, Math.min(gridCols - BOSS_SIZE, nc));

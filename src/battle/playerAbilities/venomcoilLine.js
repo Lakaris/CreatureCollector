@@ -25,6 +25,7 @@ import { attackRoll, damageBoss } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, healUnit } from "../hp.js";
 import { applyRestrained, applyPoison, applyWhileActiveStatMod, healReceivedMultiplier } from "../status.js";
+import { removeSpecialCharge } from "../charge.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -125,7 +126,7 @@ export function makeVenomcoilModule(cfg) {
 
       if (alreadyWrapped && best.abilChargeMax) {
         const drain = (best.abilChargeMax * chargeDrainPctByLevel[idx]) / 100;
-        best.abilCharge = Math.max(0, (best.abilCharge || 0) - drain);
+        removeSpecialCharge(best, drain, unit);
       }
       newFx.push({ id: now + "cc" + unit.uid + best.uid, row: best.row, col: best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },

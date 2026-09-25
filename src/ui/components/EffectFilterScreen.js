@@ -11,13 +11,14 @@
 import React, { useMemo, useState, useEffect } from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { ALL_DEX_FORMS } from "../../data/creatures.js";
+import { EQUIPMENT_DEFS } from "../../data/equipment.js";
 import { ABILITY_TAG_DEFS, TARGETING_TAGS, getCreatureEffectLabels } from "../../core/abilityText.js";
 import { undispellableNote, maxStacksNote, stackingLine, summonKit } from "./AbilityTagPills.js";
 import ScreenHeader from "./ScreenHeader.js";
 
 /**
  * {targeting, effects, defs}: sorted label lists limited to labels some
- * creature's kit actually carries, plus label -> tag definition for the
+ * creature's kit or some item's effect actually carries, plus label -> tag definition for the
  * reader panel. Twin tags sharing a label (Root and its undispellable stance
  * variant) resolve to the FIRST definition in ABILITY_TAG_DEFS -- the plain
  * one, which is the general rule rather than one creature's exception.
@@ -48,11 +49,21 @@ export function effectFilterCatalog() {
   // leaves behind rather than a status it inflicts, and grouping them keeps
   // the Effects list to things that live on a creature.
   const hazardLabels = new Set(
-    ["firehazard", "waterhazard"].map((k) => ABILITY_TAG_DEFS[k]?.label).filter(Boolean)
+    ["firehazard", "waterhazard", "windhazard"].map((k) => ABILITY_TAG_DEFS[k]?.label).filter(Boolean)
   );
   const carried = new Set();
   for (const def of ALL_DEX_FORMS) {
     for (const label of getCreatureEffectLabels(def.id)) carried.add(label);
+  }
+  // Effects equipment grants are listed too, so their definitions can be
+  // read here even when no creature's kit carries them (selecting one still
+  // matches only creature kits). An item grants every effect its text names
+  // as a whole word ("Seeded", "Wind Hazard").
+  for (const item of EQUIPMENT_DEFS) {
+    if (!item.effect) continue;
+    for (const label of defs.keys()) {
+      if (new RegExp("\\b" + label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(item.effect)) carried.add(label);
+    }
   }
   const targeting = [], hazards = [], effects = [];
   for (const label of carried) {

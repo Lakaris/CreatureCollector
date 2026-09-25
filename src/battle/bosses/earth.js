@@ -9,7 +9,7 @@ import { MELEE_RANGE, BOSS_SIZE, STATUS_TICKS } from "../constants.js";
 import { bossOutOfBounds, bossBlocked } from "../geometry.js";
 import { damageUnit } from "../hp.js";
 import { applyTimedDebuff } from "../status.js";
-import { resistsDisplacement } from "../immobilize.js";
+import { resistsDisplacement, announceDisplaced } from "../immobilize.js";
 
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
@@ -30,6 +30,8 @@ function pickDirection(ctx) {
   const max = Math.max(...counts);
   if (max > 0) return DIRS[counts.indexOf(max)];
   const tgt = ctx.byDistance()[0];
+  // Nothing targetable (every player Intangible): any direction will do.
+  if (!tgt) return DIRS[0];
   const dr = tgt.row - (boss.row + 0.5);
   const dc = tgt.col - (boss.col + 0.5);
   return Math.abs(dr) >= Math.abs(dc) ? [dr > 0 ? 1 : -1, 0] : [0, dc > 0 ? 1 : -1];
@@ -88,9 +90,11 @@ export default {
           u.prevRow = u.row;
           u.prevCol = u.col;
           u.lastMoveTime = now;
+          const moved = u[axis] !== next;
           u[axis] = next;
           next -= dir;
           allOcc.add(u.row + "," + u.col);
+          if (moved) announceDisplaced(u);
         }
         damageUnit(u, ctx.dmg(0.22));
         applyTimedDebuff(u, "slowTicks", STATUS_TICKS);

@@ -23,11 +23,26 @@
 // timer, or in damage.js beside the damage formulas) so that status.js and
 // damage.js can both use it without an import cycle.
 
-import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread } from "./applier.js";
+import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread, gearTriggers, triggersOn, basicAttackNumber } from "./applier.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { abilityHasTag } from "./abilityTags.js";
 import { gainSpecialCharge } from "./charge.js";
 import { isImmobilized } from "./immobilize.js";
+import { distToBoss } from "./geometry.js";
+
+/**
+ * Ground Hazards live in the battle state, which this module never sees, so
+ * tick.js hands over a lookup each tick: is `u` (a creature, or the boss by
+ * its body) standing on a Hazard of `kind`? Read by Flashpoint Ring and
+ * Maelstrom Core.
+ */
+let hazardLookup = () => false;
+export function setHazardLookup(fn) {
+  hazardLookup = fn || (() => false);
+}
+export function standsOnHazard(u, kind) {
+  return !!u && hazardLookup(u, kind);
+}
 
 /**
  * HIT HOOKS. Every hit that lands -- on a creature (damageUnit) or a boss
@@ -81,28 +96,56 @@ function claimCrit(attacker) {
  *   - Berserk Core: + on the Basic ability.
  * Effect damage (DoTs, reflects, hazards) takes only the echo scaling.
  */
-export function attackerDamageMultiplier(target, { effectDamage = false } = {}) {
+export function attackerDamageMultiplier(target, { effectDamage = false, crit = false } = {}) {
   let mult = effectiveness();
   const attacker = currentApplier();
   if (!attacker || attacker === target || effectDamage) return mult;
   const gear = attacker.gear;
   if (!gear) return mult;
   const ability = activeAbilityOf(attacker);
+  const more = (pct) => { mult *= 1 + pct / 100; };
   if (gear.immobilizedDmgPct && isImmobilized(target)) mult *= 1 + gear.immobilizedDmgPct / 100;
   if (gear.multiHitDmgPct && abilityHasTag(attacker, ability, "multihit")) mult *= 1 + gear.multiHitDmgPct / 100;
+  // Tag-keyed damage gear: Tidecaller Shell (Splash), Fault Line Gauntlet
+  // (Line), Static Pin (Chain), Hollow Mask (Weakest).
+  if (gear.splashDmgPct && abilityHasTag(attacker, ability, "splash")) more(gear.splashDmgPct);
+  if (gear.lineDmgPct && abilityHasTag(attacker, ability, "line")) more(gear.lineDmgPct);
+  if (gear.chainDmgPct && abilityHasTag(attacker, ability, "chain")) more(gear.chainDmgPct);
+  if (gear.weakestDmgPct && abilityHasTag(attacker, ability, "weakest")) more(gear.weakestDmgPct);
+  // Seismic Heart: an ability that Stuns, against a target that can not be
+  // Stunned (a boss -- it obeys no control effect but Taunt).
+  if (gear.stunImmuneDmgPct && target.uid == null && abilityHasTag(attacker, ability, "stun")) more(gear.stunImmuneDmgPct);
+  // Target-state damage gear: Rime Shard (Frostbite), Grave Lily (Marked),
+  // Strangler Vine (Restrained by this creature), Nightshade Bead (Shielded),
+  // Flashpoint Ring (standing on a Fire Hazard).
+  if (gear.frostbiteTargetDmgPct && (target.frostbiteTicks || 0) > 0) more(gear.frostbiteTargetDmgPct);
+  if (gear.markedTargetDmgPct && (target.markedTicks || 0) > 0) more(gear.markedTargetDmgPct);
+  if (gear.restrainedTargetDmgPct && target.restrained?.some((r) => r.src === attacker.uid && r.stacks > 0)) more(gear.restrainedTargetDmgPct);
+  if (gear.shieldedTargetDmgPct && (target.shield || 0) > 0) more(gear.shieldedTargetDmgPct);
+  if (gear.fireHazardTargetDmgPct && standsOnHazard(target, "fire")) more(gear.fireHazardTargetDmgPct);
+  // Finisher's Coin: a critical hit on a target below its Health threshold
+  // (each such item at its own threshold).
+  if (crit) for (const g of gearTriggers(attacker, "critLowHpDmgPct")) if (isBelow(target, g.critLowHpBelowPct)) more(g.critLowHpDmgPct);
+  // Glass Blade: everything it deals.
+  if (gear.dmgDealtPct) more(gear.dmgDealtPct);
+  // Ambush Fang: the first ability of the battle -- all of it (spent when that
+  // Basic attack or Special ends; see tick.js).
+  if (gear.firstAbilityDmgPct && !attacker._ambushDone && (ability === "basic" || ability === "special")) {
+    more(gear.firstAbilityDmgPct);
+    attacker._ambushUsed = true;
+  }
   if (gear.basicDmgPct && ability === "basic") mult *= 1 + gear.basicDmgPct / 100;
+  if (gear.specialDmgPct && ability === "special") mult *= 1 + gear.specialDmgPct / 100;
   // Duelist's Edge: the enemy that last damaged the attacker (see announceHit).
   if (gear.vsLastAttackerDmgPct && attacker._lastAttacker === target) mult *= 1 + gear.vsLastAttackerDmgPct / 100;
   // Hunter's Mark: a target below a share of its Health.
-  if (gear.lowHpTargetDmgPct && target.hp < (target.maxHp * (gear.lowHpTargetBelowPct || 0)) / 100) mult *= 1 + gear.lowHpTargetDmgPct / 100;
+  for (const g of gearTriggers(attacker, "lowHpTargetDmgPct")) if (isBelow(target, g.lowHpTargetBelowPct)) more(g.lowHpTargetDmgPct);
   if (ability === "basic") {
-    // Focus Band: every Nth Basic attack. The attack in progress is the one
-    // after those already finished -- except for a finished attack's own
-    // riders (settleBasicAttack), which already counted it.
-    if (gear.focusEvery) {
-      const n = (attacker._basicAttacks || 0) + (attacker._attackRiders ? 0 : 1);
-      if (n % gear.focusEvery === 0) mult *= 1 + (gear.focusDmgPct || 0) / 100;
-    }
+    // Every-Nth-attack damage, each item on its own interval (see
+    // basicAttackNumber): Focus Band, Railgun Coil.
+    const n = basicAttackNumber(attacker);
+    for (const g of triggersOn(attacker, "focusEvery", n)) more(g.focusDmgPct || 0);
+    for (const g of triggersOn(attacker, "pierceEvery", n)) more(g.pierceEveryDmgPct || 0);
     // Charger's Greaves: the first Basic attack after moving (the flag is set
     // by onUnitMoved and spent when that attack ends).
     if (gear.afterMoveAttackDmgPct && attacker._movedSinceAttack) mult *= 1 + gear.afterMoveAttackDmgPct / 100;
@@ -113,6 +156,14 @@ export function attackerDamageMultiplier(target, { effectDamage = false } = {}) 
   if (gear.vsSlowStunDmgPct && ((target.slowTicks || 0) > 0 || (target.stunTicks || 0) > 0)) mult *= 1 + gear.vsSlowStunDmgPct / 100;
   // Longshot Lens: abilities tagged Farthest (the targeting tag is the classification).
   if (gear.farthestDmgPct && abilityHasTag(attacker, ability, "farthest")) mult *= 1 + gear.farthestDmgPct / 100;
+  // Tempest Blade: abilities tagged Pierce (including a Basic that Gust Anklets made Pierce).
+  if (gear.pierceDmgPct && abilityHasTag(attacker, ability, "pierce")) mult *= 1 + gear.pierceDmgPct / 100;
+  // Shadow Shroud: the first damaging ability after a teleport -- all of it
+  // (the flag is spent when that ability ends; see tick.js).
+  if (gear.teleportNextDmgPct && attacker._shadowStrike) {
+    mult *= 1 + gear.teleportNextDmgPct / 100;
+    attacker._shadowStrikeUsed = true;
+  }
   // Vanguard Gauntlet: no ally Nearby.
   if (gear.loneDmgPct && !hasAllyNearby(attacker)) mult *= 1 + gear.loneDmgPct / 100;
   // Grit Band: a share of a percent per percent of the attacker's missing Health.
@@ -121,6 +172,11 @@ export function attackerDamageMultiplier(target, { effectDamage = false } = {}) 
     mult *= 1 + (missingPct * gear.missingHpDmgRatio) / 100;
   }
   return mult;
+}
+
+/** `u` is below `pct` of its max Health (a threshold item's condition). */
+export function isBelow(u, pct) {
+  return !!u && u.hp < (u.maxHp * (pct || 0)) / 100;
 }
 
 /** A creature's type ("Fire", ...) -- a boss's is its element key. */
@@ -145,7 +201,13 @@ export function hasAllyNearby(u) {
  * Chain), and the Execute tag's text says so.
  */
 export function canBeExecuted(u) {
-  return !!u && u.uid != null && !((u.size || 1) > 1) && u.hp > 0;
+  return !!u && !isBossUnit(u) && u.hp > 0;
+}
+
+/** A boss: the Dungeon/Daily boss (no uid) or a Labyrinth Boss creature (a
+ * 2x2 body). Effects that say "excluding bosses" check this. */
+export function isBossUnit(u) {
+  return !!u && (u.uid == null || (u.size || 1) > 1);
 }
 
 /**
@@ -171,17 +233,25 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
     if (gear.allDmgReductionPct) cut(gear.allDmgReductionPct);
     // Guardian Idol: a hit this creature took for an ally via Protect.
     if (gear.protectDmgReductionPct && redirected) cut(gear.protectDmgReductionPct);
-    // Bulwark Sigil: every Nth ability hit taken.
-    if (gear.reduceEveryNthHit && !effectDamage) {
+    // Bulwark Sigil: every Nth ability hit taken (one shared tally, each
+    // item on its own interval).
+    if (!effectDamage && gearTriggers(target, "reduceEveryNthHit").length) {
       target._hitsForBulwark = (target._hitsForBulwark || 0) + 1;
-      if (target._hitsForBulwark % gear.reduceEveryNthHit === 0) cut(gear.reduceEveryNthHitPct || 0);
+      for (const g of triggersOn(target, "reduceEveryNthHit", target._hitsForBulwark)) cut(g.reduceEveryNthHitPct || 0);
     }
     // Sentinel Idol: the first N instances of damage of the battle.
     if (gear.firstHitsReduced && (target._instancesTaken || 0) < gear.firstHitsReduced) {
       target._instancesTaken = (target._instancesTaken || 0) + 1;
       cut(gear.firstHitsReducedPct || 0);
     }
+    // Monolith Shard: damage from an enemy that is Taunted (by anyone).
+    if (gear.tauntedDmgReductionPct && attacker && attacker !== target && (attacker.tauntTicks || 0) > 0) cut(gear.tauntedDmgReductionPct);
+    // Glass Blade: the price of its damage -- everything it takes.
+    if (gear.dmgTakenPct) mult *= 1 + gear.dmgTakenPct / 100;
   }
+  // Tesla Coil: standing inside the active Aura of an enemy that wears it.
+  const tesla = teslaAuraPct(target);
+  if (tesla) mult *= 1 + tesla / 100;
   if (target.uid != null) {
     let bell = 0;
     for (const a of battleRoster()) {
@@ -192,6 +262,31 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
     if (bell) mult *= 1 - bell / 100;
   }
   return mult;
+}
+
+/** Tesla Coil: the strongest bonus among living enemies of `target` wearing
+ * it whose active Aura covers it (a boss by its body). Several don't add up. */
+function teslaAuraPct(target) {
+  let best = 0;
+  for (const a of battleRoster()) {
+    const pct = a.gear?.auraEnemyDmgPct || 0;
+    if (!pct || pct <= best || a.hp <= 0 || !a.aura || !((a.aura.ticks || 0) > 0)) continue;
+    // The boss is an enemy of the player side only.
+    if (target.uid == null ? a.uid?.[0] !== "p" : a === target || sameSide(a, target)) continue;
+    const d = target.uid == null ? distToBoss(target, a.row, a.col) : Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col));
+    if (d <= a.aura.range) best = pct;
+  }
+  return best;
+}
+
+/**
+ * Counters and Reflects -- damage a creature returns to whoever hit it --
+ * are effect damage, so the attacker gear above never touches them. Their own
+ * gear scales them at the source instead, through here: `kind` "counter"
+ * (Bramble Cuff) or "reflect" (Quartz Chip), read as `gear.<kind>DmgPct`.
+ */
+export function retaliationMultiplier(u, kind) {
+  return 1 + ((u?.gear?.[kind + "DmgPct"]) || 0) / 100;
 }
 
 /**
@@ -227,15 +322,45 @@ export function clearSeeded(u) {
  *   - Warlord's Trophy: EVERY other creature on the field wearing it, on
  *     either side, gains Attack (read by gearAtkMultiplier in damage.js).
  */
-export function onDefeated(target) {
+/**
+ * DEFEAT LISTENERS: every defeat is announced as (target, killer, info) --
+ * the killer being the current applier (null for damage over time, hazards)
+ * and `info` carrying `overkill` (the killing hit's damage past the Health
+ * it had left) and `wasSeeded`. They run first, before the fallen creature's
+ * state is cleared below, so they still see what it carried. Registered by
+ * status.js (Soul Jar, Worldtree Seed) and tick.js (Inferno Heart, Wildfire
+ * Brand, Reaper's Lantern, Bloodrush Crown, Warpath Greaves).
+ */
+const defeatListeners = [];
+export function onUnitDefeated(fn) {
+  defeatListeners.push(fn);
+}
+
+export function onDefeated(target, { overkill = 0 } = {}) {
+  const killer = currentApplier();
+  const info = { overkill: Math.max(0, Math.round(overkill)), wasSeeded: !!target.seeded };
+  for (const fn of defeatListeners) fn(target, killer && killer !== target ? killer : null, info);
   // Seeded ends the moment either side of it falls -- the fallen creature
   // takes no more turns, so it can't wait for its own next tick to clear.
   if (target.seeded) clearSeeded(target);
   if (target._seedTarget && target._seedTarget.seededBy === target) clearSeeded(target._seedTarget);
-  const killer = currentApplier();
+  // Blessing Mantle: the Health it lent its allies goes when it does.
+  if (target.gear?.shareStatsPct) {
+    for (const a of battleRoster()) {
+      const lent = a._mantleHp?.[target.uid];
+      if (!lent) continue;
+      delete a._mantleHp[target.uid];
+      a.maxHp = Math.max(1, a.maxHp - lent);
+      if (a.hp > 0) a.hp = Math.max(1, Math.min(a.hp, a.maxHp));
+    }
+  }
   if (killer && killer !== target && killer.hp > 0) {
     const pct = killer.gear?.killChargePct || 0;
     if (pct && killer.abilChargeMax) gainSpecialCharge(killer, (killer.abilChargeMax * pct) / 100);
+    // Whetstone: Attack for the rest of the battle per enemy it defeats
+    // (read by gearAtkMultiplier in damage.js).
+    const step = killer.gear?.killAtkPct || 0;
+    if (step && !sameSide(killer, target)) killer._killAtkPct = Math.min(killer.gear.killAtkMaxPct ?? Infinity, (killer._killAtkPct || 0) + step);
   }
   for (const u of battleRoster()) {
     const step = u.gear?.defeatAtkPct || 0;
@@ -341,13 +466,46 @@ export function applyShield(u, amount, ticks) {
   // the keep-the-larger comparison so a strengthened Shield competes at size.
   const extra = extraAllyFor(u);
   if (extra) asSpread(() => applyShield(extra, amount, ticks));
-  const shield = Math.max(1, Math.round(shieldAmount(amount)));
+  const shield = Math.max(1, Math.round(shieldAmount(amount) * shieldReceivedMultiplier(u)));
   const layer = stackLayer(u);
   if (shield < (u.shield || 0) - layer) return false;
   u.shield = shield + layer;
   // Duration gear on whoever granted it (see battle/applier.js).
   u.shieldTicks = buffTicks(u, ticks);
+  noteShieldPeak(u);
   return true;
+}
+
+/**
+ * Shielding Down (Nightshade Bead): the Shield twin of Healing Down -- a
+ * stackable stat mod of kind "shield" that shrinks every Shield the carrier
+ * receives. Summed per stack like Healing Down (20% each), floor 0. Read
+ * here rather than through statModMultiplier because status.js imports this
+ * module (see the header note).
+ */
+export function shieldReceivedMultiplier(u) {
+  let sum = 0;
+  for (const m of u?.statMods || []) if (m.kind === "shield" && m.pct < 0) sum += m.pct;
+  return Math.max(0, 1 + sum / 100);
+}
+
+/**
+ * The size a unit's Shield has reached since it last went to zero -- what
+ * "the Shield" means when it breaks (Aegis Feather heals a share of it).
+ */
+function noteShieldPeak(u) {
+  u._shieldPeak = Math.max(u._shieldPeak || 0, u.shield || 0);
+}
+
+/**
+ * SHIELD-BREAK LISTENERS: a unit's Shield was worn down to nothing by damage
+ * (not dispelled, stolen, or run out) -- announced as (unit, peak), `peak`
+ * being the Shield's size at its largest. Registered by status.js (Aegis
+ * Feather) and tick.js (Geode Heart).
+ */
+const shieldBreakListeners = [];
+export function onShieldBroken(fn) {
+  shieldBreakListeners.push(fn);
 }
 
 /**
@@ -375,11 +533,28 @@ export function baseShield(u) {
 /** Add `amount` (final, already gear-scaled) to the stacking layer, lasting
  * at least `ticks` (Infinity = until broken). Returns what was added. */
 export function addStackingShield(u, amount, ticks) {
-  const add = Math.round(amount);
-  if (!u || add <= 0) return 0;
+  if (!u) return 0;
+  const add = Math.round(amount * shieldReceivedMultiplier(u));
+  if (add <= 0) return 0;
   u.stackShield = stackLayer(u) + add;
   u.shield = (u.shield || 0) + add;
   u.stackShieldTicks = Math.max(u.stackShieldTicks || 0, ticks);
+  noteShieldPeak(u);
+  return add;
+}
+
+/**
+ * Leviathan Scale: dispelling debuffs banks a stacking Shield, of which the
+ * creature may hold at most `capPct` of its max Health at a time -- tracked as
+ * the `dispelLayer` share of the stacking layer, spent and refilled like the
+ * Overheal Layer's. Returns what was added.
+ */
+export function addDispelLayer(u, amount, capPct, ticks) {
+  const cap = ((u.maxHp || 0) * capPct) / 100;
+  const room = Math.floor(cap - Math.min(u.dispelLayer || 0, stackLayer(u)));
+  if (room <= 0) return 0;
+  const add = addStackingShield(u, Math.min(amount, room), ticks);
+  u.dispelLayer = Math.min(u.dispelLayer || 0, stackLayer(u)) + add;
   return add;
 }
 
@@ -394,6 +569,8 @@ export function clearShield(u) {
   u.stackShield = 0;
   u.stackShieldTicks = 0;
   u.overhealLayer = 0;
+  u.dispelLayer = 0;
+  u._shieldPeak = 0;
 }
 
 /** One expiry tick for both parts of the Shield (see tickTimedMods). */
@@ -405,7 +582,9 @@ export function tickShieldTimers(u) {
     u.shield = Math.max(0, (u.shield || 0) - stackLayer(u));
     u.stackShield = 0;
     u.overhealLayer = 0;
+    u.dispelLayer = 0;
   }
+  if (!((u.shield || 0) > 0)) u._shieldPeak = 0;
 }
 
 /**
@@ -482,26 +661,38 @@ export function onHealed(fn) {
  * (Bloodthirster-style gear, Venom Fang, Iglet's lifesteal). Vampiric Band
  * lets those Overheal into the stacking layer.
  */
-export function healUnit(u, amount, { lifesteal = false } = {}) {
+export function healUnit(u, amount, { lifesteal = false, hotFrom = null } = {}) {
   if (!u || !(amount > 0) || u.hp <= 0) return 0;
-  // Cantor's Beads: a heal on an ally also heals one more (the raw amount,
-  // so that ally's own healing-received gear applies to it).
-  const extra = extraAllyFor(u);
-  if (extra) asSpread(() => healUnit(extra, amount, { lifesteal }));
-  const healer = currentApplier();
+  // Hungering Edge: nothing but its own lifesteal heals this creature.
+  if (u.gear?.lifestealOnlyHeal && !lifesteal) return 0;
+  // A Heal Over Time tick (`hotFrom` = whoever cast it): the caster's gear
+  // was baked into the per-tick amount when it was applied, so only the
+  // receiver's own gear applies now -- but it is still the caster's heal to
+  // the heal listeners (Swiftgrace Band counts it).
+  const healer = hotFrom || currentApplier();
+  if (!hotFrom) {
+    // Cantor's Beads: a heal on an ally also heals one more (the raw amount,
+    // so that ally's own healing-received gear applies to it).
+    const extra = extraAllyFor(u);
+    if (extra) asSpread(() => healUnit(extra, amount, { lifesteal }));
+  }
   // The healer's gear -- Lifebinder Pendant's healing done, an echoed
   // Special's (Echo Conch) reduced effectiveness -- and the receiver's:
   // Sunbeam Locket's healing received.
   const received = 1 + (u.gear?.healReceivedPct || 0) / 100;
-  amount = Math.max(1, Math.round(amount * healDoneMultiplier() * effectiveness() * received));
+  const giver = hotFrom ? 1 : healDoneMultiplier() * effectiveness();
+  amount = Math.max(1, Math.round(amount * giver * received));
   const before = u.hp;
   u.hp = Math.min(u.maxHp, u.hp + amount);
   const healed = u.hp - before;
-  const excess = amount - healed;
+  // Halo Pin: the overflow of this healer's heals becomes a larger Overheal.
+  const excess = (amount - healed) * (1 + (healer?.gear?.overhealGrantPct || 0) / 100);
   // Overheal is the RECEIVER's own passive, so its Shield is the receiver's
   // to strengthen -- not whichever healer happened to overflow it.
   let left = excess;
-  const layerCap = Math.max(u.gear?.overhealLayerPct || 0, lifesteal ? u.gear?.lifestealOverhealPct || 0 : 0);
+  // Wax Cell / Honeycomb Flask, plus Vampiric Band's share on a lifesteal
+  // heal: the caps add, like any stacked gear.
+  const layerCap = (u.gear?.overhealLayerPct || 0) + (lifesteal ? u.gear?.lifestealOverhealPct || 0 : 0);
   if (left > 0 && layerCap > 0) {
     left -= asPassive(u, () => addOverhealLayer(u, left, layerCap));
   }
@@ -532,6 +723,7 @@ export function absorbShield(u, dmg, vsShield = 1) {
   if (layer) {
     u.stackShield = Math.max(0, layer - absorbed);
     u.overhealLayer = Math.min(Math.max(0, (u.overhealLayer || 0) - absorbed), u.stackShield);
+    u.dispelLayer = Math.min(Math.max(0, (u.dispelLayer || 0) - absorbed), u.stackShield);
     if (!u.stackShield) u.stackShieldTicks = 0;
   }
   return Math.round(leftover);
@@ -548,19 +740,24 @@ export function shieldBreakMultiplier(effectDamage) {
  * dealt (including the shield-absorbed part) so callers can keep their damage
  * totals and charts unchanged.
  */
-export function damageUnit(target, dmg, { pierceShield = false, effectDamage = false, redirected = false, crit = false } = {}) {
+export function damageUnit(target, dmg, { pierceShield = false, effectDamage = false, redirected = false, shared = false, crit = false } = {}) {
   if (!target || dmg <= 0) return 0;
   if (!redirected) crit = claimCrit(currentApplier());
   // Intangible (Deep Submerge): can not be damaged at all -- every damage
   // source routes through here, so the immunity is engine-wide by design.
   if ((target.intangibleTicks || 0) > 0) return 0;
+  // Lightning Rod: an attack redirected onto this creature (Protect, or
+  // Guardian's Oath's share) charges its Special.
+  if (redirected && !effectDamage && target.gear?.redirectChargePct && target.hp > 0 && target.abilChargeMax) {
+    gainSpecialCharge(target, (target.abilChargeMax * target.gear.redirectChargePct) / 100);
+  }
   // The attacker's gear, applied once at the top (never again on a Protect
   // redirect). Echo Conch scales EVERYTHING dealt during an echo, the caster's
   // own self-damage included; Hunter's Snare adds to its attacks on an
   // Immobilized creature (effect damage -- DoTs, reflects, hazards -- aside).
   const baseDmg = dmg;
   if (!redirected) {
-    const mult = attackerDamageMultiplier(target, { effectDamage });
+    const mult = attackerDamageMultiplier(target, { effectDamage, crit });
     if (mult !== 1) dmg = Math.max(1, Math.round(dmg * mult));
   }
   const wasAlive = target.hp > 0;
@@ -580,23 +777,38 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   }
   // Dodge: every Nth ability hit misses outright. Checked before Fortify so a
   // dodged swing does not also burn a Fortify stack.
-  // A creature's own Dodge (Cragling) or Dodge gear (Featherweight Wrap):
-  // the more frequent of the two, on one shared tally.
-  const dodgeEvery = Math.min(target.dodgeEvery || Infinity, target.gear?.dodgeEvery || Infinity);
-  if (!effectDamage && dodgeEvery < Infinity) {
-    target.dodgeCounter = (target.dodgeCounter || 0) + 1;
-    if (target.dodgeCounter >= dodgeEvery) {
-      target.dodgeCounter = 0;
-      target._dodgedHit = true;
-      return 0;
-    }
+  // A creature's own Dodge (Cragling) and Dodge gear (Featherweight Wrap):
+  // one shared tally of hits taken, and each interval fires on its own count
+  // (every 4th and every 6th dodge the 4th, 6th, 8th, 12th...).
+  // Shadow Shroud's Dodge after a teleport: the next ability hit, once.
+  if (!effectDamage && target._dodgeNext) {
+    target._dodgeNext = false;
+    return dodged(target);
+  }
+  const dodgeGear = gearTriggers(target, "dodgeEvery");
+  if (!effectDamage && (target.dodgeEvery || dodgeGear.length)) {
+    const n = (target.dodgeCounter = (target.dodgeCounter || 0) + 1);
+    if ((target.dodgeEvery && n % target.dodgeEvery === 0) || dodgeGear.some((g) => n % g.dodgeEvery === 0)) return dodged(target);
   }
   // Expose: checked here, after Protect and Dodge, so only a hit this creature
   // actually takes spends a stack (a redirected hit spends the guardian's).
   const exposed = spendExpose(target, effectDamage);
   if (exposed !== 1) dmg = Math.max(1, Math.round(dmg * exposed));
+  // Guardian's Oath: a Nearby ally wearing it takes a share of an ability hit
+  // (through its own defenses) while it is healthy enough.
+  if (!effectDamage && !redirected) {
+    const oath = oathGuardianFor(target);
+    if (oath) {
+      const { guardian, pct } = oath;
+      const share = Math.round((dmg * Math.min(100, pct)) / 100);
+      if (share > 0) {
+        damageUnit(guardian, share, { pierceShield, redirected: true, shared: true });
+        dmg = Math.max(1, dmg - share);
+      }
+    }
+  }
   // The target's own damage-reduction gear (see defenderDamageMultiplier).
-  const guarded = defenderDamageMultiplier(target, { effectDamage, redirected });
+  const guarded = defenderDamageMultiplier(target, { effectDamage, redirected: redirected && !shared });
   if (guarded !== 1) dmg = Math.max(1, Math.round(dmg * guarded));
   // Fortify: ability damage only. Halve it, then spend the stack that did it.
   if (!effectDamage && (target.fortifyStacks || 0) > 0) {
@@ -608,7 +820,13 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
   if ((target.windbreakTicks || 0) > 0 && (target.windbreakPct || 0) > 0) {
     dmg = Math.max(1, Math.round((dmg * (100 - target.windbreakPct)) / 100));
   }
+  const shieldBefore = target.shield || 0;
   let toHealth = pierceShield ? dmg : absorbShield(target, dmg, shieldBreakMultiplier(effectDamage));
+  if (shieldBefore > 0 && !((target.shield || 0) > 0)) {
+    const peak = Math.max(target._shieldPeak || 0, shieldBefore);
+    target._shieldPeak = 0;
+    for (const fn of shieldBreakListeners) fn(target, peak);
+  }
   // Immortal (Silver Draught): Health can not be reduced below 1 -- the
   // clamp beats everything, shield-piercing damage included.
   const floor = (target.immortalTicks || 0) > 0 ? 1 : 0;
@@ -620,6 +838,8 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
     toHealth = 0;
     target.immortalTicks = Math.max(target.immortalTicks || 0, lastBreath);
   }
+  // The killing blow's damage past the Health that was left (Warpath Greaves).
+  const overkill = Math.max(0, toHealth - Math.max(0, target.hp));
   target.hp = Math.max(floor, target.hp - toHealth);
   // Revive (Rekindle): a unit carrying the one-shot flag (set by its module
   // at battle start) returns at full Health the first time it would die.
@@ -636,6 +856,14 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
     target._gearReviveUsed = true;
     target.hp = Math.max(1, Math.round((target.maxHp * phoenix) / 100));
   }
+  // Soul Lantern: an ally's lantern, once per battle, brings it back.
+  if (target.hp <= 0 && wasAlive) {
+    const lantern = battleRoster().find((a) => a !== target && a.hp > 0 && a.gear?.reviveAllyPct && !a._lanternUsed && sameSide(a, target));
+    if (lantern) {
+      lantern._lanternUsed = true;
+      target.hp = Math.max(1, Math.round((target.maxHp * lantern.gear.reviveAllyPct) / 100));
+    }
+  }
   // Time of death, for defeat animations (ui/components/battleArtState.js).
   // Stamped here because every damage source routes through this function, and
   // only after the revive check so a reborn unit is not marked dead. Cleared
@@ -651,7 +879,48 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
     target._huskUsed = true;
     target.intangibleTicks = Math.max(target.intangibleTicks || 0, husk);
   }
-  if (wasAlive && target.hp <= 0) onDefeated(target);
+  // Twin Soul Crest: the first time an ally (the wearer included) falls below
+  // the threshold, it is healed for a share of the wearer's max Health. Each
+  // crest -- every wearer, every such item -- rescues each ally once, at its
+  // own threshold.
+  if (target.hp > 0 && target.uid != null) {
+    for (const a of battleRoster()) {
+      if (a.hp <= 0 || !sameSide(a, target)) continue;
+      gearTriggers(a, "rescueBelowPct").forEach((g, i) => {
+        const key = a.uid + ":" + i;
+        const done = target._rescuedBy || (target._rescuedBy = {});
+        if (done[key] || !(target.hp > 0) || !isBelow(target, g.rescueBelowPct)) return;
+        done[key] = true;
+        asPassive(a, () => healUnit(target, Math.round((a.maxHp * (g.rescueHealPct || 0)) / 100)));
+      });
+    }
+  }
+  if (wasAlive && target.hp <= 0) onDefeated(target, { overkill });
   announceHit(target, { baseDmg, dmg, crit, effectDamage });
   return dmg;
+}
+
+/** A hit that `target` Dodged: it lands nothing. Shale Anklet banks Attack
+ * for the rest of the battle (read by gearAtkMultiplier in damage.js). */
+function dodged(target) {
+  target._dodgedHit = true;
+  const step = target.gear?.dodgeAtkPct || 0;
+  if (step) target._dodgeAtkPct = Math.min(target.gear.dodgeAtkMaxPct ?? Infinity, (target._dodgeAtkPct || 0) + step);
+  return 0;
+}
+
+/** Guardian's Oath: the first living ally within Nearby (the 8 surrounding
+ * tiles) of `target` that wears it and is above an Oath's Health threshold,
+ * with the share it takes -- every such item of its that is above its own
+ * threshold adds its share. */
+function oathGuardianFor(target) {
+  if (target.uid == null) return null;
+  for (const a of battleRoster()) {
+    if (a === target || a.hp <= 0 || !sameSide(a, target) || (a.intangibleTicks || 0) > 0) continue;
+    if (Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col)) > 1) continue;
+    let pct = 0;
+    for (const g of gearTriggers(a, "shareNearbyDmgPct")) if (a.hp > (a.maxHp * (g.shareAboveHpPct || 0)) / 100) pct += g.shareNearbyDmgPct;
+    if (pct > 0) return { guardian: a, pct };
+  }
+  return null;
 }

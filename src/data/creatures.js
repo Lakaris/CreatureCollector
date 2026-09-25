@@ -814,14 +814,14 @@ export const CREATURES=[
    abilities:{
      basic:{name:"Holy Dust",upgrades:["8 dmg; 22% blind 1s","11 dmg","14 dmg","18 dmg","28% blind 1.5s; regen 4 HP/s 2s on hit ally"]},
      special:{name:"Sacred Aura",charge:22,upgrades:["Aura; all allies +12% ATK+DEF 4s","Aura +16%","Aura +20%","Aura +25%","Aura +30%; also +10% Ability Speed; remove 1 debuff each"]},
-     unique:{name:"Sacred Wings",upgrades:["Passive: Ability Speed +20% for all allies; each ability cast heals caster 8 HP","+26%; heal 11","30%; heal 14","+36%; heal 18","+44%; heal 24; abilities also cleanse 1 debuff from caster"]}
+     unique:{name:"Sacred Wings",upgrades:["Passive: Ability Speed +20% for all allies; each ability cast heals caster 8 HP","+26%; heal 11","30%; heal 14","+36%; heal 18","+44%; heal 24; abilities also dispel 1 debuff from caster"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:10,ascensionsToEvolve:20,evolutionId:"radiantmoth"},
   {id:"radiantmoth",name:"Lumimoth",emoji:"🦋",type:"Light",rarity:"common",description:"Holymoth evolved. Its wing scales now emit a radiance that makes allies temporarily invulnerable.",
    stats:{hp:87,atk:57,def:57,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Holy Dust",upgrades:["8 dmg; blind 22%","11 dmg","14 dmg","18 dmg","Blind 1.5s; regen 4 HP/s ally"]},
      special:{name:"Radiant Aura",charge:8,upgrades:["All allies +20% ATK+DEF+Ability Speed 5s","Aura +26%","Aura +32%","Aura +40%","Aura +48%; remove all debuffs; grant overshield 30 HP"]},
-     unique:{name:"Moth Radiance",upgrades:["Passive: Ability Speed +30% allies; each ability heals all allies 10 HP","+38%; heal 14","+46%; heal 18","+56%; heal 24","+66%; heal 32; abilities also have 20% chance to fully cleanse all debuffs from all allies"]}
+     unique:{name:"Moth Radiance",upgrades:["Passive: Ability Speed +30% allies; each ability heals all allies 10 HP","+38%; heal 14","+46%; heal 18","+56%; heal 24","+66%; heal 32; abilities also have 20% chance to fully dispel all debuffs from all allies"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"holymoth",shardsToAscend:15,ascensionsToEvolve:30,evolutionId:"celestimoth"},
   {id:"celestimoth",name:"Celestimoth",emoji:"🦋",type:"Light",rarity:"common",description:"Radiantmoth's celestial final form. The light from its wings can be seen from the other side of the world.",
    stats:{hp:117,atk:78,def:77,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -1038,14 +1038,14 @@ export const CREATURES=[
    abilities:{
      basic:{name:"Shock Sting",upgrades:["12 dmg; shock+slow 15% 2s","15 dmg","19 dmg","25 dmg","Shock+slow 22% 2.5s; heal 1 ally 10 HP"]},
      special:{name:"Storm Veil",charge:10,upgrades:["Shield all allies 55 HP+12% dodge 5s","Shield 72; 16%","Shield 90; 20%","Shield 110; 25%","Shield 135; 30%; also grant lightning-immune 4s"]},
-     unique:{name:"Tempest Drift",upgrades:["Passive: immune to ground; 15% dodge; all allies +8% dodge+12 HP/s regen","18% dodge; +10% dodge; 16/s","22% dodge; +12%; 20/s","26% dodge; +15%; 25/s","30% dodge; +18%; 32/s; Stormjelly's heals also cleanse 1 debuff; can't be targeted while all allies are alive"]}
+     unique:{name:"Tempest Drift",upgrades:["Passive: immune to ground; 15% dodge; all allies +8% dodge+12 HP/s regen","18% dodge; +10% dodge; 16/s","22% dodge; +12%; 20/s","26% dodge; +15%; 25/s","30% dodge; +18%; 32/s; Stormjelly's heals also dispel 1 debuff; can't be targeted while all allies are alive"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"tempestjelly"},
   {id:"tempestjelly",name:"Tempestjelly",emoji:"🪼",type:"Water",rarity:"epic",description:"Stormjelly grown vast and crackling. Its glow can be seen from the ocean floor. Sailors call it a 'sky reef.'",
    stats:{hp:104,atk:69,def:68,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Shock Sting",upgrades:["12 dmg; shock+slow 15% 2s","15 dmg","19 dmg","25 dmg","Shock+slow 22% 2.5s; heal 1 ally 10 HP"]},
      special:{name:"Storm Veil",charge:10,upgrades:["Shield all allies 55 HP+12% dodge 5s","Shield 72; 16%","Shield 90; 20%","Shield 110; 25%","Shield 135; 30%; also grant lightning-immune 4s"]},
-     unique:{name:"Tempest Drift",upgrades:["Passive: immune to ground; 20% dodge; allies +10% dodge+16 HP/s regen; heals cleanse 1 debuff","22% dodge; allies +12%; 20/s","26% dodge; allies +14%; 24/s","30% dodge; allies +17%; 30/s","34% dodge; allies +20%; 38/s; shields overflow as HP; can't be targeted while any ally is below 50% HP"]}
+     unique:{name:"Tempest Drift",upgrades:["Passive: immune to ground; 20% dodge; allies +10% dodge+16 HP/s regen; heals dispel 1 debuff","22% dodge; allies +12%; 20/s","26% dodge; allies +14%; 24/s","30% dodge; allies +17%; 30/s","34% dodge; allies +20%; 38/s; shields overflow as HP; can't be targeted while any ally is below 50% HP"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"stormjelly",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"abyssjelly"},  {id:"abyssjelly",name:"Abyssjelly",emoji:"🪼",type:"Water",rarity:"epic",description:"Stormjelly sunk to the abyss and absorbed its darkness. It heals with one hand and shocks with the other.",
    stats:{hp:123,atk:81,def:79,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1093,7 +1093,7 @@ export const CREATURES=[
    stats:{hp:208,atk:104,def:158,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Jade Slam",upgrades:["18 dmg; stagger 1s; heal all allies 15 HP","23 dmg","30 dmg","38 dmg","Stagger 1.5s; heal all 25 HP; DEF-12% on target"]},
-     special:{name:"Jade Bloom",charge:14,upgrades:["All allies +35 HP/s 7s+DEF+70; cleanse all","Regen 46/s; DEF+92","Regen 58/s; DEF+116","Regen 72/s; DEF+142","Regen 90/s; DEF+175; revive 1 fallen ally 25% HP; grant all invincible 1s"]},
+     special:{name:"Jade Bloom",charge:14,upgrades:["All allies +35 HP/s 7s+DEF+70; dispel all","Regen 46/s; DEF+92","Regen 58/s; DEF+116","Regen 72/s; DEF+142","Regen 90/s; DEF+175; revive 1 fallen ally 25% HP; grant all invincible 1s"]},
      unique:{name:"Jade Sovereign",upgrades:["Passive: all allies +32 HP/s; -35 all dmg to allies; thorns 40 dmg; absorb 25% ally dmg taken","Allies +42/s; -45; thorns 52; absorb 30%","Allies +54/s; -56; thorns 66; absorb 36%","Allies +68/s; -70; thorns 82; absorb 44%","Allies +85/s; -85; thorns 100; absorb 54%; Jadegiant revives twice each time healing all allies 150 HP"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"stonewarden",shardsToAscend:20,ascensionsToEvolve:null},
   // Nature line 3
@@ -1113,7 +1113,7 @@ export const CREATURES=[
    },role:"Support",attackType:"Ranged",evolutionOf:"venomfiend",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"plaguefiend"},  {id:"plaguefiend",name:"Plaguefiend",emoji:"🐸",type:"Nature",rarity:"epic",description:"Venomfiend's final form. Not a creature — a public health crisis with legs. Several legs.",
    stats:{hp:105,atk:88,def:108,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Plague Spit",upgrades:["20 dmg; poison 12/s 4s+slow 28%; spreads to 2 nearby","26 dmg","33 dmg","42 dmg","Spreads to 3 nearby; poison can't be cleansed"]},
+     basic:{name:"Plague Spit",upgrades:["20 dmg; poison 12/s 4s+slow 28%; spreads to 2 nearby","26 dmg","33 dmg","42 dmg","Spreads to 3 nearby; poison can't be dispelled"]},
      special:{name:"Pestilence Cloud",charge:10,upgrades:["Massive cloud; max poison all in area; -35% all stats 6s","Stronger","Even stronger","Max","Silence 3s; all in cloud take +30% dmg; poison spreads on contact between enemies"]},
      unique:{name:"Plague Sovereign",upgrades:["Passive: poison stacks 8x; each stack +12/s; death spreads max poison in huge radius; ally Nature immune to poison+heal 20/s","Stacks 9x; +14/s; heal 26/s","Stacks 9x; +17/s; heal 32/s","Stacks 10x; +21/s; heal 40/s","Stacks 10x; +26/s; heal 50/s; Plaguefiend revives once; revival poisons all enemies at max stacks"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"blighttoad",shardsToAscend:20,ascensionsToEvolve:null},
@@ -1346,7 +1346,7 @@ export const CREATURES=[
    },role:"Tank",attackType:"Melee",evolutionOf:"lumigator",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"radiantgator"},  {id:"radiantgator",name:"Lumicator",emoji:"🦎",type:"Light",rarity:"epic",description:"Lumigator's transcendent final form. An alligator of living sunlight that makes enemies blind and allies immortal.",
    stats:{hp:177,atk:91,def:144,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Radiant Bite",upgrades:["22 dmg; blind 28% 2s; heal all allies 18 HP; DEF-14% on target; cleanse 1 ally","28 dmg","36 dmg","46 dmg","Blind 40% 2.5s; heal all 28 HP; cleanse all allies 1 debuff; strip 1 buff target"]},
+     basic:{name:"Radiant Bite",upgrades:["22 dmg; blind 28% 2s; heal all allies 18 HP; DEF-14% on target; dispel 1 ally","28 dmg","36 dmg","46 dmg","Blind 40% 2.5s; heal all 28 HP; dispel all allies 1 debuff; strip 1 buff target"]},
      special:{name:"Radiant Fortress",charge:14,upgrades:["DEF+130+regen 28/s+blind aura 32% 7s; allies -28% dmg; immune to blind+slow","DEF+165","DEF+204","DEF+248","DEF+300; aura 44%; allies -40% dmg; immune to all debuffs 5s; allies regen 40/s"]},
      unique:{name:"Radiant Sovereign",upgrades:["Passive: -32 all dmg; allies regen 22/s; blind aura 38%; absorb 28% ally dmg; immune to blind+all CC","Reduce 42; regen 28/s; aura 48%; absorb 34%","Reduce 54; regen 36/s; aura 60%; absorb 42%","Reduce 68; regen 46/s; aura 74%; absorb 52%","Reduce 84; regen 58/s; aura 90%; absorb 64%; Radiantgator revives twice each revival healing all allies 200 HP+blinding all enemies 5s"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"gleamgator",shardsToAscend:20,ascensionsToEvolve:null},
@@ -1550,14 +1550,14 @@ export const CREATURES=[
    stats:{hp:107,atk:70,def:67,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Antler Dart",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg. +5% Attack to self on hit (stacking) until the next time Soothing Hoot is used"]},
-     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also cleanses all debuffs from healed allies"]},
+     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also dispels all debuffs from healed allies"]},
      unique:{name:"Guardian Grove",upgrades:["Heal 6 HP/s","Heal 8 HP/s","Heal 10 HP/s","Heal 13 HP/s","Heal 13 HP/s and gain +10% Attack"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"lifephoenix"},
   {id:"lifephoenix",name:"Animavis",emoji:"🌿",type:"Nature",rarity:"legendary",description:"Bloomphoenix's final form. The concept of life given wings. It sustains ecosystems just by existing nearby.",
    stats:{hp:127,atk:84,def:81,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Antler Dart",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg. +5% Attack to self on hit (stacking) until the next time Soothing Hoot is used"]},
-     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also cleanses all debuffs from healed allies"]},
+     special:{name:"Soothing Hoot",charge:22,upgrades:["Heal 38 HP","Heal 48 HP","Heal 60 HP","Heal 75 HP","Heal 75 HP. Also dispels all debuffs from healed allies"]},
      unique:{name:"Guardian Grove",upgrades:["Heal 6 HP/s","Heal 8 HP/s","Heal 10 HP/s","Heal 13 HP/s","Heal 13 HP/s and gain +10% Attack"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"bloomphoenix",shardsToAscend:30,ascensionsToEvolve:null},
   // Earth line 1
@@ -1587,7 +1587,7 @@ export const CREATURES=[
    stats:{hp:169,atk:127,def:158,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Gem Bite",upgrades:["35 dmg+DEF-22% 5s; thorn 65 return; crystal 55 AOE each bite; all 8 heads attack","44 dmg","56 dmg","70 dmg","DEF-32% 6s; thorn 90; crystal 80 AOE; each head strips 1 buff"]},
-     special:{name:"Sovereign Regen",charge:22,upgrades:["Instant 8 heads; heal full HP; head bonuses max out; also heal all allies full HP","Also revive 1 fallen","Also revive 2 fallen","Also revive 3 fallen","Revive all fallen 60%; grant all invincible 2.5s; full cleanse; grant +40% all stats 8s"]},
+     special:{name:"Sovereign Regen",charge:22,upgrades:["Instant 8 heads; heal full HP; head bonuses max out; also heal all allies full HP","Also revive 1 fallen","Also revive 2 fallen","Also revive 3 fallen","Revive all fallen 60%; grant all invincible 2.5s; full dispel; grant +40% all stats 8s"]},
      unique:{name:"Gem Sovereign",upgrades:["Passive: regrow 1 head/2s; each head +48% ATK+60% DEF+crystal aura 72/s; 8 heads: immune to all physical+magic dmg 3s every 4s; reflect 90% blocked; thorns 150+stun 1s per head","Head +60%+75%; aura 90/s","Head +75%+94%; aura 112/s","Head +94%+116%; aura 140/s","Head +118%+145%; aura 175/s; Gemhydra with 8 heads is immune to all dmg; revives 3 times each crystal explosion 500 dmg all"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"quartzhydra",shardsToAscend:30,ascensionsToEvolve:null},
   // Earth line 3
@@ -1694,7 +1694,7 @@ export const CREATURES=[
    stats:{hp:133,atk:116,def:85,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Divine Feather",upgrades:["38 dmg+blind 38% 3s; heal all 28 HP; arc all; each arc heals 1 ally 18 HP","48 dmg; heal 36/22","60 dmg; heal 46/28","74 dmg; heal 58/36","Divine burst: blind all 5s; heal all 92 HP; each arc heals all allies 46 HP; strip all buffs from each hit"]},
-     special:{name:"Divine Rebirth",charge:14,upgrades:["Become divine light; emerge 4s full HP; 192 dmg+blind all 6s; heal all 160 HP+invincible 3s; revive 1 fallen 40%","Emerge 240; heal 200; revive 2","Emerge 300; heal 250; revive 2 at 50%","Emerge 375; heal 312; revive 3 at 55%","Emerge 469; heal 390; revive all at 65%; grant all +45% all stats 8s; full cleanse"]},
+     special:{name:"Divine Rebirth",charge:14,upgrades:["Become divine light; emerge 4s full HP; 192 dmg+blind all 6s; heal all 160 HP+invincible 3s; revive 1 fallen 40%","Emerge 240; heal 200; revive 2","Emerge 300; heal 250; revive 2 at 50%","Emerge 375; heal 312; revive 3 at 55%","Emerge 469; heal 390; revive all at 65%; grant all +45% all stats 8s; full dispel"]},
      unique:{name:"Divine Sovereign",upgrades:["Passive: revives endlessly; each revival: blind all 8s+heal all 350 HP+invincible 3s+revive 1 fallen 50%; light +60%; heals +55%; immune to all blind","Light +75%; heals +68%; revive 2 per revival","Light +94%; heals +84%; revive 3","Light +116%; heals +104%; revive all at 60%","Light +144%; heals +128%; revive all at 80%; Divinephoenix immune to all dmg while any ally is alive; can never be killed"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"solarphoenix",shardsToAscend:30,ascensionsToEvolve:null},
   // Light line 3

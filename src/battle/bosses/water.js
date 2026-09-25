@@ -4,7 +4,7 @@
 import { RANGED_RANGE } from "../constants.js";
 import { randomOf } from "../../core/random.js";
 import { damageUnit } from "../hp.js";
-import { resistsDisplacement } from "../immobilize.js";
+import { resistsDisplacement, announceDisplaced } from "../immobilize.js";
 
 export default {
   key: "water",
@@ -31,6 +31,7 @@ export default {
         pushed = true;
       }
       damageUnit(u, ctx.dmg(0.18));
+      if (pushed) announceDisplaced(u);
       if (pushed) {
         newFx.push({ id: now + "rip" + u.uid, row: u.row, col: u.col, t: now, isRanged: true, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
       }

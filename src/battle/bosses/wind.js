@@ -8,7 +8,7 @@
 import { MELEE_RANGE } from "../constants.js";
 import { aStepToward } from "../geometry.js";
 import { damageUnit } from "../hp.js";
-import { resistsDisplacement } from "../immobilize.js";
+import { resistsDisplacement, announceDisplaced } from "../immobilize.js";
 
 /** Bonus damage multiplier when a knockback/pull is blocked by something. */
 const COLLISION_MULT = 0.5;
@@ -52,6 +52,7 @@ function knockAway(u, ctx) {
   u.row = nr;
   u.col = nc;
   allOcc.add(nr + "," + nc);
+  announceDisplaced(u);
   pushGustFx(u, fromR, fromC, ctx);
 }
 
@@ -74,6 +75,7 @@ function pullToward(u, tiles, ctx) {
     u.col = nc;
     allOcc.add(nr + "," + nc);
   }
+  if (fromR !== u.row || fromC !== u.col) announceDisplaced(u);
   pushGustFx(u, fromR, fromC, ctx);
   if (blockedAt) {
     damageUnit(u, ctx.dmg(COLLISION_MULT));

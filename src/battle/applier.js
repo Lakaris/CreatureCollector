@@ -209,11 +209,52 @@ export function withApplier(unit, fn) {
 }
 
 /** Duration for a debuff landing on `target`. A creature's own debuffs on
- * itself (costs, self-inflicted stances) are never stretched. */
-export function debuffTicks(target, ticks) {
+ * itself (costs, self-inflicted stances) are never stretched. `kind` names
+ * the debuff for gear that stretches only one ("burn", "poison", "dot",
+ * "frostbite", "stun" -- read as `gear.<kind>DurationTicks`: Ember Chip,
+ * Nettle Pin, Hex Nail, Frost Pearl, Sandstone Charm). */
+export function debuffTicks(target, ticks, kind = null) {
   const a = current;
-  const extra = a && a !== target ? a.gear?.debuffTicks || 0 : 0;
-  return ticks + extra;
+  if (!a || a === target) return ticks;
+  return ticks + (a.gear?.debuffTicks || 0) + ((kind && a.gear?.[kind + "DurationTicks"]) || 0);
+}
+
+/**
+ * The TRIGGERED items a unit wears that carry `key` -- each one's own
+ * `battle` block (see gearBattleBonus in core/equipment.js). Items with an
+ * interval or a Health threshold are kept apart so each fires on its own
+ * schedule: readers loop over these instead of reading `unit.gear`, and a
+ * shared tally (hits taken, attacks made) is checked against each item's
+ * own interval.
+ */
+export function gearTriggers(unit, key) {
+  const list = unit?.gearTriggers;
+  if (!list || !list.length) return NO_TRIGGERS;
+  return list.filter((g) => g[key]);
+}
+const NO_TRIGGERS = [];
+
+/** Which Basic attack is in progress, for every-Nth-attack gear: the one
+ * after those already finished -- except inside a finished attack's own
+ * riders (settleBasicAttack in tick.js), which already counted it. */
+export function basicAttackNumber(unit) {
+  return (unit._basicAttacks || 0) + (unit._attackRiders ? 0 : 1);
+}
+
+/** Every triggered item of `unit` with the interval `key` whose turn it is
+ * on count `n` (every Nth: n divisible by its own N). */
+export function triggersOn(unit, key, n) {
+  return gearTriggers(unit, key).filter((g) => n > 0 && n % g[key] === 0);
+}
+
+// The battle's tick number, for gear that may fire at most once per tick
+// (Burrow Band). Set by tick.js at the start of every tick.
+let tickNumber = 0;
+export function setBattleTick(n) {
+  tickNumber = n || 0;
+}
+export function battleTick() {
+  return tickNumber;
 }
 
 /** Duration for a buff landing on `target` (the applier itself or an ally). */
@@ -254,8 +295,23 @@ export function shieldAmount(amount) {
  */
 export function resistsDebuff(target, { environmental = false } = {}) {
   if (!target || environmental || current === target) return false;
+  // Sunforge Crown: an ally standing inside the wearer's Aura shrugs off every
+  // debuff -- checked first, so it never spends a Molted Skin charge.
+  if (auraShelters(target)) return true;
   const left = (target.gear?.debuffImmunity || 0) - (target._debuffsResisted || 0);
   if (left <= 0) return false;
   target._debuffsResisted = (target._debuffsResisted || 0) + 1;
   return true;
+}
+
+/** Sunforge Crown: `target` stands inside the active Aura of a living ally
+ * (itself included) that wears it. */
+function auraShelters(target) {
+  if (target.uid == null) return false;
+  for (const a of roster) {
+    if (!a.gear?.auraDebuffImmunity || a.hp <= 0 || !a.aura || !((a.aura.ticks || 0) > 0)) continue;
+    if (a !== target && !sameSide(a, target)) continue;
+    if (Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col)) <= a.aura.range) return true;
+  }
+  return false;
 }

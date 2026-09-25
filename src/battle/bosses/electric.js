@@ -86,6 +86,7 @@ export default {
     if (!aliveP.length || boss.atkCd > 0) return;
 
     const nearest = ctx.byDistance()[0];
+    if (!nearest) return; // every player Intangible
     const dr = nearest.row - (boss.row + 0.5);
     const dc = nearest.col - (boss.col + 0.5);
 

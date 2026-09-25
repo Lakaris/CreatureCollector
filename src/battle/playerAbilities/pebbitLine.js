@@ -43,7 +43,7 @@ function abilityIdx(unit, key) {
  * cleanup the regular per-tick decrements do (battle/status.js). Buffs --
  * positive ATK/Speed mods and the Shield itself -- are untouched. */
 function bonusExpiryTick(u) {
-  if ((u.burnTicks || 0) > 0 && !--u.burnTicks) { u.burnStacks = 0; u.burnSourceAtk = 0; }
+  if ((u.burnTicks || 0) > 0 && !--u.burnTicks) { u.burnStacks = 0; u.burnSourceAtk = 0; u.burnSource = null; u.burnUndispellable = false; }
   if ((u.rootTicks || 0) > 0 && !--u.rootTicks) u.rootUndispellable = false;
   if ((u.dotTicks || 0) > 0 && !--u.dotTicks) u.dotStacks = 0;
   if ((u.poisonTicks || 0) > 0 && !--u.poisonTicks) u.poisonStacks = 0;
@@ -56,7 +56,6 @@ function bonusExpiryTick(u) {
   if ((u.markedTicks || 0) > 0) u.markedTicks--;
   if ((u.frostbiteTicks || 0) > 0 && !--u.frostbiteTicks) u.frostbiteStacks = 0;
   if ((u.dartShredTicks || 0) > 0 && !--u.dartShredTicks) u.dartShredPct = 0;
-  if ((u.critShredTicks || 0) > 0 && !--u.critShredTicks) u.critShredPct = 0;
   // Negative stat-mod stacks (ATK/Speed/DEF Down, Healing Down) age one
   // extra tick; buff stacks are untouched. Restrained has no timer at all
   // (it comes off by range), so Stone Skin's faster expiry can't touch it.

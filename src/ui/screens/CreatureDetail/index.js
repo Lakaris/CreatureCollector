@@ -9,7 +9,7 @@ import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_I
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { statPctGain, flairStatGain, roundFractional } from "../../../core/stats.js";
-import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel, isExclusive, itemFitsCreature, exclusivityCaption } from "../../../core/equipment.js";
+import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxLevel, isExclusive, itemFitsCreature, exclusivityCaption, itemStatBonuses } from "../../../core/equipment.js";
 import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
@@ -95,10 +95,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   });
   (ownedData.equipped||[null,null,null,null]).forEach(itemId=>{
     if(!itemId)return;
-    const item=EQUIPMENT_MAP[itemId];
-    if(!item||!item.statBonus)return;
-    const{stat,pct}=item.statBonus;
-    equipBonusStats[stat]=(equipBonusStats[stat]||0)+statPctGain(stat,stats[stat],pct);
+    for(const{stat,pct}of itemStatBonuses(EQUIPMENT_MAP[itemId])){
+      equipBonusStats[stat]=(equipBonusStats[stat]||0)+statPctGain(stat,stats[stat],pct);
+    }
   });
   const abilityStatBonus=getAbilityStatBonus(def.id,ownedData.abilityLevels);
   if(abilityStatBonus){
@@ -296,9 +295,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     equipped.forEach(itemId=>{
       if(!itemId)return;
       const item=EQUIPMENT_MAP[itemId];
-      if(!item||!item.statBonus||item.statBonus.stat!==stat)return;
-      const value=statPctGain(stat,stats[stat],item.statBonus.pct);
-      if(value)sources.push({type:"equip-effect",emoji:item.emoji,label:item.name+" (Effect)",value,pct:item.statBonus.pct});
+      const bonus=itemStatBonuses(item).find(b=>b.stat===stat);
+      if(!bonus)return;
+      const value=statPctGain(stat,stats[stat],bonus.pct);
+      if(value)sources.push({type:"equip-effect",emoji:item.emoji,label:item.name+" (Effect)",value,pct:bonus.pct});
     });
     const flairValue=flairStatGain(stat,stats[stat],flairBuffs);
     if(flairValue)sources.push({type:"flair",emoji:"✨",label:"Flair bonus ("+STAT_LABELS[stat]+")",value:flairValue});
@@ -434,7 +434,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("span",null,s.label),
             s.pct&&React.createElement("span",{style:{fontSize:10,color:"#aaa"}},"("+(s.pct>0?"+":"")+s.pct+"%)")
           ),
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},"+"+fmt(s.value))
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:s.value<0?"#c62828":"#2e7d32"}},(s.value<0?"−":"+")+fmt(Math.abs(s.value)))
         )),
         sources.length===0&&React.createElement("div",{style:{padding:"10px 0",fontSize:12,color:"#bbb",textAlign:"center",borderTop:"1px solid #eee"}},"No equipment or flair boosting this stat"),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderTop:"2px solid #ddd",marginTop:4,marginBottom:16}},

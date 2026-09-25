@@ -8,7 +8,7 @@
 
 import { MELEE_RANGE } from "../constants.js";
 import { damageUnit } from "../hp.js";
-import { resistsDisplacement } from "../immobilize.js";
+import { resistsDisplacement, announceDisplaced } from "../immobilize.js";
 
 const NOVA_RANGE = 2;
 const FURY_INTERVAL_TICKS = 15;
@@ -36,6 +36,7 @@ export default {
         u.row = nr;
         u.col = nc;
         allOcc.add(key);
+        announceDisplaced(u);
       }
       newFx.push({ id: now + "nova" + u.uid, row: u.row, col: u.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     }

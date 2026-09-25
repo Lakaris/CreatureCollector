@@ -243,21 +243,50 @@ export function totalEquipBonus(ownedData, equipmentLevels, equipmentAscensions)
  *
  * Items declare their effects as `battle: { key: value }` in data/equipment.js
  * -- the full key list, and which engine file spends each, is documented
- * there. This merge needs no per-key code: numbers take the LARGEST value
- * across the worn items and booleans are true if any item sets them, so
- * stacking copies of one family never runs past its top rung. Adding a new
- * effect is a data key plus the one place in the engine that reads it.
+ * there.
+ *
+ * POLICY: the same effect from several worn items ADDS UP -- Chain 2 and
+ * Chain 3 are Chain 5, Tar Droplet and Spider Silk Spool are +3 ticks, two
+ * Lifesteal items add their percents (caps, `...MaxPct`, add with them), and
+ * durations (`...Ticks`) add. Only `...Mult` multipliers take the highest.
+ * Booleans are true if any item sets them.
+ *
+ * TRIGGERED items are the exception: an item with an interval (`...Every`,
+ * `reduceEveryNthHit` -- every Nth attack / hit) or a Health threshold
+ * (`...Below...` / `...Above...`) is NOT merged. Its whole `battle` block is
+ * kept as its own entry in `gearTriggers`, so each item fires on its own
+ * schedule with its own numbers: Thornback Plate and Rebuke Gauntlet both
+ * Counter on the 4th hit; an every-3rd and an every-4th item fire on the 3rd
+ * and 4th; two "below X% Health" items each apply at their own X. The engine
+ * reads them through `gearTriggers(unit, key)` in battle/applier.js. (So a
+ * triggered item's block holds only that effect's own keys.)
  */
+const TRIGGER_KEY = /Every$|^reduceEveryNthHit$|Below|Above/;
+
 export function gearBattleBonus(itemIds) {
   const gear = {};
+  const gearTriggers = [];
   for (const itemId of itemIds || []) {
     const battle = itemId && EQUIPMENT_MAP[itemId]?.battle;
     if (!battle) continue;
+    if (Object.keys(battle).some((k) => TRIGGER_KEY.test(k))) { gearTriggers.push(battle); continue; }
     for (const [key, value] of Object.entries(battle)) {
-      gear[key] = typeof value === "boolean" ? gear[key] || value : Math.max(gear[key] || 0, value);
+      if (typeof value === "boolean") gear[key] = gear[key] || value;
+      else if (gear[key] == null) gear[key] = value;
+      else gear[key] = /Mult$/.test(key) ? Math.max(gear[key], value) : gear[key] + value;
     }
   }
-  return { gear };
+  return { gear, gearTriggers };
+}
+
+/**
+ * An item's "gain X% more STAT" bonuses as a list. `statBonus` is one
+ * {stat, pct} on most items and a list of them on items that raise several
+ * stats (Hungering Edge); every reader goes through here.
+ */
+export function itemStatBonuses(item) {
+  if (!item?.statBonus) return [];
+  return Array.isArray(item.statBonus) ? item.statBonus : [item.statBonus];
 }
 
 /**
@@ -270,7 +299,7 @@ export function equippedStatBonuses(ownedData) {
   for (const itemId of ownedData?.equipped || []) {
     if (!itemId) continue;
     const e = EQUIPMENT_MAP[itemId];
-    if (e?.statBonus) out.push({ itemId, name: e.name, emoji: e.emoji, ...e.statBonus });
+    for (const b of itemStatBonuses(e)) out.push({ itemId, name: e.name, emoji: e.emoji, ...b });
   }
   return out;
 }

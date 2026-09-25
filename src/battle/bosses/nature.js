@@ -7,7 +7,7 @@
 import { MELEE_RANGE, STATUS_TICKS } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyPoison, applyRoot } from "../status.js";
-import { resistsDisplacement } from "../immobilize.js";
+import { resistsDisplacement, announceDisplaced } from "../immobilize.js";
 
 export default {
   key: "nature",
@@ -29,8 +29,10 @@ export default {
         u.prevRow = u.row;
         u.prevCol = u.col;
         u.lastMoveTime = now;
+        const moved = u.row !== newRow;
         u.row = newRow;
         allOcc.add(key);
+        if (moved) announceDisplaced(u);
       }
       applyRoot(u, STATUS_TICKS);
       applyPoison(u);
@@ -44,6 +46,7 @@ export default {
     if (!ctx.aliveP.length || boss.atkCd > 0) return;
 
     const tgt = ctx.byDistance()[0];
+    if (!tgt) return; // every player Intangible
     // Staying on one target ramps the damage; switching resets it.
     if (boss.lifeTarget === tgt.uid) boss.lifeStacks = Math.min((boss.lifeStacks || 0) + 1, 10);
     else {

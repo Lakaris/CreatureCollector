@@ -7,40 +7,39 @@
 // in the UI but not read by the battle engine. Creatures get a module added
 // here as their abilities are mechanically implemented.
 
-import { blazehornet, infernohive, infernoswarm } from "./emberstarLine.js";
-import { sacredwasp, divinedrone, holyswarm } from "./starlitLine.js";
-import { bloomphoenix, lifephoenix } from "./bloomibisLine.js";
-import { ignisdragon, pyredragon } from "./ignissaurLine.js";
-import { breezekit, galestride, tempesthawk, stormlord } from "./breezekitLine.js";
+import { emberstar, magmastar, blastar } from "./emberstarLine.js";
+import { starlit, starbright, starburn } from "./starlitLine.js";
+import { bloomibis, animavis } from "./bloomibisLine.js";
+import { ignissaur, pyresaur } from "./ignissaurLine.js";
+import { cirruskit, cumulynx, nimbupard, stormpelt } from "./cirruskitLine.js";
 import { crystalcrab, gemcrab, gemtitan } from "./crystalcrabLine.js";
-import { pebbit, bouldrath, granitarch, mountainking } from "./pebbitLine.js";
+import { pebbit, bouldroad, granitoad, toadalith } from "./pebbitLine.js";
 import { morusk, ivormar } from "./moruskLine.js";
-import { shockcrab, voltcrusher, galvaniccrab } from "./shockstingerLine.js";
-import { coralleviathan, tidecrush, tidelord } from "./nesslingLine.js";
-import { abyssgolem, nihilgolem } from "./loptrixLine.js";
-import { frosthydra, glacialhydra, bombardguin, cryogeddon } from "./waddlepopLine.js";
-import { glowpup, radiantkit, dawnbeast, solarcrown } from "./jadebunLine.js";
-import { galeserpent, vortexserpent, cyclonwyrm } from "./quetzalisLine.js";
+import { shockstinger, voltlasher, galvascorpion } from "./shockstingerLine.js";
+import { nessling, lochcoil, nessarch } from "./nesslingLine.js";
+import { loptrix, ragnavix } from "./loptrixLine.js";
+import { waddlepop, frostillery, bombardguin, cryogeddon } from "./waddlepopLine.js";
+import { jadebun, pestlehare, elixhare, lunarch } from "./jadebunLine.js";
+import { coatlet, plumecoatl, quetzalis } from "./coatletLine.js";
 import { emberchirp, pyrefinch, cauterix, hearthenix } from "./emberchirpLine.js";
-import { doomgrub, nihilwyrm, wispModule } from "./doomshadeLine.js";
-import { frostpup, snowmane, blizzardback, glaciertusk } from "./igletLine.js";
-import { ironmole, steelmole, titanmole, skysage } from "./craglingLine.js";
+import { doomshade, nihilgeist, wispModule } from "./doomshadeLine.js";
+import { iglet, shellter, frostkeep, hibernarch } from "./igletLine.js";
+import { cragling, cragfist, cloudvault, skysage } from "./craglingLine.js";
 import { bonebeak, gravewing, charnelord } from "./bonebeakLine.js";
 import { dustling, silkhusk, gloamwing, lunashroud } from "./dustlingLine.js";
-import { leafling, canoparch, verdantlord, ancientgrove } from "./venomcoilLine.js";
-import { mosskrab, jadekrab, crystalshell, rampartops } from "./frilletLine.js";
-import { sylvandragon, ancientdragon } from "./siegefinLine.js";
-import { aurorabird, radiancebird, celestbird, empyravis } from "./aurorionLine.js";
+import { venomcoil, mirewreathe, toxiconda, gaiaconda } from "./venomcoilLine.js";
+import { frillet, bulwarden, aegiceras, rampartops } from "./frilletLine.js";
+import { siegefin, siegespire } from "./siegefinLine.js";
+import { aurorion, lumileo, celestleo, empyreon } from "./aurorionLine.js";
 import { emberpup, emberhound, infernoking, ashmonarch } from "./emberpupLine.js";
-// Ids inherited from the retired Prismcrab line (now the Oathcub paladin bears).
-import { prismcrab, spectrumcrab, rainbowshell, chromatarch } from "./oathcubLine.js";
-import { holydragon, celestialdragon } from "./auravastLine.js";
-// Ids inherited from the retired Monovolt dragons (now the Sparkshell tortoises).
-import { voltail, stormclaw, arcstorm, ionarch } from "./sparkshellLine.js";
-// Ids inherited from the retired Aetherwing phoenixes (now the Sicklewing mantises).
-import { galephoenix, skyphoenix } from "./sicklewingLine.js";
+import { oathcub, vowbruin, sanctursa, oathmaul } from "./oathcubLine.js";
+import { auravast, lumimajor } from "./auravastLine.js";
+import { sparkshell, capacitort, dynashell, accumulith } from "./sparkshellLine.js";
+import { sicklewing, galescythe } from "./sicklewingLine.js";
+import { clubtail, anvilback } from "./clubtailLine.js";
+import { cinderbill, emberpouch, kilnwing, pyrelican } from "./cinderbillLine.js";
 
-export const PLAYER_ABILITY_MODULES = { blazehornet, infernohive, infernoswarm, sacredwasp, divinedrone, holyswarm, bloomphoenix, lifephoenix, ignisdragon, pyredragon, breezekit, galestride, tempesthawk, stormlord, crystalcrab, gemcrab, gemtitan, pebbit, bouldrath, granitarch, mountainking, morusk, ivormar, shockcrab, voltcrusher, galvaniccrab, coralleviathan, tidecrush, tidelord, abyssgolem, nihilgolem, frosthydra, glacialhydra, bombardguin, cryogeddon, glowpup, radiantkit, dawnbeast, solarcrown, galeserpent, vortexserpent, cyclonwyrm, emberchirp, pyrefinch, cauterix, hearthenix, doomgrub, nihilwyrm, frostpup, snowmane, blizzardback, glaciertusk, ironmole, steelmole, titanmole, skysage, bonebeak, gravewing, charnelord, dustling, silkhusk, gloamwing, lunashroud, leafling, canoparch, verdantlord, ancientgrove, mosskrab, jadekrab, crystalshell, rampartops, sylvandragon, ancientdragon, aurorabird, radiancebird, celestbird, empyravis, emberpup, emberhound, infernoking, ashmonarch, prismcrab, spectrumcrab, rainbowshell, chromatarch, holydragon, celestialdragon, voltail, stormclaw, arcstorm, ionarch, galephoenix, skyphoenix, "__wisp": wispModule };
+export const PLAYER_ABILITY_MODULES = { emberstar, magmastar, blastar, starlit, starbright, starburn, bloomibis, animavis, ignissaur, pyresaur, cirruskit, cumulynx, nimbupard, stormpelt, crystalcrab, gemcrab, gemtitan, pebbit, bouldroad, granitoad, toadalith, morusk, ivormar, shockstinger, voltlasher, galvascorpion, nessling, lochcoil, nessarch, loptrix, ragnavix, waddlepop, frostillery, bombardguin, cryogeddon, jadebun, pestlehare, elixhare, lunarch, coatlet, plumecoatl, quetzalis, emberchirp, pyrefinch, cauterix, hearthenix, doomshade, nihilgeist, iglet, shellter, frostkeep, hibernarch, cragling, cragfist, cloudvault, skysage, bonebeak, gravewing, charnelord, dustling, silkhusk, gloamwing, lunashroud, venomcoil, mirewreathe, toxiconda, gaiaconda, frillet, bulwarden, aegiceras, rampartops, siegefin, siegespire, aurorion, lumileo, celestleo, empyreon, emberpup, emberhound, infernoking, ashmonarch, oathcub, vowbruin, sanctursa, oathmaul, auravast, lumimajor, sparkshell, capacitort, dynashell, accumulith, sicklewing, galescythe, clubtail, anvilback, cinderbill, emberpouch, kilnwing, pyrelican, "__wisp": wispModule };
 
 /** Look up a player creature's ability module. Returns undefined if unimplemented. */
 export function getPlayerAbilityModule(creatureId) {

@@ -161,7 +161,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const leafling = makeVenomcoilModule(CFG);
-export const canoparch = makeVenomcoilModule(CFG);
-export const verdantlord = makeVenomcoilModule(CFG);
-export const ancientgrove = makeVenomcoilModule(CFG);
+export const venomcoil = makeVenomcoilModule(CFG);
+export const mirewreathe = makeVenomcoilModule(CFG);
+export const toxiconda = makeVenomcoilModule(CFG);
+export const gaiaconda = makeVenomcoilModule(CFG);

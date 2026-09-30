@@ -3,6 +3,7 @@
 import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
+import { FLAIR_AURA_MAP, backdropImage } from "../../data/flair.js";
 import { QUEST_DEFS, NEW_PLAYER_GIFT_REWARDS } from "../../data/quests.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
@@ -19,9 +20,23 @@ import { TABS } from "../../ui/components/NavBar.js";
 // a viewport unit would drift away from it as the screen changes.
 const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TABS.length)*100+"%";
 
+// Hides Home's Labyrinth entry -- the Descend button and its Victory Reward
+// bubble -- for now. The tutorial's "descend" step still shows Descend,
+// since it walks the player through that button.
+const SHOW_LABYRINTH_ENTRY = false;
+
+
+// Edge length of the Home scene's square background art: the scene's full
+// width -- its content box (100cqw) plus the 16px side padding either side --
+// or its full height if that's smaller (a wide window), so the whole image
+// always fits.
+const HOME_ART = "min(100cqw + 32px, 100cqh + 32px)";
+// Where the creature's feet sit, measured down from the scene's top: 7% up
+// from the bottom of the art, as on the creature and Flair pages.
+const HOME_FEET_TOP = "calc(0.93 * " + HOME_ART + ")";
+
 function HomeScreen(){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow, pendingDungeonReveal, setPendingDungeonReveal } = useGame();
-  const [picking,setPicking]=React.useState(false);
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
   const [showNewPlayerGift,setShowNewPlayerGift]=React.useState(false);
@@ -39,11 +54,25 @@ function HomeScreen(){
     }
   },[postTutorialPopupPending]);
   const ownedList=Object.values(owned);
-  const ownedData=featuredCreatureId?owned[featuredCreatureId]:ownedList[0];
+  const ownedData=(featuredCreatureId&&owned[featuredCreatureId])||ownedList[0];
   const def=ownedData?CREATURE_MAP[ownedData.id]:null;
   const title=ownedData&&ownedData.equippedTitle?ownedData.equippedTitle:null;
-  const aura=ownedData&&ownedData.equippedAura?ownedData.equippedAura:null;
-  const bg=ownedData&&ownedData.equippedBackground?ownedData.equippedBackground:null;
+  const auraDef=ownedData&&ownedData.equippedAura?FLAIR_AURA_MAP[ownedData.equippedAura]:null;
+  const homeBackdrop=backdropImage(ownedData);
+  // One tile in Home's menu row: the emoji in a round badge tinted with the
+  // tile's own colour, its label below, a red notification badge on the
+  // corner when something is waiting, and room for an extra overlay (the
+  // Quests pointer). Dimmed and inert while the tutorial restricts Home.
+  const homeTile=(emoji,label,tint,dot,onClick,extra)=>React.createElement("button",{
+    key:label,
+    onClick:()=>{if(tutorialRestricted)return;onClick();},
+    style:{position:"relative",flex:1,maxWidth:86,minHeight:96,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",gap:7,padding:"12px 4px 10px",border:"none",borderRadius:18,background:"#fff",boxShadow:"0 2px 10px rgba(83,74,183,0.10)",fontFamily:"inherit",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
+  },
+    React.createElement("span",{style:{width:44,height:44,borderRadius:"50%",background:tint,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,lineHeight:1,flexShrink:0}},emoji),
+    React.createElement("span",{style:{fontSize:10.5,fontWeight:700,color:"#3f3a78",textAlign:"center",lineHeight:1.15}},label),
+    dot&&React.createElement("div",{style:{position:"absolute",top:-3,right:-3,width:12,height:12,borderRadius:"50%",background:"#ef4444",border:"2px solid #fff",boxSizing:"border-box"}}),
+    extra
+  );
 
   // Tutorial 2 (post-Set-1 Dungeon reveal): unlike the original tutorial's
   // Home steps, which hide every other button to keep a brand-new player
@@ -71,31 +100,9 @@ function HomeScreen(){
   }});
   if(showBattlepass) return React.createElement(BattlepassScreen,{onBack:()=>setShowBattlepass(false),setCurrencies,currencies,battlepassLastReset,setBattlepassLastReset,battlepassClaimed,setBattlepassClaimed,battlepassPaidClaimed,setBattlepassPaidClaimed,battlepassPremium,setBattlepassPremium,battlepassPoints});
 
-  if(picking){
-    return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:0}},
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"16px 16px 12px",background:"#fff",borderBottom:"1px solid #e0e0e0"}},
-        React.createElement("button",{onClick:()=>setPicking(false),style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
-        React.createElement("div",{style:{fontSize:18,fontWeight:700}},"Featured Creature")
-      ),
-      React.createElement("div",{style:{flex:1,overflowY:"auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:12}},
-        ownedList.map(o=>{
-          const d=CREATURE_MAP[o.id];
-          if(!d)return null;
-          const selected=o.id===(featuredCreatureId||ownedList[0]?.id);
-          return React.createElement("button",{
-            key:o.id,
-            onClick:()=>{setFeaturedCreatureId(o.id);setPicking(false);},
-            style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 4px",borderRadius:10,border:selected?"2px solid #7c4dff":"2px solid #e8e8e8",background:selected?"#f3eeff":"#fafafa",cursor:"pointer"}
-          },
-            React.createElement(CreatureIcon,{def:d,ownedData:o,unlockedSkins:unlockedSkins||[],size:36}),
-            React.createElement("div",{style:{fontSize:10,fontWeight:600,color:"#333",textAlign:"center",lineHeight:1.2}},d.name)
-          );
-        })
-      )
-    );
-  }
-
-  return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column"}},
+  // height:100% -- .app-content is a plain block, so flex:1 alone never
+  // stretched Home; the background scene below needs the full height.
+  return React.createElement("div",{style:{flex:1,height:"100%",display:"flex",flexDirection:"column"}},
     React.createElement(ScreenHeader,{title:React.createElement("button",{
       onClick:()=>{if(!tutorialRestricted)setSettingsOpen(true);},
       style:{width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1,display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}
@@ -104,57 +111,45 @@ function HomeScreen(){
       React.createElement(CurrencyChip,{emoji:"🍖",value:currencies.food}),
       React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
     )}),
-    React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",padding:16}},
-    bg&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:200,opacity:0.08,pointerEvents:"none",userSelect:"none"}},bg),
-    aura&&React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-60%)",fontSize:160,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},aura),
-    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
-      onClick:()=>{if(tutorialRestricted)return;setShowQuests(true);setShowQuestsArrow(false);},
-      style:{position:"absolute",left:0,top:"calc(50% - 60px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:66,height:82,border:"none",background:"none",fontSize:32,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
-    },
-      "📋",
-      React.createElement("span",{style:{fontSize:12,fontWeight:700,color:"#534AB7"}},"Quests"),
-      hasReadyQuest&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}}),
-      // Points at Quests after the player finishes a Daily/New Player Gift
-      // popup -- unlike the tutorial's arrows, this doesn't lock anything
-      // else; it just sticks around until Quests itself is tapped.
-      !tutorialRestricted&&showQuestsArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:-30,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬆️")
-    ),
-    React.createElement("div",{style:{lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))",position:"relative"}},def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
-    title&&React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",marginTop:2}},title),
-    def&&React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginTop:title?0:4}},def.name),
-    def&&React.createElement("div",{style:{fontSize:13,color:"#888"}},def.type),
-    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
-      onClick:()=>{if(tutorialRestricted)return;setPicking(true);},
-      style:{marginTop:16,padding:"6px 18px",borderRadius:20,border:"1.5px solid #d0d0d0",background:"#f5f5f5",fontSize:13,fontWeight:600,color:"#555",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
-    },"Change"),
-    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
-      onClick:()=>{if(tutorialRestricted)return;setShowBattlepass(true);},
-      style:{position:"absolute",right:0,top:"calc(50% - 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
-    },
-      "🎫",
-      React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Battle Pass")
-    ),
-    (!tutorialRestricted||dungeonRevealActive)&&React.createElement("button",{
-      onClick:()=>{if(tutorialRestricted)return;setShowDaily(true);},
-      style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
-    },
-      "📅",
-      React.createElement("span",{style:{fontSize:10,fontWeight:700,color:"#534AB7"}},"Daily"),
-      easternNoonDayKey()!==dailyLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
-    ),
-    (!tutorialRestricted||dungeonRevealActive)&&newPlayerGiftDay<NEW_PLAYER_GIFT_REWARDS.length&&React.createElement("button",{
-      onClick:()=>{if(tutorialRestricted)return;setShowNewPlayerGift(true);},
-      style:{position:"absolute",right:0,top:"calc(50% + 74px)",transform:"translateY(-50%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,width:52,height:66,border:"none",background:"none",fontSize:22,fontWeight:700,color:"#534AB7",cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1}
-    },
-      "🎁",
-      React.createElement("span",{style:{fontSize:8,fontWeight:700,color:"#534AB7",textAlign:"center",lineHeight:1.1}},"New Player Welcome Gift"),
-      easternNoonDayKey()!==newPlayerGiftLastClaimed&&React.createElement("div",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
+    // The Home scene: the whole area between the header and the nav bar. The
+    // featured creature's equipped background art is shown WHOLE at the top
+    // -- a HOME_ART square, never stretched -- with plain page below it. The
+    // creature stands at HOME_FEET_TOP, the same spot on the art as on the
+    // creature and Flair pages. A size container so those offsets resolve
+    // against this area. The negative margins cancel the header's 12px bottom
+    // margin (so the art meets the top bar) and .app-content's 16px side
+    // padding (so it runs edge to edge).
+    React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",margin:"-12px -16px 0",padding:16,overflow:"hidden",containerType:"size"}},
+    homeBackdrop&&React.createElement("div",{style:{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:HOME_ART,height:HOME_ART,backgroundImage:'url("'+homeBackdrop+'")',backgroundSize:"100% 100%",pointerEvents:"none"}}),
+    // The creature, with its equipped aura glowing behind it and its flair
+    // title just above its head. No name/type or Change button -- the display
+    // creature is picked in Settings.
+    // Each anchored by its bottom edge at HOME_FEET_TOP (translate -100%).
+    auraDef&&React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",fontSize:160,lineHeight:1,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},auraDef.emoji),
+    React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))"}},
+      def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
+    title&&React.createElement("div",{style:{position:"absolute",left:"50%",top:"calc("+HOME_FEET_TOP+" - 128px)",transform:"translate(-50%,-100%)",whiteSpace:"nowrap",fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",textShadow:"0 0 4px #fff, 0 0 8px #fff"}},title),
+    // The bottom panel: a soft lavender area starting exactly where the art
+    // ends (never over it), holding the menu row -- Quests, Battle Pass,
+    // Daily and the New Player Welcome Gift -- centred in it.
+    React.createElement("div",{style:{position:"absolute",top:HOME_ART,left:0,right:0,bottom:0,background:"linear-gradient(180deg, #f6f4ff 0%, #f5f5f5 70%)",boxShadow:"0 -6px 18px rgba(0,0,0,0.10)",display:"flex",alignItems:"center",justifyContent:"center",gap:10,padding:"0 16px"}},
+      (!tutorialRestricted||dungeonRevealActive)&&React.createElement(React.Fragment,null,
+        homeTile("📋","Quests","#EEEDFE",hasReadyQuest,()=>{setShowQuests(true);setShowQuestsArrow(false);},
+          // Points down at Quests after the player finishes a Daily/New
+          // Player Gift popup -- unlike the tutorial's arrows, this doesn't
+          // lock anything else; it just sticks around until Quests itself is
+          // tapped.
+          !tutorialRestricted&&showQuestsArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-36,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")),
+        homeTile("🎫","Battle Pass","#FFF3D6",false,()=>setShowBattlepass(true)),
+        homeTile("📅","Daily","#E3F0FD",easternNoonDayKey()!==dailyLastClaimed,()=>setShowDaily(true)),
+        newPlayerGiftDay<NEW_PLAYER_GIFT_REWARDS.length&&homeTile("🎁","New Player Welcome Gift","#FDE7EC",easternNoonDayKey()!==newPlayerGiftLastClaimed,()=>setShowNewPlayerGift(true))
+      )
     ),
     // Stays hidden through the whole tutorial (not just before the "descend"
     // step) -- the Descend button itself is still shown/usable during that
     // step below, but the reward preview doesn't appear until the guided
     // walkthrough is fully over.
-    !tutorialRestricted&&(()=>{
+    SHOW_LABYRINTH_ENTRY&&!tutorialRestricted&&(()=>{
       const depth=labyrinthDepth||1;
       const reward=getDepthReward(depth);
       const onCurrent=Object.keys(reward).length>0;
@@ -167,7 +162,7 @@ function HomeScreen(){
         React.createElement("div",{style:{whiteSpace:"nowrap"}},rewardEmoji)
       );
     })(),
-    (!tutorialRestricted||tutorialStep==="descend")&&React.createElement("button",{
+    ((SHOW_LABYRINTH_ENTRY&&!tutorialRestricted)||tutorialStep==="descend")&&React.createElement("button",{
       onClick:()=>{setGameMode("labyrinth");setTab("play");if(tutorialStep==="descend")setTutorialStep("labyrinth");},
       style:{position:"fixed",left:"calc(75% - 52px)",bottom:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,width:88,height:88,borderRadius:24,border:"2px solid #818cf8",background:"#eef2ff",fontSize:32,fontWeight:700,color:"#4f46e5",cursor:"pointer",boxShadow:"0 4px 16px rgba(99,102,241,0.25)",zIndex:5}
     },

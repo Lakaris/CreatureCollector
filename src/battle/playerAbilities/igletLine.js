@@ -109,9 +109,10 @@ export function makeIgletModule(cfg) {
      * hit the turtle -- an enemy (or the boss) within ranged reach. Bracing
      * against an empty field would just burn the bar.
      */
-    specialInRange(unit, { aliveE, boss }) {
-      if (aliveE.some((e) => e.hp > 0 && unitDist(unit, e) <= RANGED_RANGE)) return true;
-      return !!(boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= RANGED_RANGE);
+    // Hunker In only ever touches this creature, so it fires the moment its
+    // charge fills -- a self-buff never waits for an enemy to be in reach.
+    specialInRange() {
+      return true;
     },
 
     special(unit, ctx) {
@@ -135,7 +136,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const frostpup = makeIgletModule(CFG);
-export const snowmane = makeIgletModule(CFG);
-export const blizzardback = makeIgletModule(CFG);
-export const glaciertusk = makeIgletModule(CFG);
+export const iglet = makeIgletModule(CFG);
+export const shellter = makeIgletModule(CFG);
+export const frostkeep = makeIgletModule(CFG);
+export const hibernarch = makeIgletModule(CFG);

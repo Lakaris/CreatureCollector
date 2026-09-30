@@ -18,7 +18,7 @@ import { speedPenalty, applyStatMod, healReceivedMultiplier, consumeBlind } from
 import { getRootDef } from "../../core/creatures.js";
 import { damageUnit, healUnit } from "../hp.js";
 
-const EMBERSTAR_ROOT_ID = "blazehornet";
+const EMBERSTAR_ROOT_ID = "emberstar";
 
 function abilityIdx(unit, key, table) {
   const lvl = (unit.abilityLevels && unit.abilityLevels[key]) || 0;
@@ -239,19 +239,19 @@ export function makeStarlitModule(cfg) {
   };
 }
 
-export const sacredwasp = makeStarlitModule({
+export const starlit = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
   specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,
 });
 // Starbright and Starburn intentionally mirror Starlit's numbers exactly for now -- evolutions
 // don't yet have differentiated ability scaling, only different base stats/rarity requirements.
-export const divinedrone = makeStarlitModule({
+export const starbright = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
   specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,
 });
-export const holyswarm = makeStarlitModule({
+export const starburn = makeStarlitModule({
   basicDmgByLevel: [10, 10, 11, 11, 11], basicHealByLevel: [12, 13, 13, 13, 13],
   specialDmgByLevel: [18, 20, 22, 22, 22], specialHealByLevel: [0, 0, 0, 5, 10], atkModPct: 15, atkModTicks: STATUS_TICKS,
   atkSynergyByLevel: [10, 20, 30, 40, 40], selfSpeedByLevel: [20, 20, 20, 20, 50], rangeBonus: 2,

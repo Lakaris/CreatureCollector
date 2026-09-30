@@ -235,5 +235,5 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const abyssgolem = makeLoptrixModule(CFG);
-export const nihilgolem = makeLoptrixModule(CFG);
+export const loptrix = makeLoptrixModule(CFG);
+export const ragnavix = makeLoptrixModule(CFG);

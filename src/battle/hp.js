@@ -23,7 +23,7 @@
 // timer, or in damage.js beside the damage formulas) so that status.js and
 // damage.js can both use it without an import cycle.
 
-import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread, gearTriggers, triggersOn, basicAttackNumber } from "./applier.js";
+import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread, gearTriggers, triggersOn, basicAttackNumber, asEffect, battleBoss } from "./applier.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { abilityHasTag } from "./abilityTags.js";
 import { gainSpecialCharge } from "./charge.js";
@@ -100,6 +100,13 @@ export function attackerDamageMultiplier(target, { effectDamage = false, crit = 
   let mult = effectiveness();
   const attacker = currentApplier();
   if (!attacker || attacker === target || effectDamage) return mult;
+  // Forgeheart: a creature hits harder while it carries Protect from a
+  // guardian whose passive grants it. Read off the GUARDIAN rather than
+  // stamped onto everyone it protects, so it needs no per-tick bookkeeping
+  // and ends the moment the Protect does -- and two guardians can never
+  // leave a stale bonus behind on the same ally, since only one guards it.
+  const guardian = attacker.protect?.src;
+  if (guardian && guardian._protectDmgPct) mult *= 1 + guardian._protectDmgPct / 100;
   const gear = attacker.gear;
   if (!gear) return mult;
   const ability = activeAbilityOf(attacker);
@@ -128,6 +135,8 @@ export function attackerDamageMultiplier(target, { effectDamage = false, crit = 
   if (crit) for (const g of gearTriggers(attacker, "critLowHpDmgPct")) if (isBelow(target, g.critLowHpBelowPct)) more(g.critLowHpDmgPct);
   // Glass Blade: everything it deals.
   if (gear.dmgDealtPct) more(gear.dmgDealtPct);
+  // Hawkeye Lens: per tile of distance to the target, capped.
+  if (gear.distanceDmgPct) more(Math.min(gear.distanceDmgMaxPct ?? Infinity, gear.distanceDmgPct * tilesBetween(attacker, target)));
   // Ambush Fang: the first ability of the battle -- all of it (spent when that
   // Basic attack or Special ends; see tick.js).
   if (gear.firstAbilityDmgPct && !attacker._ambushDone && (ability === "basic" || ability === "special")) {
@@ -244,6 +253,12 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
       target._instancesTaken = (target._instancesTaken || 0) + 1;
       cut(gear.firstHitsReducedPct || 0);
     }
+    // Pangolin Plate: less per enemy Nearby (the 8 surrounding tiles; the
+    // boss counts when its body touches them), capped.
+    if (gear.perNearbyEnemyDmgReductionPct) {
+      const n = nearbyEnemyCount(target);
+      if (n) cut(Math.min(gear.perNearbyEnemyDmgReductionMaxPct ?? Infinity, gear.perNearbyEnemyDmgReductionPct * n));
+    }
     // Monolith Shard: damage from an enemy that is Taunted (by anyone).
     if (gear.tauntedDmgReductionPct && attacker && attacker !== target && (attacker.tauntTicks || 0) > 0) cut(gear.tauntedDmgReductionPct);
     // Glass Blade: the price of its damage -- everything it takes.
@@ -262,6 +277,25 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
     if (bell) mult *= 1 - bell / 100;
   }
   return mult;
+}
+
+/** Living enemies of `u` within Nearby (Chebyshev 1) -- the boss by its body. */
+function nearbyEnemyCount(u) {
+  if (u.uid == null) return 0;
+  let n = 0;
+  for (const e of battleRoster()) {
+    if (e.hp > 0 && e.uid && e.uid[0] !== u.uid[0] && Math.max(Math.abs(e.row - u.row), Math.abs(e.col - u.col)) <= 1) n++;
+  }
+  const b = u.uid[0] === "p" ? battleBoss() : null;
+  if (b && distToBoss(b, u.row, u.col) <= 1) n++;
+  return n;
+}
+
+/** Hawkeye Lens: how many tiles `attacker` is from `target` (1 when beside;
+ * the boss by its nearest body tile). */
+function tilesBetween(attacker, target) {
+  if (target.uid == null) return distToBoss(target, attacker.row, attacker.col);
+  return Math.max(Math.abs(attacker.row - target.row), Math.abs(attacker.col - target.col));
 }
 
 /** Tesla Coil: the strongest bonus among living enemies of `target` wearing
@@ -425,7 +459,7 @@ export function applyProtect(target, guard, stacks = 1) {
   // the same way a new Taunt replaces the old.
   const carried = target.protect && target.protect.src === guard ? target.protect.stacks : 0;
   target.protect = { src: guard, stacks: Math.min(PROTECT_STACK_CAP, carried + buffStacks(target, stacks)) };
-  const extra = extraAllyFor(target);
+  const extra = extraAllyFor(target, "protect");
   if (extra && extra !== guard) asSpread(() => applyProtect(extra, guard, stacks));
 }
 
@@ -464,7 +498,7 @@ export function clearProtect(u) {
 export function applyShield(u, amount, ticks) {
   // Shield gear on whoever grants it (see battle/applier.js), applied before
   // the keep-the-larger comparison so a strengthened Shield competes at size.
-  const extra = extraAllyFor(u);
+  const extra = extraAllyFor(u, "shield");
   if (extra) asSpread(() => applyShield(extra, amount, ticks));
   const shield = Math.max(1, Math.round(shieldAmount(amount) * shieldReceivedMultiplier(u)));
   const layer = stackLayer(u);
@@ -671,9 +705,9 @@ export function healUnit(u, amount, { lifesteal = false, hotFrom = null } = {}) 
   // the heal listeners (Swiftgrace Band counts it).
   const healer = hotFrom || currentApplier();
   if (!hotFrom) {
-    // Cantor's Beads: a heal on an ally also heals one more (the raw amount,
-    // so that ally's own healing-received gear applies to it).
-    const extra = extraAllyFor(u);
+    // Cantor's Beads: this ability use's heal also heals one more ally, once
+    // (the raw amount, so that ally's own healing-received gear applies).
+    const extra = extraAllyFor(u, "heal");
     if (extra) asSpread(() => healUnit(extra, amount, { lifesteal }));
   }
   // The healer's gear -- Lifebinder Pendant's healing done, an echoed
@@ -891,7 +925,7 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
         const done = target._rescuedBy || (target._rescuedBy = {});
         if (done[key] || !(target.hp > 0) || !isBelow(target, g.rescueBelowPct)) return;
         done[key] = true;
-        asPassive(a, () => healUnit(target, Math.round((a.maxHp * (g.rescueHealPct || 0)) / 100)));
+        asPassive(a, () => asEffect(() => healUnit(target, Math.round((a.maxHp * (g.rescueHealPct || 0)) / 100))));
       });
     }
   }

@@ -116,6 +116,6 @@ const CFG = {
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
 export const pebbit = makePebbitModule(CFG);
-export const bouldrath = makePebbitModule(CFG);
-export const granitarch = makePebbitModule(CFG);
-export const mountainking = makePebbitModule(CFG);
+export const bouldroad = makePebbitModule(CFG);
+export const granitoad = makePebbitModule(CFG);
+export const toadalith = makePebbitModule(CFG);

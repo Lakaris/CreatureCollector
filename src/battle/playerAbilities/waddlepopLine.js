@@ -129,7 +129,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const frosthydra = makeWaddlepopModule(CFG);
-export const glacialhydra = makeWaddlepopModule(CFG);
+export const waddlepop = makeWaddlepopModule(CFG);
+export const frostillery = makeWaddlepopModule(CFG);
 export const bombardguin = makeWaddlepopModule(CFG);
 export const cryogeddon = makeWaddlepopModule(CFG);

@@ -80,10 +80,14 @@ export function makeJadebunModule(cfg) {
       newFx.push({ id: now + "hp" + unit.uid, row: tgt.row, col: tgt.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
 
+    specialInRange() {
+      return true;
+    },
+
     /**
-     * Silver Draught: heal the weakest ally anywhere (uses the default
-     * Support in-range gate, so it fires once the team is engaged), then
-     * branch on their POST-heal Health.
+     * Silver Draught: heal the weakest ally anywhere, then branch on their
+     * POST-heal Health. A heal never waits for an enemy to be in reach, so
+     * this fires the moment its charge fills.
      */
     special(unit, ctx) {
       const { aliveP, newFx, now } = ctx;
@@ -137,7 +141,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const glowpup = makeJadebunModule(CFG);
-export const radiantkit = makeJadebunModule(CFG);
-export const dawnbeast = makeJadebunModule(CFG);
-export const solarcrown = makeJadebunModule(CFG);
+export const jadebun = makeJadebunModule(CFG);
+export const pestlehare = makeJadebunModule(CFG);
+export const elixhare = makeJadebunModule(CFG);
+export const lunarch = makeJadebunModule(CFG);

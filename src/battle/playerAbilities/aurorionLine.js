@@ -118,7 +118,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const aurorabird = makeAurorionModule(CFG);
-export const radiancebird = makeAurorionModule(CFG);
-export const celestbird = makeAurorionModule(CFG);
-export const empyravis = makeAurorionModule(CFG);
+export const aurorion = makeAurorionModule(CFG);
+export const lumileo = makeAurorionModule(CFG);
+export const celestleo = makeAurorionModule(CFG);
+export const empyreon = makeAurorionModule(CFG);

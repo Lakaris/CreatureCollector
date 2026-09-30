@@ -52,7 +52,11 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
   function toggleRole(r){setActiveRoles(prev=>{const n=new Set(prev);n.has(r)?n.delete(r):n.add(r);return n;});}
   function toggleAttackType(a){setActiveAttackTypes(prev=>{const n=new Set(prev);n.has(a)?n.delete(a):n.add(a);return n;});}
 
-  const ownedDefs=useMemo(()=>Object.values(owned).map(o=>({owned:o,def:CREATURE_MAP[o.id]})),[owned]);
+  // A record whose creature no longer exists is skipped rather than crashing
+  // the whole screen on `def.name`. stripUnknownCreatures (state/GameContext)
+  // clears these out of a save on load, so this is the belt to that braces --
+  // the grid is not worth white-screening over one stale id.
+  const ownedDefs=useMemo(()=>Object.values(owned).map(o=>({owned:o,def:CREATURE_MAP[o.id]})).filter(x=>x.def),[owned]);
 
   const filtered=useMemo(()=>{
     let list=[...ownedDefs];
@@ -233,13 +237,16 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
             const asc=ascStarTier(o.ascensions);
             const showPointer=(tutorialStep==="collection"||tutorialStep==="levelupPick"||flairGuideStep==="collection"||candyGuideStep==="candyCollection")&&idx===0;
             return React.createElement("div",{key:o.id,className:"creature-card","data-guide-target":(flairGuideStep==="collection"&&idx===0)?"collection":(candyGuideStep==="candyCollection"&&idx===0)?"candyCollection":undefined,onClick:()=>{setSelected(o.id);window.scrollTo(0,0);if(tutorialStep==="collection")setTutorialStep("slot");if(tutorialStep==="levelupPick")setTutorialStep("levelupCreature");if(flairGuideStep==="collection"&&idx===0)setFlairGuideStep("flair");if(candyGuideStep==="candyCollection"&&idx===0)setCandyGuideStep("candySkins");},style:{position:"relative",paddingTop:30,background:rarCfg.bg,border:"1px solid "+rarCfg.color+"44"}},
-              // Art spans the entire card, scaled uniformly (objectFit
-              // contain -- as large as fits without distortion or cropping).
-              // Rendered first so the absolutely-positioned badges and name
-              // overlay, which come later in DOM order, paint on top of it.
+              // Art covers most of the card: the full width, from just under
+              // the level line (top 20px) down to the ascension bar, scaled
+              // uniformly (objectFit contain) and bottom-anchored. Only the
+              // very top strip -- where the level sits -- stays clear; the
+              // badge column overlaps the art's left edge but paints on top.
+              // Rendered first so the absolutely-positioned badges, which
+              // come later in DOM order, paint on top of it.
               // NOTE: a sprite poster here would stretch to the card's aspect
               // ratio; square-box it when animated collection art first lands.
-              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"calc(100% - "+ASC_BAR_H+"px)"}}),
+              art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:20,left:0,width:"100%",height:"calc(100% - "+(ASC_BAR_H+20)+"px)",objectPosition:"center bottom"}}),
               showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               // Badge column, top-left: Type, then Role, then Range.
               React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},

@@ -392,7 +392,7 @@ const NESSLING_PHRASES = {
   },
 };
 
-// Scrapcaw line (ids still say murkwing/darkpaw/abysslord -- creature ids
+// Scrapcaw line (ids still say scrapcaw/corvoid/murderking -- creature ids
 // never change): both attacks are plain damage phrases; Shadow Pact's
 // per-Dark-ally percentages vary per tier, so the passive renders raw.
 const MURKWING_PHRASES = {
@@ -482,7 +482,21 @@ const FRILLET_PHRASES = {
   basic: null,
 };
 
-// Sicklewing (mantis) line, root id "galephoenix": Sickle Cut is a plain hit on
+// Frizzlamb (static sheep) line: Static Prickle banks a Charge on every hit,
+// so it needs its own phrase rather than the generic damage one. Flock Surge
+// and Skittish are written out per tier.
+const FRIZZLAMB_PHRASES = {
+  basic: { phrase: "Deal damage to an enemy and gain 1 Charge (stacking, max 50)" },
+};
+
+// Clubtail (ankylosaur) line: Tail Club is a plain hit on the generic phrase,
+// and is the only ability here with a number the phrase system can read --
+// Wind Up and Dead Weight are written out per tier.
+const CLUBTAIL_PHRASES = {
+  basic: null,
+};
+
+// Sicklewing (mantis) line: Sickle Cut is a plain hit on
 // the generic phrase; Twin Reap rides its own Fork phrase, with the max tier's
 // Stun appended as a rider. Unfettered is written out per tier.
 const SICKLEWING_PHRASES = {
@@ -490,7 +504,7 @@ const SICKLEWING_PHRASES = {
   special: { phrase: "Deal damage to all enemies in a Fork" },
 };
 
-// Cinderbill (pelican) line, root id "magmavore": Lava Spit is a plain hit on
+// Cinderbill (pelican) line: Lava Spit is a plain hit on
 // the generic phrase. Magma Mantle
 // carries its Heal Over Time total as a leading "Heal N HP" (the same shape
 // as Shared Flame), rendered as a HEAL badge beside a fixed sentence; the max
@@ -544,44 +558,44 @@ const SHOCKSTINGER_PHRASES = {
 };
 
 const PLAIN_ABILITY_PHRASES = {
-  bloomphoenix: BLOOMIBIS_PHRASES,
-  lifephoenix: BLOOMIBIS_PHRASES,
-  ignisdragon: IGNISSAUR_PHRASES,
-  pyredragon: IGNISSAUR_PHRASES,
-  breezekit: BREEZEKIT_PHRASES,
-  galestride: BREEZEKIT_PHRASES,
-  tempesthawk: BREEZEKIT_PHRASES,
-  stormlord: BREEZEKIT_PHRASES,
+  bloomibis: BLOOMIBIS_PHRASES,
+  animavis: BLOOMIBIS_PHRASES,
+  ignissaur: IGNISSAUR_PHRASES,
+  pyresaur: IGNISSAUR_PHRASES,
+  cirruskit: BREEZEKIT_PHRASES,
+  cumulynx: BREEZEKIT_PHRASES,
+  nimbupard: BREEZEKIT_PHRASES,
+  stormpelt: BREEZEKIT_PHRASES,
   crystalcrab: CRYSTALCRAB_PHRASES,
   gemcrab: CRYSTALCRAB_PHRASES,
   gemtitan: CRYSTALCRAB_PHRASES,
   // Pebbit line: only the basic is a plain damage ability; the special's
   // shield % and the passive's expiry % live in their text.
   pebbit: { basic: null },
-  bouldrath: { basic: null },
-  granitarch: { basic: null },
-  mountainking: { basic: null },
+  bouldroad: { basic: null },
+  granitoad: { basic: null },
+  toadalith: { basic: null },
   morusk: MORUSK_PHRASES,
   ivormar: MORUSK_PHRASES,
-  shockcrab: SHOCKSTINGER_PHRASES,
-  voltcrusher: SHOCKSTINGER_PHRASES,
-  galvaniccrab: SHOCKSTINGER_PHRASES,
-  coralleviathan: NESSLING_PHRASES,
-  tidecrush: NESSLING_PHRASES,
-  tidelord: NESSLING_PHRASES,
-  abyssgolem: LOPTRIX_PHRASES,
-  nihilgolem: LOPTRIX_PHRASES,
-  frosthydra: WADDLEPOP_PHRASES,
-  glacialhydra: WADDLEPOP_PHRASES,
+  shockstinger: SHOCKSTINGER_PHRASES,
+  voltlasher: SHOCKSTINGER_PHRASES,
+  galvascorpion: SHOCKSTINGER_PHRASES,
+  nessling: NESSLING_PHRASES,
+  lochcoil: NESSLING_PHRASES,
+  nessarch: NESSLING_PHRASES,
+  loptrix: LOPTRIX_PHRASES,
+  ragnavix: LOPTRIX_PHRASES,
+  waddlepop: WADDLEPOP_PHRASES,
+  frostillery: WADDLEPOP_PHRASES,
   bombardguin: WADDLEPOP_PHRASES,
   cryogeddon: WADDLEPOP_PHRASES,
-  glowpup: JADEBUN_PHRASES,
-  radiantkit: JADEBUN_PHRASES,
-  dawnbeast: JADEBUN_PHRASES,
-  solarcrown: JADEBUN_PHRASES,
-  galeserpent: QUETZALIS_PHRASES,
-  vortexserpent: QUETZALIS_PHRASES,
-  cyclonwyrm: QUETZALIS_PHRASES,
+  jadebun: JADEBUN_PHRASES,
+  pestlehare: JADEBUN_PHRASES,
+  elixhare: JADEBUN_PHRASES,
+  lunarch: JADEBUN_PHRASES,
+  coatlet: QUETZALIS_PHRASES,
+  plumecoatl: QUETZALIS_PHRASES,
+  quetzalis: QUETZALIS_PHRASES,
   dustling: DUSTLING_PHRASES,
   silkhusk: DUSTLING_PHRASES,
   gloamwing: DUSTLING_PHRASES,
@@ -589,57 +603,62 @@ const PLAIN_ABILITY_PHRASES = {
   bonebeak: BONEBEAK_PHRASES,
   gravewing: BONEBEAK_PHRASES,
   charnelord: BONEBEAK_PHRASES,
-  ironmole: CRAGLING_PHRASES,
-  steelmole: CRAGLING_PHRASES,
-  titanmole: CRAGLING_PHRASES,
+  cragling: CRAGLING_PHRASES,
+  cragfist: CRAGLING_PHRASES,
+  cloudvault: CRAGLING_PHRASES,
   skysage: CRAGLING_PHRASES,
-  murkwing: MURKWING_PHRASES,
-  darkpaw: MURKWING_PHRASES,
-  abysslord: MURKWING_PHRASES,
-  frostpup: IGLET_PHRASES,
-  snowmane: IGLET_PHRASES,
-  blizzardback: IGLET_PHRASES,
-  glaciertusk: IGLET_PHRASES,
-  doomgrub: DOOMSHADE_PHRASES,
-  nihilwyrm: DOOMSHADE_PHRASES,
+  scrapcaw: MURKWING_PHRASES,
+  corvoid: MURKWING_PHRASES,
+  murderking: MURKWING_PHRASES,
+  iglet: IGLET_PHRASES,
+  shellter: IGLET_PHRASES,
+  frostkeep: IGLET_PHRASES,
+  hibernarch: IGLET_PHRASES,
+  doomshade: DOOMSHADE_PHRASES,
+  nihilgeist: DOOMSHADE_PHRASES,
   emberchirp: EMBERCHIRP_PHRASES,
   pyrefinch: EMBERCHIRP_PHRASES,
   cauterix: EMBERCHIRP_PHRASES,
   hearthenix: EMBERCHIRP_PHRASES,
-  leafling: VENOMCOIL_PHRASES,
-  canoparch: VENOMCOIL_PHRASES,
-  verdantlord: VENOMCOIL_PHRASES,
-  ancientgrove: VENOMCOIL_PHRASES,
+  venomcoil: VENOMCOIL_PHRASES,
+  mirewreathe: VENOMCOIL_PHRASES,
+  toxiconda: VENOMCOIL_PHRASES,
+  gaiaconda: VENOMCOIL_PHRASES,
   emberpup: EMBERPUP_PHRASES,
   emberhound: EMBERPUP_PHRASES,
   infernoking: EMBERPUP_PHRASES,
   ashmonarch: EMBERPUP_PHRASES,
-  aurorabird: AURORION_PHRASES,
-  radiancebird: AURORION_PHRASES,
-  celestbird: AURORION_PHRASES,
-  empyravis: AURORION_PHRASES,
-  sylvandragon: SIEGEFIN_PHRASES,
-  ancientdragon: SIEGEFIN_PHRASES,
-  mosskrab: FRILLET_PHRASES,
-  jadekrab: FRILLET_PHRASES,
-  crystalshell: FRILLET_PHRASES,
+  aurorion: AURORION_PHRASES,
+  lumileo: AURORION_PHRASES,
+  celestleo: AURORION_PHRASES,
+  empyreon: AURORION_PHRASES,
+  siegefin: SIEGEFIN_PHRASES,
+  siegespire: SIEGEFIN_PHRASES,
+  frillet: FRILLET_PHRASES,
+  bulwarden: FRILLET_PHRASES,
+  aegiceras: FRILLET_PHRASES,
   rampartops: FRILLET_PHRASES,
-  prismcrab: OATHCUB_PHRASES,
-  spectrumcrab: OATHCUB_PHRASES,
-  rainbowshell: OATHCUB_PHRASES,
-  chromatarch: OATHCUB_PHRASES,
-  holydragon: AURAVAST_PHRASES,
-  celestialdragon: AURAVAST_PHRASES,
-  voltail: SPARKSHELL_PHRASES,
-  stormclaw: SPARKSHELL_PHRASES,
-  arcstorm: SPARKSHELL_PHRASES,
-  ionarch: SPARKSHELL_PHRASES,
-  magmavore: MAGMAVORE_PHRASES,
-  pyroclaw: MAGMAVORE_PHRASES,
-  cindercolosus: MAGMAVORE_PHRASES,
-  calderarch: MAGMAVORE_PHRASES,
-  galephoenix: SICKLEWING_PHRASES,
-  skyphoenix: SICKLEWING_PHRASES,
+  oathcub: OATHCUB_PHRASES,
+  vowbruin: OATHCUB_PHRASES,
+  sanctursa: OATHCUB_PHRASES,
+  oathmaul: OATHCUB_PHRASES,
+  auravast: AURAVAST_PHRASES,
+  lumimajor: AURAVAST_PHRASES,
+  sparkshell: SPARKSHELL_PHRASES,
+  capacitort: SPARKSHELL_PHRASES,
+  dynashell: SPARKSHELL_PHRASES,
+  accumulith: SPARKSHELL_PHRASES,
+  cinderbill: MAGMAVORE_PHRASES,
+  emberpouch: MAGMAVORE_PHRASES,
+  kilnwing: MAGMAVORE_PHRASES,
+  pyrelican: MAGMAVORE_PHRASES,
+  sicklewing: SICKLEWING_PHRASES,
+  galescythe: SICKLEWING_PHRASES,
+  clubtail: CLUBTAIL_PHRASES,
+  anvilback: CLUBTAIL_PHRASES,
+  frizzlamb: FRIZZLAMB_PHRASES,
+  staticoat: FRIZZLAMB_PHRASES,
+  thunderfleece: FRIZZLAMB_PHRASES,
 };
 
 /**
@@ -731,9 +750,9 @@ export function formatPlainAbilityLevel(creatureId, key, text, idx) {
   return { label: hit.prefix + phrase + (override ? "" : hit.rest), amount: hit.amount, healAmt: null };
 }
 
-/** sacredwasp/divinedrone/holyswarm (Starlit/Starbright/Starburn) currently share identical ability values. */
+/** starlit/starbright/starburn (Starlit/Starbright/Starburn) currently share identical ability values. */
 export function isStarlitAbilityLine(creatureId) {
-  return creatureId === "sacredwasp" || creatureId === "divinedrone" || creatureId === "holyswarm";
+  return creatureId === "starlit" || creatureId === "starbright" || creatureId === "starburn";
 }
 
 /**
@@ -743,9 +762,9 @@ export function isStarlitAbilityLine(creatureId) {
  * doesn't have to import the battle simulation module.
  */
 const ABILITY_STAT_BONUSES = {
-  sacredwasp: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
-  divinedrone: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
-  holyswarm: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+  starlit: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+  starbright: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
+  starburn: { stat: "spd", byLevel: [20, 20, 20, 20, 50] },
 };
 
 /** The passive self stat buff (if any) a creature's unique ability grants at its current level. */
@@ -766,7 +785,7 @@ export function getAbilityStatBonus(creatureId, abilityLevels) {
  * Ignissaur's Burn).
  */
 export function getAbilityTags(creatureId, key, abilityLevel) {
-  const isEmberstarLine = getRootDef(creatureId)?.id === "blazehornet";
+  const isEmberstarLine = getRootDef(creatureId)?.id === "emberstar";
   const isStarlitLine = isStarlitAbilityLine(creatureId);
   const tags = [];
   if (key === "special" && isEmberstarLine) {
@@ -779,7 +798,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   if (key === "unique" && isEmberstarLine) tags.push("burn");
   if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
   if (key === "special" && isStarlitLine) tags.push("closest");
-  const isBloomibisLine = getRootDef(creatureId)?.id === "bloomphoenix";
+  const isBloomibisLine = getRootDef(creatureId)?.id === "bloomibis";
   if (key === "basic" && isBloomibisLine) tags.push("closest");
   if (key === "unique" && isBloomibisLine) tags.push("nearby");
   if (key === "special" && isBloomibisLine) {
@@ -789,7 +808,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // below that. Level-less contexts (dex, gacha) show the full kit.
     if (abilityLevel == null || abilityLevel >= 4) tags.push("dispeldebuff");
   }
-  const isIgnissaurLine = getRootDef(creatureId)?.id === "ignisdragon";
+  const isIgnissaurLine = getRootDef(creatureId)?.id === "ignissaur";
   if (isIgnissaurLine && (key === "basic" || key === "special")) {
     if (key === "basic") tags.push("closest");
     if (key === "special") tags.push("line");
@@ -797,7 +816,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // level-gating rule as Bloomibis's Cleanse above.
     if (abilityLevel == null || abilityLevel >= 4) tags.push("burn");
   }
-  if (getRootDef(creatureId)?.id === "breezekit") {
+  if (getRootDef(creatureId)?.id === "cirruskit") {
     if (key === "basic") {
       tags.push("closest");
       // Gust Swipe only shreds DEF from its 4th upgrade on -- same
@@ -834,7 +853,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("fear");
     }
   }
-  const isAurorionLine = getRootDef(creatureId)?.id === "aurorabird";
+  const isAurorionLine = getRootDef(creatureId)?.id === "aurorion";
   if (isAurorionLine) {
     if (key === "basic") {
       tags.push("closest");
@@ -847,7 +866,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("dispelbuff");
     }
   }
-  const isSiegefinLine = getRootDef(creatureId)?.id === "sylvandragon";
+  const isSiegefinLine = getRootDef(creatureId)?.id === "siegefin";
   if (isSiegefinLine) {
     if (key === "basic") {
       tags.push("closest");
@@ -858,8 +877,25 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // stance, and the same cast dispels everything else -- at every tier.
     if (key === "special") tags.push("rootundispellable", "dispeldebuff");
   }
-  // The Sicklewing mantises -- root id inherited from the retired Aetherwing.
-  const isSicklewingLine = getRootDef(creatureId)?.id === "galephoenix";
+  const isFrizzlambLine = getRootDef(creatureId)?.id === "frizzlamb";
+  if (isFrizzlambLine) {
+    // Both halves of the kit read Charge, so both carry its pill. Skittish is
+    // a flat Speed gain on itself with no effect to name.
+    if (key === "basic") tags.push("closest", "charge");
+    if (key === "special") {
+      tags.push("nearby", "charge");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defenseup");
+    }
+  }
+  const isClubtailLine = getRootDef(creatureId)?.id === "clubtail";
+  if (isClubtailLine) {
+    // Wind Up and Dead Weight are self-only stat changes with no effect of
+    // their own to name, so they carry no pills -- except the overkill
+    // Splash Dead Weight buys at max.
+    if (key === "basic") tags.push("closest");
+    if (key === "unique" && (abilityLevel == null || abilityLevel >= 4)) tags.push("splash");
+  }
+  const isSicklewingLine = getRootDef(creatureId)?.id === "sicklewing";
   if (isSicklewingLine) {
     // Sickle Cut only Executes from its 4th upgrade on; Twin Reap only Stuns
     // from its 4th on -- the Fork is its shape at every tier. Unfettered
@@ -877,8 +913,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("bypasstaunt");
     }
   }
-  // The Cinderbill pelicans -- root id inherited from the retired Magmavore.
-  const isMagmavoreLine = getRootDef(creatureId)?.id === "magmavore";
+  const isMagmavoreLine = getRootDef(creatureId)?.id === "cinderbill";
   if (isMagmavoreLine) {
     // Lava Spit only Exposes from its 4th upgrade on. Magma Mantle grants
     // Protect and Heal Over Time at every tier (the max tier only adds a
@@ -890,7 +925,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     }
     if (key === "special") tags.push("beside", "protect", "healovertime");
   }
-  const isSparkshellLine = getRootDef(creatureId)?.id === "voltail";
+  const isSparkshellLine = getRootDef(creatureId)?.id === "sparkshell";
   if (isSparkshellLine) {
     // Static Zap Chains from tier 1 (the max tier only widens it). Discharge
     // reads Charge and raises an Aura at every tier; the Speed Up / Speed Down
@@ -903,7 +938,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("hasteup");
     }
   }
-  const isAuravastLine = getRootDef(creatureId)?.id === "holydragon";
+  const isAuravastLine = getRootDef(creatureId)?.id === "auravast";
   if (isAuravastLine) {
     // Twin Radiance only shaves Defense from its 4th upgrade on; Sovereign
     // Call only pulls in an Assist from its 4th on. The Aura is the ability's
@@ -920,7 +955,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // Sworn Guard is a targeting rule and a damage bonus -- neither is an
     // effect anything else can read, so it deliberately carries no pills.
   }
-  const isOathcubLine = getRootDef(creatureId)?.id === "prismcrab";
+  const isOathcubLine = getRootDef(creatureId)?.id === "oathcub";
   if (isOathcubLine) {
     // Mailed Paw only braces from its 4th upgrade on; Radiant Smite only
     // Blinds from its 4th on -- the Shield it spends is part of every tier.
@@ -935,7 +970,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // Reliquary banks excess Healing as a Shield, so it carries both.
     if (key === "unique") tags.push("overheal", "shield");
   }
-  const isFrilletLine = getRootDef(creatureId)?.id === "mosskrab";
+  const isFrilletLine = getRootDef(creatureId)?.id === "frillet";
   if (isFrilletLine) {
     // Guard Horn only shaves Defense from its 4th upgrade on.
     if (key === "basic") {
@@ -945,7 +980,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") tags.push("beside", "protect");
     if (key === "unique") tags.push("counter");
   }
-  const isVenomcoilLine = getRootDef(creatureId)?.id === "leafling";
+  const isVenomcoilLine = getRootDef(creatureId)?.id === "venomcoil";
   if (isVenomcoilLine) {
     if (key === "basic") tags.push("closest");
     // Restrained is the same debuff the Shockstinger line uses -- it comes off
@@ -955,7 +990,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     // no pill of its own; the Poison the Restrain drags along does.
     if (key === "unique") tags.push("poison");
   }
-  const isShockstingerLine = getRootDef(creatureId)?.id === "shockcrab";
+  const isShockstingerLine = getRootDef(creatureId)?.id === "shockstinger";
   if (isShockstingerLine) {
     if (key === "basic") tags.push("closest", "restrained");
     if (key === "special") {
@@ -966,7 +1001,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     }
     if (key === "unique") tags.push("restrained");
   }
-  const isNesslingLine = getRootDef(creatureId)?.id === "coralleviathan";
+  const isNesslingLine = getRootDef(creatureId)?.id === "nessling";
   if (isNesslingLine) {
     if (key === "basic") {
       tags.push("farthest");
@@ -1005,7 +1040,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "basic") tags.push("closest", "damageovertime");
     if (key === "special") tags.push("damageovertime");
   }
-  const isCraglingLine = getRootDef(creatureId)?.id === "ironmole";
+  const isCraglingLine = getRootDef(creatureId)?.id === "cragling";
   if (isCraglingLine) {
     if (key === "basic") tags.push("closest");
     if (key === "special") {
@@ -1015,14 +1050,14 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     }
     if (key === "unique") tags.push("dodge");
   }
-  const isMurkwingLine = getRootDef(creatureId)?.id === "murkwing";
+  const isMurkwingLine = getRootDef(creatureId)?.id === "scrapcaw";
   if (isMurkwingLine) {
     if (key === "basic") tags.push("closest");
     // Beside is a targeting pill (it picks the allies called); Assist is the
     // effect. Shadow Pact deliberately carries no tags.
     if (key === "special") tags.push("beside", "assist");
   }
-  const isIgletLine = getRootDef(creatureId)?.id === "frostpup";
+  const isIgletLine = getRootDef(creatureId)?.id === "iglet";
   if (isIgletLine) {
     if (key === "basic") tags.push("closest");
     if (key === "special") {
@@ -1038,7 +1073,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
   }
-  const isDoomshadeLine = getRootDef(creatureId)?.id === "doomgrub";
+  const isDoomshadeLine = getRootDef(creatureId)?.id === "doomshade";
   if (isDoomshadeLine) {
     if (key === "basic") {
       tags.push("closest");
@@ -1056,7 +1091,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") tags.push("nearby", "healovertime");
     if (key === "unique") tags.push("revive");
   }
-  const isQuetzalisLine = getRootDef(creatureId)?.id === "galeserpent";
+  const isQuetzalisLine = getRootDef(creatureId)?.id === "coatlet";
   if (isQuetzalisLine) {
     if (key === "basic") tags.push("closest");
     if (key === "special") {
@@ -1066,7 +1101,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
     }
   }
-  const isJadebunLine = getRootDef(creatureId)?.id === "glowpup";
+  const isJadebunLine = getRootDef(creatureId)?.id === "jadebun";
   if (isJadebunLine) {
     if (key === "basic") tags.push("weakest");
     if (key === "special") {
@@ -1076,7 +1111,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");
     }
   }
-  const isWaddlepopLine = getRootDef(creatureId)?.id === "frosthydra";
+  const isWaddlepopLine = getRootDef(creatureId)?.id === "waddlepop";
   if (isWaddlepopLine) {
     if (key === "basic") {
       tags.push("closest");
@@ -1089,7 +1124,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
   }
-  const isLoptrixLine = getRootDef(creatureId)?.id === "abyssgolem";
+  const isLoptrixLine = getRootDef(creatureId)?.id === "loptrix";
   if (isLoptrixLine) {
     if (key === "basic") {
       tags.push("weakest");
@@ -1113,8 +1148,8 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   return tags;
 }
 
-// Mirror basicHealByLevel/specialHealByLevel in battle/playerAbilities/starlitLine.js (sacredwasp/
-// divinedrone/holyswarm) -- Piercing Blessing's and Radiant Exchange's text no longer spell out
+// Mirror basicHealByLevel/specialHealByLevel in battle/playerAbilities/starlitLine.js (starlit/
+// starbright/starburn) -- Piercing Blessing's and Radiant Exchange's text no longer spell out
 // the heal amount at every level (it's shown as its own badge instead), so the badge sources the
 // real per-level value directly instead of parsing text.
 const STARLIT_BASIC_HEAL_BY_LEVEL = [12, 13, 13, 13, 13];

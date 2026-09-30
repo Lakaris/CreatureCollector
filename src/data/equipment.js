@@ -103,7 +103,7 @@
 //   healedBuffPct             Attack Up and Critical Damage Up when healed        (battle/status.js)
 //   seedPotencyPct            +% to the Seeded it inflicts                        (battle/status.js)
 //   lifestealOverhealPct      lifesteal past max Health becomes a stacking Shield (battle/hp.js)
-//   extraAllyTargets          its heals and buffs on an ally also reach N more    (battle/applier.js)
+//   extraAllyTargets          each ability use's heals/buffs on allies reach N more (battle/applier.js)
 //   fireHazardPct / waterHazardPct  +% potency of hazards it lays                 (battle/tick.js)
 //   startProtectAdjacent      N Protect stacks to Beside allies, first turn       (battle/tick.js)
 //   adjacentEvery             every Nth Basic attack also hits enemies Beside it  (battle/tick.js)
@@ -197,6 +197,11 @@
 //   dmgDealtPct / dmgTakenPct +% damage dealt / taken                             (battle/hp.js)
 //   killBasicAgain            on a defeat, use its Basic on a random Closest foe  (battle/tick.js)
 //   overkillCarry             a killing blow's excess hits a random Closest foe   (battle/tick.js)
+//   nearbyEvery               every Nth Basic attack also hits every enemy Nearby it (battle/tick.js)
+//   volleyEvery / volleyShots / volleyLessPct  every Nth Basic attack fires N extra
+//                             shots at random enemies in range, for % less        (battle/tick.js)
+//   distanceDmgPct / ...MaxPct  +% per tile to the target, capped                 (battle/hp.js)
+//   perNearbyEnemyDmgReductionPct / ...MaxPct  takes % less per enemy Nearby, capped (battle/hp.js)
 // (Flat "Gain X% more STAT" effects -- Sigils, "Haste +X%" -- use `statBonus`
 // instead, applied to the creature's stats before battle by core/stats.js.)
 //   Per Basic ATTACK (a whole swing, however many hits) -- settleBasicAttack in battle/tick.js:
@@ -360,7 +365,7 @@ export const EQUIPMENT_DEFS=[
   {id:"epi_role_atk_slayer", name:"Slayer's Band",    emoji:"⚔️", rarity:"epic", role:"Attacker", stats:{atk:9,hp:8},   effect:"Attacks against enemies below 40% Health always critically hit", battle:{alwaysCritBelowPct:40}},
   // Granted on the wearer's first turn of each battle.
   {id:"epi_role_tank_bastion",name:"Bastion Plate",   emoji:"🛡️", rarity:"epic", role:"Tank",     stats:{hp:9,def:8},   effect:"Beside allies gain 2 stacks of Protect", battle:{startProtectAdjacent:2}},
-  {id:"epi_role_sup_cantor", name:"Cantor's Beads",   emoji:"📿", rarity:"epic", role:"Support",  stats:{hp:19},        effect:"This creature's Healing and Buffs affect 1 additional ally", battle:{extraAllyTargets:1}},
+  {id:"epi_role_sup_cantor", name:"Cantor's Beads",   emoji:"📿", rarity:"epic", role:"Support",  stats:{hp:19},        effect:"Abilities this creature uses that heal or buff allies affect 1 additional ally", battle:{extraAllyTargets:1}},
   // Epic range-exclusives (Melee twins: one for damage, one for Defense)
   {id:"epi_rng_melee_vanguard",name:"Vanguard Gauntlet",emoji:"🥊", rarity:"epic", attackType:"Melee",  stats:{atk:8,def:9}, effect:"Deal 30% more damage when there is no allied creature Nearby", battle:{loneDmgPct:30}},
   {id:"epi_rng_melee_vanguard_def",name:"Vanguard Pauldron",emoji:"🦾", rarity:"epic", attackType:"Melee", stats:{hp:8,def:9}, effect:"Gain 30% Defense when there is no allied creature Nearby", battle:{loneDefPct:30}},
@@ -551,6 +556,12 @@ export const EQUIPMENT_DEFS=[
   {id:"leg_gen_hp_atk_hourglass",name:"Thief's Hourglass", emoji:"⏳", rarity:"legendary", stats:{hp:17,atk:17},   effect:"Whenever this creature removes an enemy's Special ability charge, gain 50% of the amount removed", battle:{chargeStealPct:50}},
   // Shielding Down: 20% per stack, one stack from this source, standard duration.
   {id:"leg_gen_atk_cdmg_nightshade",name:"Nightshade Bead",emoji:"🟣", rarity:"legendary", stats:{atk:17,critDmg:30}, effect:"Attacks deal 50% more damage to Shielded enemies and inflict Shielding Down", battle:{shieldedTargetDmgPct:50, shieldDownOnHit:true}},
+  // Legendary range-exclusives. Volley's shots each pick a different enemy in
+  // range the attack hasn't hit; Hawkeye counts tiles to the target (1 = beside).
+  {id:"leg_rng_melee_whirlwind", name:"Whirlwind Axe",     emoji:"🪓", rarity:"legendary", attackType:"Melee",  stats:{atk:17,def:17},  effect:"Every 3rd Basic attack hits all Nearby enemies", battle:{nearbyEvery:3}},
+  {id:"leg_rng_ranged_hawkeye",  name:"Hawkeye Lens",      emoji:"🦅", rarity:"legendary", attackType:"Ranged", stats:{atk:17,crit:30}, effect:"Deal 4% more damage for each tile between this creature and its target (max 40%)", battle:{distanceDmgPct:4, distanceDmgMaxPct:40}},
+  {id:"leg_rng_ranged_volley",   name:"Volley Quiver",     emoji:"🏹", rarity:"legendary", attackType:"Ranged", stats:{atk:17,def:17},  effect:"Every 4th Basic attack fires 2 extra shots at random enemies in range, dealing 50% less damage", battle:{volleyEvery:4, volleyShots:2, volleyLessPct:50}},
+  {id:"epi_gen_hp_def_pangolin", name:"Pangolin Plate",    emoji:"🦔", rarity:"epic",      stats:{hp:9,def:8},     effect:"Receive 5% less damage for each enemy Nearby (max 20%)", battle:{perNearbyEnemyDmgReductionPct:5, perNearbyEnemyDmgReductionMaxPct:20}},
   // Trade-off items: a stat penalty (a negative `statBonus`) paid for with
   // stronger stats (Sloth Claw: 20 vs the Sigils' 18) or a battle effect.
   {id:"rar_gen_atk_sloth",       name:"Sloth Claw",        emoji:"🦥", rarity:"rare",      stats:{atk:20},         effect:"Haste -15%", hasteEffect:true, statBonus:{stat:"abilitySpeed", pct:-15}},

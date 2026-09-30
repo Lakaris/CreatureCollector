@@ -132,5 +132,5 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const sylvandragon = makeSiegefinModule(CFG);
-export const ancientdragon = makeSiegefinModule(CFG);
+export const siegefin = makeSiegefinModule(CFG);
+export const siegespire = makeSiegefinModule(CFG);

@@ -25,7 +25,7 @@ const DMG_MULT_BY_LEVEL = PER_HIT_DMG_BY_LEVEL.map((d, i) => (d * HITS_BY_LEVEL[
 /** Bonus flat damage per 5 Burn stacks on the target, as a fraction of Emberstar's ATK (unique lvl 5 only). */
 const BURN_BONUS_ATK_FRACTION = 0.08;
 
-const STARLIT_ROOT_ID = "sacredwasp";
+const STARLIT_ROOT_ID = "starlit";
 
 /** Charging Pierce: lane width (tiles), indexed by special-ability level. */
 const WIDTH_BY_LEVEL = [1, 1, 3, 3, 3];
@@ -185,6 +185,6 @@ export function makeEmberstarModule(defBonusByLevel) {
 }
 
 // Ids stay on the original line ids (Emberstar / Magmastar / Blastar).
-export const blazehornet = makeEmberstarModule([10, 20, 30, 40, 40]);
-export const infernohive = makeEmberstarModule([15, 25, 35, 45, 45]);
-export const infernoswarm = makeEmberstarModule([20, 30, 40, 50, 50]);
+export const emberstar = makeEmberstarModule([10, 20, 30, 40, 40]);
+export const magmastar = makeEmberstarModule([15, 25, 35, 45, 45]);
+export const blastar = makeEmberstarModule([20, 30, 40, 50, 50]);

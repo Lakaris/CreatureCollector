@@ -5,9 +5,10 @@
 // more the fight leans on it, the more it gives back.
 //
 // Battery Shell is the intake. Every hit it takes and every buff it gains adds
-// Charge (capped at 60), and every stack it holds is a little more Attack and
-// Defense -- so a battered, well-supported tortoise is a stronger one. At max
-// level, sitting at full Charge also grants Haste Up.
+// Charge (capped at 50, the cap every Charge kit shares), and every stack it
+// holds is a little more Attack and Defense -- so a battered, well-supported
+// tortoise is a stronger one. At max level, sitting at full Charge also grants
+// Haste Up.
 //
 // Static Zap is the ordinary output: a ranged hit that Chains to one enemy
 // beside its target with the same effects. At max level Charge widens the
@@ -38,7 +39,7 @@ const CHAIN_BASE = 1;
 /** Static Zap lvl 5 / Discharge lvl 5: Charge per extra chain target / aura tile. */
 const CHARGE_PER_STEP = 10;
 /** The most Charge the shell can hold. */
-const CHARGE_CAP = 60;
+const CHARGE_CAP = 50;
 /** Battery Shell: Charge gained per hit taken or buff gained, by unique level. */
 const CHARGE_GAIN_BY_LEVEL = [1, 2, 3, 3, 3];
 /** Battery Shell: Attack and Defense % per stack of Charge, by unique level. */
@@ -187,10 +188,14 @@ export function makeSparkshellModule(cfg) {
     },
 
     /**
-     * Discharge: spend half the Charge, raise the aura. Uses the default
-     * in-range special gate (Ranged), so it goes off once something is close
-     * enough to be inside the field it is about to raise.
+     * Discharge: spend half the Charge, raise the aura. The aura is a buff
+     * the team stands in, so it goes up off cooldown rather than waiting for
+     * an enemy -- allies benefit from it while the line is still closing.
      */
+    specialInRange() {
+      return true;
+    },
+
     special(unit, ctx) {
       const idx = abilityIdx(unit, "special");
       const consumed = Math.floor((unit.charge || 0) * DISCHARGE_FRACTION);
@@ -216,9 +221,8 @@ const CFG = {
   enemyHasteByLevel: AURA_ENEMY_HASTE_BY_LEVEL,
 };
 // The whole line intentionally shares one kit -- same names, text, and
-// numbers (see data/creatures.js); only base stats differ per stage. The ids
-// are inherited from the retired Monovolt dragons; see the note in data/skins.js.
-export const voltail = makeSparkshellModule(CFG);
-export const stormclaw = makeSparkshellModule(CFG);
-export const arcstorm = makeSparkshellModule(CFG);
-export const ionarch = makeSparkshellModule(CFG);
+// numbers (see data/creatures.js); only base stats differ per stage.
+export const sparkshell = makeSparkshellModule(CFG);
+export const capacitort = makeSparkshellModule(CFG);
+export const dynashell = makeSparkshellModule(CFG);
+export const accumulith = makeSparkshellModule(CFG);

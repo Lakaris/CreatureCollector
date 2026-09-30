@@ -186,7 +186,14 @@
       "Bash(grep -oE 'id:\"[a-z]+\",name:\"[^\"]*\",emoji:\"[^\"]*\"|stats:\\\\{hp:[0-9]+,atk:[0-9]+,def:[0-9]+|role:\"[^\"]*\",attackType:\"[^\"]*\"|shardsToAscend:[0-9]+,ascensionsToEvolve:\\(null|[0-9]+\\)|evolutionId:\"[a-z]+\"')",
       "Bash(grep -o 'charge: { label: \"Charge\", description: \"[^\"]*\"' src/core/abilityText.js)",
       "Bash(python - C:/Users/Annie/Desktop/Stuff/CreatureCollector/src/battle/status.js)",
-      "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\12722a5c-cfa9-4f6e-9505-840340ffb9e6\\\\scratchpad\\\\reword.ps1\")"
+      "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\12722a5c-cfa9-4f6e-9505-840340ffb9e6\\\\scratchpad\\\\reword.ps1\")",
+      "Bash(grep -n \"^import\\\\|^export default\\\\|^function DungeonScreen\\\\|return React.createElement\\(\\\\\"div\\\\\",{style:{height\\\\|  return React.createElement\" ui/screens/battle/DungeonScreen.js)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $i=[System.Drawing.Image]::FromFile\\(\"$PWD\\\\images\\\\breezekit\\\\breezekit_idle.png\"\\); \"$\\($i.Width\\)x$\\($i.Height\\)\"; $i.Dispose\\(\\); Test-Path images\\\\cirruskit.png)",
+      "PowerShell(Rename-Item images\\\\breezekit\\\\breezekit_idle.png cirruskit_idle.png)",
+      "PowerShell(Rename-Item images\\\\breezekit cirruskit)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $i=[System.Drawing.Image]::FromFile\\(\"$PWD\\\\images\\\\flair\\\\backgrounds\\\\AutumnWoods.png\"\\); \"$\\($i.Width\\)x$\\($i.Height\\)\"; $i.Dispose\\(\\); \\(Get-Item images\\\\flair\\\\backgrounds\\\\AutumnWoods.png\\).Length)",
+      "PowerShell($files='src\\\\ui\\\\screens\\\\CreatureDetail\\\\index.js','src\\\\ui\\\\screens\\\\CreatureDetail\\\\FlairSection.js'; foreach\\($f in $files\\){ $c=[IO.File]::ReadAllText\\(\"$PWD\\\\$f\"\\); $c=$c.Replace\\('PORTRAIT_FEET_PCT','PORTRAIT_FEET_BOTTOM'\\).Replace\\('PORTRAIT_STAGE_BLEED','PORTRAIT_STAGE_STYLE'\\); [IO.File]::WriteAllText\\(\"$PWD\\\\$f\",$c\\) }; Select-String -Path $files -Pattern 'PORTRAIT_' | ForEach-Object { \"$\\($_.Filename\\):$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\)\\)\" })",
+      "PowerShell($f=\"$PWD\\\\src\\\\ui\\\\screens\\\\HomeScreen.js\"; $c=[IO.File]::ReadAllText\\($f\\); $n=\\([regex]::Matches\\($c,'bottom:PORTRAIT_FEET_BOTTOM'\\)\\).Count; $c=$c.Replace\\('bottom:PORTRAIT_FEET_BOTTOM','bottom:HOME_FEET_BOTTOM'\\).Replace\\('\"calc\\(\"+PORTRAIT_FEET_BOTTOM+\" + 128px\\)\"','\"calc\\(\"+HOME_FEET_BOTTOM+\" + 128px\\)\"'\\).Replace\\('import { FLAIR_AURA_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM } from','import { FLAIR_AURA_MAP, backdropImage } from'\\); [IO.File]::WriteAllText\\($f,$c\\); \"replaced $n\"; Select-String -Path $f -Pattern 'PORTRAIT_|HOME_FEET|backdropImage|homeBackdrop' | % { \"$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\).Substring\\(0,[Math]::Min\\(110,$_.Line.Trim\\(\\).Length\\)\\)\\)\" })"
     ]
   }
 }

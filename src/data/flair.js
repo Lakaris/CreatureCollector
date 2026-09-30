@@ -210,7 +210,7 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_village",name:"Village Road",emoji:"🏘️",desc:"A cobblestone road through a small village"},
     {id:"bg_market",name:"Busy Market",emoji:"🛒",desc:"Colorful market stalls and banners",buff:{stat:"crit",pct:0.1}},
     {id:"bg_canyon",name:"Dry Canyon",emoji:"🏜️",desc:"A cracked canyon floor under harsh sun"},
-    {id:"bg_autumn",name:"Autumn Woods",emoji:"🍁",desc:"Trees blazing with red and gold autumn color"},
+    {id:"bg_autumn",name:"Autumn Woods",emoji:"🍁",image:"images/flair/backgrounds/AutumnWoods.png",desc:"Trees blazing with red and gold autumn color"},
     {id:"bg_sunrise",name:"Sunrise Meadow",emoji:"🌄",desc:"A dewy meadow glowing in soft sunrise light"},
     {id:"bg_dock",name:"Old Dock",emoji:"⚓",desc:"Creaky wooden planks over calm harbour water",buff:{stat:"critDmg",pct:0.5}},
   ],
@@ -384,6 +384,41 @@ export const FLAIR_ITEMS={
 {const _S=["hp","atk","def","spd","abilitySpeed"],_P={common:0.5,rare:1,epic:3,legendary:5},_P_SPD={common:0.1,rare:0.3,epic:0.5,legendary:1};[FLAIR_AURAS,FLAIR_BACKGROUNDS,FLAIR_ITEMS].forEach(data=>Object.entries(data).forEach(([r,arr])=>arr.forEach((x,i)=>{if(x.buff)return;const stat=_S[Math.floor(i/4)%5];x.buff={stat,pct:(stat==="spd"||stat==="abilitySpeed")?_P_SPD[r]:_P[r]};})));}
 export const FLAIR_AURA_MAP=Object.fromEntries(Object.values(FLAIR_AURAS).flat().map(e=>[e.id,e]));
 export const FLAIR_BG_MAP=Object.fromEntries(Object.values(FLAIR_BACKGROUNDS).flat().map(e=>[e.id,e]));
+/** Style for a creature's portrait stage (creature page and Flair page) when
+ * its equipped background flair has art. The stage bleeds to the card's top,
+ * left and right edges (PORTRAIT_STAGE_STYLE) and ends where the stats begin.
+ *
+ * The art is never stretched: it's scaled uniformly to cover the stage and
+ * anchored to the bottom, so the ground always shows and the overflow is
+ * cropped -- off the top on the wide creature-page stage, off the sides on a
+ * tall Flair Feed stage. Background art is SQUARE, which makes the drawn
+ * image exactly max(stage width, stage height) tall; PORTRAIT_FEET_BOTTOM
+ * relies on that. Null when the equipped background has no image yet (or
+ * nothing is equipped). */
+export function portraitBackdropStyle(ownedData){
+  const image=backdropImage(ownedData);
+  if(!image)return null;
+  return {backgroundImage:'url("'+image+'")',backgroundSize:"cover",backgroundPosition:"center bottom",backgroundRepeat:"no-repeat"};
+}
+/** The equipped background flair's art path, or null (none equipped, or no
+ * art for it yet). */
+export function backdropImage(ownedData){
+  const bg=ownedData&&ownedData.equippedBackground&&FLAIR_BG_MAP[ownedData.equippedBackground];
+  return bg&&bg.image?bg.image:null;
+}
+/** Creature's feet above the stage bottom: 7% of the drawn backdrop's height
+ * (max of the stage's width and height, for square art -- see
+ * portraitBackdropStyle), so they land on the same spot of the art at any
+ * stage size. cqw/cqh resolve against the stage, which PORTRAIT_STAGE_STYLE
+ * makes a size container. */
+export const PORTRAIT_FEET_BOTTOM="calc(0.07 * max(100cqw, 100cqh))";
+/** The portrait stage's shared styling. Pulls it out over the card's 12px
+ * padding on the top, left and right, so backdrop art runs to the card's
+ * edges (its top corners matching the card's 12px radius) -- the stage's
+ * height includes the 12px it reclaims from the top padding. Also makes it a
+ * size container for PORTRAIT_FEET_BOTTOM; the stage always has an explicit
+ * height (fixed, or flex-sized on the Flair Feed tab), so that's safe. */
+export const PORTRAIT_STAGE_STYLE={margin:"-12px -12px 0",borderRadius:"12px 12px 0 0",containerType:"size"};
 export const FLAIR_ITEM_MAP=Object.fromEntries(Object.values(FLAIR_ITEMS).flat().map(e=>[e.id,e]));
 export const FLAIR_SHARD_COSTS={common:30,rare:75,epic:150,legendary:500};
 

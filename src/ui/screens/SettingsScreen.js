@@ -5,6 +5,7 @@ import { useGame } from "../../state/GameContext.js";
 import { FRAME_MAP } from "../../data/profileCosmetics.js";
 import ProfilePopup from "../components/ProfilePopup.js";
 import ScreenHeader from "../components/ScreenHeader.js";
+import DisplayCreaturePicker from "./DisplayCreaturePicker.js";
 
 function ToggleRow({ label, value, onChange }) {
   return React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 4px" } },
@@ -23,7 +24,10 @@ function SettingsScreen({ onBack }) {
   const [sound, setSound] = React.useState(true);
   const [notifications, setNotifications] = React.useState(true);
   const [showProfilePopup, setShowProfilePopup] = React.useState(false);
+  const [pickingDisplay, setPickingDisplay] = React.useState(false);
   const frame = FRAME_MAP[profileFrame] || FRAME_MAP.none;
+
+  if (pickingDisplay) return React.createElement(DisplayCreaturePicker, { onBack: () => setPickingDisplay(false) });
 
   return React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } },
     React.createElement(ScreenHeader, { title: "Settings", onBack, edgeToEdge: false }),
@@ -40,6 +44,15 @@ function SettingsScreen({ onBack }) {
             React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "#111" } }, username || "Player"),
             React.createElement("div", { style: { fontSize: 10, fontWeight: 600, color: "#7c4dff", letterSpacing: 1, textTransform: "uppercase", marginTop: 2, minHeight: 13, lineHeight: "13px" } }, profileTitle || "")
           ),
+          React.createElement("div", { style: { fontSize: 18, color: "#bbb" } }, "›")
+        )
+      ),
+      React.createElement("div", { className: "card", style: { marginBottom: 16 } },
+        React.createElement("button", {
+          onClick: () => setPickingDisplay(true),
+          style: { width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 4px", background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }
+        },
+          React.createElement("div", { style: { fontSize: 15, color: "#333" } }, "🐾 Change display creature"),
           React.createElement("div", { style: { fontSize: 18, color: "#bbb" } }, "›")
         )
       ),

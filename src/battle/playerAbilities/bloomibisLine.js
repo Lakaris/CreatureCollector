@@ -18,6 +18,7 @@ import { aChebDist } from "../geometry.js";
 import { healReceivedMultiplier, applyWhileActiveStatMod, hasNegativeStatMods, dispelDebuffs, auraRange } from "../status.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { healUnit } from "../hp.js";
+import { asEffect } from "../applier.js";
 
 /** Displayed per-hit damage by basic-ability level; the engine deals stat-based
  * damage scaled by the ratio of the current level's value to the base value. */
@@ -102,7 +103,8 @@ export function makeBloomibisModule(cfg) {
       for (const a of ctx.aliveP) {
         if (aChebDist(unit.row, unit.col, a.row, a.col) > auraRange(unit, AURA_RANGE)) continue;
         if (unit._groveGate && a.hp < a.maxHp && canBeHealed(a)) {
-          healUnit(a, Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a))));
+          // An Aura effect: Cantor's Beads doesn't spread it (see asEffect).
+          asEffect(() => healUnit(a, Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a)))));
         }
         if (idx >= MAX_IDX) {
           // One ATK Up stack per Bloomibis, refreshed every tick while the
@@ -145,14 +147,14 @@ export function makeBloomibisModule(cfg) {
   };
 }
 
-export const bloomphoenix = makeBloomibisModule({
+export const bloomibis = makeBloomibisModule({
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialHealByLevel: SPECIAL_HEAL_BY_LEVEL,
   auraHealPerSecByLevel: AURA_HEAL_PER_SEC_BY_LEVEL,
 });
 // Animavis intentionally mirrors Bloomibis exactly for now -- same names, text,
 // and numbers (see data/creatures.js); only base stats differ.
-export const lifephoenix = makeBloomibisModule({
+export const animavis = makeBloomibisModule({
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialHealByLevel: SPECIAL_HEAL_BY_LEVEL,
   auraHealPerSecByLevel: AURA_HEAL_PER_SEC_BY_LEVEL,

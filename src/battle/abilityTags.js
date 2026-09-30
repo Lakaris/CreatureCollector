@@ -40,6 +40,7 @@ function gearTags(unit, key) {
     if (due("extraHitEvery")) tags.push("multihit");
     if (due("stunEvery")) tags.push("stun");
     if (due("pullEvery")) tags.push("displace");
+    if (due("nearbyEvery")) tags.push("nearby");
   }
   if (key === "special") {
     if (g.specialPush) tags.push("displace");

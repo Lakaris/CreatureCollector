@@ -7,7 +7,7 @@ import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit, clearShield, app
 import { aChebDist } from "./geometry.js";
 // constants.js imports nothing, so this cannot cycle.
 import { STATUS_TICKS } from "./constants.js";
-import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, sameSide, extraAllyFor, asSpread, battleRoster, shieldAmount, battleTick, gearTriggers } from "./applier.js";
+import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, sameSide, extraAllyFor, asSpread, battleRoster, shieldAmount, battleTick, gearTriggers, asEffect } from "./applier.js";
 import { onDisplaced } from "./immobilize.js";
 // damage.js imports this module too; defenseOf is only called at run time,
 // never while either module is loading, so the cycle is safe.
@@ -317,12 +317,12 @@ onHitLanded((attacker, target, info) => {
 onHitLanded((attacker, target, info) => {
   const pct = attacker.gear?.critBesideAtkUpPct || 0;
   if (!pct || !info.crit || info.effectDamage || attacker.uid == null || !(attacker.hp > 0)) return;
-  withApplier(attacker, () => {
+  withApplier(attacker, () => asEffect(() => {
     for (const a of battleRoster()) {
       if (a === attacker || a.hp <= 0 || !sameSide(a, attacker) || aChebDist(a.row, a.col, attacker.row, attacker.col) > 1) continue;
       applyStatMod(a, { kind: "atk", pct, src: attacker.uid + ":solar", ticks: STATUS_TICKS });
     }
-  });
+  }));
 });
 
 /** Nightshade Bead: every ability hit inflicts Shielding Down (one stack
@@ -353,7 +353,7 @@ onUnitDefeated((target, killer, info) => {
     for (const a of battleRoster()) {
       if (a.hp <= 0 || (a !== w && !sameSide(a, w)) || (a.healImmuneTicks || 0) > 0) continue;
       const amt = Math.round(((a.maxHp * pct) / 100) * healReceivedMultiplier(a));
-      if (amt > 0) asPassive(w, () => healUnit(a, amt));
+      if (amt > 0) asPassive(w, () => asEffect(() => healUnit(a, amt)));
     }
   }
 });
@@ -381,7 +381,7 @@ onShieldBroken((u, peak) => {
     }
     if (!weakest || (weakest.healImmuneTicks || 0) > 0) continue;
     const amt = Math.round(((peak * pct) / 100) * healReceivedMultiplier(weakest));
-    if (amt > 0) asPassive(w, () => healUnit(weakest, amt));
+    if (amt > 0) asPassive(w, () => asEffect(() => healUnit(weakest, amt)));
   }
 });
 
@@ -873,10 +873,11 @@ export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = fals
   for (let i = 1; i < stacks; i++) added = pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks) || added;
   if (debuff) debuffLanded(u, added && !had);
   if (debuff && !environmental) mirrorDebuff(u, (m) => applyStatMod(m, { kind, pct, src: u.uid + ":mirror", ticks: baseTicks, holdDuration }));
-  // Cantor's Beads: a buff on an ally reaches one more (never a while-active
-  // stack -- those are re-stamped every tick and would never fall off).
+  // Cantor's Beads: this ability use's buff reaches one more ally, once per
+  // stat (never a while-active stack -- those are re-stamped every tick and
+  // would never fall off).
   if (!debuff && !holdDuration) {
-    const extra = extraAllyFor(u);
+    const extra = extraAllyFor(u, "stat:" + kind);
     if (extra) asSpread(() => applyStatMod(extra, { kind, pct, src, ticks, holdDuration: true }));
   }
   // Ion Thread: a Haste Up this creature gains reaches every ally Beside it
@@ -1343,7 +1344,7 @@ export function frostbiteMultiplier(attackerIsWater, defender) {
  * something does (dispelDebuffs clears debuffs and must never touch it).
  */
 export function applyFortify(u, stacks) {
-  const extra = extraAllyFor(u);
+  const extra = extraAllyFor(u, "fortify");
   if (extra) asSpread(() => applyFortify(extra, stacks));
   // Beetle Carapace: this creature gains 1 more stack whenever it gains any.
   u.fortifyStacks = Math.min(FORTIFY_STACK_CAP, (u.fortifyStacks || 0) + buffStacks(u, stacks) + (u.gear?.fortifyExtraStack || 0));
@@ -1378,7 +1379,7 @@ export function applyWindbreak(u, pct, tickKey) {
  * per-tick amount and the longer remaining duration, never stacks.
  */
 export function applyHealOverTime(u, perTick, ticks = 6) {
-  const extra = extraAllyFor(u);
+  const extra = extraAllyFor(u, "hot");
   if (extra) asSpread(() => applyHealOverTime(extra, perTick, ticks));
   // The healer's gear, baked in now (the ticks later run with no applier):
   // Lifebinder Pendant's healing done, and an echo's reduced effectiveness.

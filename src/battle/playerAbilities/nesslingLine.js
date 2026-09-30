@@ -176,6 +176,6 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const coralleviathan = makeNesslingModule(CFG);
-export const tidecrush = makeNesslingModule(CFG);
-export const tidelord = makeNesslingModule(CFG);
+export const nessling = makeNesslingModule(CFG);
+export const lochcoil = makeNesslingModule(CFG);
+export const nessarch = makeNesslingModule(CFG);

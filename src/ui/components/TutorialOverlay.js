@@ -39,7 +39,7 @@ const TUTORIAL_ITEM_ID = "com_hp_atk";
 // Index of the line after which the egg-choice screen appears.
 const EGG_CHOICE_AFTER_LINE = 1;
 // Fire / Water / Nature starter eggs: Emberpup, Waddlepop (penguin), Vixling (woodland fox).
-const STARTER_CHOICES = ["emberpup", "frosthydra", "ashpup"];
+const STARTER_CHOICES = ["emberpup", "waddlepop", "vixling"];
 
 /** Full evolution chain, base to final, for a starter id -- shown as a preview above the egg row. */
 function chainDefsFor(starterId) {
@@ -54,7 +54,7 @@ function finalFormDef(starterId) {
 
 // The tutorial's first fight uses a smaller grid than a real arena/dungeon
 // battle, with a single fixed level-1 Scrapcaw as the only enemy (its id is
-// still "murkwing" -- creature ids never change). Tile size
+// still "scrapcaw" -- creature ids never change). Tile size
 // is bumped up from ARENA_TILE just for this screen -- it's a much shorter
 // grid than a real arena/dungeon board, so it can afford bigger tiles.
 const TUTORIAL_GRID_COLS = 5;
@@ -64,7 +64,7 @@ const TUTORIAL_PLAYER_ZONE_ROWS = 3;
 const TUTORIAL_PLAYER_ZONE_START_ROW = TUTORIAL_GRID_ROWS - TUTORIAL_PLAYER_ZONE_ROWS;
 const TUTORIAL_ENEMY_CELL = "0,2";
 const TUTORIAL_PLAYER_CELL = "5,2";
-const TUTORIAL_ENEMY_ID = "murkwing";
+const TUTORIAL_ENEMY_ID = "scrapcaw";
 const TUTORIAL_ENEMY_LEVEL = 1;
 
 function TutorialOverlay() {

@@ -360,7 +360,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   const [passCount,setPassCount]=useState(1);
   const [buyPassesOpen,setBuyPassesOpen]=useState(false);
   const [confirmBuyOpen,setConfirmBuyOpen]=useState(false);
-  const [showDrops,setShowDrops]=useState(false);
+  const [showRewards,setShowRewards]=useState(false);
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(t);},[]);
   function getTimeToNoon(){
@@ -779,6 +779,37 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("button",{onClick:collectRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
     )
   );
+  // Rewards page: this Dungeon's type-exclusive equipment -- every item of the
+  // boss's type, which rollDungeonRewards (core/gacha.js) drops from this
+  // Dungeon only -- split by rarity, each with its stats and effect. Read
+  // from the catalog, so a new type item appears here on its own. The back
+  // arrow returns to the Dungeon.
+  if(showRewards&&boss)return React.createElement("div",{key:"sfvrewards",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+      React.createElement("button",{onClick:()=>setShowRewards(false),"aria-label":"Back",style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1,flexShrink:0}},
+        React.createElement("i",{className:"ti ti-arrow-left"})
+      ),
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,lineHeight:1.25,minWidth:0}},boss.type+" Dungeon Exclusive Rewards")
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:16}},
+      ["rare","epic","legendary"].map(rarity=>{
+        const items=EQUIPMENT_DEFS.filter(item=>item.element===boss.type&&item.rarity===rarity);
+        if(!items.length)return null;
+        const rarCfg=EQUIP_RARITY_CONFIG[rarity];
+        return React.createElement("div",{key:rarity,style:{marginBottom:20}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:rarCfg.color,textTransform:"uppercase",letterSpacing:0.5,marginBottom:8}},rarCfg.label+" ("+items.length+")"),
+          items.map(item=>React.createElement("div",{key:item.id,style:{display:"flex",gap:12,alignItems:"flex-start",background:"#fff",borderRadius:14,padding:12,border:"1.5px solid "+rarCfg.color+"55",marginBottom:8}},
+            React.createElement("div",{style:{width:48,height:48,flexShrink:0,borderRadius:12,background:rarCfg.bg,border:"2px solid "+rarCfg.color+"88",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26}},item.emoji),
+            React.createElement("div",{style:{flex:1,minWidth:0}},
+              React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"#111"}},item.name),
+              item.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",marginTop:2}},Object.entries(item.stats).map(([s,v])=>formatStatBonus(s,v)).join(" · ")),
+              item.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.45,marginTop:6}},"✦ "+item.effect)
+            )
+          ))
+        );
+      })
+    )
+  );
   return React.createElement("div",{key:"sfv656",className:"screen-fade",style:{position:"fixed",inset:0,background:DUNGEON_BG_BY_TYPE[boss?.type]||"#f5f5f5",transition:"background 0.5s ease",display:"flex",flexDirection:"column"}},
     // Final beat of the post-Set-1 Dungeon reveal. Same box style/size as
     // every other tutorial text box in the game (see HomeScreen's) -- full
@@ -830,36 +861,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
       React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🏰 Dungeon"),
-      boss&&React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setShowDrops(true);},style:{marginLeft:"auto",padding:"5px 12px",fontSize:12,fontWeight:600,background:"#f0f0f0",border:"none",borderRadius:20,cursor:dungeonEnterActive?"not-allowed":"pointer",color:dungeonEnterActive?"#ccc":"#555"}},"Drops")
-    ),
-    showDrops&&boss&&React.createElement("div",{onClick:()=>setShowDrops(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:320,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:340}},
-        React.createElement("div",{style:{fontSize:16,fontWeight:800,color:"#111",marginBottom:16,textAlign:"center"}},"Exclusive Drops"),
-        ...(["epic","legendary"]).map(rarity=>{
-          const items=EQUIPMENT_DEFS.filter(item=>item.element===boss.type&&item.rarity===rarity);
-          if(!items.length)return null;
-          const rarCfg=EQUIP_RARITY_CONFIG[rarity];
-          return React.createElement("div",{key:rarity,style:{marginBottom:16}},
-            React.createElement("div",{style:{fontSize:11,fontWeight:700,color:rarCfg.color,textTransform:"uppercase",letterSpacing:0.5,marginBottom:8}},rarCfg.label),
-            React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:8}},
-              items.map(item=>{
-                const ROLE_EMOJI={Attacker:"⚔️",Tank:"🛡️",Support:"💚"};
-                const indicator=item.element?(TYPE_EMOJI[item.element]||""):item.role?(ROLE_EMOJI[item.role]||""):"";
-                return React.createElement("div",{key:item.id,onClick:()=>setPreviewItem(item),style:{
-                  width:52,height:52,borderRadius:12,background:rarCfg.bg,
-                  border:"2px solid "+rarCfg.color+"88",
-                  display:"flex",alignItems:"center",justifyContent:"center",
-                  fontSize:26,cursor:"pointer",position:"relative",
-                }},
-                  item.emoji,
-                  indicator&&React.createElement("span",{style:{position:"absolute",top:1,left:3,fontSize:10,lineHeight:1,pointerEvents:"none"}},indicator)
-                );
-              })
-            )
-          );
-        }),
-        React.createElement("button",{onClick:()=>setShowDrops(false),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer",marginTop:4}},"Close")
-      )
+      boss&&React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setShowRewards(true);},style:{marginLeft:"auto",padding:"5px 12px",fontSize:12,fontWeight:600,background:"#f0f0f0",border:"none",borderRadius:20,cursor:dungeonEnterActive?"not-allowed":"pointer",color:dungeonEnterActive?"#ccc":"#555"}},"Rewards")
     ),
     previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:330,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},

@@ -70,6 +70,17 @@ export function withActiveAbility(unit, key, fn) {
   }
 }
 
+// The boss of this battle, if any is alive (it is not in the roster) --
+// refreshed by tick.js each tick, for gear that counts the enemies around a
+// creature (Pangolin Plate). The boss is an enemy of the player side only.
+let boss = null;
+export function setBattleBoss(b) {
+  boss = b && b.hp > 0 ? b : null;
+}
+export function battleBoss() {
+  return boss && boss.hp > 0 ? boss : null;
+}
+
 // Every creature in the battle, both sides -- refreshed by tick.js each tick
 // -- for gear that reacts to things happening to OTHERS (Warlord's Trophy
 // counts every defeat on the field).
@@ -87,26 +98,53 @@ export function sameSide(a, b) {
 }
 
 /**
- * Cantor's Beads: "This creature's Healing and Buffs affect 1 additional
- * ally." POLICY: every heal and buff helper that lands something on an ally
+ * Cantor's Beads: each ability use that heals or buffs an ally also affects 1
+ * additional ally (equipment and Aura effects never spread -- see asEffect
+ * below). POLICY: every heal and buff helper that lands something on an ally
  * asks this for the extra ally and repeats itself on it -- healUnit,
  * applyShield, applyProtect (hp.js); applyStatMod, applyHealOverTime,
- * applyFortify (status.js). The extra ally is the lowest-Health ally (by
- * share of max Health) that isn't the target or the giver. Only what the
- * wearer gives an ALLY spreads -- not what it gives itself -- and the repeat
- * never spreads again.
+ * applyFortify (status.js) -- naming its `kind` ("heal", "shield",
+ * "stat:atk", ...).
+ *
+ * It is ONE extra ally per ABILITY USE (see beginAbilityUse): the first heal
+ * or buff of a use picks the lowest-Health ally (by share of max Health) that
+ * isn't the giver or already a target of this use, and that ally receives
+ * each kind of heal or buff the use gives ONCE -- so an ability that heals
+ * three allies still reaches just one more, healed once. Only what the wearer
+ * gives an ALLY spreads -- not what it gives itself -- and the repeat never
+ * spreads again.
  */
 let spreading = false;
-export function extraAllyFor(target) {
+let useCounter = 0;
+
+/**
+ * A new use of an ability begins for `unit`: each tick's passive section,
+ * each Basic attack section, each Special cast (an Echo Conch echo is its
+ * own cast), each Assist. Called by tick.js and asAssist.
+ */
+export function beginAbilityUse(unit) {
+  if (unit) unit._useId = ++useCounter;
+}
+
+export function extraAllyFor(target, kind = "heal") {
   const giver = current;
   if (spreading || !giver || giver === target || !(giver.gear?.extraAllyTargets > 0)) return null;
   if (!sameSide(giver, target)) return null;
-  let best = null;
-  for (const a of roster) {
-    if (a === giver || a === target || a.hp <= 0 || !sameSide(a, giver)) continue;
-    if (!best || a.hp / a.maxHp < best.hp / best.maxHp) best = a;
+  let use = giver._spreadUse;
+  if (!use || use.id !== giver._useId) use = giver._spreadUse = { id: giver._useId, ally: null, kinds: new Set(), targets: new Set() };
+  use.targets.add(target);
+  if (use.kinds.has(kind)) return null;
+  if (!use.ally || use.ally.hp <= 0) {
+    let best = null;
+    for (const a of roster) {
+      if (a === giver || use.targets.has(a) || a.hp <= 0 || !sameSide(a, giver)) continue;
+      if (!best || a.hp / a.maxHp < best.hp / best.maxHp) best = a;
+    }
+    use.ally = best;
   }
-  return best;
+  if (!use.ally || use.ally === target) return null;
+  use.kinds.add(kind);
+  return use.ally;
 }
 export function asSpread(fn) {
   const prev = spreading;
@@ -117,6 +155,14 @@ export function asSpread(fn) {
     spreading = prev;
   }
 }
+
+/**
+ * POLICY: Cantor's Beads spreads only Healing and Buffs from ABILITIES.
+ * An equipment effect (Sanctuary Lamp, Worldtree Seed, Dawn Chime, Sanctum
+ * Seal...) or an Aura effect (Guardian Grove's heal) is an effect, not an
+ * ability, so it runs through here and never reaches an extra ally.
+ */
+export const asEffect = asSpread;
 
 /** The ability `unit` is using right now, or null. */
 export function activeAbilityOf(unit) {
@@ -142,6 +188,7 @@ export function currentApplier() {
  * Both are restored afterwards, so the caller's turn carries on as before.
  */
 export function asAssist(helper, fn) {
+  beginAbilityUse(helper);
   return withActiveAbility(helper, "basic", () => withApplier(helper, fn));
 }
 

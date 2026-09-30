@@ -1,6 +1,6 @@
 // Per-creature art, keyed by creature id -- the same key space as CREATURE_MAP
 // and SKIN_SETS.chain. Note those ids are historical and do not always match
-// the display name (id "blazehornet" is the Emberstar line, "coralleviathan"
+// the display name (id "emberstar" is the Emberstar line, "nessling"
 // is Nessling), because ids are baked into save data.
 //
 // EVERY creature resolves art through one path (getDisplayArt in
@@ -50,19 +50,12 @@ export function artLoops(state, entry) {
 }
 
 export const CREATURE_ART = {
-  // Was legacy art on an opaque white background, and carried `blend:
-  // "multiply"` to knock that background out. The file now ships real alpha
-  // (measured: no white pixels at all, 81% fully transparent), so the blend had
-  // nothing left to erase except the artwork itself -- multiplying the
-  // creature's own colours into every surface behind it, which turned it muddy
-  // on the tinted cards and near-black on dark ones. Nothing to knock out any
-  // more; the alpha does the job.
-  breezekit: { idle: { src: "images/breezekit.png" } },
+  cirruskit: { idle: { src: "images/cirruskit/cirruskit_idle.png" } },
 
-  // Blastar (id "infernoswarm" -- final stage of the Emberstar line).
+  // Blastar (id "blastar" -- final stage of the Emberstar line).
   // Attack and defeat are stills: attack shows for ATTACK_ART_MS after each
   // swing, defeat while the defeated unit lingers (see battleArtState.js).
-  infernoswarm: {
+  blastar: {
     idle: { src: "images/blastar/idle.png" },
     attack: { src: "images/blastar/attack.png" },
     defeat: { src: "images/blastar/defeat.png" },

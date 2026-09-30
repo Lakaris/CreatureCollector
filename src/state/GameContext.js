@@ -43,7 +43,10 @@ export const INITIAL_CURRENCIES = {
 // invalidates old saves outright rather than trying to migrate them --
 // simple and safe; there's no server data to reconcile against.
 const SAVE_KEY = "cc_save_v1";
-const SAVE_VERSION = 1;
+// Bumped to 2 when creature ids were renamed to match their names (ids key
+// every owned creature and every deployment grid, so a v1 save points at
+// creatures that no longer exist).
+const SAVE_VERSION = 2;
 const SET_FIELDS = [
   "everOwnedCreatureIds", "equipFavorites", "claimedQuests",
   "dailyMissionsDone", "collectedTreasures", "completedTreasureSets",
@@ -93,6 +96,50 @@ function stripRetiredEquipment(parsed) {
   }
 }
 
+/**
+ * The same treatment for creatures: any id a save holds that no longer exists
+ * is dropped on load. Renaming a creature (ids are kept matching their names)
+ * or retiring one otherwise leaves a save pointing at nothing, and the very
+ * next screen that reads `CREATURE_MAP[id].name` throws.
+ *
+ * Generic on purpose -- it costs one map lookup per stored id and makes every
+ * future rename safe without a SAVE_VERSION bump, so the rest of a player's
+ * progress survives instead of the whole save being thrown away. Retired ids
+ * (RETIRED_CREATURE_IDS) still resolve to the placeholder, so they are kept.
+ */
+function stripUnknownCreatures(parsed) {
+  const known = (id) => !!CREATURE_MAP[id];
+  if (parsed.owned && typeof parsed.owned === "object") {
+    // Checked on BOTH the key and the record's own `id`: the collection screen
+    // reads the latter (CREATURE_MAP[o.id]), so a record whose two disagree
+    // would survive a key-only sweep and still crash the grid.
+    for (const [key, rec] of Object.entries(parsed.owned)) {
+      if (!known(key) || !known(rec?.id)) delete parsed.owned[key];
+    }
+  }
+  // Runs after the SET_FIELDS conversion, so this one may be either shape.
+  if (parsed.everOwnedCreatureIds instanceof Set) {
+    for (const id of [...parsed.everOwnedCreatureIds]) if (!known(id)) parsed.everOwnedCreatureIds.delete(id);
+  } else if (Array.isArray(parsed.everOwnedCreatureIds)) {
+    parsed.everOwnedCreatureIds = parsed.everOwnedCreatureIds.filter(known);
+  }
+  // Deployment grids are "r,c" -> id, the Arena's and Dungeon's nested one
+  // level under their tab key. An emptied cell is simply removed.
+  const prune = (grid) => {
+    if (!grid || typeof grid !== "object") return grid;
+    for (const [key, val] of Object.entries(grid)) {
+      if (val && typeof val === "object") prune(val);
+      else if (!known(val)) delete grid[key];
+    }
+    return grid;
+  };
+  for (const field of ["arenaPlanGrid", "dungeonPlanGrid", "labyrinthPlanGrid", "dailyBossPlanGrid"]) {
+    prune(parsed[field]);
+  }
+  if (!known(parsed.featuredCreatureId)) parsed.featuredCreatureId = null;
+  if (!known(parsed.tutorialPickedCreatureId)) parsed.tutorialPickedCreatureId = null;
+}
+
 function loadSave() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -116,6 +163,7 @@ function loadSave() {
       );
     }
     stripRetiredEquipment(parsed);
+    stripUnknownCreatures(parsed);
     return parsed;
   } catch {
     return null;
@@ -174,7 +222,7 @@ export function GameProvider({ children }) {
   // component itself on mount/unmount rather than by its openers, since both
   // the Collection and the Dex open it.
   const [effectFilterOpen, setEffectFilterOpen] = useState(false);
-  const [featuredCreatureId, setFeaturedCreatureId] = useState(null);
+  const [featuredCreatureId, setFeaturedCreatureId] = useState(() => initialSave?.featuredCreatureId ?? null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(() => initialSave?.tutorialSeen ?? false);
   // True for the stretch right after the tutorial's intro battle, once the player
@@ -480,7 +528,7 @@ export function GameProvider({ children }) {
     tab, gameMode,
     tutorialSeen, tutorialRestricted, tutorialStep, postTutorialPopupPending, showQuestsArrow, pendingDungeonReveal,
     tutorialPhase, tutorialLine, tutorialPostLine, tutorialPickedCreatureId, tutorialPlayerCell,
-    username, profileEmoji, profileAvatarId, profileFrame, profileTitle,
+    username, profileEmoji, profileAvatarId, profileFrame, profileTitle, featuredCreatureId,
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,

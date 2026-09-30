@@ -54,9 +54,9 @@ function getEnemiesForDepth(depth) {
 // tracks the floor's normal enemy mix (base forms early, finals late).
 // "__placeholder" slots held the retired Squallhawk line; they stand in until
 // the replacement creatures land (see RETIRED_CREATURE_IDS in data/creatures.js).
-const LAB_BOSS_ROTATION_BASE = ["pebbit", "voltail", "bloomphoenix", "blazehornet", "coralleviathan", "voidspider", "sacredwasp", "shockcrab", "__placeholder", "morusk"];
-const LAB_BOSS_ROTATION_MID = ["infernohive", "tidecrush", "__placeholder", "jadekrab", "divinedrone", "shadowspider", "voltcrusher", "deepdrake", "spectrumcrab", "steelmole"];
-const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "arcstorm", "lifephoenix", "infernoswarm", "tidelord", "abyssspider", "holyswarm", "galvaniccrab", "__placeholder", "ivormar"];
+const LAB_BOSS_ROTATION_BASE = ["pebbit", "sparkshell", "bloomibis", "emberstar", "nessling", "vacurach", "starlit", "shockstinger", "__placeholder", "morusk"];
+const LAB_BOSS_ROTATION_MID = ["magmastar", "lochcoil", "__placeholder", "bulwarden", "starbright", "umbrachnid", "voltlasher", "bathydrake", "vowbruin", "cragfist"];
+const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "dynashell", "animavis", "blastar", "nessarch", "abyrach", "starburn", "galvascorpion", "__placeholder", "ivormar"];
 
 /** The predetermined Boss creature for a depth, or null off boss floors. */
 function getLabyrinthBossForDepth(depth) {
@@ -73,8 +73,8 @@ function getEnemyLayoutForDepth(depth) {
   // together). Cirruskit took the second slot when the Sparkit line was
   // retired; it is the closest stand-in the roster still has.
   if (depth === 1) {
-    const duskling = CREATURE_MAP["shadowpup"];
-    const cirruskit = CREATURE_MAP["breezekit"];
+    const duskling = CREATURE_MAP["duskling"];
+    const cirruskit = CREATURE_MAP["cirruskit"];
     const layout = {};
     if (duskling) layout["1,1"] = duskling;
     if (cirruskit) layout["1,3"] = cirruskit;

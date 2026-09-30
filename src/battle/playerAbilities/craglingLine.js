@@ -131,7 +131,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const ironmole = makeCraglingModule(CFG);
-export const steelmole = makeCraglingModule(CFG);
-export const titanmole = makeCraglingModule(CFG);
+export const cragling = makeCraglingModule(CFG);
+export const cragfist = makeCraglingModule(CFG);
+export const cloudvault = makeCraglingModule(CFG);
 export const skysage = makeCraglingModule(CFG);

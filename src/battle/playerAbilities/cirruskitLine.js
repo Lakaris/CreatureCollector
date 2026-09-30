@@ -1,6 +1,6 @@
 // Cirruskit line: Gust Swipe / Zephyr Step / Slipstream.
 //
-// (Ids and this file's name still say "breezekit" -- the line was re-themed
+// (Ids and this file's name still say "cirruskit" -- the line was re-themed
 // into a cloud leopard, and creature ids never change, for save compat.
 // "Breezekit" below reads as the line, whose display name is now Cirruskit.)
 //
@@ -242,9 +242,9 @@ const CFG = {
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialDmgByLevel: SPECIAL_DMG_BY_LEVEL,
 };
-export const breezekit = makeBreezekitModule(CFG);
+export const cirruskit = makeBreezekitModule(CFG);
 // The evolutions intentionally mirror Breezekit exactly for now -- same names,
 // text, and numbers (see data/creatures.js); only base stats differ.
-export const galestride = makeBreezekitModule(CFG);
-export const tempesthawk = makeBreezekitModule(CFG);
-export const stormlord = makeBreezekitModule(CFG);
+export const cumulynx = makeBreezekitModule(CFG);
+export const nimbupard = makeBreezekitModule(CFG);
+export const stormpelt = makeBreezekitModule(CFG);

@@ -86,11 +86,14 @@ export function makeMoruskModule(cfg) {
       return 0;
     },
 
-    /**
-     * Blubber Wall: shield up for a % of max Health. Uses the default
-     * in-range special gate (melee range), so the wall goes up right as
-     * something closes in -- which is also when a burst has targets.
-     */
+    // The wall is a Shield on this creature and nothing else, so it goes up
+    // the moment the charge fills rather than waiting for something to close.
+    // (The burst it arms is a later, separate event -- see onTick.)
+    specialInRange() {
+      return true;
+    },
+
+    /** Blubber Wall: shield up for a % of max Health. */
     special(unit) {
       const pct = shieldPctByLevel[abilityIdx(unit, "special")];
       // Arm the burst only if this wall is the Shield actually standing --

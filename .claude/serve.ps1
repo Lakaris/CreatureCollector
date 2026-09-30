@@ -25,6 +25,8 @@ while ($listener.IsListening) {
         }
         $bytes = [System.IO.File]::ReadAllBytes($file)
         $res.ContentType = $mime
+        # Dev server: never let the browser reuse a stale module or image after an edit.
+        $res.Headers.Add('Cache-Control', 'no-store')
         $res.ContentLength64 = $bytes.LongLength
         $res.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {

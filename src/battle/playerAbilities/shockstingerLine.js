@@ -121,6 +121,6 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const shockcrab = makeShockstingerModule(CFG);
-export const voltcrusher = makeShockstingerModule(CFG);
-export const galvaniccrab = makeShockstingerModule(CFG);
+export const shockstinger = makeShockstingerModule(CFG);
+export const voltlasher = makeShockstingerModule(CFG);
+export const galvascorpion = makeShockstingerModule(CFG);

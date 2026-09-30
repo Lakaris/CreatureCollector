@@ -131,6 +131,6 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const galeserpent = makeQuetzalisModule(CFG);
-export const vortexserpent = makeQuetzalisModule(CFG);
-export const cyclonwyrm = makeQuetzalisModule(CFG);
+export const coatlet = makeQuetzalisModule(CFG);
+export const plumecoatl = makeQuetzalisModule(CFG);
+export const quetzalis = makeQuetzalisModule(CFG);

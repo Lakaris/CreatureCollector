@@ -94,9 +94,14 @@ export function makeDustlingModule(cfg) {
     /**
      * Pollen Veil: full heal on the lowest ally, then the cloud Splashes the
      * 3x3 around them -- half heal for allies caught in it, Healing Down (and
-     * at max level Blind) for enemies. No damage anywhere. Uses the default
-     * Support in-range gate, so it fires once the team is engaged.
+     * at max level Blind) for enemies. No damage anywhere. Leads with a heal,
+     * so it fires off cooldown rather than waiting for an enemy in reach
+     * (specialInRange below).
      */
+    specialInRange() {
+      return true;
+    },
+
     special(unit, ctx) {
       const { aliveP, aliveE, boss, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");

@@ -24,7 +24,7 @@ import {
 import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields, stealBuff, onUnitMoved, applyTimedDebuff, onUnitTeleported, applyTaunt, tickBurn, isEnemyOf, applyBurn, transferDebuffs, healReceivedMultiplier } from "./status.js";
 import { damageUnit, onHitLanded, addStackingShield, applyProtect, applyShield, isBossUnit, healUnit, setHazardLookup, onUnitDefeated, onShieldBroken, retaliationMultiplier } from "./hp.js";
 import { abilityHasTag } from "./abilityTags.js";
-import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster, setBattleTick, triggersOn } from "./applier.js";
+import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster, setBattleTick, triggersOn, asEffect, beginAbilityUse, setBattleBoss } from "./applier.js";
 import { isSpecialSealed, gainSpecialCharge, bankOverflowCharge } from "./charge.js";
 import { tickMinionSpecials } from "./minions.js";
 import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown, lowHpSpdHastePct, defenseOf } from "./damage.js";
@@ -45,13 +45,15 @@ function castSpecial(abilMod, u, ctx) {
 /** One cast of a Special, then its per-cast gear. Every enemy the cast
  * damages is collected (by the listener after afterSpecialCast) for it. */
 function runCast(u, cast) {
+  // Each cast is one use of the Special (Cantor's Beads spreads per use).
+  beginAbilityUse(u);
   u._specialHits = new Set();
   try {
     cast();
   } finally {
     const hits = [...u._specialHits];
     u._specialHits = null;
-    withApplier(u, () => withActiveAbility(u, "special", () => afterSpecialCast(u, hits)));
+    withApplier(u, () => withActiveAbility(u, "special", () => asEffect(() => afterSpecialCast(u, hits))));
   }
 }
 
@@ -284,10 +286,14 @@ function layWindHazard(u, targets) {
 let tickCtx = null;
 
 /** Gear that fires once, the first time a creature acts in a battle:
- * Crest of Conquest's stacking Shield, which lasts until broken. */
+ * Crest of Conquest's stacking Shield, which lasts until broken. All of it
+ * is equipment, so none of it spreads through Cantor's Beads. */
 function startOfBattleGear(u) {
   if (u._gearStarted) return;
   u._gearStarted = true;
+  asEffect(() => startOfBattleGearNow(u));
+}
+function startOfBattleGearNow(u) {
   const pct = u.gear?.startStackShieldPct || 0;
   if (pct) asPassive(u, () => addStackingShield(u, shieldAmount((u.maxHp * pct) / 100), Infinity));
   // Bastion Plate: Protect stacks, with this creature as the guardian, on
@@ -387,8 +393,9 @@ function settleBasicAttack(u) {
   //      attacker's position -- never from a creature a rider hit. Chained or
   //      Line-hit enemies don't Pierce or Splash onward.
   //   2. Each enemy takes at most one rider hit per attack (`struck`), the
-  //      full-damage shapes first: Chain, Quake, Line, Pierce, and only then
-  //      Splash's reduced hit on whoever is left around the target. Twin Fang's
+  //      full-damage shapes first: Chain, Quake, Line, Pierce, Whirlwind, then
+  //      Volley's reduced shots, and only then Splash's reduced hit on
+  //      whoever is left around the target. Twin Fang's
   //      extra hit is the one exception -- it is a repeat on the target itself.
   // Effects that change the target's state (a stolen buff, a Stun) come after
   // every hit, and Undertow's Pull comes last, so nothing is traced from a
@@ -422,6 +429,17 @@ function settleBasicAttack(u) {
       // Railgun Coil: every Nth attack does the same (its extra damage rides
       // the attack and these hits -- see attackerDamageMultiplier in hp.js).
       if (gear.basicPierce || due("pierceEvery").length) hitAll(foesOnCells(u, walk(target.row, target.col, dr, dc, attackRangeOf(u)), struck), attackDmg);
+      // Whirlwind Axe: every Nth attack also lands, with its effects, on every
+      // enemy Nearby the ATTACKER (Quake Brand's shape, around itself).
+      if (due("nearbyEvery").length) hitAll(foesBeside(u, u, struck), attackDmg);
+      // Volley Quiver: every Nth attack fires extra shots, each at a different
+      // random enemy in range not already hit, for less damage (with effects).
+      for (const g of due("volleyEvery")) {
+        const pool = foesWithDist(u, u.row, u.col).filter((c) => c.d <= attackRangeOf(u) && !struck.has(c.e)).map((c) => c.e);
+        const shots = [];
+        for (let i = 0; i < (g.volleyShots || 0) && pool.length; i++) shots.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+        hitAll(shots, attackDmg * (1 - (g.volleyLessPct || 0) / 100));
+      }
       // Shockwave Gauntlet: every Nth attack Splashes every enemy around the
       // target not already hit, for less damage (damage only).
       for (const g of due("splashEvery")) hitAll(foesBeside(u, target, struck), attackDmg * (1 - (g.splashLessPct || 0) / 100), false);
@@ -970,6 +988,7 @@ export function runBattleTick(state, config) {
   tickCtx = { state, newFx, now, allOcc, gridRows, gridCols, bossOcc };
   setDisplaceGrid({ allOcc, gridRows, gridCols, bossOcc, tick: state.tick, now });
   setBattleTick(state.tick);
+  setBattleBoss(state.boss);
   // Is a creature (or the boss, by its body) on a Hazard of this kind? For
   // gear that reads the ground (see setHazardLookup in hp.js).
   setHazardLookup((u, kind) => {
@@ -1003,6 +1022,7 @@ export function runBattleTick(state, config) {
     // applier.js): the always-on passive first; the Special and the Basic
     // re-mark it below.
     setActiveAbility(u, "unique");
+    beginAbilityUse(u);
     startOfBattleGear(u);
     // Stunned units can't attack: hold the cooldown above zero so every
     // attack branch below (including custom basicAttack hooks, which check
@@ -1075,6 +1095,7 @@ export function runBattleTick(state, config) {
     // Everything from here to the end of the turn is the Basic ability (the
     // hook or the default flow), for gear keyed on which ability hit.
     setActiveAbility(u, "basic");
+    beginAbilityUse(u);
 
     // A custom basicAttack hook (e.g. Starlit's piercing beam) fully replaces
     // the default "attack the nearest thing" flow below -- it owns targeting,
@@ -1189,6 +1210,7 @@ export function runBattleTick(state, config) {
     tickTimedMods(u);
     setApplier(u);
     setActiveAbility(u, "unique");
+    beginAbilityUse(u);
     startOfBattleGear(u);
     if (isStunned(u)) u.atkCd = Math.max(u.atkCd, 1);
 
@@ -1226,6 +1248,7 @@ export function runBattleTick(state, config) {
     }
 
     setActiveAbility(u, "basic");
+    beginAbilityUse(u);
     if (abilMod?.basicAttack) {
       abilMod.basicAttack(u, enemyCtx());
       continue;
@@ -1299,7 +1322,7 @@ export function runBattleTick(state, config) {
     for (const a of side) {
       if (a.hp <= 0 || a.hp >= a.maxHp || (a.healImmuneTicks || 0) > 0 || aChebDist(a.row, a.col, src.row, src.col) > src.aura.range) continue;
       const amt = Math.max(1, Math.round(((a.maxHp * pct) / 100) * healReceivedMultiplier(a)));
-      asPassive(src, () => healUnit(a, amt));
+      asPassive(src, () => asEffect(() => healUnit(a, amt)));
     }
   }
 

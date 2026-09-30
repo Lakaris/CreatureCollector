@@ -132,13 +132,13 @@ export function makeIgnissaurModule(cfg) {
   };
 }
 
-export const ignisdragon = makeIgnissaurModule({
+export const ignissaur = makeIgnissaurModule({
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialDmgByLevel: SPECIAL_DMG_BY_LEVEL,
 });
 // Pyresaur intentionally mirrors Ignissaur exactly for now -- same names, text,
 // and numbers (see data/creatures.js); only base stats differ.
-export const pyredragon = makeIgnissaurModule({
+export const pyresaur = makeIgnissaurModule({
   basicDmgByLevel: BASIC_DMG_BY_LEVEL,
   specialDmgByLevel: SPECIAL_DMG_BY_LEVEL,
 });

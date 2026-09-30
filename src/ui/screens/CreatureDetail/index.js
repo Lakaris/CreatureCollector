@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
-import { RARITY_CONFIG, STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
+import { STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
-import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP } from "../../../data/flair.js";
+import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { statPctGain, flairStatGain, roundFractional } from "../../../core/stats.js";
@@ -28,6 +28,8 @@ import { formatNum } from "../../../core/format.js";
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
 // guided walkthrough points the player at equipping.
 const TUTORIAL_ITEM_ID="com_hp_atk";
+// Marker beside the rarity label in the header -- a climbing ladder of stones.
+const RARITY_GEM={common:"🪨",epic:"🔮",legendary:"💎"};
 // The level-up detour only requires a single level-up before advancing --
 // the guided harvest's fixed food amount isn't guaranteed to afford more
 // than that (it doesn't scale with the food-cost curve in core/creatures.js),
@@ -77,6 +79,17 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const [lastLeveledStat,setLastLeveledStat]=useState(null);
   const [ascPopup,setAscPopup]=useState(null);
   const [confirmMelon,setConfirmMelon]=useState(null);
+  // Whether the header's info (rarity / type / role / range) is expanded.
+  const [infoOpen,setInfoOpen]=useState(false);
+  // Which header tag icon ("type" | "role" | "range") has its name bubble open.
+  const [tagBubble,setTagBubble]=useState(null);
+  useEffect(()=>{
+    if(!tagBubble)return;
+    const t=setTimeout(()=>setTagBubble(null),2000);
+    const close=()=>setTagBubble(null);
+    document.addEventListener("pointerdown",close);
+    return()=>{clearTimeout(t);document.removeEventListener("pointerdown",close);};
+  },[tagBubble]);
   const [statInfoPopup,setStatInfoPopup]=useState(null);
   const [abilityTagPopup,setAbilityTagPopup]=useState(null);
   const def=CREATURE_MAP[ownedData.id];
@@ -527,11 +540,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           )
         )
       ),
-      React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},backDisabled:pickerTutorialLock,right:chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
-        disabled:pickerTutorialLock,
-        onClick:()=>{if(pickerTutorialLock)return;setDexOverlay(def.id);},
-        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(pickerTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:pickerTutorialLock?"#f5f5f5":"#f0effe",color:pickerTutorialLock?"#bbb":"#534AB7",cursor:pickerTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
-      },"Evolutions")}),
+      React.createElement(ScreenHeader,{title:def.name,onBack:()=>{setShowEquipPage(false);setEquipSlotPicker(null);},backDisabled:pickerTutorialLock}),
       React.createElement("div",{className:"card",style:{marginBottom:12}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
           React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:52,style:{flexShrink:0}}),
@@ -775,22 +784,51 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     );
   }
 
+  const backdrop=portraitBackdropStyle(ownedData);
   return React.createElement("div",swipeHandlers,
     statInfoPopupEl,
     abilityTagPopupEl,
     ascPopup&&React.createElement(AscensionPopup,{def,unlockedSkins,ascPopup,ownedData,onClose:()=>setAscPopup(null)}),
     // The header title carries the equipped flair title ("Blastar the
-    // Mighty") -- it's the only place the title shows on this page. The right
-    // slot holds Evolutions; Flair Effects lives on the Flair page's own
-    // header, beside the flair it summarises. The grid survives the move
-    // because it costs nothing with one button and is what keeps them equally
-    // sized should a second ever come back.
-    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{display:"grid",gridAutoFlow:"column",gridAutoColumns:"1fr",gap:6,alignItems:"stretch"}},
-      chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
-        disabled:equipTutorialLock,
-        onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
-        style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid "+(equipTutorialLock?"#ccc":"#534AB7"),borderRadius:8,background:equipTutorialLock?"#f5f5f5":"#f0effe",color:equipTutorialLock?"#bbb":"#534AB7",cursor:equipTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
-      },"Evolutions")
+    // Mighty") -- it's the only place the title shows on this page.
+    // Evolutions lives in the Ascension card, beside the progress it's about.
+    // The right slot is an arrow that expands the creature's info -- rarity
+    // (gem + label in its colour), a hairline divider, then icon-only Type /
+    // Role / Range (tap an icon for a bubble with its name). Collapsed, a
+    // long name + flair title gets the whole bar; expanded, the info sits
+    // left of the arrow and overlaps the end of the name, fading in over it
+    // on a white gradient. 26px tall to match the Flair page's header slot,
+    // so the art doesn't shift between the two pages.
+    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{position:"relative",display:"flex",alignItems:"center",height:26}},
+      infoOpen&&(()=>{
+        const rar=EQUIP_RARITY_CONFIG[def.rarity];
+        const icon=(key,label,glyph)=>React.createElement("span",{
+          key,
+          onPointerDown:e=>e.stopPropagation(),
+          onClick:()=>setTagBubble(tagBubble===key?null:key),
+          style:{position:"relative",fontSize:14,lineHeight:1,padding:"4px 2px",cursor:"pointer",userSelect:"none"}
+        },
+          glyph,
+          tagBubble===key&&React.createElement("span",{className:"screen-fade",style:{position:"absolute",top:"calc(100% + 6px)",right:-4,zIndex:50,whiteSpace:"nowrap",background:"#333",color:"#fff",fontSize:11,fontWeight:600,padding:"4px 8px",borderRadius:6,boxShadow:"0 2px 8px rgba(0,0,0,0.2)",pointerEvents:"none"}},
+            React.createElement("span",{style:{position:"absolute",top:-4,right:9,width:8,height:8,background:"#333",transform:"rotate(45deg)"}}),
+            label
+          )
+        );
+        return React.createElement("div",{className:"screen-fade",style:{position:"absolute",right:"calc(100% + 4px)",top:0,height:26,display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap",paddingLeft:22,background:"linear-gradient(to right, rgba(255,255,255,0) 0, #fff 18px)"}},
+          React.createElement("span",{style:{fontSize:12,lineHeight:1}},RARITY_GEM[def.rarity]),
+          React.createElement("span",{style:{fontSize:11,fontWeight:700,color:rar.color,letterSpacing:".03em"}},rar.label),
+          React.createElement("span",{style:{width:1,height:14,background:"#ddd",margin:"0 2px"}}),
+          icon("type",def.type,TYPE_EMOJI[def.type]||def.type),
+          def.role&&icon("role",def.role,ROLE_CONFIG[def.role].emoji),
+          def.attackType&&icon("range",def.attackType,ATTACK_TYPE_CONFIG[def.attackType].emoji)
+        );
+      })(),
+      React.createElement("button",{
+        onClick:()=>{setInfoOpen(o=>!o);setTagBubble(null);},
+        "aria-label":infoOpen?"Hide creature info":"Show creature info",
+        "aria-expanded":infoOpen,
+        style:{width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",padding:0,border:"none",borderRadius:8,background:infoOpen?"#f0effe":"transparent",color:infoOpen?"#534AB7":"#999",fontSize:16,cursor:"pointer"}
+      },React.createElement("i",{className:"ti ti-chevron-left",style:{transition:"transform .2s ease",transform:infoOpen?"rotate(180deg)":"none"}}))
     )}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
@@ -824,28 +862,29 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         )
       )
     ),
+    // The portrait card. No name or level under the portrait -- the name is
+    // already in the ScreenHeader and the level sits top-right.
     React.createElement("div",{className:"card",style:{marginBottom:12}},
       React.createElement("div",{style:{position:"relative",marginBottom:14}},
-        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,position:"absolute",top:0,left:0,alignItems:"flex-start"}},
-          React.createElement("span",{className:"badge "+RARITY_CONFIG[def.rarity].color},RARITY_CONFIG[def.rarity].label),
-          React.createElement("span",{style:{fontSize:11,fontWeight:600,color:"#444",background:"#f0f0f0",borderRadius:8,padding:"2px 7px"}},TYPE_EMOJI[def.type]+" "+def.type),
-          def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},ROLE_CONFIG[def.role].emoji+" "+def.role),
-          def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
-        ),
-        React.createElement("div",{style:{textAlign:"center"}},
-          // No name or level under the portrait -- the name is already in the
-          // ScreenHeader and the level sits top-right -- so the art gets the
-          // freed space (130px, up from 100). Art renders transparent, no
-          // backing plate; legacy multiply-blend art reads fine on any light
-          // background.
-          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{margin:"0 auto"}})
+        // The portrait stage: runs to the card's top/left/right edges and
+        // ends where the stats begin, with an equipped background's art
+        // covering it, never stretched (see portraitBackdropStyle). Square,
+        // matching the square background art, so the whole backdrop shows
+        // with nothing cropped. The creature stands PORTRAIT_FEET_BOTTOM up
+        // from its bottom -- scaled with the drawn art, so it's on the same
+        // spot of the art as on the Flair stage -- leaving the room above for
+        // effects.
+        React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,...backdrop}},
+          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
         ),
         // Top-right: level, with the ascension stars tucked under it. Same
         // banded row the Collection cards draw (colour = band of ten, ringed
         // star = worth two), just smaller -- it reads as a detail line beside
-        // the level here rather than a headline over the art.
+        // the level here rather than a headline over the art. Over a
+        // backdrop it turns white with a shadow -- grey vanishes into busy
+        // scenery.
         React.createElement("div",{style:{position:"absolute",top:0,right:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3}},
-          React.createElement("span",{style:{fontSize:17,fontWeight:700,color:"#666"}},"Lv "+ownedData.level),
+          React.createElement("span",{style:{fontSize:17,fontWeight:700,...(backdrop?{color:"#fff",textShadow:"0 1px 3px rgba(0,0,0,0.7)"}:{color:"#666"})}},"Lv "+ownedData.level),
           (()=>{
             const asc=ascStarTier(ownedData.ascensions);
             if(!asc.count)return null;
@@ -975,7 +1014,11 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       React.createElement("div",{className:"card",style:{marginBottom:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}},
           React.createElement("div",{className:"section-label",style:{marginBottom:0}},"Ascension"),
-          React.createElement("span",{style:{fontSize:12,color:"#2e7d32",fontWeight:600}},ascMelon.emoji+" "+(currencies[ascMelon.key]||0))
+          chainDefs.length>1&&setDexOverlay&&React.createElement("button",{
+            disabled:equipTutorialLock,
+            onClick:()=>{if(equipTutorialLock)return;setDexOverlay(def.id);},
+            style:{padding:"2px 8px",fontSize:11,fontWeight:600,border:"1px solid #e0e0e0",borderRadius:6,background:"transparent",color:equipTutorialLock?"#ccc":"#888",cursor:equipTutorialLock?"not-allowed":"pointer",whiteSpace:"nowrap"}
+          },"Evolutions ›")
         ),
         def.evolutionId&&React.createElement("div",{style:{fontSize:11,color:"#666",marginBottom:6}},
           "Evolves to "+CREATURE_MAP[def.evolutionId].name+" after "+def.ascensionsToEvolve+" ascensions ("+ownedData.ascensions+" / "+def.ascensionsToEvolve+")"
@@ -985,7 +1028,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           React.createElement("div",{className:"shard-bar-bg"},
             React.createElement("div",{className:"shard-bar-fill",style:{width:Math.round(shardsProgress*100)+"%",background:ownedData.shards>=rootDef.shardsToAscend?"#378ADD":"#EF9F27"}})
           ),
-          ownedData.shards>=rootDef.shardsToAscend&&React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#378ADD",whiteSpace:"nowrap"}},"Ready!")
+          ownedData.shards>=rootDef.shardsToAscend&&React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#378ADD",whiteSpace:"nowrap"}},"Ready!"),
+          React.createElement("span",{style:{fontSize:12,color:"#2e7d32",fontWeight:600,whiteSpace:"nowrap"}},ascMelon.emoji+" "+(currencies[ascMelon.key]||0))
         ),
         canEvolve&&React.createElement("div",{style:{fontSize:11,background:"#FAECE7",color:"#4A1B0C",borderRadius:6,padding:"4px 8px",marginBottom:8}},
           "✨ Ready to evolve into "+CREATURE_MAP[def.evolutionId].name+"!"

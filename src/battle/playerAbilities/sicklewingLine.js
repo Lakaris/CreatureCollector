@@ -135,7 +135,6 @@ const CFG = {
   speedPctByLevel: SPEED_PCT_BY_LEVEL,
 };
 // The whole line intentionally shares one kit -- same names, text, and
-// numbers (see data/creatures.js); only base stats differ per stage. The ids
-// are inherited from the retired Aetherwing phoenixes.
-export const galephoenix = makeSicklewingModule(CFG);
-export const skyphoenix = makeSicklewingModule(CFG);
+// numbers (see data/creatures.js); only base stats differ per stage.
+export const sicklewing = makeSicklewingModule(CFG);
+export const galescythe = makeSicklewingModule(CFG);

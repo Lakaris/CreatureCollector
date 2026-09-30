@@ -208,5 +208,5 @@ export const wispModule = {
 const CFG = { basicDmgByLevel: BASIC_DMG_BY_LEVEL };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const doomgrub = makeDoomshadeModule(CFG);
-export const nihilwyrm = makeDoomshadeModule(CFG);
+export const doomshade = makeDoomshadeModule(CFG);
+export const nihilgeist = makeDoomshadeModule(CFG);

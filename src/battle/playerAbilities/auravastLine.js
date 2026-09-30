@@ -205,5 +205,5 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const holydragon = makeAuravastModule(CFG);
-export const celestialdragon = makeAuravastModule(CFG);
+export const auravast = makeAuravastModule(CFG);
+export const lumimajor = makeAuravastModule(CFG);

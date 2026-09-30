@@ -84,11 +84,14 @@ export function makeFrilletModule(cfg) {
       return Math.max(1, Math.round(scaled * COUNTER_DMG_MULT));
     },
 
-    /**
-     * Aegis Frill: Shield up and put every Beside ally behind this creature.
-     * Uses the default in-range special gate (Tank, melee), so the frill goes
-     * up as the line meets -- which is when allies have hits to redirect.
-     */
+    // Everything Aegis Frill does lands on this creature and its allies, so
+    // it fires off cooldown -- the frill is worth raising before the line
+    // meets, not after.
+    specialInRange() {
+      return true;
+    },
+
+    /** Aegis Frill: Shield up and put every Beside ally behind this creature. */
     special(unit, ctx) {
       const { aliveP, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
@@ -115,7 +118,7 @@ const CFG = {
 };
 // The whole line intentionally shares one kit -- same names, text, and
 // numbers (see data/creatures.js); only base stats differ per stage.
-export const mosskrab = makeFrilletModule(CFG);
-export const jadekrab = makeFrilletModule(CFG);
-export const crystalshell = makeFrilletModule(CFG);
+export const frillet = makeFrilletModule(CFG);
+export const bulwarden = makeFrilletModule(CFG);
+export const aegiceras = makeFrilletModule(CFG);
 export const rampartops = makeFrilletModule(CFG);

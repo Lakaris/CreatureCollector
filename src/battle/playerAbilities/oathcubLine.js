@@ -129,10 +129,8 @@ const CFG = {
   overhealCapPctByLevel: OVERHEAL_CAP_PCT_BY_LEVEL,
 };
 // The whole line intentionally shares one kit -- same names, text, and
-// numbers (see data/creatures.js); only base stats differ per stage. The ids
-// are inherited from the retired Prismcrab line so existing saves still
-// resolve; see the note in data/skins.js.
-export const prismcrab = makeOathcubModule(CFG);
-export const spectrumcrab = makeOathcubModule(CFG);
-export const rainbowshell = makeOathcubModule(CFG);
-export const chromatarch = makeOathcubModule(CFG);
+// numbers (see data/creatures.js); only base stats differ per stage.
+export const oathcub = makeOathcubModule(CFG);
+export const vowbruin = makeOathcubModule(CFG);
+export const sanctursa = makeOathcubModule(CFG);
+export const oathmaul = makeOathcubModule(CFG);

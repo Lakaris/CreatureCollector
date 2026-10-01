@@ -19,7 +19,7 @@
 // team is already committed and wants the damage instead. At max level a
 // successful Taunt also drags a nearby ally in to Assist the same target.
 //
-// Sworn Guard is the retaliation. When an ally near it is attacked, the dragon
+// Sworn Guard is the retaliation. When an ally near it is attacked, the griffin
 // marks that attacker and hits it markedly harder -- but it can only hold one
 // mark at a time, and can not take another until the marked creature is dead.
 // That makes it a commitment rather than a rolling buff: it picks the enemy
@@ -176,7 +176,7 @@ export function makeAuravastModule(cfg) {
             const dealt = asAssist(helper, () => onBoss
               ? damageBoss(best, Math.max(1, Math.round(basicDamageToBoss(helper, best, aliveP))))
               : damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best)))));
-            // Credited to the dragon: this damage is Sovereign Call's doing,
+            // Credited to the griffin: this damage is Sovereign Call's doing,
             // and the chart tracks the ability that caused it.
             ctx.addDamageDealt(dealt || 0);
             newFx.push({ id: now + "sca" + helper.uid + (onBoss ? "boss" : best.uid), row: fxRow, col: fxCol, t: now, fromRow: helper.row, fromCol: helper.col, isEnemy: !!ctx.isEnemySide });

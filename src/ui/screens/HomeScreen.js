@@ -1,6 +1,7 @@
 // Home tab: featured creature plus entries into quests, daily, and battle pass.
 
 import React from "../../react.js";
+import { iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { FLAIR_AURA_MAP, backdropImage } from "../../data/flair.js";
@@ -26,11 +27,16 @@ const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TA
 const SHOW_LABYRINTH_ENTRY = false;
 
 
+// The height the bottom panel is guaranteed, so its 96px-min tiles always fit.
+// The art gives way to this, never the other way round: the panel is positioned
+// at top:HOME_ART with bottom:0, so any art taller than the scene minus this
+// leaves the panel zero height and its tiles spill out under the nav bar.
+const HOME_PANEL_MIN = 120;
 // Edge length of the Home scene's square background art: the scene's full
 // width -- its content box (100cqw) plus the 16px side padding either side --
-// or its full height if that's smaller (a wide window), so the whole image
-// always fits.
-const HOME_ART = "min(100cqw + 32px, 100cqh + 32px)";
+// or whatever height is left once the panel has taken its share, if that's
+// smaller (a wide or short window), so the whole image always fits.
+const HOME_ART = "min(100cqw + 32px, 100cqh + 32px - " + HOME_PANEL_MIN + "px)";
 // Where the creature's feet sit, measured down from the scene's top: 7% up
 // from the bottom of the art, as on the creature and Flair pages.
 const HOME_FEET_TOP = "calc(0.93 * " + HOME_ART + ")";
@@ -56,7 +62,6 @@ function HomeScreen(){
   const ownedList=Object.values(owned);
   const ownedData=(featuredCreatureId&&owned[featuredCreatureId])||ownedList[0];
   const def=ownedData?CREATURE_MAP[ownedData.id]:null;
-  const title=ownedData&&ownedData.equippedTitle?ownedData.equippedTitle:null;
   const auraDef=ownedData&&ownedData.equippedAura?FLAIR_AURA_MAP[ownedData.equippedAura]:null;
   const homeBackdrop=backdropImage(ownedData);
   // One tile in Home's menu row: the emoji in a round badge tinted with the
@@ -121,14 +126,13 @@ function HomeScreen(){
     // padding (so it runs edge to edge).
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",margin:"-12px -16px 0",padding:16,overflow:"hidden",containerType:"size"}},
     homeBackdrop&&React.createElement("div",{style:{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:HOME_ART,height:HOME_ART,backgroundImage:'url("'+homeBackdrop+'")',backgroundSize:"100% 100%",pointerEvents:"none"}}),
-    // The creature, with its equipped aura glowing behind it and its flair
-    // title just above its head. No name/type or Change button -- the display
-    // creature is picked in Settings.
+    // The creature, with its equipped aura glowing behind it. No name, type,
+    // flair title or Change button -- the display creature is picked in
+    // Settings.
     // Each anchored by its bottom edge at HOME_FEET_TOP (translate -100%).
     auraDef&&React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",fontSize:160,lineHeight:1,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},auraDef.emoji),
     React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))"}},
       def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
-    title&&React.createElement("div",{style:{position:"absolute",left:"50%",top:"calc("+HOME_FEET_TOP+" - 128px)",transform:"translate(-50%,-100%)",whiteSpace:"nowrap",fontSize:11,fontWeight:600,color:"#7c4dff",letterSpacing:1,textTransform:"uppercase",textShadow:"0 0 4px #fff, 0 0 8px #fff"}},title),
     // The bottom panel: a soft lavender area starting exactly where the art
     // ends (never over it), holding the menu row -- Quests, Battle Pass,
     // Daily and the New Player Welcome Gift -- centred in it.
@@ -159,7 +163,7 @@ function HomeScreen(){
       const label=onCurrent?"Victory Reward:":"Floor "+next.depth+" Victory Reward:";
       return React.createElement("div",{style:{position:"fixed",left:"calc(75% - 8px)",transform:"translateX(-50%)",bottom:222,textAlign:"center",fontSize:13,fontWeight:700,color:"#d97706",background:"#fffbeb",border:"2px solid #fbbf24",borderRadius:12,padding:"6px 12px",boxShadow:"0 2px 8px rgba(217,119,6,0.15)",zIndex:5,lineHeight:1.35}},
         React.createElement("div",{style:{whiteSpace:"nowrap"}},label),
-        React.createElement("div",{style:{whiteSpace:"nowrap"}},rewardEmoji)
+        React.createElement("div",{style:{whiteSpace:"nowrap"}},iconText(rewardEmoji))
       );
     })(),
     ((SHOW_LABYRINTH_ENTRY&&!tutorialRestricted)||tutorialStep==="descend")&&React.createElement("button",{

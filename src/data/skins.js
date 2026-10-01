@@ -198,9 +198,9 @@ export const SKIN_SETS=[
   {id:"sphoenix_void",name:"Void",tier:"epic",chain:["dawnwing","celestialis"],appearances:{dawnwing:{emoji:"🌑"},celestialis:{emoji:"💀"}}},
   {id:"sphoenix_cosmic",name:"Cosmic",tier:"legendary",chain:["dawnwing","celestialis"],appearances:{dawnwing:{emoji:"🌌"},celestialis:{emoji:"🌠"}}},
   // auravast / lumimajor
-  {id:"hdragon_night",name:"Nightfall",tier:"rare",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌙"},lumimajor:{emoji:"⭐"}}},
-  {id:"hdragon_void",name:"Void",tier:"epic",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌑"},lumimajor:{emoji:"💀"}}},
-  {id:"hdragon_cosmic",name:"Cosmic",tier:"legendary",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌌"},lumimajor:{emoji:"🌠"}}},
+  {id:"griffin_night",name:"Nightfall",tier:"rare",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌙"},lumimajor:{emoji:"⭐"}}},
+  {id:"griffin_void",name:"Void",tier:"epic",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌑"},lumimajor:{emoji:"💀"}}},
+  {id:"griffin_cosmic",name:"Cosmic",tier:"legendary",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌌"},lumimajor:{emoji:"🌠"}}},
   // blazephoenix / solarpyre
   {id:"bphoenix_frost",name:"Frosted",tier:"rare",chain:["blazephoenix","solarpyre"],appearances:{blazephoenix:{emoji:"❄️"},solarpyre:{emoji:"🧊"}}},
   {id:"bphoenix_void",name:"Void",tier:"epic",chain:["blazephoenix","solarpyre"],appearances:{blazephoenix:{emoji:"🌑"},solarpyre:{emoji:"💀"}}},

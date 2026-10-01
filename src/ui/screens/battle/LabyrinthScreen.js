@@ -5,6 +5,7 @@
 // per-type tiers of 10 fixed stages.
 
 import React, { useState } from "../../../react.js";
+import { iconText } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -444,7 +445,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: 1 } }, "Reward"),
           Object.entries(reward).map(([k, v]) => {
             const d = REWARD_DISPLAY[k] || ["🎁", k, k];
-            return React.createElement("div", { key: k, style: { fontSize: 16, fontWeight: 700, color: "#534AB7" } }, d[0] + " " + v + " " + (v === 1 ? d[1] : d[2]));
+            return React.createElement("div", { key: k, style: { fontSize: 16, fontWeight: 700, color: "#534AB7" } }, iconText(d[0] + " " + v + " " + (v === 1 ? d[1] : d[2])));
           })
         )
       ),

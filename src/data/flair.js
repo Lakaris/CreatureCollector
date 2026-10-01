@@ -207,15 +207,17 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_fog",name:"Morning Fog",emoji:"🌫️",desc:"A misty low fog blanketing the ground"},
     {id:"bg_mud",name:"Muddy Swamp",emoji:"🟤",desc:"A boggy swamp with murky water patches"},
     {id:"bg_snow_plain",name:"Snowy Field",emoji:"🌨️",desc:"A flat field blanketed in fresh snow"},
-    {id:"bg_village",name:"Village Road",emoji:"🏘️",desc:"A cobblestone road through a small village"},
+    // Formerly "Village Road" -- the id stays bg_village so saves that
+    // already unlocked or equipped it carry over.
+    {id:"bg_village",name:"Secluded Cove",emoji:"🏝️",image:"images/flair/backgrounds/SecludedCove.jpg",desc:"A hidden sandy cove sheltered by towering sea rocks"},
     {id:"bg_market",name:"Busy Market",emoji:"🛒",desc:"Colorful market stalls and banners",buff:{stat:"crit",pct:0.1}},
     {id:"bg_canyon",name:"Dry Canyon",emoji:"🏜️",desc:"A cracked canyon floor under harsh sun"},
-    {id:"bg_autumn",name:"Autumn Woods",emoji:"🍁",image:"images/flair/backgrounds/AutumnWoods.png",desc:"Trees blazing with red and gold autumn color"},
+    {id:"bg_autumn",name:"Autumn Woods",emoji:"🍁",image:"images/flair/backgrounds/AutumnWoods.jpg",desc:"Trees blazing with red and gold autumn color"},
     {id:"bg_sunrise",name:"Sunrise Meadow",emoji:"🌄",desc:"A dewy meadow glowing in soft sunrise light"},
     {id:"bg_dock",name:"Old Dock",emoji:"⚓",desc:"Creaky wooden planks over calm harbour water",buff:{stat:"critDmg",pct:0.5}},
   ],
   rare:[
-    {id:"bg_volcano",name:"Volcanic Ridge",emoji:"🌋",desc:"A smoking ridge overlooking a lava lake"},
+    {id:"bg_volcano",name:"Volcanic Ridge",emoji:"🌋",image:"images/flair/backgrounds/VolcanicRidge.jpg",desc:"A smoking ridge overlooking a lava lake"},
     {id:"bg_glacier",name:"Glacier Cliffs",emoji:"🧊",desc:"Towering blue-white ice cliffs in the arctic"},
     {id:"bg_storm",name:"Stormy Cliffs",emoji:"⛈️",desc:"Crashing waves and lightning-lit dark cliffs"},
     {id:"bg_jungle",name:"Dense Jungle",emoji:"🌴",desc:"A thick jungle teeming with vines and ferns"},
@@ -227,7 +229,7 @@ export const FLAIR_BACKGROUNDS={
     {id:"bg_sky_islands",name:"Sky Islands",emoji:"☁️",desc:"Floating islands drifting above the clouds"},
     {id:"bg_deep_sea",name:"Deep Sea Floor",emoji:"🐠",desc:"The glowing bioluminescent ocean floor"},
     {id:"bg_catacombs",name:"Catacombs",emoji:"💀",desc:"Ancient bone-lined tunnels lit by dim torches"},
-    {id:"bg_crystal_cave",name:"Crystal Cave",emoji:"💎",desc:"A cavern encrusted with glittering gemstone walls"},
+    {id:"bg_crystal_cave",name:"Crystal Cave",emoji:"💎",image:"images/flair/backgrounds/CrystalCave.jpg",desc:"A cavern encrusted with glittering gemstone walls"},
     {id:"bg_arena",name:"Battle Arena",emoji:"⚔️",desc:"A stone arena scarred by countless fights"},
     {id:"bg_clocktower",name:"Clock Tower",emoji:"🕰️",desc:"The gears of a massive ancient clock tower"},
     {id:"bg_shipwreck",name:"Shipwreck",emoji:"⛵",desc:"A sunken ship resting on the sea floor",buff:{stat:"crit",pct:0.2}},
@@ -424,7 +426,7 @@ export const FLAIR_SHARD_COSTS={common:30,rare:75,epic:150,legendary:500};
 
 export const FLAIR_SHARD_VALUES={common:5,rare:10,epic:25,legendary:50};
 export const FLAIR_BANANAS=[
-  {id:"flairBanana",      name:"Flair Banana",         emoji:"🍌",  weights:{common:85,rare:10,epic:4.5,legendary:0.5}, color:"#f9a825", bg:"#fffde7"},
+  {id:"flairBanana",      name:"Flair Banana",         emoji:"🍌",  image:"images/item_icons/flairbanana.png", weights:{common:85,rare:10,epic:4.5,legendary:0.5}, color:"#f9a825", bg:"#fffde7"},
   {id:"mythicalFlairBanana", name:"Mythical Flair Banana",emoji:"🍌✨",weights:{common:0, rare:70,epic:28, legendary:2},   color:"#7b1fa2", bg:"#f3e5f5"},
   {id:"ancientFlairBanana",  name:"Ancient Flair Banana", emoji:"🍌🏺",weights:{common:0, rare:0, epic:90, legendary:10},  color:"#bf360c", bg:"#fbe9e7"},
 ];

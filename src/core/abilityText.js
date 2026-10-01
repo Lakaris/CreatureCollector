@@ -170,6 +170,11 @@ export const ABILITY_TAG_DEFS = {
   windhazard: { label: "Wind Hazard", description: "Deals damage if a creature attempts to move while on it; every few seconds it pushes the creatures standing on it back." },
   immortal: { label: "Immortal", description: "Health can not be reduced below 1." },
   healovertime: { label: "Heal Over Time", description: "Restores Health over time." },
+  // The healing-from-damage effect the engine already has a flag for: every
+  // drain routes through healUnit's `lifesteal` option (battle/hp.js), gear
+  // (Bloodthirster, Vampiric Band) included. Anything that scales lifesteal
+  // therefore scales ability drain and gear drain together, from one place.
+  lifesteal: { label: "Lifesteal", description: "Recover Health equal to a share of the damage dealt." },
   revive: { label: "Revive", description: "Returns to battle after being defeated." },
   // Each stack ticks for another DOT_HEALTH_PCT of the AFFECTED creature's
   // max Health (see battle/status.js), so the per-stack totals below read as
@@ -489,6 +494,36 @@ const FRIZZLAMB_PHRASES = {
   basic: { phrase: "Deal damage to an enemy and gain 1 Charge (stacking, max 50)" },
 };
 
+// Gillet (axolotl) line: Water Jet is a plain hit on the generic phrase. Swell
+// carries two numbers ("Heal 20 HP; 14 dmg") so it rides the dual-badge
+// healDamage shape. Its max tier folds the knockback in beside the damage
+// rather than tacking it on the end, so that tier replaces the whole sentence
+// instead of appending a rider. Undertow is written out per tier.
+const GILLET_PHRASES = {
+  basic: null,
+  special: {
+    phrase: "Send forward a wave that damages enemies and heals allies in its path",
+    phraseByLevel: {
+      4: "Send forward a wave that damages and knocks back enemies and heals allies in its path",
+    },
+    healDamage: true,
+  },
+};
+
+// Duskling (vampire bat) line: Sonic Screech is a plain hit on the generic
+// phrase. Bloodletting's drain stays 30% at every tier -- only the damage
+// moves -- so it rides one fixed phrase, with the max tier's below-30% bonus
+// as a rider. Insatiable is written out per tier.
+const DUSKLING_PHRASES = {
+  basic: null,
+  special: {
+    phrase: "Deal damage to an enemy and recover Health equal to 30% of the damage dealt",
+    phraseByLevel: {
+      4: "Deal damage to an enemy and recover Health equal to 30% of the damage dealt. This attack deals 50% more damage to enemies below 30% Health",
+    },
+  },
+};
+
 // Clubtail (ankylosaur) line: Tail Club is a plain hit on the generic phrase,
 // and is the only ability here with a number the phrase system can read --
 // Wind Up and Dead Weight are written out per tier.
@@ -638,6 +673,14 @@ const PLAIN_ABILITY_PHRASES = {
   bulwarden: FRILLET_PHRASES,
   aegiceras: FRILLET_PHRASES,
   rampartops: FRILLET_PHRASES,
+  gillet: GILLET_PHRASES,
+  gillow: GILLET_PHRASES,
+  plumewake: GILLET_PHRASES,
+  xolotide: GILLET_PHRASES,
+  duskling: DUSKLING_PHRASES,
+  nightbat: DUSKLING_PHRASES,
+  nightstalker: DUSKLING_PHRASES,
+  voidfang: DUSKLING_PHRASES,
   oathcub: OATHCUB_PHRASES,
   vowbruin: OATHCUB_PHRASES,
   sanctursa: OATHCUB_PHRASES,
@@ -707,8 +750,12 @@ export function formatPlainAbilityLevel(creatureId, key, text, idx) {
     const h = /Heal\s+(\d+)\s*HP/i.exec(text);
     const d = /(\d+)\s*dmg\b/i.exec(text);
     const rest = d ? text.slice(d.index + d[0].length) : "";
+    // phraseByLevel works here too, for a max tier that RE-ORDERS its clauses
+    // rather than appending one (Swell's knockback lands mid-sentence, beside
+    // the damage it comes with) -- the same shape the `heal` branch above uses.
+    const dmgPhrase = (cfg.phraseByLevel && cfg.phraseByLevel[idx]) || cfg.phrase;
     return {
-      label: cfg.phrase + rest,
+      label: dmgPhrase + rest,
       amount: d ? Number(d[1]) : null,
       healAmt: h ? Number(h[1]) : null,
     };
@@ -979,6 +1026,35 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     }
     if (key === "special") tags.push("beside", "protect");
     if (key === "unique") tags.push("counter");
+  }
+  const isGilletLine = getRootDef(creatureId)?.id === "gillet";
+  if (isGilletLine) {
+    // Water Jet only chills from its 4th upgrade on. Swell is a Line at every
+    // tier and only Displaces at max. Undertow just moves Swell's two numbers,
+    // so it names no effect of its own (the same rule as Skittish's Speed).
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
+    }
+    if (key === "special") {
+      tags.push("line");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("displace");
+    }
+  }
+  const isDusklingLine = getRootDef(creatureId)?.id === "duskling";
+  if (isDusklingLine) {
+    // The whole line hunts wounded prey, so BOTH attacks target the weakest
+    // enemy rather than the closest -- which is what the max tiers pay off.
+    // Sonic Screech only bleeds from its 4th upgrade on. Insatiable scales
+    // lifesteal itself, so it carries that pill; its max-tier Haste is a flat
+    // stat bump rather than the Haste Up buff, so that half names no effect
+    // (the same rule as Skittish's Speed and Clubtail's self-only bumps).
+    if (key === "basic") {
+      tags.push("weakest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("damageovertime");
+    }
+    if (key === "special") tags.push("weakest", "lifesteal");
+    if (key === "unique") tags.push("lifesteal");
   }
   const isVenomcoilLine = getRootDef(creatureId)?.id === "venomcoil";
   if (isVenomcoilLine) {

@@ -1,23 +1,41 @@
 // Flair tab: feed bananas to unlock titles, auras, backgrounds, and items.
 
-import React, { useState, useEffect, useRef } from "../../../react.js";
+import React, { useState, useEffect } from "../../../react.js";
+import { iconText } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
-import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
+import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
-import AscStars, { ascStarTier } from "../../../ui/components/AscStars.js";
-import StatStrip from "../../../ui/components/StatStrip.js";
 import AutoFitText from "../../../ui/components/AutoFitText.js";
-import { STAT_CYCLE } from "../../../data/rarity.js";
 
 /** Category presentation. The short labels are for the reveal grid's cards,
  * which are far too narrow for "Background". */
 const CAT_LABEL={titles:"Title",aura:"Aura",background:"Background",item:"Item"};
 const CAT_LABEL_SHORT={titles:"Title",aura:"Aura",background:"BG",item:"Item"};
 const CAT_EMOJI={titles:"📛",aura:"✨",background:"🖼️",item:"🌿"};
+// Whether the Feed tab shows the "Equipped" row (hidden for now).
+const SHOW_EQUIPPED_ROW=false;
+
+/** A banana's icon: its art if it has any, else its emoji (at `emojiSize`
+ * px). `style` sizes the art. */
+function bananaIcon(banana,style,emojiSize){
+  return banana.image
+    ? React.createElement("img",{src:banana.image,alt:"",draggable:false,style:{objectFit:"contain",pointerEvents:"none",...style}})
+    : React.createElement("span",{style:{fontSize:emojiSize,lineHeight:1,whiteSpace:"nowrap"}},iconText(banana.emoji));
+}
+
+// The Feed tab's "Equipped" row: per category, the tab it opens, the owned-
+// creature field holding the equipped entry (a title's name, else an id), the
+// lookup from that to the entry, and the rarity pools (to colour it).
+const EQUIP_SLOTS=[
+  {cat:"titles",key:"equippedTitle",map:FLAIR_TITLE_MAP,pool:FLAIR_TITLES},
+  {cat:"aura",key:"equippedAura",map:FLAIR_AURA_MAP,pool:FLAIR_AURAS},
+  {cat:"background",key:"equippedBackground",map:FLAIR_BG_MAP,pool:FLAIR_BACKGROUNDS},
+  {cat:"item",key:"equippedItem",map:FLAIR_ITEM_MAP,pool:FLAIR_ITEMS},
+];
 
 /**
  * The category a result should be LABELLED with.
@@ -30,7 +48,7 @@ function categoryOf(r){
   return r.won?r.cat:(r.dupeCat||r.cat);
 }
 
-function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep,hasFlairEffects,onShowFlairEffects}){
+function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep,hasFlairEffects,onShowFlairEffects}){
   const { setOwned, currencies, setCurrencies, lastFreeBananaDate, setLastFreeBananaDate } = useGame();
   const freeBananaAvailable = lastFreeBananaDate !== easternNoonDayKey();
   const [flairTab,setFlairTab]=useState("feed");
@@ -99,21 +117,6 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
   }
   const selCount=currencies[selectedBanana.id]||0;
 
-  // Flash any stat that just went up (a fed flair's buff landing), so the
-  // player sees the gain the moment it happens. Clearing the set afterwards
-  // is what lets the same stat re-flash on the next unlock -- toggling the
-  // animation style off and on restarts it.
-  const [statFlash,setStatFlash]=useState(()=>new Set());
-  const prevStatsRef=useRef(statsWithEquip);
-  useEffect(()=>{
-    const prev=prevStatsRef.current;
-    prevStatsRef.current=statsWithEquip;
-    const changed=STAT_CYCLE.filter(s=>statsWithEquip[s]>prev[s]);
-    if(!changed.length)return;
-    setStatFlash(new Set(changed));
-    const t=setTimeout(()=>setStatFlash(new Set()),1600);
-    return()=>clearTimeout(t);
-  },[STAT_CYCLE.map(s=>statsWithEquip[s]).join(",")]);
   // overflowY auto + a stable scrollbar gutter keep this overlay's content
   // exactly as wide as the creature page's (which scrolls, so its content
   // sits a scrollbar-width narrower than the viewport) -- without both, the
@@ -135,59 +138,51 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
             style:{padding:"4px 10px",fontSize:12,fontWeight:600,border:"1px solid #534AB7",borderRadius:8,background:"#f0effe",color:"#534AB7",cursor:"pointer",whiteSpace:"nowrap"}
           },"✨ Flair Effects")
         : React.createElement("div",{style:{width:1,height:26}})}),
-    // Header card mirrors the creature page's exactly: one white card
-    // wrapping both the 220px portrait stage (same position -- 12px gap
-    // below the header + 12px card padding on both pages) and the stat row,
-    // with no name text (the name is in the ScreenHeader). Keep in sync with
-    // CreatureDetail/index.js. Stats come from index.js's statsWithEquip so
-    // flair buffs land here live.
-    //
-    // On the Feed tab the card also grows to take the page's spare height
-    // (results open on their own page, so the Feed tab needs only the banana
-    // selector and buttons); the stage absorbs the growth, never dropping
-    // below the creature page's 220px. Other tabs keep 220px so their lists
-    // get the room.
-    //
-    // As on the creature page, the stage runs to the card's top/left/right
-    // edges and ends where the stats begin, with an equipped background's art
-    // covering it (bottom-anchored, never stretched); 232px = 220px of room +
-    // the 12px top padding it bleeds over. The creature stands
-    // PORTRAIT_FEET_BOTTOM up from the stage bottom, so it lands on the same
-    // spot of the art however tall this stage grows.
-    React.createElement("div",{className:"card",style:{margin:"0 16px 12px",flexShrink:0,
-      ...(flairTab==="feed"?{flex:"1 0 auto",display:"flex",flexDirection:"column"}:null)}},
-      React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,marginBottom:14,...portraitBackdropStyle(ownedData),
-        ...(flairTab==="feed"?{flex:1,minHeight:232}:{height:232})}},
-        React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}}),
-        // This page has no level readout to sit under, so the banded stars
-        // sit top-centre of the stage (inset by the 12px the stage bleeds
-        // over), clear of the art.
-        (()=>{
-          const asc=ascStarTier(ownedData.ascensions);
-          if(!asc.count)return null;
-          return React.createElement("div",{style:{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"center"}},
-            React.createElement(AscStars,{n:asc.count,max:5,doubled:asc.doubled,colors:asc.colors,slotted:true,style:{fontSize:11,gap:1,...asc.style}}));
-        })()
-      ),
-      // Same click behavior as the creature page's stat pills: opens the
-      // stat-info popup (base/equipment/flair breakdown).
-      React.createElement(StatStrip,{values:statsWithEquip,onClick:onStatClick,isHighlighted:s=>statFlash.has(s)})
+    // The portrait stage -- just the creature on its background, no stats
+    // (feeding happens on its own results page, so there's nothing to watch
+    // change here). Edge to edge and flush with the top bar, like the creature
+    // page, and the SAME size on every tab so switching tabs never moves it: a
+    // full-width square, like the creature page's (the whole square background
+    // shows) with no height cap, so the art is never trimmed; the controls
+    // below are kept compact instead, and on a phone too short for them the
+    // page scrolls (the tab bar stays pinned). The art covers it,
+    // bottom-anchored and never stretched; the creature stands
+    // PORTRAIT_FEET_BOTTOM up, the same spot on the art as elsewhere.
+    React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
+      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
     ),
-    React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12,padding:"0 16px",flexShrink:0}},
-      flairTabs.map(t=>React.createElement("button",{key:t.id,
-        onClick:()=>setFlairTab(t.id),
-        // minWidth:0 so all five tabs are exactly even. A flex item defaults to
-        // refusing to shrink below its own text, which had "Background" holding
-        // 64px while its neighbours gave up width to 62 -- and it makes the
-        // width AutoFitText measures against depend on the size AutoFitText
-        // picked, which is a loop. Even columns make it a plain one-way fit.
-        style:{flex:1,minWidth:0,padding:"9px 0",fontWeight:600,border:"none",borderRadius:10,cursor:"pointer",
-          background:flairTab===t.id?"#534AB7":"#e8e8e8",
-          color:flairTab===t.id?"#fff":"#666"}
-      },React.createElement(AutoFitText,{size:11},t.label)))
-    ),
-    React.createElement("div",{style:{flex:flairTab==="feed"?"0 0 auto":1,overflow:"hidden",display:"flex",flexDirection:"column"}},
-      flairTab==="feed"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",padding:"0 16px 16px",position:"relative"}},
+    React.createElement("div",{style:{flex:flairTab==="feed"?"1 0 auto":1,minHeight:0,overflow:flairTab==="feed"?"visible":"hidden",display:"flex",flexDirection:"column"}},
+      // Feed tab: the equipped-flair row fills the space under the portrait,
+      // with the banana selector and Feed buttons at the bottom, just above
+      // the tab bar.
+      flairTab==="feed"&&React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",padding:"0 16px 8px",position:"relative"}},
+        // Equipped flair: one tile per category showing what's on the
+        // creature now (rarity-coloured name, or "None"). Tapping a tile opens
+        // that category's tab to change it. Centred in its space, with a
+        // 8px floor under it so it never sits right on the banana selector.
+        // Kept compact (no heading) so the Feed tab fits without scrolling.
+        // Hidden for now (SHOW_EQUIPPED_ROW) -- flip it to bring the row back.
+        SHOW_EQUIPPED_ROW&&React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",justifyContent:"center",paddingBottom:8}},
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,minmax(0,1fr))",gap:8}},
+            EQUIP_SLOTS.map(({cat,key,map,pool})=>{
+              const id=ownedData[key];
+              const entry=id?map[id]:null;
+              const rarity=entry?Object.keys(pool).find(r=>(pool[r]||[]).includes(entry)):null;
+              // Six-digit form, so an alpha suffix can be appended ("#888"
+              // would otherwise become the invalid "#88844").
+              const c=rarity?RARITY_COLORS_FLAIR[rarity]:"#aaaaaa";
+              const tint=c.length===4?"#"+c[1]+c[1]+c[2]+c[2]+c[3]+c[3]:c;
+              return React.createElement("button",{key:cat,onClick:()=>setFlairTab(cat),style:{
+                display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:0,padding:"3px 4px 4px",
+                border:"1.5px solid "+(entry?tint+"99":"#cfcfcf"),borderRadius:14,background:entry?tint+"12":"#fff",
+                boxShadow:"0 1px 4px rgba(0,0,0,0.08)",fontFamily:"inherit",cursor:"pointer"}},
+                React.createElement("div",{style:{fontSize:8,fontWeight:700,color:"#999",letterSpacing:".05em",textTransform:"uppercase"}},CAT_LABEL[cat]),
+                React.createElement("div",{style:{fontSize:18,lineHeight:1,opacity:entry?1:0.3}},(entry&&entry.emoji)||CAT_EMOJI[cat]),
+                React.createElement(AutoFitText,{size:10,minSize:7,style:{width:"100%",textAlign:"center",fontWeight:700,color:entry?tint:"#bbb",lineHeight:1.2}},entry?(entry.name||id):"None")
+              );
+            })
+          )
+        ),
         // Feed results page, layered over the Flair page. Bare on purpose --
         // no header, no card -- just the results and one button at the
         // bottom: Skip during a multi-feed's staggered reveal, then Done,
@@ -311,7 +306,9 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
         // Banana info modal
         bananaInfo&&React.createElement("div",{onClick:()=>setBananaInfo(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
           React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-            React.createElement("div",{style:{fontSize:32,textAlign:"center",marginBottom:6}},bananaInfo.emoji),
+            bananaInfo.image
+              ? React.createElement("img",{src:bananaInfo.image,alt:bananaInfo.name,draggable:false,style:{display:"block",width:88,height:88,objectFit:"contain",margin:"0 auto 8px"}})
+              : React.createElement("div",{style:{fontSize:32,textAlign:"center",marginBottom:6}},iconText(bananaInfo.emoji)),
             React.createElement("div",{style:{fontSize:15,fontWeight:700,textAlign:"center",marginBottom:4}},bananaInfo.name),
             React.createElement("div",{style:{fontSize:11,color:"#888",textAlign:"center",marginBottom:14}},"¼ chance for each category: Title, Aura, Background, Item"),
             React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
@@ -327,28 +324,42 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
             React.createElement("button",{onClick:()=>setBananaInfo(null),style:{marginTop:16,width:"100%",padding:"10px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer"}},"Close")
           )
         ),
-        // Banana selector
-        React.createElement("div",{style:{display:"flex",gap:8,marginBottom:10}},
-          FLAIR_BANANAS.map(banana=>{
-            const cnt=currencies[banana.id]||0;
-            const isSel=selectedBanana.id===banana.id;
-            return React.createElement("div",{key:banana.id,onClick:()=>setSelectedBanana(banana),style:{
-              flex:1,background:isSel?banana.bg:"#fff",border:"2px solid "+(isSel?banana.color:"#e0e0e0"),
-              borderRadius:12,padding:"10px 6px",textAlign:"center",cursor:"pointer",position:"relative",
-            }},
-              React.createElement("button",{onClick:e=>{e.stopPropagation();setBananaInfo(banana);},style:{
-                position:"absolute",top:4,right:4,width:16,height:16,borderRadius:"50%",border:"none",
-                background:"rgba(0,0,0,0.12)",color:"#555",fontSize:9,fontWeight:700,cursor:"pointer",
-                display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1,padding:0
-              }},"ⓘ"),
-              React.createElement("div",{style:{fontSize:24,marginBottom:4}},banana.emoji),
-              React.createElement("div",{style:{fontSize:9,fontWeight:700,color:isSel?banana.color:"#555",lineHeight:1.3,marginBottom:3}},banana.name),
-              React.createElement("div",{style:{fontSize:11,fontWeight:700,color:cnt>0?"#222":"#bbb"}},"×"+cnt)
-            );
-          })
-        ),
-        // Feed buttons
-        React.createElement("div",{style:{display:"flex",gap:8}},
+        // Banana + feed controls: a row of square banana tiles (count badge on
+        // the corner), the selected banana's name with its ⓘ, then Feed ×1 /
+        // Feed ×9 buttons showing the banana and what each costs. Centred in
+        // the space while the Equipped row is hidden.
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",...(SHOW_EQUIPPED_ROW?null:{margin:"auto 0"})}},
+          // Tile size and the gap under the row shrink a little on short
+          // screens only (--vh, see uiScale.js), so older 16:9 phones fit the
+          // Feed tab without scrolling; everywhere else they're 74px / 16px.
+          React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:16,marginBottom:"min(16px, calc(var(--vh) * 1.9))"}},
+            FLAIR_BANANAS.map(banana=>{
+              const cnt=currencies[banana.id]||0;
+              const isSel=selectedBanana.id===banana.id;
+              return React.createElement("button",{key:banana.id,onClick:()=>setSelectedBanana(banana),"aria-label":banana.name,style:{
+                position:"relative",width:"min(74px, calc(var(--vh) * 9.5))",height:"min(74px, calc(var(--vh) * 9.5))",padding:6,borderRadius:18,cursor:"pointer",fontFamily:"inherit",
+                background:isSel?banana.bg:"#fff",border:"3px solid "+(isSel?banana.color:"#e6e6e6"),
+                boxShadow:isSel?"0 2px 10px "+banana.color+"44":"0 1px 4px rgba(0,0,0,0.06)",
+                display:"flex",alignItems:"center",justifyContent:"center",opacity:isSel?1:0.85}},
+                bananaIcon(banana,{width:"100%",height:"100%"},24),
+                // Count badge on the bottom-right corner: red when you have
+                // some, grey at zero.
+                React.createElement("div",{style:{position:"absolute",right:-8,bottom:-8,minWidth:26,height:26,padding:"0 6px",boxSizing:"border-box",borderRadius:13,
+                  background:cnt>0?"#ef4444":"#9e9e9e",border:"2px solid #fff",color:"#fff",fontSize:13,fontWeight:800,
+                  display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}},cnt)
+              );
+            })
+          ),
+          // Selected banana's name, with the ⓘ that opens its rates.
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:8}},
+            React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#2a2640",letterSpacing:".04em",textTransform:"uppercase"}},selectedBanana.name),
+            React.createElement("button",{onClick:()=>setBananaInfo(selectedBanana),"aria-label":"Show "+selectedBanana.name+" rates",style:{
+              width:18,height:18,borderRadius:"50%",border:"none",background:"#2a2640",color:"#fff",fontSize:11,fontWeight:800,fontFamily:"Georgia, serif",
+              cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1,padding:0}},"i")
+          ),
+          // Feed buttons, each labelled "Feed ×N" with its cost (banana +
+          // count) beside it. The free daily banana makes Feed ×1 "FREE" and
+          // takes one off Feed ×9.
           (()=>{
             const revealing=feedResult&&feedResult.type==="multi"&&visibleCount<feedResult.results.length;
             // The multi-feed is 9, revealed as a full-page 3x3 grid. The free
@@ -358,28 +369,48 @@ function FlairSection({unlockedSkins,def,statsWithEquip,onStatClick,onBack,onBan
             const dis1=selCount<need1||revealing;
             const dis9=selCount<need9||revealing;
             const showFeedGuideArrow=flairGuideStep==="feed";
-            return React.createElement(React.Fragment,null,
-              React.createElement("button",{
-                "data-guide-target":"feed",
-                onClick:()=>{doFeed(1);if(flairGuideStep==="feed")setFlairGuideStep(null);},
-                disabled:dis1,
-                style:{
-                flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis1?"default":"pointer",
-                position:"relative",
-                background:dis1?"#e0e0e0":selectedBanana.color,color:dis1?"#aaa":"#fff"}
-              },
-                showFeedGuideArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
-                freeBananaAvailable?"Feed ×1 (Free!)":"Feed ×1"
-              ),
-              React.createElement("button",{onClick:()=>doFeed(9),disabled:dis9,style:{
-                flex:1,padding:"12px 0",fontSize:14,fontWeight:700,border:"none",borderRadius:10,cursor:dis9?"default":"pointer",
-                background:dis9?"#e0e0e0":selectedBanana.color,color:dis9?"#aaa":"#fff"}
-              },"Feed ×9")
+            // Each button reads "Feed ×N" on the left, with its cost -- the
+            // banana and how many, or FREE -- in a pill on the right.
+            const feedBtn=(label,cost,dis,onClick,extra)=>React.createElement("button",{...extra,onClick,disabled:dis,style:{
+                position:"relative",flex:1,maxWidth:170,height:46,padding:"0 8px 0 14px",borderRadius:14,cursor:dis?"default":"pointer",fontFamily:"inherit",
+                border:"2px solid "+(dis?"#dcdcdc":"#3d3854"),background:dis?"#ececec":"#2a2640",color:dis?"#b0b0b0":"#fff",
+                display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
+                React.createElement("span",{style:{fontSize:15,fontWeight:800,whiteSpace:"nowrap"}},label),
+                React.createElement("span",{style:{display:"flex",alignItems:"center",gap:4,height:32,padding:"0 9px 0 6px",borderRadius:10,
+                  background:dis?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.12)"}},
+                  cost===0
+                    ? React.createElement("span",{style:{fontSize:13,fontWeight:800,letterSpacing:".04em",padding:"0 3px"}},"FREE")
+                    : React.createElement(React.Fragment,null,
+                        React.createElement("span",{style:{display:"flex",alignItems:"center",height:24,minWidth:24,filter:dis?"grayscale(1)":"none",opacity:dis?0.6:1}},bananaIcon(selectedBanana,{width:24,height:24},15)),
+                        React.createElement("span",{style:{fontSize:16,fontWeight:800}},cost)
+                      )
+                ),
+                showFeedGuideArrow&&label==="Feed ×1"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
+              );
+            return React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:14,width:"100%"}},
+              feedBtn("Feed ×1",need1,dis1,()=>{doFeed(1);if(flairGuideStep==="feed")setFlairGuideStep(null);},{"data-guide-target":"feed"}),
+              feedBtn("Feed ×9",need9,dis9,()=>doFeed(9))
             );
           })()
         )
       ),
       (flairTab==="titles"||flairTab==="aura"||flairTab==="background"||flairTab==="item")&&React.createElement(FlairRaritySection,{flairTab,ownedData,setOwned,currencies,setCurrencies})
+    ),
+    // Tab bar, pinned to the bottom of the screen like a nav bar, so it
+    // stays put whichever tab is open (the portrait card grows on Feed and
+    // shrinks on the others, which used to push the tabs up and down).
+    React.createElement("div",{style:{display:"flex",gap:8,padding:"8px 16px 8px",flexShrink:0,marginTop:"auto",position:"sticky",bottom:0,zIndex:2,background:"#fff",borderTop:"1px solid #e8e8e8"}},
+      flairTabs.map(t=>React.createElement("button",{key:t.id,
+        onClick:()=>setFlairTab(t.id),
+        // minWidth:0 so all five tabs are exactly even. A flex item defaults to
+        // refusing to shrink below its own text, which had "Background" holding
+        // 64px while its neighbours gave up width to 62 -- and it makes the
+        // width AutoFitText measures against depend on the size AutoFitText
+        // picked, which is a loop. Even columns make it a plain one-way fit.
+        style:{flex:1,minWidth:0,padding:"9px 0",fontWeight:600,border:"none",borderRadius:10,cursor:"pointer",
+          background:flairTab===t.id?"#534AB7":"#e8e8e8",
+          color:flairTab===t.id?"#fff":"#666"}
+      },React.createElement(AutoFitText,{size:11},t.label)))
     ),
   );
 }

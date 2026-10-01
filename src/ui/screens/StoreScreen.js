@@ -3,6 +3,7 @@
 // tapping Buy grants the goods instantly, no payment step in between.
 
 import React from "../../react.js";
+import { iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { STORE_GEM_PACKS, STORE_BUNDLES } from "../../data/store.js";
 import ScreenHeader, { CurrencyChip } from "../../ui/components/ScreenHeader.js";
@@ -42,7 +43,7 @@ function StoreScreen(){
         ),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,marginBottom:16,textAlign:"left"}},
           confirmItem.items
-            ? confirmItem.items.map((item,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:"#555"}},item))
+            ? confirmItem.items.map((item,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:"#555"}},iconText(item)))
             : React.createElement("div",{style:{fontSize:12,color:"#555"}},"💎 "+formatNum(confirmItem.gems)+(confirmItem.bonus>0?" + "+formatNum(confirmItem.bonus)+" bonus":""))
         ),
         React.createElement("div",{style:{fontSize:12,color:"#999",marginBottom:18}},
@@ -67,7 +68,7 @@ function StoreScreen(){
             React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"#111",marginBottom:2}},b.name),
             React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2,marginTop:2}},
               b.items.map((item,i)=>React.createElement("div",{key:i,style:{fontSize:11,color:"#666",display:"flex",alignItems:"center",gap:4}},
-                item
+                iconText(item)
               ))
             )
           ),

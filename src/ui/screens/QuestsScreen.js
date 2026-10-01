@@ -1,6 +1,7 @@
 // Tabbed quest board with per-quest and per-batch claiming.
 
 import React from "../../react.js";
+import { iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { QUEST_TABS, DAILY_MISSIONS, QUEST_DEFS, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
@@ -131,7 +132,7 @@ function QuestsScreen({onBack}){
 
   const questRewardPopupEl=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
     React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-      React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},REWARD_LABELS[rewardPopup]?.split(" ")[0]||"🎁"),
+      React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},iconText(REWARD_LABELS[rewardPopup]?.split(" ")[0]||"🎁")),
       React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},REWARD_LABELS[rewardPopup]?.split(" ").slice(1).join(" ")||rewardPopup),
       React.createElement("div",{style:{fontSize:14,color:"#666",lineHeight:1.5}},REWARD_DESC[rewardPopup]||""),
       React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
@@ -152,7 +153,7 @@ function QuestsScreen({onBack}){
             opacity:visible?1:0,transform:visible?"scale(1)":"scale(0.7)",
             transition:"opacity 0.3s, transform 0.3s",
           }},
-            React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+            React.createElement("div",{style:{fontSize:34,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
             React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},formatNum(v))
           );
         })
@@ -212,7 +213,7 @@ function QuestsScreen({onBack}){
                   width:72,height:72,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
                   background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,cursor:"pointer",
                 }},
-                  React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+                  React.createElement("div",{style:{fontSize:26,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
                   React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},formatNum(v))
                 ))
               ),
@@ -250,7 +251,7 @@ function QuestsScreen({onBack}){
                     border:"2px solid "+(claimed?"#86efac":done?"#c4b5fd":"#ddd6fe"),
                     borderRadius:10,cursor:"pointer",
                   }},
-                    React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+                    React.createElement("div",{style:{fontSize:26,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
                     React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":done?"#534AB7":"#7c3aed"}},formatNum(v))
                   ))
                 ),

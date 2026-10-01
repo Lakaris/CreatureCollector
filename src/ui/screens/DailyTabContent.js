@@ -1,6 +1,7 @@
 // Daily missions widget: select, track, and claim.
 
 import React from "../../react.js";
+import { iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { DAILY_COMPLETION_REWARD, DAILY_COMPLETION_BP, DAILY_MISSIONS, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
@@ -89,8 +90,8 @@ function DailyTabContent({setRewardPopup,onNavigate}){
     return React.createElement("div",{onClick:allVisible?()=>setRewardItems(null):undefined,style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200,cursor:allVisible?"pointer":"default"}},
       localRewardPopup&&React.createElement("div",{onClick:()=>setLocalRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center"}},
         React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:18,padding:"24px 28px",maxWidth:280,textAlign:"center"}},
-          React.createElement("div",{style:{fontSize:36,marginBottom:8}},REWARD_LABELS[localRewardPopup]?.split(" ")[0]||"🎁"),
-          React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:6}},REWARD_LABELS[localRewardPopup]||localRewardPopup),
+          React.createElement("div",{style:{fontSize:36,marginBottom:8}},iconText(REWARD_LABELS[localRewardPopup]?.split(" ")[0]||"🎁")),
+          React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:6}},iconText(REWARD_LABELS[localRewardPopup]||localRewardPopup)),
           React.createElement("div",{style:{fontSize:13,color:"#555"}},REWARD_DESC[localRewardPopup]||""),
           React.createElement("button",{onClick:()=>setLocalRewardPopup(null),style:{marginTop:16,padding:"8px 24px",fontSize:13,fontWeight:700,background:"linear-gradient(135deg,#534AB7,#7c4dff)",color:"#fff",border:"none",borderRadius:10,cursor:"pointer"}},"OK")
         )
@@ -105,7 +106,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
             opacity:visible?1:0,transform:visible?"scale(1)":"scale(0.7)",
             transition:"opacity 0.3s, transform 0.3s",
           }},
-            React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+            React.createElement("div",{style:{fontSize:34,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
             React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},typeof v==="number"&&k==="battlepassPoints"?formatNum(v)+" pts":formatNum(v))
           );
         })
@@ -124,7 +125,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
             width:72,height:72,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
             background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,cursor:"pointer",
           }},
-            React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+            React.createElement("div",{style:{fontSize:26,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
             React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#534AB7"}},formatNum(v))
           )),
           React.createElement("div",{onClick:()=>setRewardPopup?.("battlepassPoints"),style:{
@@ -166,7 +167,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
               border:"2px solid "+(claimed?"#86efac":ready?"#c4b5fd":"#ddd6fe"),
               borderRadius:10,cursor:"pointer",
             }},
-              React.createElement("div",{style:{fontSize:26,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+              React.createElement("div",{style:{fontSize:26,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
               React.createElement("div",{style:{fontSize:12,fontWeight:800,color:claimed?"#166534":ready?"#534AB7":"#7c3aed"}},formatNum(v))
             ))
           ),

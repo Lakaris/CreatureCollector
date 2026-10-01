@@ -863,8 +863,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       )
     ),
     // The portrait card. No name or level under the portrait -- the name is
-    // already in the ScreenHeader and the level sits top-right.
-    React.createElement("div",{className:"card",style:{marginBottom:12}},
+    // already in the ScreenHeader and the level sits top-right. Edge to edge
+    // like Home's scene: the negative margins cancel the header's 12px bottom
+    // margin and the page's 16px side padding, so it meets the top bar and
+    // both screen edges -- square-cornered and borderless, since it touches
+    // them (the hairline border would leave a 1px gap beside the art).
+    React.createElement("div",{className:"card",style:{margin:"-12px -16px 12px",borderRadius:0,border:"none"}},
       React.createElement("div",{style:{position:"relative",marginBottom:14}},
         // The portrait stage: runs to the card's top/left/right edges and
         // ends where the stats begin, with an equipped background's art
@@ -874,7 +878,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         // from its bottom -- scaled with the drawn art, so it's on the same
         // spot of the art as on the Flair stage -- leaving the room above for
         // effects.
-        React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,...backdrop}},
+        React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,borderRadius:0,...backdrop}},
           React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
         ),
         // Top-right: level, with the ascension stars tucked under it. Same
@@ -1125,7 +1129,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     // hasFlairEffects/onShowFlairEffects drive the header button that used to
     // sit on this page. The popup it opens stays here -- it is a top-level
     // overlay and outranks the Flair page's own layer, so it still shows over it.
-    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,statsWithEquip,onStatClick:setStatInfoPopup,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep,hasFlairEffects:flairBuffs.length>0,onShowFlairEffects:()=>setShowFlairEffects(true)}),
+    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep,hasFlairEffects:flairBuffs.length>0,onShowFlairEffects:()=>setShowFlairEffects(true)}),
     tab==="skins"&&React.createElement(SkinSection,{
       ownedData,def,currencies,setCurrencies,setOwned,
       unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,

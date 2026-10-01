@@ -1,6 +1,7 @@
 // Arena: symmetric minion-vs-minion stages, no boss unit.
 
 import React, { useState, useEffect } from "../../../react.js";
+import { iconText } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -709,7 +710,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   return React.createElement("div",{key:"sfv682",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f5f5f5"}},
     rewardPopup!==null&&(()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[rewardPopup];return React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-        React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},rd.emoji),
+        React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},iconText(rd.emoji)),
         React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},rd.label),
         React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:4}},REWARD_DESC[rd.key]||""),
         React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
@@ -774,7 +775,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 )
               ),
               (()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[i];return React.createElement("div",{onClick:!isPast?(e=>{e.stopPropagation();setRewardPopup(i);}):undefined,style:{flexShrink:0,textAlign:"center",cursor:isPast?"default":"pointer",opacity:isPast?0.35:1}},
-                React.createElement("div",{style:{fontSize:24,lineHeight:1}},rd.emoji),
+                React.createElement("div",{style:{fontSize:24,lineHeight:1}},iconText(rd.emoji)),
                 React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#555",marginTop:2}},rd.qty)
               );})()
             );

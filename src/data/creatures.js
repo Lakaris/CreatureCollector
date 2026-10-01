@@ -166,34 +166,62 @@ export const CREATURES=[
      unique:{name:"Verdant Dominion",upgrades:["Passive: poisoned enemies take 20% more dmg from all sources","25%","30%","36%","42%; Verdanvox gains +1% ATK for each second an enemy remains poisoned"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"sylvavix",shardsToAscend:18,ascensionsToEvolve:null},
   // Water line 1
-  {id:"droplette",name:"Droplette",emoji:"💧",type:"Water",rarity:"common",description:"A tiny water sprite no bigger than a raindrop. Its healing tears can soothe any wound.",
+  // Water line 1 -- axolotls: Common, 4 stages, one kit shared verbatim. A
+  // ranged Support whose whole output is one shaped ability.
+  //
+  // The animal is doing work here: an axolotl regrows what it loses, which is
+  // why the healing half needs no explaining, and it never leaves its larval
+  // form, which is why the line gets bigger without ever becoming something
+  // else.
+  //
+  // Swell is a 1x3 wave that travels 3 tiles forward from the caster: it damages
+  // enemies and heals allies standing in its path, the same cast doing both.
+  // Its printed numbers sit BELOW an average common healer's on purpose --
+  // Undertow is what brings them up to par, so the two must be read together.
+  //
+  // Undertow is why the wave has to resolve ROW BY ROW, outward from the caster,
+  // rather than as one instantaneous cell set the way Line and Fork do: the
+  // order rows are touched in changes the result. Accumulate the falloff as the
+  // wave advances and apply each row's effects before stepping to the next one.
+  //
+  // The falloff is 30 PERCENTAGE POINTS off the bonus per occupied row, not 30%
+  // of the output, and it applies from the FIRST occupied row -- so the printed
+  // bonus is never delivered in full, and a wave that passes through enough
+  // creatures inverts into a penalty. At the first upgrade (+50% / +60%) a third
+  // occupied row leaves -40% damage and -30% healing.
+  //
+  // There is deliberately NO floor constant: the wave is 3 tiles deep, so it can
+  // spend at most 90 points, and the worst case it can actually reach is x0.60
+  // damage and x0.70 healing. A floor that never fires is only a claim the code
+  // does not keep. Deepen the wave or raise the falloff and that stops holding.
+  {id:"gillet",name:"Gillet",emoji:"🦎",type:"Water",rarity:"common",description:"A hand-sized axolotl wearing three pink fronds where a sensible animal keeps its gills. It has already healed from several things nobody saw happen.",
    stats:{hp:46,atk:30,def:29,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Water Jet",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Reduces target ATK by 8% for 2s"]},
-     special:{name:"Healing Mist",charge:14,upgrades:["Heal ally 20 HP","Heal 28 HP","Heal 38 HP","Heal 50 HP","Heal all allies 22 HP"]},
-     unique:{name:"Rain Aura",upgrades:["Passive: all allies regen 1 HP/s","Regen 2 HP/s","Regen 3 HP/s","Regen 4 HP/s","Regen 5 HP/s; heal overflows as temporary shield"]}
-   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"bubblin"},
-  {id:"bubblin",name:"Bubblin",emoji:"🫧",type:"Water",rarity:"common",description:"A Droplette that has grown a protective bubble shell. It heals by popping mini bubbles.",
+     basic:{name:"Water Jet",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Frostbite"]},
+     special:{name:"Swell",charge:16,upgrades:["Heal 20 HP; 14 dmg","Heal 24 HP; 17 dmg","Heal 28 HP; 20 dmg","Heal 33 HP; 24 dmg","Heal 33 HP; 24 dmg"]},
+     unique:{name:"Undertow",upgrades:["This creature's Special ability deals an additional 50% damage and heals an additional 60% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 60% damage and heals an additional 70% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 70% damage and heals an additional 80% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 80% damage and heals an additional 90% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 90% damage and heals an additional 100% Health. Each row of enemies or allies hit reduces both bonuses by 30%"]}
+   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"gillow"},
+  {id:"gillow",name:"Gillow",emoji:"🦎",type:"Water",rarity:"common",description:"The fronds have filled out and now trail behind it like a wake. It regrows whatever it loses and seems mildly puzzled that anyone finds this impressive.",
    stats:{hp:75,atk:48,def:46,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Water Jet",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Reduces target ATK by 8% for 2s"]},
-     special:{name:"Bubble Shield",charge:18,upgrades:["Shield ally 30 HP","Shield 42 HP","Shield 55 HP","Shield 70 HP","Shield all allies 25 HP"]},
-     unique:{name:"Bubble Burst",upgrades:["Passive: when shield breaks, heals wearer 15 HP","Heals 22 HP","Heals 30 HP; stuns attacker 0.5s","Heals 40 HP; stuns 0.5s","Heals 50 HP; stuns 1s; also deals 20 dmg to attacker"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"droplette",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"wavecrest"},
-  {id:"wavecrest",name:"Wavecrest",emoji:"🌊",type:"Water",rarity:"common",description:"Bubblin evolved into a creature that rides its own waves. Heals by surf.",
+     basic:{name:"Water Jet",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Frostbite"]},
+     special:{name:"Swell",charge:16,upgrades:["Heal 20 HP; 14 dmg","Heal 24 HP; 17 dmg","Heal 28 HP; 20 dmg","Heal 33 HP; 24 dmg","Heal 33 HP; 24 dmg"]},
+     unique:{name:"Undertow",upgrades:["This creature's Special ability deals an additional 50% damage and heals an additional 60% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 60% damage and heals an additional 70% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 70% damage and heals an additional 80% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 80% damage and heals an additional 90% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 90% damage and heals an additional 100% Health. Each row of enemies or allies hit reduces both bonuses by 30%"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"gillet",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"plumewake"},
+  {id:"plumewake",name:"Plumewake",emoji:"🦎",type:"Water",rarity:"common",description:"Big enough now that the water moves when it does. It pushes a slow swell ahead of itself, and everything on the near side of that swell comes out of it better than it went in.",
    stats:{hp:107,atk:69,def:66,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Water Jet",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Reduces target ATK by 8% for 2s"]},
-     special:{name:"Healing Tide",charge:16,upgrades:["Heal all allies 30 HP","Heal 42 HP","Heal 55 HP","Heal 70 HP","Heal 85 HP; remove all debuffs from allies"]},
-     unique:{name:"Surf Heal",upgrades:["Passive: abilities heal all allies 8 HP on cast","Heal 12 HP","Heal 16 HP; also restore 5% max HP","Heal 22 HP; restore 8% max HP","Heal 30 HP; restore 12% max HP; Wavecrest gains double regen"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"bubblin",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"tidecrown"},
-  {id:"tidecrown",name:"Tidecrown",emoji:"🐬",type:"Water",rarity:"common",description:"Wavecrest's final form. The ocean answers its call. Healers across the land seek its blessing.",
+     basic:{name:"Water Jet",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Frostbite"]},
+     special:{name:"Swell",charge:16,upgrades:["Heal 20 HP; 14 dmg","Heal 24 HP; 17 dmg","Heal 28 HP; 20 dmg","Heal 33 HP; 24 dmg","Heal 33 HP; 24 dmg"]},
+     unique:{name:"Undertow",upgrades:["This creature's Special ability deals an additional 50% damage and heals an additional 60% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 60% damage and heals an additional 70% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 70% damage and heals an additional 80% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 80% damage and heals an additional 90% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 90% damage and heals an additional 100% Health. Each row of enemies or allies hit reduces both bonuses by 30%"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"gillow",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"xolotide"},
+  {id:"xolotide",name:"Xolotide",emoji:"🦎",type:"Water",rarity:"common",description:"The old lake's last and largest. It never once finished growing up, and the water it sends out arrives somewhere between a current and a blessing.",
    stats:{hp:141,atk:92,def:88,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Water Jet",upgrades:["8 dmg","11 dmg","14 dmg","18 dmg","Reduces target ATK by 8% for 2s"]},
-     special:{name:"Healing Tide",charge:16,upgrades:["Heal all allies 30 HP","Heal 42 HP","Heal 55 HP","Heal 70 HP","Heal 85 HP; remove all debuffs"]},
-     unique:{name:"Tidal Grace",upgrades:["Passive: healing done by Tidecrown +20%","+28%","+36%; overheal converts to shield","+45%; overheal shield","+55%; overheal shield; Tidecrown revives one fallen ally at 30% HP once per battle"]}
-   },role:"Support",attackType:"Ranged",evolutionOf:"wavecrest",shardsToAscend:18,ascensionsToEvolve:null},
+     basic:{name:"Water Jet",upgrades:["10 dmg","11 dmg","12 dmg","13 dmg","13 dmg and inflict Frostbite"]},
+     special:{name:"Swell",charge:16,upgrades:["Heal 20 HP; 14 dmg","Heal 24 HP; 17 dmg","Heal 28 HP; 20 dmg","Heal 33 HP; 24 dmg","Heal 33 HP; 24 dmg"]},
+     unique:{name:"Undertow",upgrades:["This creature's Special ability deals an additional 50% damage and heals an additional 60% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 60% damage and heals an additional 70% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 70% damage and heals an additional 80% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 80% damage and heals an additional 90% Health. Each row of enemies or allies hit reduces both bonuses by 30%","This creature's Special ability deals an additional 90% damage and heals an additional 100% Health. Each row of enemies or allies hit reduces both bonuses by 30%"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"plumewake",shardsToAscend:18,ascensionsToEvolve:null},
   // Water line 2
   {id:"iglet",name:"Iglet",emoji:"🐢",type:"Water",rarity:"common",description:"A turtle hatchling that packed its own shell out of snow. It is enormously proud of this and will not be told it is doing turtling wrong.",
    stats:{hp:59,atk:29,def:44,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -332,35 +360,44 @@ export const CREATURES=[
      special:{name:"Silver Draught",charge:18,upgrades:["Heal 24 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 29 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 35 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 42 HP. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal","Heal 42 HP and shield them. If they're above 50% Health, they gain Attack Up. If they're below 50% Health, they briefly gain Immortal"]},
      unique:{name:"Pestle Tempo",upgrades:["When an ally within range is below 50% Health, gain 2% Haste and Speed","When an ally within range is below 50% Health, gain 4% Haste and Speed","When an ally within range is below 50% Health, gain 6% Haste and Speed","When an ally within range is below 50% Health, gain 8% Haste and Speed","When an ally within range is below 50% Health, gain 10% Haste and Speed"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"elixhare",shardsToAscend:18,ascensionsToEvolve:null},
-  // Dark line 1
-  {id:"duskling",name:"Duskling",emoji:"🐈‍⬛",type:"Dark",rarity:"common",description:"A small black cat that flickers in and out of shadow. Enjoys knocking things off shelves.",
+  // Dark line 1 -- vampire bats: Common, 4 stages, one kit shared verbatim. A
+  // ranged Attacker that drinks its way through a fight.
+  //
+  // Insatiable scales LIFESTEAL ITSELF rather than the Special, so it multiplies
+  // every source at once -- Bloodletting's 30% drain and any lifesteal gear the
+  // bat is wearing (Bloodthirster's 20%, Vampiric Band's Overheal share). That
+  // is deliberate: the passive is the reason to build lifesteal onto this line
+  // rather than a flat number bolted to one ability. Route it through
+  // healUnit's `lifesteal` flag (battle/hp.js) when this line is implemented,
+  // so gear and ability drain both pick it up from one place.
+  {id:"duskling",name:"Duskling",emoji:"🦇",type:"Dark",rarity:"common",description:"A palm-sized bat pup that roosts upside down in places nobody agreed to. It flickers in and out of shadow, mostly by accident.",
    stats:{hp:45,atk:45,def:22,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Shadow Slash",upgrades:["11 dmg","14 dmg","18 dmg","24 dmg","Reduces target DEF 10% for 2s"]},
-     special:{name:"Fade",charge:16,upgrades:["Become untargetable 1.5s; +15 SPD after","Untargetable 2s; +20 SPD","Untargetable 2s; +28 SPD","Untargetable 2.5s; +36 SPD","Untargetable 3s; +45 SPD; emerge dealing 25 dmg to nearby foes"]},
-     unique:{name:"Shadowstep",upgrades:["Passive: first attack each battle ignores all DEF","First 2 attacks","First 3 attacks","First 4 attacks","First 5 attacks; shadow attacks also silence target 0.5s"]}
-   },role:"Attacker",attackType:"Melee",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"nightbat"},
-  {id:"nightbat",name:"Nightbat",emoji:"🦇",type:"Dark",rarity:"common",description:"Duskling evolved into a stealthy shadow bat. It strikes from the darkness and vanishes.",
+     basic:{name:"Sonic Screech",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Damage Over Time"]},
+     special:{name:"Bloodletting",charge:14,upgrades:["30 dmg","38 dmg","47 dmg","58 dmg","58 dmg"]},
+     unique:{name:"Insatiable",upgrades:["Lifesteal on this creature is 20% more effective","Lifesteal on this creature is 30% more effective","Lifesteal on this creature is 40% more effective","Lifesteal on this creature is 50% more effective","Lifesteal on this creature is 50% more effective. This creature gains 20% Haste when targeting enemies below 30% Health"]}
+   },role:"Attacker",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"nightbat"},
+  {id:"nightbat",name:"Nightbat",emoji:"🦇",type:"Dark",rarity:"common",description:"Duskling with its wingspan filled in. It hunts by sound, strikes from the dark, and is gone before the echo gets back.",
    stats:{hp:71,atk:72,def:37,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Shadow Slash",upgrades:["11 dmg","14 dmg","18 dmg","24 dmg","Reduces DEF 10% 2s"]},
-     special:{name:"Dark Shroud",charge:14,upgrades:["Cloak self 2s; ATK +25%","Cloak 2.5s; +32%","Cloak 3s; +40%","Cloak 3s; +50%","Cloak 3.5s; +62%; emerge with area shadow burst 35 dmg"]},
-     unique:{name:"Predator's Mark",upgrades:["Passive: marked targets take +10% dmg from Gloomkit","Marked +14%","Marked +18%","Marked +22%","Marked +28%; mark spreads to 1 nearby enemy on death of marked target"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"duskling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"nightstalker"},
-  {id:"nightstalker",name:"Nightstalker",emoji:"🐺",type:"Dark",rarity:"common",description:"Nightbat grown into a shadowy wolf that hunts by instinct alone. It never misses.",
+     basic:{name:"Sonic Screech",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Damage Over Time"]},
+     special:{name:"Bloodletting",charge:14,upgrades:["30 dmg","38 dmg","47 dmg","58 dmg","58 dmg"]},
+     unique:{name:"Insatiable",upgrades:["Lifesteal on this creature is 20% more effective","Lifesteal on this creature is 30% more effective","Lifesteal on this creature is 40% more effective","Lifesteal on this creature is 50% more effective","Lifesteal on this creature is 50% more effective. This creature gains 20% Haste when targeting enemies below 30% Health"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"duskling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"nightstalker"},
+  {id:"nightstalker",name:"Nightstalker",emoji:"🦇",type:"Dark",rarity:"common",description:"A bat that no longer needs the dark to hide in. It reads a whole room off its echoes and has never once been surprised.",
    stats:{hp:99,atk:102,def:54,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Night Fang",upgrades:["17 dmg; silence 10% chance 1s","22 dmg","28 dmg","36 dmg","20% silence 1.5s"]},
-     special:{name:"Shadow Hunt",charge:14,upgrades:["Mark target; Nightstalker deals +20% dmg to marked","Mark; +28%","Mark; +36%","Mark; +45%","Mark; +55%; marked target also takes +15% dmg from all sources"]},
-     unique:{name:"Apex Predator",upgrades:["Passive: kills grant +8% ATK for 5s (stacks 3x)","Kills grant +11%","Kills grant +14%","Kills grant +18%","Kills grant +22%; at 3 stacks next attack deals 200% dmg"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"nightbat",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"voidfang"},
-  {id:"voidfang",name:"Voidfang",emoji:"🐉",type:"Dark",rarity:"common",description:"Nightstalker's final dark dragon form. It does not walk. It unexists from one place and reappears at another.",
+     basic:{name:"Sonic Screech",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Damage Over Time"]},
+     special:{name:"Bloodletting",charge:14,upgrades:["30 dmg","38 dmg","47 dmg","58 dmg","58 dmg"]},
+     unique:{name:"Insatiable",upgrades:["Lifesteal on this creature is 20% more effective","Lifesteal on this creature is 30% more effective","Lifesteal on this creature is 40% more effective","Lifesteal on this creature is 50% more effective","Lifesteal on this creature is 50% more effective. This creature gains 20% Haste when targeting enemies below 30% Health"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"nightbat",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"voidfang"},
+  {id:"voidfang",name:"Voidfang",emoji:"🦇",type:"Dark",rarity:"common",description:"The line's last form: a bat whose wings open onto somewhere else. It does not cross a room so much as stop being on one side of it.",
    stats:{hp:133,atk:135,def:72,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Night Fang",upgrades:["17 dmg; silence 10%","22 dmg","28 dmg","36 dmg","20%; silence 1.5s"]},
-     special:{name:"Void Tear",charge:20,upgrades:["Teleport to target; 70 dmg; silence 1.5s","88 dmg","108 dmg","132 dmg","Silence 2s; also strips 1 buff from target"]},
-     unique:{name:"Void Sovereign",upgrades:["Passive: dark attacks bypass 15% of enemy DEF; kills grant full HP regen for 2s","Bypass 20%","Bypass 26%; regen 3s","Bypass 32%; regen 3s","Bypass 40%; regen 4s; dark attacks also silence for 0.5s; Voidfang is immune to silence"]}
-   },role:"Attacker",attackType:"Melee",evolutionOf:"nightstalker",shardsToAscend:18,ascensionsToEvolve:null},
+     basic:{name:"Sonic Screech",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Damage Over Time"]},
+     special:{name:"Bloodletting",charge:14,upgrades:["30 dmg","38 dmg","47 dmg","58 dmg","58 dmg"]},
+     unique:{name:"Insatiable",upgrades:["Lifesteal on this creature is 20% more effective","Lifesteal on this creature is 30% more effective","Lifesteal on this creature is 40% more effective","Lifesteal on this creature is 50% more effective","Lifesteal on this creature is 50% more effective. This creature gains 20% Haste when targeting enemies below 30% Health"]}
+   },role:"Attacker",attackType:"Ranged",evolutionOf:"nightstalker",shardsToAscend:18,ascensionsToEvolve:null},
   // Dark line 2
   {id:"scrapcaw",name:"Scrapcaw",emoji:"🐦",type:"Dark",rarity:"epic",description:"The lowest rung of a very organized murder. It carries messages, holds things, and is told almost nothing.",
    stats:{hp:58,atk:62,def:40,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -1710,15 +1747,19 @@ export const CREATURES=[
      special:{name:"Divine Rebirth",charge:14,upgrades:["Become divine light; emerge 4s full HP; 192 dmg+blind all 6s; heal all 160 HP+invincible 3s; revive 1 fallen 40%","Emerge 240; heal 200; revive 2","Emerge 300; heal 250; revive 2 at 50%","Emerge 375; heal 312; revive 3 at 55%","Emerge 469; heal 390; revive all at 65%; grant all +45% all stats 8s; full dispel"]},
      unique:{name:"Divine Sovereign",upgrades:["Passive: revives endlessly; each revival: blind all 8s+heal all 350 HP+invincible 3s+revive 1 fallen 50%; light +60%; heals +55%; immune to all blind","Light +75%; heals +68%; revive 2 per revival","Light +94%; heals +84%; revive 3","Light +116%; heals +104%; revive all at 60%","Light +144%; heals +128%; revive all at 80%; Divinephoenix immune to all dmg while any ally is alive; can never be killed"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"dawnwing",shardsToAscend:30,ascensionsToEvolve:null},
-  // Light line 3
-  {id:"auravast",name:"Auravast",emoji:"🐲",type:"Light",rarity:"legendary",description:"A dragon born in a beam of divine light. It guards sacred places and heals anyone who approaches. Even enemies.",
+  // Light line 3 -- griffins: Legendary, 2 stages, one kit shared verbatim. A
+  // melee Light tank that fights on other creatures' behalf rather than its own.
+  //
+  // Twin Radiance is named for the two halves of the beast -- eagle and lion
+  // landing as one strike -- so the name is the theme, not decoration.
+  {id:"auravast",name:"Auravast",emoji:"🦅",type:"Light",rarity:"legendary",description:"Eagle at the front, lion at the back, gold the whole way through. It swore itself to something a long time ago and has never been argued out of it; anything that approaches is invited, politely, to stand behind it.",
    stats:{hp:154,atk:79,def:122,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Twin Radiance",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},
      special:{name:"Sovereign Call",charge:16,upgrades:["Taunt an enemy. If there are no Tauntable enemies, this creature gains an Aura granting all allies within it +10% Attack and +10% Critical Damage","Taunt an enemy. If there are no Tauntable enemies, this creature gains an Aura granting all allies within it +15% Attack and +10% Critical Damage","Taunt an enemy. If there are no Tauntable enemies, this creature gains an Aura granting all allies within it +20% Attack and +10% Critical Damage","Taunt an enemy. If there are no Tauntable enemies, this creature gains an Aura granting all allies within it +20% Attack and +20% Critical Damage","Taunt an enemy and call a nearby ally to Assist. If there are no Tauntable enemies, this creature gains an Aura granting all allies within it +20% Attack and +20% Critical Damage"]},
      unique:{name:"Sworn Guard",upgrades:["Whenever an ally within range is attacked, target that enemy and deal 20% extra damage against it. This effect can not trigger again until that enemy is defeated","Whenever an ally within range is attacked, target that enemy and deal 30% extra damage against it. This effect can not trigger again until that enemy is defeated","Whenever an ally within range is attacked, target that enemy and deal 40% extra damage against it. This effect can not trigger again until that enemy is defeated","Whenever an ally within range is attacked, target that enemy and deal 50% extra damage against it. This effect can not trigger again until that enemy is defeated","Whenever an ally within range is attacked, instantly refresh this creature's Special ability, target that enemy, and deal 50% extra damage against it. This effect can not trigger again until that enemy is defeated"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"lumimajor"},
-  {id:"lumimajor",name:"Lumimajor",emoji:"🐉",type:"Light",rarity:"legendary",description:"Holydragon's celestial final form. A dragon of pure starlight and divine grace. Its very presence is a blessing.",
+  {id:"lumimajor",name:"Lumimajor",emoji:"🦅",type:"Light",rarity:"legendary",description:"The griffin heralds paint onto shields, standing in a light of its own making. It has never once moved out of the way of anything, and allies have learned to form up in its shadow.",
    stats:{hp:186,atk:94,def:146,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
      basic:{name:"Twin Radiance",upgrades:["12 dmg","13 dmg","15 dmg","17 dmg","17 dmg and inflict Defense Down"]},

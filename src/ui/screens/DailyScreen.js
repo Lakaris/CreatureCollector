@@ -1,6 +1,7 @@
 // Daily login streak calendar.
 
 import React from "../../react.js";
+import { iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { REWARD_LABELS, REWARD_DESC, DAILY_REWARDS, resolveDailyReward } from "../../data/quests.js";
 import { applyRewards } from "../../core/rewards.js";
@@ -90,7 +91,7 @@ function DailyScreen({onBack}){
   function debugAdvanceDay(){advanceFrontierTo(dailyDay+1);}
   const popup=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
     React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-      React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},rewardPopup.emoji||REWARD_LABELS[rewardPopup.key]?.split(" ")[0]||"🎁"),
+      React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},iconText(rewardPopup.emoji||REWARD_LABELS[rewardPopup.key]?.split(" ")[0]||"🎁")),
       React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},REWARD_LABELS[rewardPopup.key]?.split(" ").slice(1).join(" ")||rewardPopup.key),
       React.createElement("div",{style:{fontSize:14,color:"#666",lineHeight:1.5}},REWARD_DESC[rewardPopup.key]||""),
       React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
@@ -108,7 +109,7 @@ function DailyScreen({onBack}){
             background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:16,cursor:"pointer",
             opacity:visible?1:0,transform:visible?"scale(1)":"scale(0.7)",transition:"opacity 0.3s, transform 0.3s",
           }},
-            React.createElement("div",{style:{fontSize:34,lineHeight:1}},REWARD_LABELS[k]?.split(" ")[0]||"🎁"),
+            React.createElement("div",{style:{fontSize:34,lineHeight:1}},iconText(REWARD_LABELS[k]?.split(" ")[0]||"🎁")),
             React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"#534AB7"}},formatNum(v))
           );
         })
@@ -158,7 +159,7 @@ function DailyScreen({onBack}){
             }
           },
             React.createElement("div",{style:{fontSize:9,fontWeight:700,color:done?"#bbb":claimable?"#7c4dff":"#aaa",letterSpacing:0.3}},"DAY "+(i+1)),
-            React.createElement("div",{style:{fontSize:26,lineHeight:1}},r.emoji),
+            React.createElement("div",{style:{fontSize:26,lineHeight:1}},iconText(r.emoji)),
             React.createElement("div",{style:{height:16,display:"flex",alignItems:"center",justifyContent:"center"}},
               claimable&&React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#7c4dff",borderRadius:6,padding:"2px 6px"}},"CLAIM")
             )

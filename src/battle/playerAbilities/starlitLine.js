@@ -11,9 +11,9 @@
 // Per-source stacking (see applyStatMod in battle/status.js): one Starlit
 // maintains one stack, refreshed per cast; several Starlits stack.
 
-import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS, BASIC_ATTACK_DMG_MULT } from "../constants.js";
-import { aCardinalDist, distToBoss } from "../geometry.js";
-import { attackCooldown, damageBoss } from "../damage.js";
+import { RANGED_RANGE, STATUS_TICKS, BASIC_ATTACK_DMG_MULT } from "../constants.js";
+import { unitCardinalDist, unitDist, occupies } from "../geometry.js";
+import { attackCooldown } from "../damage.js";
 import { speedPenalty, applyStatMod, healReceivedMultiplier, consumeBlind } from "../status.js";
 import { getRootDef } from "../../core/creatures.js";
 import { damageUnit, healUnit } from "../hp.js";
@@ -30,54 +30,34 @@ function rangeOf(unit) {
   return unit.range || RANGED_RANGE;
 }
 
-/** Cardinal distance from `unit` to the boss body's near edge, or Infinity when not aligned. */
-function bossCardinalDist(unit, boss) {
-  const rowAligned = unit.row >= boss.row && unit.row < boss.row + BOSS_SIZE;
-  const colAligned = unit.col >= boss.col && unit.col < boss.col + BOSS_SIZE;
-  if (rowAligned) {
-    if (unit.col < boss.col) return boss.col - unit.col;
-    if (unit.col >= boss.col + BOSS_SIZE) return unit.col - (boss.col + BOSS_SIZE - 1);
-    return 0;
-  }
-  if (colAligned) {
-    if (unit.row < boss.row) return boss.row - unit.row;
-    if (unit.row >= boss.row + BOSS_SIZE) return unit.row - (boss.row + BOSS_SIZE - 1);
-    return 0;
-  }
-  return Infinity;
-}
-
-/** The boss cell nearest `unit` along their shared row/column. */
-function bossNearCell(unit, boss) {
-  if (unit.row >= boss.row && unit.row < boss.row + BOSS_SIZE) {
-    return { row: unit.row, col: unit.col < boss.col ? boss.col : boss.col + BOSS_SIZE - 1 };
-  }
-  return { row: unit.row < boss.row ? boss.row : boss.row + BOSS_SIZE - 1, col: unit.col };
-}
-
-/** True when `o` sits on the straight line from `unit` to (tr,tc), inclusive of the target, exclusive of `unit`. */
+/** True when `o`'s body covers any tile of the straight line from `unit` to
+ * (tr,tc), inclusive of the target, exclusive of `unit`'s own tile. */
 function onBeam(unit, tr, tc, o) {
   if (o === unit) return false;
   if (unit.row === tr) {
-    if (o.row !== unit.row) return false;
     const lo = Math.min(unit.col, tc), hi = Math.max(unit.col, tc);
-    return o.col >= lo && o.col <= hi && o.col !== unit.col;
+    for (let c = lo; c <= hi; c++) if (c !== unit.col && occupies(o, unit.row, c)) return true;
+    return false;
   }
-  if (o.col !== unit.col) return false;
   const lo = Math.min(unit.row, tr), hi = Math.max(unit.row, tr);
-  return o.row >= lo && o.row <= hi && o.row !== unit.row;
+  for (let r = lo; r <= hi; r++) if (r !== unit.row && occupies(o, r, unit.col)) return true;
+  return false;
+}
+
+/** The tile of `e`'s body the beam reaches first along the row or column it
+ * shares with `unit` -- its own tile when 1x1. Only meaningful when aligned. */
+function nearCellOnLine(unit, e) {
+  const s = e.size || 1;
+  if (unit.row >= e.row && unit.row < e.row + s) return { row: unit.row, col: e.col > unit.col ? e.col : e.col + s - 1 };
+  return { row: e.row > unit.row ? e.row : e.row + s - 1, col: unit.col };
 }
 
 /** Chase waypoint when nothing is currently aligned/in range: whatever's Chebyshev-nearest. */
-function nearestFoe(unit, aliveE, boss) {
+function nearestFoe(unit, aliveE) {
   let best = null, bestD = Infinity;
   for (const e of aliveE) {
-    const d = Math.max(Math.abs(e.row - unit.row), Math.abs(e.col - unit.col));
+    const d = unitDist(unit, e);
     if (d < bestD) { bestD = d; best = { row: e.row, col: e.col }; }
-  }
-  if (boss && boss.hp > 0) {
-    const d = distToBoss(boss, unit.row, unit.col);
-    if (d < bestD) best = { row: boss.row, col: boss.col };
   }
   return best;
 }
@@ -113,7 +93,7 @@ export function makeStarlitModule(cfg) {
     },
 
     basicAttack(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, aliveP, newFx, now } = ctx;
       if (unit.atkCd > 0) return;
       // Blinded: the beam fires and misses entirely, cooldown still paid.
       if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
@@ -122,20 +102,16 @@ export function makeStarlitModule(cfg) {
       const range = rangeOf(unit);
       let best = null;
       for (const e of aliveE) {
-        if (e.row !== unit.row && e.col !== unit.col) continue;
-        const d = aCardinalDist(unit.row, unit.col, e.row, e.col);
-        if (d <= range && (!best || d > best.dist)) best = { tr: e.row, tc: e.col, dist: d };
-      }
-      if (boss && boss.hp > 0) {
-        const bd = bossCardinalDist(unit, boss);
-        if (bd <= range && (!best || bd > best.dist)) {
-          const cell = bossNearCell(unit, boss);
-          best = { tr: cell.row, tc: cell.col, dist: bd };
+        const d = unitCardinalDist(unit, e);
+        if (d === Infinity) continue;
+        if (d <= range && (!best || d > best.dist)) {
+          const cell = nearCellOnLine(unit, e);
+          best = { tr: cell.row, tc: cell.col, dist: d };
         }
       }
 
       if (!best) {
-        const chase = nearestFoe(unit, aliveE, boss);
+        const chase = nearestFoe(unit, aliveE);
         if (chase) ctx.stepToward(chase.row, chase.col);
         return;
       }
@@ -152,10 +128,6 @@ export function makeStarlitModule(cfg) {
           damageUnit(e, dmg);
           totalDmg += dmg;
         }
-      }
-      if (boss && boss.hp > 0 && bossCardinalDist(unit, boss) <= best.dist) {
-        damageBoss(boss, dmg);
-        totalDmg += dmg;
       }
       for (const a of aliveP) {
         if (onBeam(unit, best.tr, best.tc, a)) healUnit(a, Math.round(heal * healReceivedMultiplier(a)));
@@ -176,27 +148,20 @@ export function makeStarlitModule(cfg) {
      * until this passes means the cast can no longer whiff (the old code
      * consumed the charge even when special() found nothing in range).
      */
-    specialInRange(unit, { aliveE, boss }) {
+    specialInRange(unit, { aliveE }) {
       const range = rangeOf(unit);
-      for (const e of aliveE) {
-        if (Math.max(Math.abs(e.row - unit.row), Math.abs(e.col - unit.col)) <= range) return true;
-      }
-      return !!(boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= range);
+      return aliveE.some((e) => unitDist(unit, e) <= range);
     },
 
     special(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, aliveP, newFx, now } = ctx;
 
       // Closest enemy in range picks the blast center -- a lobbed burst, not a beam, so no line-of-sight needed.
       const range = rangeOf(unit);
       let centerR = null, centerC = null, bestDist = Infinity;
       for (const e of aliveE) {
-        const d = Math.max(Math.abs(e.row - unit.row), Math.abs(e.col - unit.col));
+        const d = unitDist(unit, e);
         if (d <= range && d < bestDist) { bestDist = d; centerR = e.row; centerC = e.col; }
-      }
-      if (boss && boss.hp > 0) {
-        const bd = distToBoss(boss, unit.row, unit.col);
-        if (bd <= range && bd < bestDist) { bestDist = bd; centerR = boss.row; centerC = boss.col; }
       }
       if (centerR === null) return;
 
@@ -206,22 +171,9 @@ export function makeStarlitModule(cfg) {
       let totalDmg = 0;
 
       for (const e of aliveE) {
-        if (Math.abs(e.row - centerR) <= 1 && Math.abs(e.col - centerC) <= 1) {
+        if (unitDist({ row: centerR, col: centerC }, e) <= 1) {
           damageUnit(e, dmg);
           applyStatMod(e, { kind: "atk", pct: -atkModPct, src: unit.uid, ticks: atkModTicks });
-          totalDmg += dmg;
-        }
-      }
-      if (boss && boss.hp > 0) {
-        let overlaps = false;
-        for (let dr = 0; dr < BOSS_SIZE && !overlaps; dr++) {
-          for (let dc = 0; dc < BOSS_SIZE && !overlaps; dc++) {
-            if (Math.abs((boss.row + dr) - centerR) <= 1 && Math.abs((boss.col + dc) - centerC) <= 1) overlaps = true;
-          }
-        }
-        if (overlaps) {
-          damageBoss(boss, dmg);
-          applyStatMod(boss, { kind: "atk", pct: -atkModPct, src: unit.uid, ticks: atkModTicks });
           totalDmg += dmg;
         }
       }

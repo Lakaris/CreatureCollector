@@ -20,12 +20,12 @@
 // replaces a stronger slow already on the target. Bosses are unaffected --
 // their action cadence doesn't read unit speed mods.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { damageBoss } from "../damage.js";
+import { unitDist } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, applyShield, baseShield } from "../hp.js";
 import { isEchoCast } from "../applier.js";
 import { applyStatMod } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -64,7 +64,7 @@ export function makeMoruskModule(cfg) {
    * hit; stacks with other sources. Skips bosses (no uid -- their cadence
    * ignores unit speed mods). */
   function applyChill(unit, target) {
-    if (!target || target.uid == null) return;
+    if (!target || hasRule(target, "ignoresOnHitEffects")) return;
     const pct = slowPctByLevel[abilityIdx(unit, "unique")];
     if (!pct) return;
     applyStatMod(target, { kind: "spd", pct: -pct, src: unit.uid, ticks: STATUS_TICKS });
@@ -80,7 +80,7 @@ export function makeMoruskModule(cfg) {
     /** Tusk Slam on-hit: always chill; at max basic level also halve healing received. */
     onHit(unit, target) {
       applyChill(unit, target);
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "heal", pct: -HEAL_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
@@ -115,18 +115,13 @@ export function makeMoruskModule(cfg) {
       if (!broken) return; // timed out quietly -- no burst
 
       const dmg = Math.max(1, Math.round((unit.def * burstPctByLevel[abilityIdx(unit, "special")]) / 100));
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       for (const e of aliveE) {
-        if (aChebDist(unit.row, unit.col, e.row, e.col) > BURST_RANGE) continue;
+        if (unitDist(unit, e) > BURST_RANGE) continue;
         damageUnit(e, dmg);
         ctx.addDamageDealt(dmg);
         applyChill(unit, e);
-        newFx.push({ id: now + "bw" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= BURST_RANGE) {
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "bwb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        newFx.push({ id: now + "bw" + unit.uid + e.uid, row: e.row + ((e.size || 1) - 1) / 2, col: e.col + ((e.size || 1) - 1) / 2, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
     },
   };

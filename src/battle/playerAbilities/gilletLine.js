@@ -27,12 +27,13 @@
 //     falloff ever grows, the Math.max(1, ...) on each creature's damage and
 //     heal below is what keeps a deeply spent wave from inverting outright.
 
-import { bossOccupies } from "../geometry.js";
-import { attackRoll, damageBoss } from "../damage.js";
+import { occupiesAny } from "../geometry.js";
+import { attackRoll } from "../damage.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, healUnit } from "../hp.js";
 import { healReceivedMultiplier, applyFrostbite, isIntangible } from "../status.js";
 import { displaceUnit } from "../displace.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -101,7 +102,7 @@ export function makeGilletModule(cfg) {
 
     /** Water Jet lvl 5: every landed hit leaves the target Frostbitten. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyFrostbite(target);
       }
       return 0;
@@ -121,7 +122,7 @@ export function makeGilletModule(cfg) {
      * whatever the bonus has fallen to.
      */
     special(unit, ctx) {
-      const { aliveP, aliveE, boss, newFx, now, gridRows, gridCols } = ctx;
+      const { aliveP, aliveE, newFx, now, gridRows, gridCols } = ctx;
       const sIdx = abilityIdx(unit, "special");
       const uIdx = abilityIdx(unit, "unique");
       const baseDmgMult = swellDmgByLevel[sIdx] / BASIC_DMG_BASELINE;
@@ -135,13 +136,16 @@ export function makeGilletModule(cfg) {
       // resolved. Shoving an enemy mid-walk would move it into a row the wave
       // has not reached yet and hit it a second time.
       const toKnock = [];
+      // A creature is struck by the FIRST row of the wave that reaches it -- a
+      // 2x2 body spans two rows, and must not be hit (or charge Undertow) twice.
+      const struck = new Set();
 
       let occupiedRows = 0;
       for (const cells of waveRows(unit.row, unit.col, dir, gridRows, gridCols)) {
         const cellSet = new Set(cells.map(([r, c]) => r + "," + c));
-        const foes = aliveE.filter((e) => e.hp > 0 && !isIntangible(e) && cellSet.has(e.row + "," + e.col));
-        const friends = aliveP.filter((a) => a.hp > 0 && cellSet.has(a.row + "," + a.col));
-        const bossHere = boss && boss.hp > 0 && cells.some(([r, c]) => bossOccupies(boss, r, c));
+        const foes = aliveE.filter((e) => e.hp > 0 && !isIntangible(e) && !struck.has(e) && occupiesAny(e, cellSet));
+        for (const e of foes) struck.add(e);
+        const friends = aliveP.filter((a) => a.hp > 0 && occupiesAny(a, cellSet));
 
         // Paint the whole row, hit or not -- the shape is the ability.
         for (const [r, c] of cells) {
@@ -150,7 +154,7 @@ export function makeGilletModule(cfg) {
 
         // Charged BEFORE the row resolves, so the first occupied row already
         // pays -- see the header note on the printed bonus never landing whole.
-        if (foes.length || friends.length || bossHere) occupiedRows++;
+        if (foes.length || friends.length) occupiedRows++;
         const spent = UNDERTOW_FALLOFF_PCT * occupiedRows;
         const dmgMult = 1 + (dmgBonus - spent) / 100;
         const healMult = 1 + (healBonus - spent) / 100;
@@ -159,12 +163,6 @@ export function makeGilletModule(cfg) {
           const dmg = Math.max(1, Math.round(attackRoll(unit) * baseDmgMult * dmgMult));
           ctx.addDamageDealt(damageUnit(e, dmg));
           if (knocksBack && !e._dodgedHit) toKnock.push(e);
-        }
-        if (bossHere) {
-          const dmg = Math.max(1, Math.round(attackRoll(unit) * baseDmgMult * dmgMult));
-          damageBoss(boss, dmg);
-          ctx.addDamageDealt(dmg);
-          newFx.push({ id: now + "swb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isFrost: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         }
         for (const a of friends) {
           if (!canBeHealed(a)) continue;

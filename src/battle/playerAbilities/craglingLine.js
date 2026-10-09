@@ -19,12 +19,13 @@
 // nothing at all lands. Effect damage (Burn, DoTs, Hazards) neither advances
 // the tally nor can be dodged.
 
-import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
-import { unitDist, distToBoss } from "../geometry.js";
-import { BOSS_SIZE, BASIC_DMG_BASELINE } from "../constants.js";
+import { abilityRoll } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyTimedDebuff } from "../status.js";
 import { damageUnit } from "../hp.js";
 import { gainSpecialCharge } from "../charge.js";
+import { isBoss } from "../classifications.js";
 
 /** Staff Strike's damage is flat across levels -- upgrades buy charge. */
 const BASIC_DMG = 20;
@@ -86,38 +87,35 @@ export function makeCraglingModule(cfg) {
      * gate, so the bar holds until something is actually in melee reach.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const stuns = idx >= MAX_IDX;
 
-      let best = null, bestD = Infinity;
+      // The closest foe picks the column -- minions first; a boss's left body
+      // column only when no minion is up.
+      let best = null, bestD = Infinity, bossBest = null, bossD = Infinity;
       for (const e of aliveE) {
         if (e.hp <= 0 || isIntangible(e)) continue;
         const d = unitDist(unit, e);
-        if (d < bestD) { bestD = d; best = e; }
+        if (isBoss(e)) { if (d < bossD) { bossD = d; bossBest = e; } }
+        else if (d < bestD) { bestD = d; best = e; }
       }
-      const bossAlive = !!(boss && boss.hp > 0);
-      const bossD = bossAlive ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      const col = best ? best.col : bossAlive && bossD < Infinity ? boss.col : null;
-      if (col == null) return;
+      const pick = best || bossBest;
+      if (!pick) return;
+      const col = pick.col;
 
       let total = 0;
       for (const e of aliveE) {
         const size = e.size || 1;
         if (e.hp <= 0 || isIntangible(e) || col < e.col || col > e.col + size - 1) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
+        const dmg = Math.max(1, Math.round(abilityRoll(unit, e) * mult));
         const dealt = damageUnit(e, dmg);
         total += dealt;
         // A dodged strike lands nothing -- the stun included.
         if (stuns && !e._dodgedHit) applyTimedDebuff(e, "stunTicks", MOMENTARY_STUN_TICKS);
-        newFx.push({ id: now + "rr" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isPillar: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (bossAlive && col >= boss.col && col <= boss.col + BOSS_SIZE - 1) {
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, ctx.aliveP) * mult));
-        damageBoss(boss, dmg);
-        total += dmg;
-        newFx.push({ id: now + "rrb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isPillar: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        const mid = (size - 1) / 2;
+        newFx.push({ id: now + "rr" + unit.uid + e.uid, row: e.row + mid, col: e.col + mid, t: now, isPillar: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
       if (total > 0) ctx.addDamageDealt(total);
     },

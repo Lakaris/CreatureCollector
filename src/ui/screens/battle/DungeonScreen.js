@@ -13,7 +13,7 @@ import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON
 import { aEase } from "../../../battle/geometry.js";
 import { getBossModule, getHighlightTiles } from "../../../battle/bosses/registry.js";
 import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/context.js";
-import { makeArenaBattle } from "../../../battle/state.js";
+import { makeArenaBattle, makeBossUnit, addBossToBattle, bossOf } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
@@ -187,8 +187,9 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         el.style.top=((u.prevRow+(u.row-u.prevRow)*t)*DUNGEON_TILE)+"px";
         if(hpEl)hpEl.style.width=(Math.max(0,u.hp/u.maxHp)*100)+"%";
       }
-      if(s.boss&&dBossDomRef.current){
-        const b=s.boss;
+      const sb=bossOf(s);
+      if(sb&&dBossDomRef.current){
+        const b=sb;
         const bt=aEase(Math.min(1,(now-b.lastMoveTime)/dAnimRef.current));
         dBossDomRef.current.style.left=((b.prevCol+(b.col-b.prevCol)*bt)*DUNGEON_TILE)+"px";
         dBossDomRef.current.style.top=((b.prevRow+(b.row-b.prevRow)*bt)*DUNGEON_TILE)+"px";
@@ -205,9 +206,9 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const s=dBRef.current;if(!s)return;
     const {newFx,acted,now}=runBattleTick(s,{gridRows:DUNGEON_GRID_ROWS,gridCols:DUNGEON_GRID_COLS});
     if(!acted)return;
-    const b=s.boss;
+    const b=bossOf(s);
     if(newFx.length)setDAtkFx(prev=>[...prev.filter(e=>(e.isShock?now-e.t<800:e.isSplash?now-e.t<1200:(e.isDark||e.isPoison)?now-e.t<900:e.isEmpSlam?now-e.t<900:now-e.t<700)),...newFx]);
-    setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
+    setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.filter(u=>u!==b).map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
     const dGameElapsed=(Date.now()-dBattleStartRef.current)*dSpeedRef.current;
     const dTL=Math.min(60,Math.ceil(Math.max(0,60000-dGameElapsed)/1000));
     setDTimeLeft(dTL);
@@ -217,7 +218,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const anyE=s.enemyUnits.some(u=>u.hp>0);
     // Winners hold a victory pose for a beat before the outcome overlay;
     // one more snapshot so React renders the stamped state.
-    const victorySnap=()=>setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
+    const victorySnap=()=>setDBSnap({playerUnits:s.playerUnits.map(u=>({...u})),enemyUnits:s.enemyUnits.filter(u=>u!==b).map(u=>({...u})),boss:b?{...b}:null,damageDealt:{...s.damageDealt}});
     if(!bossAlive&&!anyE){
       stopDLoops();
       const stamped=stampVictors(s.playerUnits,now);
@@ -250,9 +251,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     setDPlanning(false);setDBattling(true);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDBattleSelected(null);setDTimeLeft(60);dBattleStartRef.current=Date.now();
     const battle=makeArenaBattle(dPlanGrid,enemyGrid,owned,bossLevel,dAnimRef.current,equipmentLevels,equipmentAscensions);
     battle._boss=boss;
-    const bStats=getBossStats(boss,bossLevel);
     const bRow=1,bCol=Math.floor((DUNGEON_GRID_COLS-2)/2);
-    battle.boss={row:bRow,col:bCol,prevRow:bRow,prevCol:bCol,lastMoveTime:Date.now()-dAnimRef.current,hp:bStats.hp,maxHp:bStats.hp,atk:bStats.atk,crit:bStats.crit,critDmg:bStats.critDmg,atkCd:0,moveCd:0,specialCd:10,_bossKey:boss.key};
     if(boss.minions){
       const vNow=Date.now();const vHP=Math.round(80*4*(1+bossLevel*0.15));const vATK=Math.round(25*(1+bossLevel*0.1));
       // Staggered opening cooldowns so the pair doesn't act in lockstep.
@@ -266,6 +265,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         return {uid:"vm"+i,creatureId:"__vine_minion",row:m.row,col:m.col,prevRow:m.row,prevCol:m.col,lastMoveTime:vNow-dAnimRef.current,hp:vHP,maxHp:vHP,atk:vATK,def:15,spd:1,crit:CREATURE_MAP["__vine_minion"].stats.crit??0,critDmg:CREATURE_MAP["__vine_minion"].stats.critDmg??0,isRanged:false,atkCd,specialCd,isVineMinion:true};
       }));
     }
+    // The boss joins after its minions (addBossToBattle); it fights as a creature.
+    addBossToBattle(battle,makeBossUnit(boss,bossLevel,bRow,bCol,{now:Date.now()-dAnimRef.current}));
     dBRef.current=battle;
     startDRenderLoop();
     dTickRef.current=setInterval(runDTick,Math.round(500/dSpeedRef.current));

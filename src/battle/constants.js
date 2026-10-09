@@ -132,7 +132,7 @@ export const COOLDOWN_TICKS_AT_SPD_1 = 4;
  * Specials are deliberately untouched -- they fire off a charge bar, not the
  * attack cooldown, so they gained no cadence to pay for. They call
  * attackRoll/unitDamage directly; only the basic-attack paths use the
- * basicUnitDamage / basicDamageToBoss wrappers in battle/damage.js.
+ * basicUnitDamage wrapper in battle/damage.js.
  */
 const LEGACY_COOLDOWN_TICKS = 12;
 export const BASIC_ATTACK_DMG_MULT = COOLDOWN_TICKS_AT_SPD_1 / LEGACY_COOLDOWN_TICKS;

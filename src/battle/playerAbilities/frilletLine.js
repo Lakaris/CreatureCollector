@@ -22,11 +22,12 @@
 // The two halves compose: Protect drags an ally's incoming attacks onto the
 // creature whose passive punishes being attacked.
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { basicUnitDamage } from "../damage.js";
 import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { applyShield, applyProtect } from "../hp.js";
 import { applyStatMod } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -65,7 +66,7 @@ export function makeFrilletModule(cfg) {
 
     /** Guard Horn lvl 5: every landed hit shaves the victim's Defense. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
@@ -102,7 +103,7 @@ export function makeFrilletModule(cfg) {
       const stacks = protectStacksByLevel[idx];
       for (const a of aliveP) {
         if (a.uid === unit.uid || a.hp <= 0) continue;
-        if (aChebDist(unit.row, unit.col, a.row, a.col) > BESIDE_RANGE) continue;
+        if (unitDist(unit, a) > BESIDE_RANGE) continue;
         applyProtect(a, unit, stacks);
         newFx.push({ id: now + "afp" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }

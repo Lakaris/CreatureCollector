@@ -29,9 +29,10 @@
 // a summoner's Wisps vanish when the summoner is defeated.
 
 import { attackCooldown } from "../damage.js";
-import { unitDist, distToBoss } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, isStunned, speedPenalty, applyDot, applyTaunt } from "../status.js";
+import { isBoss } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -115,9 +116,9 @@ export function makeDoomshadeModule(cfg) {
      * Wisps are up; otherwise fire as soon as there is any foe to haunt --
      * the Wisp walks (or teleports) there on its own, so no range gate.
      */
-    specialInRange(unit, { aliveE, aliveP, boss }) {
+    specialInRange(unit, { aliveE, aliveP }) {
       if (livingWispsOf(unit, aliveP) >= WISP_CAP) return false;
-      return aliveE.some((e) => e.hp > 0) || !!(boss && boss.hp > 0);
+      return aliveE.some((e) => e.hp > 0);
     },
 
     special(unit, ctx) {
@@ -135,42 +136,41 @@ export const wispModule = {
    * tauntSourceUid, replace-on-reapply per policy). Owns targeting and
    * movement like other basicAttack overrides -- the Wisp never deals
    * attack damage. With no minions left it walks at the boss and Taunts that
-   * instead: Taunt is the one control effect a boss obeys, so the Wisp can
+   * instead: a boss obeys Taunt, so the Wisp can
    * hold a boss's attention exactly as it holds a minion's.
    */
   basicAttack(unit, ctx) {
-    const { aliveE, boss, newFx, now } = ctx;
+    const { aliveE, newFx, now } = ctx;
     let best = null, bestD = Infinity;
     for (const e of aliveE) {
       if (e.hp <= 0 || isIntangible(e)) continue;
       const d = unitDist(unit, e);
       if (d < bestD) { bestD = d; best = e; }
     }
-    const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-    const onBoss = bd < bestD;
-    if (onBoss) { best = boss; bestD = bd; }
     if (!best) return;
     if (bestD > MELEE_RANGE) { ctx.stepToward(best.row, best.col); return; }
     if (unit.atkCd > 0 || isStunned(unit)) return;
     applyTaunt(best, unit);
     unit.atkCd = attackCooldown(unit, speedPenalty(unit));
-    newFx.push({ id: now + "bk" + unit.uid, row: onBoss ? best.row + 0.5 : best.row, col: onBoss ? best.col + 0.5 : best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+    const mid = ((best.size || 1) - 1) / 2;
+    newFx.push({ id: now + "bk" + unit.uid, row: best.row + mid, col: best.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
   },
 
-  /** Ghostly Step is an engage tool: any foe on the field opens the gate. */
+  /** Ghostly Step is an engage tool: any foe on the field opens the gate --
+   * except a boss, which it has never blinked to (it only walks at one). */
   specialInRange(unit, { aliveE }) {
-    return aliveE.some((e) => e.hp > 0 && !isIntangible(e));
+    return aliveE.some((e) => e.hp > 0 && !isIntangible(e) && !isBoss(e));
   },
 
   /**
-   * Ghostly Step: teleport to an empty tile beside a RANDOM enemy (never
+   * Ghostly Step: teleport to an empty tile beside a RANDOM non-boss enemy (never
    * onto an occupied one; the ring accounts for 2x2 bodies). relocate is a
    * blink, so it never triggers ground Hazards. Falls back to the nearest
    * open cell around the target when its whole ring is occupied.
    */
   special(unit, ctx) {
     const { aliveE, newFx, now } = ctx;
-    const foes = aliveE.filter((e) => e.hp > 0 && !isIntangible(e));
+    const foes = aliveE.filter((e) => e.hp > 0 && !isIntangible(e) && !isBoss(e));
     if (!foes.length) return;
     const tgt = foes[Math.floor(Math.random() * foes.length)];
     const size = tgt.size || 1;

@@ -15,9 +15,9 @@
 // Burn is the shared one (applyBurn in status.js): same duration, stack cap,
 // and source-ATK-scaled damage-over-time as Emberstar's Burning Bond.
 
-import { attackRoll, damageBoss } from "../damage.js";
-import { bossOccupies, aCardinalDist } from "../geometry.js";
-import { BOSS_SIZE, BASIC_DMG_BASELINE } from "../constants.js";
+import { attackRoll } from "../damage.js";
+import { occupies, cardinalStepToward } from "../geometry.js";
+import { BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyBurn } from "../status.js";
 
@@ -44,16 +44,6 @@ function stokedMult(unit, target) {
   return 1 + ((target.burnStacks || 0) * pct) / 100;
 }
 
-/** Rows/cols the boss body spans, for alignment checks; null when no boss. */
-function bossAlignment(unit, boss) {
-  if (!boss || boss.hp <= 0) return null;
-  const rowAligned = unit.row >= boss.row && unit.row < boss.row + BOSS_SIZE;
-  const colAligned = unit.col >= boss.col && unit.col < boss.col + BOSS_SIZE;
-  if (rowAligned) return { dr: 0, dc: unit.col < boss.col ? 1 : -1, dist: Math.abs(unit.col - boss.col) };
-  if (colAligned) return { dr: unit.row < boss.row ? 1 : -1, dc: 0, dist: Math.abs(unit.row - boss.row) };
-  return null;
-}
-
 export function makeIgnissaurModule(cfg) {
   const { basicDmgByLevel, specialDmgByLevel } = cfg;
   return {
@@ -70,58 +60,51 @@ export function makeIgnissaurModule(cfg) {
     },
 
     /**
-     * Inferno Breath needs something to aim along: a foe (or the boss) sharing
+     * Inferno Breath needs something to aim along: a foe whose body shares
      * the unit's row or column. The full charge holds until that's true.
      */
-    specialInRange(unit, { aliveE, boss }) {
-      if (aliveE.some((e) => e.row === unit.row || e.col === unit.col)) return true;
-      return !!bossAlignment(unit, boss);
+    specialInRange(unit, { aliveE }) {
+      return aliveE.some((e) => cardinalStepToward(unit, e));
     },
 
     /**
      * Inferno Breath: pick the nearest cardinally-aligned foe, then torch every
      * tile from the unit to the arena's edge in that direction -- damaging (and
-     * at max level, Burning) every enemy on the way. The boss counts when the
-     * ray crosses its 2x2 body.
+     * at max level, Burning) every enemy on the way -- a 2x2 boss included,
+     * once, however many of its tiles the ray crosses.
      */
     special(unit, ctx) {
-      const { aliveE, boss, gridRows, gridCols, newFx, now } = ctx;
+      const { aliveE, gridRows, gridCols, newFx, now } = ctx;
 
       let dir = null, bestDist = Infinity;
       for (const e of aliveE) {
-        if (e.row !== unit.row && e.col !== unit.col) continue;
-        const d = aCardinalDist(unit.row, unit.col, e.row, e.col);
-        if (d < bestDist) {
-          bestDist = d;
-          dir = e.row === unit.row ? { dr: 0, dc: e.col > unit.col ? 1 : -1 } : { dr: e.row > unit.row ? 1 : -1, dc: 0 };
+        const step = cardinalStepToward(unit, e);
+        if (step && step.dist < bestDist) {
+          bestDist = step.dist;
+          dir = step;
         }
       }
-      const bossDir = bossAlignment(unit, boss);
-      if (bossDir && bossDir.dist < bestDist) dir = bossDir;
       if (!dir) return;
 
       const idx = abilityIdx(unit, "special");
       const ratio = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const burns = idx >= MAX_IDX;
-      let totalDmg = 0, hitBoss = false;
+      let totalDmg = 0;
+      // Once per creature however many of its tiles the ray crosses -- a 2x2
+      // body spans two tiles of any row or column.
+      const struck = new Set();
 
       let r = unit.row + dir.dr, c = unit.col + dir.dc;
       while (r >= 0 && r < gridRows && c >= 0 && c < gridCols) {
         newFx.push({ id: now + "breath" + unit.uid + r + "_" + c, row: r, col: c, t: now, isPillar: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
-        const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
-        if (minion) {
-          const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, minion)));
-          damageUnit(minion, dmg);
+        const foe = aliveE.find((e) => e.hp > 0 && !struck.has(e) && occupies(e, r, c));
+        if (foe) {
+          struck.add(foe);
+          const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, foe)));
+          damageUnit(foe, dmg);
           totalDmg += dmg;
-          if (burns) applyBurn(minion, unit.atk);
-        }
-        if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
-          const dmg = Math.max(1, Math.round(attackRoll(unit) * ratio * stokedMult(unit, boss)));
-          damageBoss(boss, dmg);
-          totalDmg += dmg;
-          if (burns) applyBurn(boss, unit.atk);
-          hitBoss = true;
+          if (burns) applyBurn(foe, unit.atk);
         }
         r += dir.dr;
         c += dir.dc;

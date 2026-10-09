@@ -134,7 +134,7 @@ export const ABILITY_TAG_DEFS = {
   // so tagging an ability here is all it takes to include it.
   multihit: { label: "Multi-hit", description: "Strikes several times in one use." },
   closest: { label: "Closest", description: "Targets the closest enemy in range." },
-  farthest: { label: "Farthest", description: "Targets the farthest aligned enemy in range." },
+  farthest: { label: "Farthest", description: "Targets the farthest enemy in range." },
   burn: { label: "Burn", description: "Deals damage over time." },
   // Label only -- the blue charge pill draws its own ⚡ (see CreatureDetail
   // and DexEntry); this is just the heading of the popup it opens.
@@ -147,7 +147,10 @@ export const ABILITY_TAG_DEFS = {
   blind: { label: "Blind", description: "This creature's next attack misses; no damage and negative effects are dealt." },
   assist: { label: "Assist", description: "Called allies immediately use their Basic ability on the enemy this creature targeted." },
   dispeldebuff: { label: "Dispel Debuff", description: "Removes debuffs." },
-  line: { label: "Line", description: "Hits every tile in the direction of the attack, all the way to the arena's edge." },
+  // A shape, not a length: each ability sets its own reach (Swell travels 3
+  // tiles; Storm Lance and Inferno Breath run the column). Anything that DOES
+  // reach the arena's edge has to say so in its own text -- Tremor Edge does.
+  line: { label: "Line", description: "Hits every tile in a straight line in the direction of the attack, as far as the ability reaches." },
   horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row." },
   speedup: { label: "Speed Up", description: "Increases the creature's Speed.", stacking: [25, 50, 75, 100, 125] },
   taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them." },
@@ -168,7 +171,20 @@ export const ABILITY_TAG_DEFS = {
   waterhazard: { label: "Water Hazard", description: "Deals damage if a creature attempts to move while on it; -10% Haste when standing on it." },
   firehazard: { label: "Fire Hazard", description: "Deals damage if a creature attempts to move while on it; deals damage over time when standing on it." },
   windhazard: { label: "Wind Hazard", description: "Deals damage if a creature attempts to move while on it; every few seconds it pushes the creatures standing on it back." },
+  // Wind's mirror: Wind throws you off the tile, Lightning punishes staying on
+  // it to cast. Only a SPECIAL triggers it -- Basic attacks do not -- so it is
+  // a once-per-cast hit rather than a per-swing tax, and it lands hardest on
+  // Supports whose whole kit is the Special. Defined here ahead of its battle
+  // implementation; Voltravene's Storm Lance is the first thing that lays it.
+  lightninghazard: { label: "Lightning Hazard", description: "Deals damage if a creature attempts to move while on it; deals damage whenever a creature on it uses a Special ability." },
   immortal: { label: "Immortal", description: "Health can not be reduced below 1." },
+  // The umbrella for every ability that restores Health, however it does it --
+  // a flat heal, a regen aura, a Heal Over Time, a drain off damage dealt. The
+  // narrower tags (Heal Over Time, Lifesteal) still say HOW; this one is what a
+  // player filtering for healers is actually looking for, so it rides alongside
+  // them rather than instead of them. Effects that only MODIFY healing (Undertow,
+  // Rekindle's bonus) or bring a creature back (Revive) do not carry it.
+  heal: { label: "Heal", description: "Restores Health." },
   healovertime: { label: "Heal Over Time", description: "Restores Health over time." },
   // The healing-from-damage effect the engine already has a flag for: every
   // drain routes through healUnit's `lifesteal` option (battle/hp.js), gear
@@ -253,6 +269,10 @@ export const ABILITY_TAG_DEFS = {
   // pull, or knockback) -- the general term, as Immobilized is for effects
   // that stop movement. Gear keyed on Displace (Brineplate) reads this tag.
   displace: { label: "Displace", description: "Forcefully moves the enemy it hits." },
+  // Trading places outright, with ANY creature -- an ally with an ally, an
+  // ally with an enemy, an enemy with an enemy. Not a Displace: nobody is
+  // shoved, two creatures exchange tiles.
+  swap: { label: "Swap", description: "Switches places with the target. Works on any creature, ally or enemy. Doesn't affect bosses." },
   // The first ability to take damageUnit's pierceShield path -- the policy
   // note in battle/hp.js asks that the text say so, and Unfettered's does.
   bypassshield: { label: "Bypass Shield", description: "This creature's attacks ignore Shields." },
@@ -494,6 +514,45 @@ const FRIZZLAMB_PHRASES = {
   basic: { phrase: "Deal damage to an enemy and gain 1 Charge (stacking, max 50)" },
 };
 
+// Voltravene (three-headed storm dragon) line: Trident Arc names its three
+// targets in its own phrase -- one per head -- with the max tier's same-enemy
+// bonus arriving as a rider. Storm Lance is a column hit, its max tier's
+// Lightning Hazard also a rider. Stormsight is written out per tier.
+const VOLTRAVENE_PHRASES = {
+  basic: { phrase: "Deal damage to the Weakest, Closest, and Farthest enemy" },
+  special: { phrase: "Deal damage to a column of enemies" },
+};
+
+// Emberant (fire ant) line: Formic Spray is a plain hit on the generic phrase,
+// its max tier's Burn arriving as a rider. Kindled Brood leads with "Heal N HP",
+// so it rides the heal shape; its max tier adds Attack Up mid-sentence, so that
+// tier replaces the sentence rather than appending to it. Alarm Pheromone is
+// written out per tier.
+const EMBERANT_PHRASES = {
+  basic: null,
+  special: {
+    heal: true,
+    phrase: "Heal all Nearby allies and they temporarily inflict Burn when dealing damage. If an ability already inflicts Burn, inflict an additional stack of Burn",
+    phraseByLevel: {
+      4: "Heal all Nearby allies and they gain Attack Up and temporarily inflict Burn when dealing damage. If an ability already inflicts Burn, inflict an additional stack of Burn",
+    },
+  },
+};
+
+// Zephyrcoo (storm cuckoo) line -- ids stormwyvern/tempestlord. Gust Peck
+// carries two numbers ("Heal 4 HP; 16 dmg") so it rides the dual-badge
+// healDamage shape; its max tier's Shield is its own sentence, so that tier
+// replaces the whole phrase. Nest Swap and Brood Ward are written out per tier.
+const ZEPHYRCOO_PHRASES = {
+  basic: {
+    phrase: "Deal damage to an enemy. If no enemies are in range, heal an ally",
+    phraseByLevel: {
+      4: "Deal damage to an enemy. If no enemies are in range, heal an ally. This creature gains a Shield",
+    },
+    healDamage: true,
+  },
+};
+
 // Gillet (axolotl) line: Water Jet is a plain hit on the generic phrase. Swell
 // carries two numbers ("Heal 20 HP; 14 dmg") so it rides the dual-badge
 // healDamage shape. Its max tier folds the knockback in beside the damage
@@ -673,6 +732,10 @@ const PLAIN_ABILITY_PHRASES = {
   bulwarden: FRILLET_PHRASES,
   aegiceras: FRILLET_PHRASES,
   rampartops: FRILLET_PHRASES,
+  voltravene: VOLTRAVENE_PHRASES,
+  arcmajor: VOLTRAVENE_PHRASES,
+  emberant: EMBERANT_PHRASES,
+  formicinder: EMBERANT_PHRASES,
   gillet: GILLET_PHRASES,
   gillow: GILLET_PHRASES,
   plumewake: GILLET_PHRASES,
@@ -702,6 +765,8 @@ const PLAIN_ABILITY_PHRASES = {
   frizzlamb: FRIZZLAMB_PHRASES,
   staticoat: FRIZZLAMB_PHRASES,
   thunderfleece: FRIZZLAMB_PHRASES,
+  stormwyvern: ZEPHYRCOO_PHRASES,
+  tempestlord: ZEPHYRCOO_PHRASES,
 };
 
 /**
@@ -843,13 +908,19 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   // Twin Barb: 2-4 hits per swing at every tier.
   if (key === "basic" && isEmberstarLine) tags.push("closest", "multihit");
   if (key === "unique" && isEmberstarLine) tags.push("burn");
-  if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce");
-  if (key === "special" && isStarlitLine) tags.push("closest");
+  // Piercing Blessing heals every ally on its beam at every tier (see
+  // basicHealByLevel in starlitLine.js). Radiant Exchange only heals the party
+  // from its 4th upgrade on -- specialHealByLevel is 0 below that.
+  if (key === "basic" && isStarlitLine) tags.push("farthest", "pierce", "heal");
+  if (key === "special" && isStarlitLine) {
+    tags.push("closest");
+    if (abilityLevel == null || abilityLevel >= 3) tags.push("heal");
+  }
   const isBloomibisLine = getRootDef(creatureId)?.id === "bloomibis";
   if (key === "basic" && isBloomibisLine) tags.push("closest");
-  if (key === "unique" && isBloomibisLine) tags.push("nearby");
+  if (key === "unique" && isBloomibisLine) tags.push("nearby", "heal");
   if (key === "special" && isBloomibisLine) {
-    tags.push("weakest");
+    tags.push("weakest", "heal");
     // Soothing Hoot only dispels debuffs from its 4th upgrade on; when the caller
     // passes the displayed tier (the owned-creature screen), hide the tag
     // below that. Level-less contexts (dex, gacha) show the full kit.
@@ -926,11 +997,12 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   }
   const isFrizzlambLine = getRootDef(creatureId)?.id === "frizzlamb";
   if (isFrizzlambLine) {
-    // Both halves of the kit read Charge, so both carry its pill. Skittish is
-    // a flat Speed gain on itself with no effect to name.
+    // Both halves of the kit read Charge, so both carry its pill. Flock Surge
+    // restores Health to the flock at every tier. Skittish is a flat Speed
+    // gain on itself with no effect to name.
     if (key === "basic") tags.push("closest", "charge");
     if (key === "special") {
-      tags.push("nearby", "charge");
+      tags.push("nearby", "heal", "charge");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("defenseup");
     }
   }
@@ -970,7 +1042,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       tags.push("closest");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("expose");
     }
-    if (key === "special") tags.push("beside", "protect", "healovertime");
+    if (key === "special") tags.push("beside", "protect", "heal", "healovertime");
   }
   const isSparkshellLine = getRootDef(creatureId)?.id === "sparkshell";
   if (isSparkshellLine) {
@@ -1027,6 +1099,35 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") tags.push("beside", "protect");
     if (key === "unique") tags.push("counter");
   }
+  const isVoltraveneLine = getRootDef(creatureId)?.id === "voltravene";
+  if (isVoltraveneLine) {
+    // Trident Arc's three heads each pick by their own rule, so it carries all
+    // three targeting pills at every tier. Storm Lance is a Line throughout and
+    // only lays its Lightning Hazard at max. Stormsight reads the Hazard at
+    // every tier, so it carries that pill for the definition.
+    if (key === "basic") tags.push("weakest", "closest", "farthest");
+    if (key === "special") {
+      tags.push("line");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("lightninghazard");
+    }
+    if (key === "unique") tags.push("lightninghazard");
+  }
+  const isEmberantLine = getRootDef(creatureId)?.id === "emberant";
+  if (isEmberantLine) {
+    // Formic Spray only Burns from its 4th upgrade on. Kindled Brood heals and
+    // hands out Burn at every tier, and Attack Up only at max. Alarm Pheromone
+    // is keyed on Burning enemies, so it carries Burn's pill for the
+    // definition -- the same reason Windbreak carries Fortify's.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("burn");
+    }
+    if (key === "special") {
+      tags.push("nearby", "heal", "burn");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("attackup");
+    }
+    if (key === "unique") tags.push("nearby", "burn");
+  }
   const isGilletLine = getRootDef(creatureId)?.id === "gillet";
   if (isGilletLine) {
     // Water Jet only chills from its 4th upgrade on. Swell is a Line at every
@@ -1037,28 +1138,52 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("frostbite");
     }
     if (key === "special") {
-      tags.push("line");
+      tags.push("line", "heal");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("displace");
+    }
+  }
+  const isZephyrcooLine = getRootDef(creatureId)?.id === "stormwyvern";
+  if (isZephyrcooLine) {
+    // Gust Peck heals at every tier and only Shields at max. Nest Swap Swaps
+    // at every tier and only reaches Nearby allies at max. Brood Ward Swaps
+    // and heals at every tier, Shielding only at max. Their Speed and Haste
+    // are flat bonuses, not the Speed Up / Haste Up buffs, so they carry no
+    // pill (the same rule as Insatiable's Haste).
+    if (key === "basic") {
+      tags.push("closest", "heal");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");
+    }
+    if (key === "special") {
+      tags.push("swap");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("nearby");
+    }
+    if (key === "unique") {
+      tags.push("swap", "heal");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");
     }
   }
   const isDusklingLine = getRootDef(creatureId)?.id === "duskling";
   if (isDusklingLine) {
     // The whole line hunts wounded prey, so BOTH attacks target the weakest
     // enemy rather than the closest -- which is what the max tiers pay off.
-    // Sonic Screech only bleeds from its 4th upgrade on. Insatiable scales
-    // lifesteal itself, so it carries that pill; its max-tier Haste is a flat
-    // stat bump rather than the Haste Up buff, so that half names no effect
-    // (the same rule as Skittish's Speed and Clubtail's self-only bumps).
+    // Sonic Screech only bleeds from its 4th upgrade on. Bloodletting drains
+    // Health back, and lifesteal is a heal, so it carries Heal beside
+    // Lifesteal. Insatiable scales lifesteal itself, so it carries that pill
+    // -- but it restores nothing on its own, so no Heal (the same rule as
+    // Undertow); its max-tier Haste is a flat stat bump rather than the Haste
+    // Up buff, so that half names no effect (as Skittish's Speed and
+    // Clubtail's self-only bumps).
     if (key === "basic") {
       tags.push("weakest");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("damageovertime");
     }
-    if (key === "special") tags.push("weakest", "lifesteal");
+    if (key === "special") tags.push("weakest", "heal", "lifesteal");
     if (key === "unique") tags.push("lifesteal");
   }
   const isVenomcoilLine = getRootDef(creatureId)?.id === "venomcoil";
   if (isVenomcoilLine) {
-    if (key === "basic") tags.push("closest");
+    // Venom Fang drains a share of every hit back as Health at every tier.
+    if (key === "basic") tags.push("closest", "heal");
     // Restrained is the same debuff the Shockstinger line uses -- it comes off
     // by range, which for a melee constrictor means the moment its grip breaks.
     if (key === "special") tags.push("closest", "restrained", "abilitychargeremoval");
@@ -1086,7 +1211,7 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("hastedown");
     }
     if (key === "special") {
-      tags.push("intangible", "closest");
+      tags.push("intangible", "closest", "heal");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
     }
   }
@@ -1099,11 +1224,11 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
     if (key === "special") {
       // "Lowest" is this game's existing Weakest tag -- same rule, and the
       // one already used by the other ally-healers.
-      tags.push("weakest", "splash");
+      tags.push("weakest", "splash", "heal");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("blind");
     }
     if (key === "unique") {
-      tags.push("weakest");
+      tags.push("weakest", "heal");
       // Moonlit Scales only hands out Speed Up from its 4th upgrade on.
       if (abilityLevel == null || abilityLevel >= 4) tags.push("speedup");
     }
@@ -1112,9 +1237,11 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   if (isBonebeakLine) {
     // Carrion Rip applies the DoT from tier 1 -- the upgrades only add a
     // second stack -- so the tag is not level-gated here. Gorge carries it
-    // too now that it leaves stacks behind; Death Feast has no tags.
+    // too now that it leaves stacks behind. Death Feast recovers Health off
+    // every defeat at every tier, so it carries Heal.
     if (key === "basic") tags.push("closest", "damageovertime");
     if (key === "special") tags.push("damageovertime");
+    if (key === "unique") tags.push("heal");
   }
   const isCraglingLine = getRootDef(creatureId)?.id === "cragling";
   if (isCraglingLine) {
@@ -1135,7 +1262,11 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   }
   const isIgletLine = getRootDef(creatureId)?.id === "iglet";
   if (isIgletLine) {
-    if (key === "basic") tags.push("closest");
+    // Frost Nip only drains Health back from its 4th upgrade on.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("heal");
+    }
     if (key === "special") {
       tags.push("fortify");
       // Hunker In only dispels from its 4th upgrade on -- same level-gating
@@ -1163,8 +1294,10 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   }
   const isEmberchirpLine = getRootDef(creatureId)?.id === "emberchirp";
   if (isEmberchirpLine) {
-    if (key === "basic") tags.push("closest");
-    if (key === "special") tags.push("nearby", "healovertime");
+    // Stolen Spark heals this creature on every hit. Rekindle only scales
+    // healing and brings it back, so it carries Revive but not Heal.
+    if (key === "basic") tags.push("closest", "heal");
+    if (key === "special") tags.push("nearby", "heal", "healovertime");
     if (key === "unique") tags.push("revive");
   }
   const isQuetzalisLine = getRootDef(creatureId)?.id === "coatlet";
@@ -1179,9 +1312,9 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
   }
   const isJadebunLine = getRootDef(creatureId)?.id === "jadebun";
   if (isJadebunLine) {
-    if (key === "basic") tags.push("weakest");
+    if (key === "basic") tags.push("weakest", "heal");
     if (key === "special") {
-      tags.push("weakest", "immortal", "attackup");
+      tags.push("weakest", "heal", "immortal", "attackup");
       // The elixir only shields from its 4th upgrade on -- same level-gating
       // rule as the other final-tier effects.
       if (abilityLevel == null || abilityLevel >= 4) tags.push("shield");

@@ -24,8 +24,7 @@
 // Defense. It works through the engine's heal chokepoint (battle/hp.js), so
 // EVERY healer in the game feeds it, not just a scripted one.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { damageBoss } from "../damage.js";
+import { unitDist } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { applyShield, damageUnit } from "../hp.js";
 import { applyStatMod, applyBlind, isIntangible } from "../status.js";
@@ -89,7 +88,7 @@ export function makeOathcubModule(cfg) {
      * something is standing close enough to be worth hitting.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
 
       applyShield(unit, (unit.def * SMITE_SHIELD_PCT) / 100, STATUS_TICKS);
@@ -101,23 +100,14 @@ export function makeOathcubModule(cfg) {
 
       for (const e of aliveE) {
         if (e.hp <= 0 || isIntangible(e)) continue;
-        if (aChebDist(unit.row, unit.col, e.row, e.col) > NEARBY_RANGE) continue;
+        if (unitDist(unit, e) > NEARBY_RANGE) continue;
         const dealt = damageUnit(e, dmg);
         // Protect may have handed the hit to a guardian -- Blind belongs on
         // whoever actually took it, the same rule the attack loop uses.
         const hit = e._redirectedTo || e;
         if (blinds && !e._dodgedHit) applyBlind(hit);
         ctx.addDamageDealt(dealt);
-        newFx.push({ id: now + "rsh" + unit.uid + e.uid, row: e.row, col: e.col, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-
-      // A boss standing next to it is a nearby enemy too. Bosses are immune to
-      // control, so it takes the light and not the Blind -- the same policy
-      // Hellfang's Root and Taunt follow.
-      if (boss && boss.hp > 0 && distToBoss(boss, unit.row, unit.col) <= NEARBY_RANGE) {
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "rsb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        newFx.push({ id: now + "rsh" + unit.uid + e.uid, row: e.row + ((e.size || 1) - 1) / 2, col: e.col + ((e.size || 1) - 1) / 2, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
     },
   };

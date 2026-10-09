@@ -19,7 +19,7 @@
 // buff icons, no dispel interaction, per the ability's design note).
 
 import { attackCooldown } from "../damage.js";
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS } from "../constants.js";
 import { speedPenalty, isStunned, applyStatMod, healReceivedMultiplier } from "../status.js";
 import { applyShield, healUnit } from "../hp.js";
@@ -70,7 +70,7 @@ export function makeJadebunModule(cfg) {
       if (!hurt.length) return; // nobody to tend: hold position
       hurt.sort((a, z) => a.hp - z.hp);
       const tgt = hurt[0];
-      const d = aChebDist(unit.row, unit.col, tgt.row, tgt.col);
+      const d = unitDist(unit, tgt);
       if (d > RANGED_RANGE) { ctx.stepToward(tgt.row, tgt.col); return; }
       if (unit.atkCd > 0 || isStunned(unit)) return;
 
@@ -116,7 +116,7 @@ export function makeJadebunModule(cfg) {
       const pct = tempoPctByLevel[abilityIdx(unit, "unique")];
       const active = ctx.aliveP.some(
         (a) => a !== unit && a.hp > 0 && a.hp < a.maxHp * TEMPO_HP_FRAC &&
-          aChebDist(unit.row, unit.col, a.row, a.col) <= RANGED_RANGE
+          unitDist(unit, a) <= RANGED_RANGE
       );
       // Direct stat adjustment, applied/removed as a tracked factor so
       // repeated ticks never compound and external stat writes stay intact.

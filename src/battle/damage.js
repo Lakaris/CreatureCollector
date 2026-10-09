@@ -3,11 +3,12 @@
 import { weakenMultiplier, statModMultiplier, restrainedSlowMultiplier, frostbiteMultiplier, dartShredMultiplier, critShredMultiplier, countBuffs, countDebuffs } from "./status.js";
 import { COOLDOWN_TICKS_AT_SPD_1, BASIC_ATTACK_DMG_MULT } from "./constants.js";
 import { CREATURE_MAP } from "../data/creatures.js";
-import { isUsingBasic, currentApplier, withApplier, withActiveAbility, battleRoster } from "./applier.js";
+import { isUsingBasic, currentApplier, withApplier, withActiveAbility, battleRoster, tickStartPlayers, sameSide } from "./applier.js";
+import { hasRule } from "./classifications.js";
 import { onDefeated, announceHit, onHitLanded, attackerDamageMultiplier, damageUnit, spendExpose, hasAllyNearby, shieldBreakMultiplier, standsOnHazard, retaliationMultiplier, isBelow } from "./hp.js";
 import { gearTriggers, triggersOn } from "./applier.js";
 import { abilityHasTag } from "./abilityTags.js";
-import { distToBoss } from "./geometry.js";
+import { unitDist } from "./geometry.js";
 import { gainSpecialCharge } from "./charge.js";
 
 /**
@@ -45,7 +46,7 @@ function critMultiplier(unit) {
 }
 
 /** A crit happened: pay crit gear, and flag it for the hit it belongs to
- * (claimed by damageUnit / damageBoss for hit listeners -- see hp.js). */
+ * (claimed by damageUnit for hit listeners -- see hp.js). */
 function landCrit(unit) {
   grantCritCharge(unit);
   unit._critLanded = true;
@@ -237,7 +238,16 @@ export function mitigatedDamage(atk, def) {
  * Unit-vs-unit damage, mitigated by the defender's DEF.
  * Used for player-vs-minion and minion-vs-player alike.
  */
-export function unitDamage(attacker, defender) {
+/**
+ * `party` (optional): the defender's foes to count for a boss's Dark Shroud
+ * (see playerDamageToBoss). Left out, it is the party at the start of the tick;
+ * a hit landed outside the acting creature's own turn -- a Counter, a
+ * Bloodrush bonus hit -- passes the party standing right now, as it always has.
+ */
+export function unitDamage(attacker, defender, party) {
+  // A creature classed to take damage unmitigated (the boss -- see
+  // battle/classifications.js) is hit by the boss formula instead.
+  if (hasRule(defender, "unmitigatedDamage")) return playerDamageToBoss(attacker, defender, party);
   // Frostbite: Water attackers hit the carrier harder (5% per stack).
   const water = CREATURE_MAP[attacker.creatureId]?.type === "Water";
   const atk = attackOf(attacker) * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker) * gearAtkMultiplier(attacker, defender);
@@ -265,7 +275,7 @@ function sureCritAgainst(attacker, target) {
  *
  * Crit comes in through attackRoll, not from a second roll here.
  */
-export function playerDamageToBoss(attacker, boss, aliveP) {
+export function playerDamageToBoss(attacker, boss, aliveP = tickStartPlayers()) {
   const roll = sureCritAgainst(attacker, boss) ? withGuaranteedCrit(attacker, () => attackRoll(attacker, boss)) : attackRoll(attacker, boss);
   let dmg = Math.max(1, Math.round(roll * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker)));
   if (boss._bossKey === "dark") {
@@ -278,40 +288,32 @@ export function playerDamageToBoss(attacker, boss, aliveP) {
 }
 
 /**
+ * The roll an ability scales its damage from, against `target`: attackRoll,
+ * except that a creature classed to take damage unmitigated (the boss -- see
+ * battle/classifications.js) is rolled by the boss formula, which also folds
+ * in the attacker's Attack buffs/debuffs, Weaken and Aura.
+ *
+ * Only some abilities use this -- the ones that have always hit bosses through
+ * the boss formula (Feathered Gale, Ruyi Reach, Gorge, ...). The rest roll
+ * attackRoll against everything, bosses included, as they always have. That
+ * split is how these abilities were built before bosses were creatures; it is
+ * kept exactly so no boss fight changes.
+ */
+export function abilityRoll(attacker, target) {
+  if (target && hasRule(target, "unmitigatedDamage")) return playerDamageToBoss(attacker, target);
+  // Untargeted, exactly as these abilities have always rolled against creatures.
+  return attackRoll(attacker);
+}
+
+/**
  * Basic-attack damage: the unit-vs-unit and vs-boss formulas scaled by
  * BASIC_ATTACK_DMG_MULT, so the faster attack cadence costs proportionally
  * smaller hits. Every basic attack goes through these -- the default flow in
  * tick.js and the custom basicAttack hooks alike -- while specials keep
- * calling unitDamage / playerDamageToBoss / attackRoll directly.
+ * calling unitDamage / abilityRoll / attackRoll directly.
  */
-export function basicUnitDamage(attacker, defender) {
-  return unitDamage(attacker, defender) * BASIC_ATTACK_DMG_MULT;
-}
-
-export function basicDamageToBoss(attacker, boss, aliveP) {
-  return playerDamageToBoss(attacker, boss, aliveP) * BASIC_ATTACK_DMG_MULT;
-}
-
-/**
- * Apply damage to a boss, letting any shield soak it first. The boss's twin
- * of damageUnit for the attacker's gear (attackerDamageMultiplier in hp.js),
- * Special charge on the defeat, and Basic-hit reactions. Returns the damage
- * actually applied.
- */
-export function damageBoss(boss, dmg, { effectDamage = false } = {}) {
-  const attacker = currentApplier();
-  const crit = !!attacker?._critLanded;
-  if (attacker) attacker._critLanded = false;
-  const baseDmg = dmg;
-  dmg = Math.max(1, Math.round(dmg * attackerDamageMultiplier(boss, { effectDamage, crit }) * spendExpose(boss, effectDamage)));
-  const wasAlive = boss.hp > 0;
-  const hpBefore = boss.hp;
-  // Stormshell Mantle counts extra against the boss's shield pool too.
-  if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - Math.round(dmg * shieldBreakMultiplier(effectDamage)));
-  else boss.hp = Math.max(0, boss.hp - dmg);
-  if (wasAlive && boss.hp <= 0) onDefeated(boss, { overkill: dmg - hpBefore });
-  announceHit(boss, { baseDmg, dmg, crit, effectDamage });
-  return dmg;
+export function basicUnitDamage(attacker, defender, party) {
+  return unitDamage(attacker, defender, party) * BASIC_ATTACK_DMG_MULT;
 }
 
 /** Ticks until a unit can act again, slowed by Slow/Shock and sped up by
@@ -336,10 +338,7 @@ export function attackCooldown(unit, penalty = 1) {
 /** Deal `dmg` as `source`'s effect damage (never countered, reflected, or
  * dodged) to a creature or a boss. Shared by the retaliation gear below. */
 function retaliate(source, victim, dmg) {
-  withApplier(source, () => withActiveAbility(source, "unique", () => {
-    if (victim.uid == null) damageBoss(victim, dmg, { effectDamage: true });
-    else damageUnit(victim, dmg, { effectDamage: true });
-  }));
+  withApplier(source, () => withActiveAbility(source, "unique", () => damageUnit(victim, dmg, { effectDamage: true })));
 }
 
 /** Thornback Vest: every ability hit taken, whoever landed it takes a share
@@ -359,15 +358,12 @@ onHitLanded((attacker, target, info) => {
   target._hitsForDischarge = (target._hitsForDischarge || 0) + 1;
   for (const g of triggersOn(target, "dischargeEvery", target._hitsForDischarge)) {
     if (target.hp <= 0) break;
-    const players = battleRoster().filter((u) => u.hp > 0 && u.uid?.[0] === "p");
+    // Every enemy whose body touches the 8 surrounding tiles -- a 2x2 boss
+    // included; it is in the roster like any creature.
     for (const e of battleRoster()) {
       if (e.hp <= 0 || !e.uid || e.uid[0] === target.uid[0]) continue;
-      if (Math.max(Math.abs(e.row - target.row), Math.abs(e.col - target.col)) > 1) continue;
-      retaliate(target, e, Math.max(1, Math.round(basicUnitDamage(target, e))));
-    }
-    // The boss is an enemy of the player side only, and not in the roster.
-    if (target.uid[0] === "p" && attacker.uid == null && attacker.hp > 0 && distToBoss(attacker, target.row, target.col) <= 1) {
-      retaliate(target, attacker, Math.max(1, Math.round(basicDamageToBoss(target, attacker, players))));
+      if (unitDist(target, e) > 1) continue;
+      retaliate(target, e, Math.max(1, Math.round(basicUnitDamage(target, e, standingFoesOf(e)))));
     }
   }
 });
@@ -383,13 +379,14 @@ onHitLanded((attacker, target, info) => {
     // Bramble Cuff: Counters hit harder.
     const bonus = (defenseOf(target) * (g.counterBonusDefPct || 0)) / 100;
     const more = retaliationMultiplier(target, "counter");
-    withApplier(target, () => withActiveAbility(target, "unique", () => {
-      if (attacker.uid == null) {
-        const players = battleRoster().filter((u) => u.hp > 0 && u.uid?.[0] === "p");
-        damageBoss(attacker, Math.max(1, Math.round((basicDamageToBoss(target, attacker, players) + bonus) * more)), { effectDamage: true });
-      } else {
-        damageUnit(attacker, Math.max(1, Math.round((basicUnitDamage(target, attacker) + bonus) * more)), { effectDamage: true });
-      }
-    }));
+    // basicUnitDamage hits a boss with the boss formula (its classification),
+    // counting the party that stands now (see unitDamage).
+    withApplier(target, () => withActiveAbility(target, "unique", () =>
+      damageUnit(attacker, Math.max(1, Math.round((basicUnitDamage(target, attacker, standingFoesOf(attacker)) + bonus) * more)), { effectDamage: true })));
   }
 });
+
+/** `u`'s foes standing right now, across the whole battle. */
+function standingFoesOf(u) {
+  return battleRoster().filter((o) => o.hp > 0 && o !== u && !sameSide(o, u));
+}

@@ -16,11 +16,12 @@
 // the count before its own hits bank a fresh ramp, so a full-row sweep
 // rebuilds the buff instantly while a whiffed cast drops it.
 
-import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
-import { distToBoss } from "../geometry.js";
-import { RANGED_RANGE, BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { abilityRoll } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyStatMod, applyDartShred } from "../status.js";
 import { damageUnit } from "../hp.js";
+import { isBoss, hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -67,9 +68,10 @@ export function makeQuetzalisModule(cfg) {
       return basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
     },
 
-    /** Plume Dart's grind: shred DEF per landed hit (bosses have none -- skip). */
+    /** Plume Dart's grind: shred DEF per landed hit.
+     * A boss shrugs it off (ignoresOnHitEffects in battle/classifications.js). */
     onHit(unit, target) {
-      if (target && target.uid != null) {
+      if (target && !hasRule(target, "ignoresOnHitEffects")) {
         applyDartShred(target, abilityIdx(unit, "basic") >= MAX_IDX ? DART_SHRED_PCT * 2 : DART_SHRED_PCT);
       }
       return 0;
@@ -81,21 +83,22 @@ export function makeQuetzalisModule(cfg) {
      * reach opens it). Resets and re-banks the Rising Star ramp.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const debuffs = idx >= MAX_IDX;
 
-      // Closest targetable foe decides the row; the boss's top row is the
-      // fallback when only the boss is in reach.
-      let best = null, bestD = Infinity;
+      // Closest targetable foe decides the row -- minions first; a boss's top
+      // row is the fallback when only a boss is in reach.
+      let best = null, bestD = Infinity, bossBest = null, bossD = Infinity;
       for (const e of aliveE) {
         if (isIntangible(e)) continue;
-        const d = Math.max(Math.abs(e.row - unit.row), Math.abs(e.col - unit.col));
-        if (d <= RANGED_RANGE && d < bestD) { bestD = d; best = e; }
+        const d = unitDist(unit, e);
+        if (d > RANGED_RANGE) continue;
+        if (isBoss(e)) { if (d < bossD) { bossD = d; bossBest = e; } }
+        else if (d < bestD) { bestD = d; best = e; }
       }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      const row = best ? best.row : bossD <= RANGED_RANGE ? boss.row : null;
+      const row = best ? best.row : bossBest ? bossBest.row : null;
       if (row == null) return;
 
       // "Until the next time Feathered Gale is used": the cast itself resets
@@ -105,19 +108,14 @@ export function makeQuetzalisModule(cfg) {
       for (const e of aliveE) {
         const size = e.size || 1;
         if (isIntangible(e) || row < e.row || row > e.row + size - 1) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
+        const dmg = Math.max(1, Math.round(abilityRoll(unit, e) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
-        if (debuffs) applyStatMod(e, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
+        // A boss shrugs off the riders a hit carries (see classifications.js).
+        if (debuffs && !hasRule(e, "ignoresOnHitEffects")) applyStatMod(e, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
         unit._starStacks++;
-        newFx.push({ id: now + "fg" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (boss && boss.hp > 0 && row >= boss.row && row <= boss.row + BOSS_SIZE - 1) {
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, ctx.aliveP) * mult));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        unit._starStacks++;
-        newFx.push({ id: now + "fgb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        const mid = (size - 1) / 2;
+        newFx.push({ id: now + "fg" + unit.uid + e.uid, row: e.row + mid, col: e.col + mid, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
       applyStar(unit);
     },

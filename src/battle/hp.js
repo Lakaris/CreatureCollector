@@ -17,18 +17,20 @@
 // Cut's Execute, which is a kill rather than damage and so has no Shield to
 // chew through. Adding another means writing it in the ability's text first.
 //
-// The boss's own separate shield pool is handled by damageBoss in damage.js.
+// A boss's Shield is a pool rather than a Shield (the shieldIsPool rule in
+// battle/classifications.js) -- see damageUnit.
 //
 // This lives in its own module (rather than in status.js beside the Shield
 // timer, or in damage.js beside the damage formulas) so that status.js and
 // damage.js can both use it without an import cycle.
 
-import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread, gearTriggers, triggersOn, basicAttackNumber, asEffect, battleBoss } from "./applier.js";
+import { buffTicks, buffStacks, shieldAmount, asPassive, currentApplier, activeAbilityOf, effectiveness, battleRoster, sameSide, extraAllyFor, asSpread, gearTriggers, triggersOn, basicAttackNumber, asEffect } from "./applier.js";
 import { CREATURE_MAP } from "../data/creatures.js";
 import { abilityHasTag } from "./abilityTags.js";
 import { gainSpecialCharge } from "./charge.js";
 import { isImmobilized } from "./immobilize.js";
-import { distToBoss } from "./geometry.js";
+import { unitDist } from "./geometry.js";
+import { isBoss, isImmune, hasRule } from "./classifications.js";
 
 /**
  * Ground Hazards live in the battle state, which this module never sees, so
@@ -45,8 +47,8 @@ export function standsOnHazard(u, kind) {
 }
 
 /**
- * HIT HOOKS. Every hit that lands -- on a creature (damageUnit) or a boss
- * (damageBoss in damage.js) -- is announced here as (attacker, target, info),
+ * HIT HOOKS. Every hit that lands on a creature, a boss included (damageUnit),
+ * is announced here as (attacker, target, info),
  * where the attacker is the current applier and `info` carries:
  *   ability      "basic" / "special" / "unique" (null if unknown)
  *   baseDmg      the hit before the attacker's damage gear
@@ -85,8 +87,8 @@ function claimCrit(attacker) {
 }
 
 /**
- * POLICY: the attacker's damage gear, in one place -- damageUnit and
- * damageBoss (damage.js) both apply it, once per hit:
+ * POLICY: the attacker's damage gear, in one place -- damageUnit
+ * applies it, once per hit:
  *   - Echo Conch: everything dealt during an echo, at its effectiveness
  *     (the caster's own self-damage included).
  *   - Hunter's Snare: + against an Immobilized target (see immobilize.js).
@@ -120,8 +122,8 @@ export function attackerDamageMultiplier(target, { effectDamage = false, crit = 
   if (gear.chainDmgPct && abilityHasTag(attacker, ability, "chain")) more(gear.chainDmgPct);
   if (gear.weakestDmgPct && abilityHasTag(attacker, ability, "weakest")) more(gear.weakestDmgPct);
   // Seismic Heart: an ability that Stuns, against a target that can not be
-  // Stunned (a boss -- it obeys no control effect but Taunt).
-  if (gear.stunImmuneDmgPct && target.uid == null && abilityHasTag(attacker, ability, "stun")) more(gear.stunImmuneDmgPct);
+  // Stunned (a boss -- see its immunities in battle/classifications.js).
+  if (gear.stunImmuneDmgPct && isImmune(target, "stun") && abilityHasTag(attacker, ability, "stun")) more(gear.stunImmuneDmgPct);
   // Target-state damage gear: Rime Shard (Frostbite), Grave Lily (Marked),
   // Strangler Vine (Restrained by this creature), Nightshade Bead (Shielded),
   // Flashpoint Ring (standing on a Fire Hazard).
@@ -190,7 +192,6 @@ export function isBelow(u, pct) {
 
 /** A creature's type ("Fire", ...) -- a boss's is its element key. */
 function creatureTypeOf(u) {
-  if (u.uid == null) return u._bossKey ? u._bossKey[0].toUpperCase() + u._bossKey.slice(1) : null;
   return CREATURE_MAP[u.creatureId]?.type || null;
 }
 
@@ -205,18 +206,20 @@ export function hasAllyNearby(u) {
 
 /**
  * POLICY: an Execute -- an instant defeat below a Health threshold -- never
- * lands on a boss: not the Dungeon/Daily boss, and not a Labyrinth Boss
- * creature (a 2x2 body). Every Execute checks this (Sickle Cut, Gloomreaper
- * Chain), and the Execute tag's text says so.
+ * lands on a creature immune to it (the "boss" classification -- see
+ * battle/classifications.js). Every Execute checks this (Sickle Cut,
+ * Gloomreaper Chain), and the Execute tag's text says so.
  */
 export function canBeExecuted(u) {
-  return !!u && !isBossUnit(u) && u.hp > 0;
+  return !!u && !isImmune(u, "execute") && u.hp > 0;
 }
 
-/** A boss: the Dungeon/Daily boss (no uid) or a Labyrinth Boss creature (a
- * 2x2 body). Effects that say "excluding bosses" check this. */
+/** A boss for the effects that say "excluding bosses": the Dungeon/Daily
+ * boss, and the Labyrinth's Boss creatures (the countsAsBoss rule in
+ * battle/classifications.js). Narrower rules -- Stun immunity and the rest --
+ * read the classification itself. */
 export function isBossUnit(u) {
-  return !!u && (u.uid == null || (u.size || 1) > 1);
+  return hasRule(u, "countsAsBoss");
 }
 
 /**
@@ -279,23 +282,20 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
   return mult;
 }
 
-/** Living enemies of `u` within Nearby (Chebyshev 1) -- the boss by its body. */
+/** Living enemies of `u` within Nearby (Chebyshev 1) -- a 2x2 boss by its body. */
 function nearbyEnemyCount(u) {
-  if (u.uid == null) return 0;
+  if (isBoss(u)) return 0;
   let n = 0;
   for (const e of battleRoster()) {
-    if (e.hp > 0 && e.uid && e.uid[0] !== u.uid[0] && Math.max(Math.abs(e.row - u.row), Math.abs(e.col - u.col)) <= 1) n++;
+    if (e.hp > 0 && e.uid && e.uid[0] !== u.uid[0] && unitDist(u, e) <= 1) n++;
   }
-  const b = u.uid[0] === "p" ? battleBoss() : null;
-  if (b && distToBoss(b, u.row, u.col) <= 1) n++;
   return n;
 }
 
 /** Hawkeye Lens: how many tiles `attacker` is from `target` (1 when beside;
- * the boss by its nearest body tile). */
+ * a 2x2 boss by its nearest body tile). */
 function tilesBetween(attacker, target) {
-  if (target.uid == null) return distToBoss(target, attacker.row, attacker.col);
-  return Math.max(Math.abs(attacker.row - target.row), Math.abs(attacker.col - target.col));
+  return unitDist(attacker, target);
 }
 
 /** Tesla Coil: the strongest bonus among living enemies of `target` wearing
@@ -305,10 +305,8 @@ function teslaAuraPct(target) {
   for (const a of battleRoster()) {
     const pct = a.gear?.auraEnemyDmgPct || 0;
     if (!pct || pct <= best || a.hp <= 0 || !a.aura || !((a.aura.ticks || 0) > 0)) continue;
-    // The boss is an enemy of the player side only.
-    if (target.uid == null ? a.uid?.[0] !== "p" : a === target || sameSide(a, target)) continue;
-    const d = target.uid == null ? distToBoss(target, a.row, a.col) : Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col));
-    if (d <= a.aura.range) best = pct;
+    if (a === target || sameSide(a, target)) continue;
+    if (unitDist(a, target) <= a.aura.range) best = pct;
   }
   return best;
 }
@@ -328,8 +326,7 @@ export function retaliationMultiplier(u, kind) {
  * hit its carrier takes deals 20% more and spends one stack. Effect damage
  * (DoTs, reflects, hazards) neither benefits nor spends a stack -- otherwise a
  * Burn tick would eat every stack before a real hit ever landed. Returns the
- * multiplier for this hit and spends the stack. Shared by damageUnit and
- * damageBoss.
+ * multiplier for this hit and spends the stack. Used by damageUnit.
  */
 export const EXPOSE_DMG_PCT = 20;
 export function spendExpose(target, effectDamage) {
@@ -348,7 +345,7 @@ export function clearSeeded(u) {
 }
 
 /**
- * `target` was just defeated. Shared by damageUnit and damageBoss so every
+ * `target` was just defeated. Called from damageUnit, so every
  * killing blow pays the same way:
  *   - Mantis Scythe: the creature that landed it gains Special charge.
  *     Damage over time and hazards tick between turns with no applier, so
@@ -454,7 +451,7 @@ export const FORTIFY_REDUCTION_PCT = 50;
 export const PROTECT_STACK_CAP = 5;
 
 export function applyProtect(target, guard, stacks = 1) {
-  if (!target || !guard || target === guard || target.uid == null) return;
+  if (!target || !guard || target === guard || isImmune(target, "protect")) return;
   // One guardian at a time -- a newer Protect replaces an older one outright,
   // the same way a new Taunt replaces the old.
   const carried = target.protect && target.protect.src === guard ? target.protect.stacks : 0;
@@ -486,7 +483,7 @@ export function clearProtect(u) {
  * A Shield may stack ONLY when its own displayed text says so. The Light
  * boss's Holy Radiance ("stackable") adds to the boss's own pool directly
  * (battle/bosses/light.js) -- that pool is one plain number with no timer,
- * spent by damageBoss in damage.js, not a unit Shield at all. On creatures,
+ * spent whole by any hit (the shieldIsPool rule), not a unit Shield at all. On creatures,
  * stacking Shields form the STACKING LAYER below.
  *
  * The keep-the-larger comparison is against the Shield WITHOUT the stacking
@@ -668,7 +665,7 @@ function addOverhealLayer(u, excess, capPct) {
  *     ignored by a larger one, rather than accumulating over a fight.
  *
  * The Light boss's self-heal deliberately does NOT come through here: a boss
- * keeps a separate shield pool spent by damageBoss (see damage.js), and
+ * keeps its Shield as a pool (the shieldIsPool rule), and
  * routing it would let a heal write to the wrong pool.
  */
 const OVERHEAL_SHIELD_TICKS = 6;
@@ -855,7 +852,15 @@ export function damageUnit(target, dmg, { pierceShield = false, effectDamage = f
     dmg = Math.max(1, Math.round((dmg * (100 - target.windbreakPct)) / 100));
   }
   const shieldBefore = target.shield || 0;
-  let toHealth = pierceShield ? dmg : absorbShield(target, dmg, shieldBreakMultiplier(effectDamage));
+  let toHealth;
+  if (shieldBefore > 0 && hasRule(target, "shieldIsPool")) {
+    // A Shield POOL (battle/classifications.js -- the boss's): the whole hit is
+    // spent on it, nothing spills over, and bypassing Shields doesn't apply.
+    target.shield = Math.max(0, shieldBefore - Math.round(dmg * shieldBreakMultiplier(effectDamage)));
+    toHealth = 0;
+  } else {
+    toHealth = pierceShield ? dmg : absorbShield(target, dmg, shieldBreakMultiplier(effectDamage));
+  }
   if (shieldBefore > 0 && !((target.shield || 0) > 0)) {
     const peak = Math.max(target._shieldPeak || 0, shieldBefore);
     target._shieldPeak = 0;
@@ -948,7 +953,7 @@ function dodged(target) {
  * with the share it takes -- every such item of its that is above its own
  * threshold adds its share. */
 function oathGuardianFor(target) {
-  if (target.uid == null) return null;
+  if (isImmune(target, "protect")) return null;
   for (const a of battleRoster()) {
     if (a === target || a.hp <= 0 || !sameSide(a, target) || (a.intangibleTicks || 0) > 0) continue;
     if (Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col)) > 1) continue;

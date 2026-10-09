@@ -143,6 +143,18 @@ export function cellsOf(u) {
   return out;
 }
 
+/** Does `u`'s body cover cell (r, c)? The body-aware `u.row === r && u.col === c`. */
+export function occupies(u, r, c) {
+  const s = u.size || 1;
+  return r >= u.row && r < u.row + s && c >= u.col && c < u.col + s;
+}
+
+/** Does `u`'s body cover any cell of `cellSet` (a Set of "r,c" keys)? The
+ * body-aware `cellSet.has(u.row + "," + u.col)`. */
+export function occupiesAny(u, cellSet) {
+  return cellsOf(u).some((k) => cellSet.has(k));
+}
+
 /** Chebyshev distance between two units' BODIES (0 when they touch/overlap). */
 export function unitDist(a, b) {
   const as = a.size || 1, bs = b.size || 1;
@@ -163,6 +175,19 @@ export function unitCardinalDist(a, b) {
   if (rowsOverlap) return cd;
   if (colsOverlap) return rd;
   return Infinity;
+}
+
+/** The single cardinal step from `a` toward `b` when their BODIES share a row
+ * or column, with the gap between them (unitCardinalDist); null when they
+ * don't line up. For a straight ray at a target (Inferno Breath, Storm
+ * Lance): sharing a row means the ray runs along it, toward b's side. */
+export function cardinalStepToward(a, b) {
+  const dist = unitCardinalDist(a, b);
+  if (dist === Infinity) return null;
+  const as = a.size || 1, bs = b.size || 1;
+  const rowsOverlap = a.row <= b.row + bs - 1 && b.row <= a.row + as - 1;
+  if (rowsOverlap) return { dr: 0, dc: b.col > a.col ? 1 : -1, dist };
+  return { dr: b.row > a.row ? 1 : -1, dc: 0, dist };
 }
 
 /** Ease-in-out curve for movement interpolation. */

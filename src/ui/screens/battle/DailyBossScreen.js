@@ -11,7 +11,7 @@ import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
 import { runBattleTick } from "../../../battle/tick.js";
-import { makeArenaBattle } from "../../../battle/state.js";
+import { makeArenaBattle, makeBossUnit, addBossToBattle, bossOf } from "../../../battle/state.js";
 import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
@@ -189,15 +189,10 @@ function DailyBossScreen({onBack,onViewCreature}){
   // Player units come from the shared builder, so Daily Boss fights now respect
   // equipment, ascensions, and flair exactly like Dungeon and Arena do.
   function initBattle(grid){
-    const bossStats=getBossStats(boss,level);
     const battle=makeArenaBattle(grid,{},owned,level,moveAnimMsRef.current,equipmentLevels,equipmentAscensions);
-    battle.boss={row:BOSS_START_ROW,col:BOSS_START_COL,prevRow:BOSS_START_ROW,prevCol:BOSS_START_COL,
-      lastMoveTime:Date.now()-moveAnimMsRef.current,
-      hp:bossStats.hp,maxHp:bossStats.hp,atkCd:0,moveCd:0,specialCd:10,atk:bossStats.atk,
-      crit:bossStats.crit,critDmg:bossStats.critDmg,
-      // Daily Boss always runs the shared generic kit (daily.js), never the
-      // dungeon's unique per-element boss modules -- same kit, different element.
-      _bossKey:"daily"};
+    // Daily Boss always runs the shared generic kit (daily.js), never the
+    // dungeon's unique per-element boss modules -- same kit, different element.
+    addBossToBattle(battle,makeBossUnit(boss,level,BOSS_START_ROW,BOSS_START_COL,{kitKey:"daily",now:Date.now()-moveAnimMsRef.current}));
     battle.log=[];
     return battle;
   }
@@ -224,13 +219,14 @@ function DailyBossScreen({onBack,onViewCreature}){
         if(hpEl)hpEl.style.width=(Math.max(0,u.hp/u.maxHp)*100)+"%";
       }
       // boss position + HP
-      if(s.boss&&bossDomRef.current){
-        const bt=easeInOut(Math.min(1,(now-s.boss.lastMoveTime)/moveAnimMsRef.current));
-        const bdr=s.boss.prevRow+(s.boss.row-s.boss.prevRow)*bt;
-        const bdc=s.boss.prevCol+(s.boss.col-s.boss.prevCol)*bt;
+      const sb=bossOf(s);
+      if(sb&&bossDomRef.current){
+        const bt=easeInOut(Math.min(1,(now-sb.lastMoveTime)/moveAnimMsRef.current));
+        const bdr=sb.prevRow+(sb.row-sb.prevRow)*bt;
+        const bdc=sb.prevCol+(sb.col-sb.prevCol)*bt;
         bossDomRef.current.style.left=(bdc*TILE)+"px";
         bossDomRef.current.style.top=(bdr*TILE)+"px";
-        const pct=Math.max(0,s.boss.hp/s.boss.maxHp)*100;
+        const pct=Math.max(0,sb.hp/sb.maxHp)*100;
         const bossHpEl=document.getElementById("battle-boss-hp");
         if(bossHpEl)bossHpEl.style.width=pct+"%";
         const bossHpMini=document.getElementById("battle-boss-hp-mini");
@@ -259,7 +255,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     const takeSnap=()=>setBSnap({playerUnits:s.playerUnits.map(u=>({uid:u.uid,creatureId:u.creatureId,hp:u.hp,maxHp:u.maxHp,row:u.row,col:u.col,
         burnTicks:u.burnTicks,poisonTicks:u.poisonTicks,poisonStacks:u.poisonStacks,dotTicks:u.dotTicks,dotStacks:u.dotStacks,rootTicks:u.rootTicks,weakTicks:u.weakTicks,slowTicks:u.slowTicks,shockTicks:u.shockTicks,healImmuneTicks:u.healImmuneTicks,
         lastAttackTime:u.lastAttackTime,lastMoveTime:u.lastMoveTime,deathTime:u.deathTime,victoryTime:u.victoryTime,abilFlashTicks:u.abilFlashTicks,abilCharge:u.abilCharge,abilChargeMax:u.abilChargeMax,shield:u.shield})),
-      boss:{...s.boss},log:[...s.log],damageDealt:{...s.damageDealt}});
+      boss:{...bossOf(s)},log:[...s.log],damageDealt:{...s.damageDealt}});
     takeSnap();
     const bGameElapsed=(Date.now()-battleStartRef.current)*speedRef.current;
     const bTL=Math.min(60,Math.ceil(Math.max(0,60000-bGameElapsed)/1000));
@@ -275,7 +271,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       return;
     }
     const anyAlive=s.playerUnits.some(u=>u.hp>0);
-    if(s.boss.hp<=0){
+    if(bossOf(s).hp<=0){
       stopLoops();
       // Survivors hold a victory pose for a beat before the outcome overlay;
       // one more snapshot so React renders the stamped state.

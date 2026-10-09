@@ -27,6 +27,7 @@ export default {
   basic(ctx) {
     const { boss, aliveP, newFx, now, gridRows, gridCols } = ctx;
     if (boss.atkCd > 0 || !aliveP.length) return;
+    if (ctx.missesBlinded(11)) return;
 
     for (const u of aliveP) {
       damageUnit(u, ctx.dmg(0.11));

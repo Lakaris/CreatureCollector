@@ -43,6 +43,7 @@ export default {
 
     if (adj.length > 0 && boss.atkCd <= 0) {
       const tgt = adj[0];
+      if (ctx.missesBlinded(12, tgt)) return;
       damageUnit(tgt, ctx.dmg(0.12));
       applyTimedDebuff(tgt, "burnTicks", STATUS_TICKS);
       boss.atkCd = 12;

@@ -7,7 +7,7 @@
 // victim is forced to target this crab while the debuff lasts (tauntTicks +
 // tauntSourceUid, enforced by the engine's selectTarget / boss-priority
 // logic; refresh-on-reapply per the STATUS_TICKS policy). A boss takes the hit
-// AND the Taunt -- it is the one control effect a boss obeys, applied through
+// AND the Taunt -- one of the two control effects a boss obeys, applied through
 // its targeting helpers (see tauntedTarget in bosses/context.js). The
 // final upgrade cuts the special's energy cost 10% instead of adding damage
 // (see getSpecialChargeAt in core/creatures.js).
@@ -16,8 +16,8 @@
 // the attacker, via the engine's onDamaged hook (attack damage only -- DoTs
 // and direct boss-module hits are not reflected).
 
-import { attackRoll, damageBoss } from "../damage.js";
-import { aChebDist, distToBoss } from "../geometry.js";
+import { attackRoll } from "../damage.js";
+import { unitDist } from "../geometry.js";
 import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyTaunt } from "../status.js";
@@ -61,25 +61,14 @@ export function makeCrystalcrabModule(cfg) {
      * so the charge holds until something is actually beside the crab.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
 
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d <= MELEE_RANGE && d < bestD) { bestD = d; best = e; }
-      }
-      const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      if (bd <= MELEE_RANGE && bd < bestD) {
-        // The boss takes the hit AND the Taunt -- it is the one control effect
-        // a boss obeys (see tauntedTarget in bosses/context.js).
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        applyTaunt(boss, unit);
-        newFx.push({ id: now + "ts" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        return;
       }
       if (!best) return;
 
@@ -87,7 +76,8 @@ export function makeCrystalcrabModule(cfg) {
       damageUnit(best, dmg);
       ctx.addDamageDealt(dmg);
       applyTaunt(best, unit);
-      newFx.push({ id: now + "ts" + unit.uid, row: best.row, col: best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+      const mid = ((best.size || 1) - 1) / 2;
+      newFx.push({ id: now + "ts" + unit.uid, row: best.row + mid, col: best.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
   };
 }

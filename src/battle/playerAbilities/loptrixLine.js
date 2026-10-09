@@ -1,7 +1,7 @@
 // Loptrix line: Mocking Nip / Scapegoat / Vanishing Act.
 //
 // Mocking Nip is a melee nip at the WEAKEST enemy (lowest current Health,
-// boss included as a last resort): it owns targeting and chase movement like
+// a boss loses Health ties): it owns targeting and chase movement like
 // other basicAttack overrides, walking at the weakest foe rather than the
 // nearest. At max level every landed hit inflicts a Defense Down stack.
 //
@@ -20,11 +20,12 @@
 // again until it has recovered above 30% first). At max level the escape
 // also dispels all debuffs on self.
 
-import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
-import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { BOSS_SIZE, MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { basicUnitDamage, attackRoll, attackCooldown } from "../damage.js";
+import { aChebDist, unitDist, occupies } from "../geometry.js";
+import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { speedPenalty, isStunned, isIntangible, applyStatMod, dispelDebuffs, consumeBlind, applyTimedDebuff } from "../status.js";
 import { damageUnit } from "../hp.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -45,34 +46,23 @@ function abilityIdx(unit, key) {
   return Math.min(lvl, MAX_IDX);
 }
 
-/** The 8 cells around a minion, or the ring around the boss's 2x2 body. */
-function cellsBeside(candidate) {
+/** The ring of cells around a foe's body (8 for a 1x1, 12 for a 2x2 boss). */
+function cellsBeside(u) {
   const out = [];
-  if (candidate.isBossCandidate) {
-    const b = candidate.boss;
-    for (let r = b.row - 1; r <= b.row + BOSS_SIZE; r++) {
-      for (let c = b.col - 1; c <= b.col + BOSS_SIZE; c++) {
-        if (r >= b.row && r < b.row + BOSS_SIZE && c >= b.col && c < b.col + BOSS_SIZE) continue;
-        out.push([r, c]);
-      }
-    }
-    return out;
-  }
-  const u = candidate.unit;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      if (!dr && !dc) continue;
-      out.push([u.row + dr, u.col + dc]);
+  const size = u.size || 1;
+  for (let r = u.row - 1; r <= u.row + size; r++) {
+    for (let c = u.col - 1; c <= u.col + size; c++) {
+      if (r >= u.row && r < u.row + size && c >= u.col && c < u.col + size) continue;
+      out.push([r, c]);
     }
   }
   return out;
 }
 
-/** Scapegoat's candidates: every living targetable foe (boss last), weakest first. */
-function candidatesByHp(aliveE, boss) {
-  const list = aliveE.filter((u) => !isIntangible(u)).map((unit) => ({ unit, hp: unit.hp }));
-  if (boss && boss.hp > 0) list.push({ isBossCandidate: true, boss, hp: boss.hp });
-  return list.sort((a, z) => a.hp - z.hp);
+/** Scapegoat's candidates: every living targetable foe, weakest first. The
+ * sort is stable, so a boss (last in the enemy list) loses Health ties. */
+function candidatesByHp(aliveE) {
+  return aliveE.filter((u) => u.hp > 0 && !isIntangible(u)).sort((a, z) => a.hp - z.hp);
 }
 
 export function makeLoptrixModule(cfg) {
@@ -92,40 +82,23 @@ export function makeLoptrixModule(cfg) {
      * whoever is faltering).
      */
     basicAttack(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
-      const cands = candidatesByHp(aliveE, boss);
-      if (!cands.length) return;
-      const tgt = cands[0];
+      const { aliveE, newFx, now } = ctx;
+      const victim = candidatesByHp(aliveE)[0];
+      if (!victim) return;
 
-      const d = tgt.isBossCandidate
-        ? distToBoss(tgt.boss, unit.row, unit.col)
-        : aChebDist(unit.row, unit.col, tgt.unit.row, tgt.unit.col);
-      if (d > MELEE_RANGE) {
-        const tr = tgt.isBossCandidate ? tgt.boss.row : tgt.unit.row;
-        const tc = tgt.isBossCandidate ? tgt.boss.col : tgt.unit.col;
-        ctx.stepToward(tr, tc);
-        return;
-      }
+      if (unitDist(unit, victim) > MELEE_RANGE) { ctx.stepToward(victim.row, victim.col); return; }
       if (unit.atkCd > 0 || isStunned(unit)) return;
       // Blinded: the nip misses entirely, cooldown still paid.
       if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       const idx = abilityIdx(unit, "basic");
       const mult = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
-      if (tgt.isBossCandidate) {
-        // Bosses take the nip but skip Defense Down -- they have no DEF stat.
-        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, tgt.boss, aliveP) * mult));
-        damageBoss(tgt.boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + unit.uid, row: tgt.boss.row + 0.5, col: tgt.boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      } else {
-        const victim = tgt.unit;
-        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
-        const dealt = damageUnit(victim, dmg);
-        if (dealt) ctx.addDamageDealt(dealt);
-        if (idx >= MAX_IDX) applyStatMod(victim, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
-        newFx.push({ id: now + unit.uid, row: victim.row, col: victim.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
+      const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
+      const dealt = damageUnit(victim, dmg);
+      if (dealt) ctx.addDamageDealt(dealt);
+      if (idx >= MAX_IDX && !hasRule(victim, "ignoresOnHitEffects")) applyStatMod(victim, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
+      const mid = ((victim.size || 1) - 1) / 2;
+      newFx.push({ id: now + unit.uid, row: victim.row + mid, col: victim.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       unit.atkCd = attackCooldown(unit, speedPenalty(unit));
     },
 
@@ -133,39 +106,31 @@ export function makeLoptrixModule(cfg) {
      * Scapegoat holds its charge until some foe qualifies: either Loptrix
      * already stands beside one, or one has a free adjacent tile to land on.
      */
-    specialInRange(unit, { aliveE, aliveP, boss, gridRows, gridCols }) {
-      const occ = new Set([...aliveE, ...aliveP].map((o) => o.row + "," + o.col));
+    specialInRange(unit, { aliveE, aliveP, gridRows, gridCols }) {
+      const everyone = [...aliveE, ...aliveP];
       const open = (r, c) =>
-        r >= 0 && r < gridRows && c >= 0 && c < gridCols && !occ.has(r + "," + c) &&
-        !(boss && boss.hp > 0 && bossOccupies(boss, r, c));
-      for (const cand of candidatesByHp(aliveE, boss)) {
-        const besideAlready = cand.isBossCandidate
-          ? distToBoss(cand.boss, unit.row, unit.col) <= 1
-          : aChebDist(unit.row, unit.col, cand.unit.row, cand.unit.col) <= 1;
-        if (besideAlready || cellsBeside(cand).some(([r, c]) => open(r, c))) return true;
+        r >= 0 && r < gridRows && c >= 0 && c < gridCols && !everyone.some((o) => occupies(o, r, c));
+      for (const foe of candidatesByHp(aliveE)) {
+        if (unitDist(unit, foe) <= 1 || cellsBeside(foe).some(([r, c]) => open(r, c))) return true;
       }
       return false;
     },
 
     /**
      * Scapegoat: teleport beside the weakest reachable foe, strike it, and
-     * Mark it (bosses take the hit but can't be Marked). Never lands on an
-     * occupied square; stays put when already adjacent.
+     * Mark it -- a boss included.
+     * Never lands on an occupied square; stays put when already adjacent.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
 
-      for (const cand of candidatesByHp(aliveE, boss)) {
-        const besideAlready = cand.isBossCandidate
-          ? distToBoss(cand.boss, unit.row, unit.col) <= 1
-          : aChebDist(unit.row, unit.col, cand.unit.row, cand.unit.col) <= 1;
-
+      for (const foe of candidatesByHp(aliveE)) {
         let dest = null;
-        if (!besideAlready) {
-          // ctx.blocked covers bounds, every unit's cell, and the boss body.
-          const openCells = cellsBeside(cand).filter(([r, c]) => !ctx.blocked(r, c));
+        if (unitDist(unit, foe) > 1) {
+          // ctx.blocked covers bounds and every unit's body.
+          const openCells = cellsBeside(foe).filter(([r, c]) => !ctx.blocked(r, c));
           if (!openCells.length) continue;
           openCells.sort((a, z) => aChebDist(unit.row, unit.col, a[0], a[1]) - aChebDist(unit.row, unit.col, z[0], z[1]));
           dest = openCells[0];
@@ -177,19 +142,13 @@ export function makeLoptrixModule(cfg) {
         if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-        if (cand.isBossCandidate) {
-          damageBoss(cand.boss, dmg);
-          ctx.addDamageDealt(dmg);
-        } else {
-          const dealt = damageUnit(cand.unit, dmg);
-          if (dealt) ctx.addDamageDealt(dealt);
-          applyTimedDebuff(cand.unit, "markedTicks", STATUS_TICKS, { stretch: true });
-        }
+        const dealt = damageUnit(foe, dmg);
+        if (dealt) ctx.addDamageDealt(dealt);
+        applyTimedDebuff(foe, "markedTicks", STATUS_TICKS, { stretch: true });
 
-        const tr = cand.isBossCandidate ? cand.boss.row + 0.5 : cand.unit.row;
-        const tc = cand.isBossCandidate ? cand.boss.col + 0.5 : cand.unit.col;
+        const mid = ((foe.size || 1) - 1) / 2;
         newFx.push({ id: now + "sg" + unit.uid, row: unit.row, col: unit.col, t: now, isRanged: true, fromRow, fromCol, isEnemy: !!ctx.isEnemySide });
-        newFx.push({ id: now + "sghit" + unit.uid, row: tr, col: tc, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        newFx.push({ id: now + "sghit" + unit.uid, row: foe.row + mid, col: foe.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         return;
       }
     },
@@ -205,15 +164,15 @@ export function makeLoptrixModule(cfg) {
       // no open tile means keep waiting -- the trigger isn't consumed).
       const allies = aliveP
         .filter((a) => a !== unit && a.hp > 0 && a.isRanged)
-        .sort((a, z) => aChebDist(unit.row, unit.col, a.row, a.col) - aChebDist(unit.row, unit.col, z.row, z.col));
+        .sort((a, z) => unitDist(unit, a) - unitDist(unit, z));
       for (const ally of allies) {
-        if (aChebDist(unit.row, unit.col, ally.row, ally.col) <= 1) {
+        if (unitDist(unit, ally) <= 1) {
           // Already beside a Ranged ally: no blink needed, just the dispel.
           unit._vanishReady = false;
           if (abilityIdx(unit, "unique") >= MAX_IDX) dispelDebuffs(unit);
           return;
         }
-        const openCells = cellsBeside({ unit: ally }).filter(([r, c]) => !ctx.blocked(r, c));
+        const openCells = cellsBeside(ally).filter(([r, c]) => !ctx.blocked(r, c));
         if (!openCells.length) continue;
         openCells.sort((a, z) => aChebDist(unit.row, unit.col, a[0], a[1]) - aChebDist(unit.row, unit.col, z[0], z[1]));
         const fromRow = unit.row, fromCol = unit.col;

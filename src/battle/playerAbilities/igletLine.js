@@ -20,7 +20,7 @@
 // with Frostbite on the attacker.
 
 import { RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
-import { unitDist, distToBoss } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { healUnit } from "../hp.js";
 import {
   applyFortify, hasFortify, applyWindbreak, applyFrostbite, auraRange,

@@ -14,7 +14,7 @@
 // tick is 500ms, so the full rate lands every second tick). At max level the
 // aura also grants those allies a +10% ATK buff while they stay in range.
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { healReceivedMultiplier, applyWhileActiveStatMod, hasNegativeStatMods, dispelDebuffs, auraRange } from "../status.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { healUnit } from "../hp.js";
@@ -101,7 +101,7 @@ export function makeBloomibisModule(cfg) {
       // ticks keeps HP integral while matching the displayed rate exactly.
       unit._groveGate = !unit._groveGate;
       for (const a of ctx.aliveP) {
-        if (aChebDist(unit.row, unit.col, a.row, a.col) > auraRange(unit, AURA_RANGE)) continue;
+        if (unitDist(unit, a) > auraRange(unit, AURA_RANGE)) continue;
         if (unit._groveGate && a.hp < a.maxHp && canBeHealed(a)) {
           // An Aura effect: Cantor's Beads doesn't spread it (see asEffect).
           asEffect(() => healUnit(a, Math.max(1, Math.round(healPerSec * healReceivedMultiplier(a)))));

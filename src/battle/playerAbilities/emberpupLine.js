@@ -20,8 +20,8 @@
 // Cinder Scent reads the ground through ctx.hazardsOn, stashed each tick
 // because the attack hooks receive no context of their own.
 
-import { aChebDist, distToBoss, bossOccupies, coneCells } from "../geometry.js";
-import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
+import { coneCells, unitDist, occupiesAny, cellsOf } from "../geometry.js";
+import { basicUnitDamage, attackRoll, attackCooldown } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { isIntangible, isStunned, speedPenalty, consumeBlind, applyRoot, applyFear } from "../status.js";
@@ -59,12 +59,8 @@ export function makeEmberpupModule(cfg) {
   /** Is this foe standing in a Fire Hazard? Reads the query stashed by
    * onTick; false before the first tick has run. */
   const inFire = (unit, r, c) => !!(unit._hazardsOn && unit._hazardsOn(r, c, "fire"));
-  const bossInFire = (unit, boss) => {
-    for (let dr = 0; dr < 2; dr++) for (let dc = 0; dc < 2; dc++) {
-      if (inFire(unit, boss.row + dr, boss.col + dc)) return true;
-    }
-    return false;
-  };
+  /** Is any tile of this foe's body (a boss spans four) in a Fire Hazard? */
+  const bodyInFire = (unit, e) => cellsOf(e).some((k) => { const [r, c] = k.split(",").map(Number); return inFire(unit, r, c); });
   /** Cinder Scent's Attack bonus, as a damage multiplier. */
   const scentMult = (unit, burning) =>
     burning ? 1 + scentAtkPctByLevel[abilityIdx(unit, "unique")] / 100 : 1;
@@ -90,7 +86,7 @@ export function makeEmberpupModule(cfg) {
      * buys a longer strike, never a longer pursuit.
      */
     basicAttack(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "basic");
       const mult = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const roots = idx >= MAX_IDX;
@@ -100,14 +96,9 @@ export function makeEmberpupModule(cfg) {
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
         if (e.hp <= 0 || isIntangible(e)) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
-        const burning = inFire(unit, e.row, e.col);
+        const d = unitDist(unit, e);
+        const burning = bodyInFire(unit, e);
         if (d <= base + (burning ? bonus : 0) && d < bestD) { bestD = d; best = { unit: e, burning }; }
-      }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      if (bossD < Infinity) {
-        const burning = bossInFire(unit, boss);
-        if (bossD <= base + (burning ? bonus : 0) && bossD < bestD) { bestD = bossD; best = { isBoss: true, burning }; }
       }
 
       if (!best) {
@@ -115,10 +106,9 @@ export function makeEmberpupModule(cfg) {
         let chase = null, chaseD = Infinity;
         for (const e of aliveE) {
           if (e.hp <= 0 || isIntangible(e)) continue;
-          const d = aChebDist(unit.row, unit.col, e.row, e.col);
+          const d = unitDist(unit, e);
           if (d < chaseD) { chaseD = d; chase = e; }
         }
-        if (boss && boss.hp > 0 && bossD < chaseD) chase = { row: boss.row, col: boss.col };
         if (chase) ctx.stepToward(chase.row, chase.col);
         return;
       }
@@ -127,37 +117,23 @@ export function makeEmberpupModule(cfg) {
       if (consumeBlind(unit)) { unit.atkCd = attackCooldown(unit, speedPenalty(unit)); return; }
 
       const scent = scentMult(unit, best.burning);
-      if (best.isBoss) {
-        // Bosses take the bite but can not be Rooted -- the CC-immunity
-        // policy as Taunt.
-        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult * scent));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      } else {
-        const tgt = best.unit;
-        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, tgt) * mult * scent));
-        const dealt = damageUnit(tgt, dmg);
-        if (dealt) ctx.addDamageDealt(dealt);
-        // A dodged or redirected bite pins nothing.
-        if (roots && dealt > 0 && !tgt._dodgedHit && !tgt._redirectedTo) applyRoot(tgt, ROOT_TICKS);
-        newFx.push({ id: now + unit.uid, row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
+      const tgt = best.unit;
+      const dmg = Math.max(1, Math.round(basicUnitDamage(unit, tgt) * mult * scent));
+      const dealt = damageUnit(tgt, dmg);
+      if (dealt) ctx.addDamageDealt(dealt);
+      // A dodged or redirected bite pins nothing (nor does one on a creature
+      // immune to Root -- applyRoot checks).
+      if (roots && dealt > 0 && !tgt._dodgedHit && !tgt._redirectedTo) applyRoot(tgt, ROOT_TICKS);
+      const mid = ((tgt.size || 1) - 1) / 2;
+      newFx.push({ id: now + unit.uid, row: tgt.row + mid, col: tgt.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       unit.atkCd = attackCooldown(unit, speedPenalty(unit));
     },
 
     /** Dread Howl fires once anything stands in the wedge ahead. */
-    specialInRange(unit, { aliveE, boss }) {
+    specialInRange(unit, { aliveE }) {
       const dir = unit._coneDir || 1;
       const cells = new Set(coneCells(unit.row, unit.col, dir, CONE_DEPTH).map(([r, c]) => r + "," + c));
-      if (aliveE.some((e) => e.hp > 0 && !isIntangible(e) && cells.has(e.row + "," + e.col))) return true;
-      if (boss && boss.hp > 0) {
-        for (const cell of cells) {
-          const [r, c] = cell.split(",").map(Number);
-          if (bossOccupies(boss, r, c)) return true;
-        }
-      }
-      return false;
+      return aliveE.some((e) => e.hp > 0 && !isIntangible(e) && occupiesAny(e, cells));
     },
 
     /**
@@ -165,7 +141,7 @@ export function makeEmberpupModule(cfg) {
      * and leave the whole wedge burning.
      */
     special(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const fears = idx >= MAX_IDX;
@@ -185,24 +161,13 @@ export function makeEmberpupModule(cfg) {
       }
 
       for (const e of aliveE) {
-        if (e.hp <= 0 || isIntangible(e) || !cellSet.has(e.row + "," + e.col)) continue;
-        const scent = scentMult(unit, inFire(unit, e.row, e.col));
+        if (e.hp <= 0 || isIntangible(e) || !occupiesAny(e, cellSet)) continue;
+        const scent = scentMult(unit, bodyInFire(unit, e));
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult * scent));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
+        // Fear-immune creatures (bosses) take the howl but hold their ground.
         if (fears) applyFear(e, unit.uid, FEAR_TICKS);
-      }
-      if (boss && boss.hp > 0) {
-        let overlaps = false;
-        for (const [r, c] of cellPairs) { if (bossOccupies(boss, r, c)) { overlaps = true; break; } }
-        if (overlaps) {
-          // Bosses take the howl but are immune to Fear, like every other
-          // forced-movement and control effect.
-          const dmg = Math.max(1, Math.round(attackRoll(unit) * mult * scentMult(unit, bossInFire(unit, boss))));
-          damageBoss(boss, dmg);
-          ctx.addDamageDealt(dmg);
-          newFx.push({ id: now + "dhb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isBurn: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        }
       }
 
       ctx.addHazard(cells, HAZARD_TICKS, Math.max(1, Math.round(unit.atk * HAZARD_DMG_RATE)), "fire");

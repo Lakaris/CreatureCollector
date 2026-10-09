@@ -20,12 +20,13 @@
 // does). The buff is re-applied each tick the condition holds and lapses on
 // its own a tick after it stops.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { attackRoll, damageBoss } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { attackRoll } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, healUnit } from "../hp.js";
 import { applyRestrained, applyPoison, applyWhileActiveStatMod, healReceivedMultiplier } from "../status.js";
 import { removeSpecialCharge } from "../charge.js";
+import { isImmune } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -90,25 +91,14 @@ export function makeVenomcoilModule(cfg) {
      * beside the snake -- which is also the only place the grip can hold.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
 
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d <= MELEE_RANGE && d < bestD) { bestD = d; best = e; }
-      }
-      const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      if (bd <= MELEE_RANGE && bd < bestD) {
-        // The boss takes the hit but can not be wrapped -- same CC-immunity
-        // policy as Taunt -- so there is no Poison and no charge to drain
-        // either (bosses run on their own cast timers, not an Ability bar).
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "cc" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        return;
       }
       if (!best) return;
 
@@ -120,15 +110,20 @@ export function makeVenomcoilModule(cfg) {
       const dealt = damageUnit(best, dmg);
       if (dealt) ctx.addDamageDealt(dealt);
 
-      applyRestrained(best, unit.uid, RESTRAIN_STACKS, RESTRAIN_SLOW_PCT, MELEE_RANGE);
-      // Dripping Scales: the venom rides along with every Restrain.
-      applyPoison(best);
-
-      if (alreadyWrapped && best.abilChargeMax) {
-        const drain = (best.abilChargeMax * chargeDrainPctByLevel[idx]) / 100;
-        removeSpecialCharge(best, drain, unit);
+      // A creature immune to Restrain (a boss) takes the hit but can not be
+      // wrapped -- and Dripping Scales' venom only rides along with a Restrain
+      // that lands, so it is not Poisoned, and has no grip to drain through.
+      if (!isImmune(best, "restrained")) {
+        applyRestrained(best, unit.uid, RESTRAIN_STACKS, RESTRAIN_SLOW_PCT, MELEE_RANGE);
+        // Dripping Scales: the venom rides along with every Restrain.
+        applyPoison(best);
+        if (alreadyWrapped && best.abilChargeMax) {
+          const drain = (best.abilChargeMax * chargeDrainPctByLevel[idx]) / 100;
+          removeSpecialCharge(best, drain, unit);
+        }
       }
-      newFx.push({ id: now + "cc" + unit.uid + best.uid, row: best.row, col: best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+      const mid = ((best.size || 1) - 1) / 2;
+      newFx.push({ id: now + "cc" + unit.uid + best.uid, row: best.row + mid, col: best.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
 
     /**
@@ -143,7 +138,7 @@ export function makeVenomcoilModule(cfg) {
       let target = null, bestD = Infinity;
       for (const e of ctx.aliveE) {
         if (e.hp <= 0) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d <= range && d < bestD) { bestD = d; target = e; }
       }
       if (!target || !isRestrained(target)) return;

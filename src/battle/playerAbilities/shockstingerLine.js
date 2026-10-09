@@ -19,7 +19,7 @@
 // Restrained slows its carrier (restrainedSlowPct, read by attackCooldown
 // via restrainedSlowMultiplier while any stacks are active).
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { attackRoll } from "../damage.js";
 import { MELEE_RANGE, RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
@@ -80,7 +80,7 @@ export function makeShockstingerModule(cfg) {
     /** Overload Sting's gate: a 20+-stack Restrained enemy in melee reach. */
     specialInRange(unit, { aliveE }) {
       return aliveE.some(
-        (e) => (e.restrainedStacks || 0) >= STACK_GATE && aChebDist(unit.row, unit.col, e.row, e.col) <= MELEE_RANGE
+        (e) => (e.restrainedStacks || 0) >= STACK_GATE && unitDist(unit, e) <= MELEE_RANGE
       );
     },
 
@@ -90,7 +90,7 @@ export function makeShockstingerModule(cfg) {
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
         if ((e.restrainedStacks || 0) < STACK_GATE) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d <= MELEE_RANGE && d < bestD) { bestD = d; best = e; }
       }
       if (!best) return;

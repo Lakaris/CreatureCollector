@@ -24,11 +24,12 @@
 // "Charge" here is the kit's own resource, not the ability-charge meter that
 // fires the Special -- the two share a word and nothing else.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { basicUnitDamage, basicDamageToBoss, damageBoss } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { basicUnitDamage } from "../damage.js";
 import { ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyWhileActiveStatMod, applyAura, isIntangible, countBuffs } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -138,8 +139,6 @@ export function makeSparkshellModule(cfg) {
       // Static Zap's chain fires from onHit, which sees no context -- stash
       // what it needs here (the same pattern Cinder Scent uses for hazards).
       unit._foes = ctx.aliveE;
-      unit._allies = ctx.aliveP;
-      unit._boss = ctx.boss;
       unit._fx = ctx.newFx;
       unit._now = ctx.now;
       unit._credit = ctx.addDamageDealt;
@@ -153,7 +152,7 @@ export function makeSparkshellModule(cfg) {
      * Protect and Dodge all apply to them as they would to the first hit.
      */
     onHit(unit, target) {
-      if (!target || target.uid == null || !unit._foes) return 0;
+      if (!target || hasRule(target, "ignoresOnHitEffects") || !unit._foes) return 0;
       let count = CHAIN_BASE;
       if (abilityIdx(unit, "basic") >= MAX_IDX) count += Math.floor((unit.charge || 0) / CHARGE_PER_STEP);
       const mult = basicDmgByLevel[abilityIdx(unit, "basic")] / BASIC_DMG_BASELINE;
@@ -163,7 +162,7 @@ export function makeSparkshellModule(cfg) {
       const beside = [];
       for (const e of unit._foes) {
         if (e === target || e.hp <= 0 || isIntangible(e)) continue;
-        const d = aChebDist(target.row, target.col, e.row, e.col);
+        const d = unitDist(target, e);
         if (d <= 1) beside.push({ e, d });
       }
       beside.sort((a, b) => a.d - b.d);
@@ -173,16 +172,9 @@ export function makeSparkshellModule(cfg) {
         if (left <= 0) break;
         const dmg = Math.max(1, Math.round(basicUnitDamage(unit, e) * mult));
         credit(damageUnit(e, dmg));
-        if (fx) fx.push({ id: now + "szc" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isShock: true, fromRow: target.row, fromCol: target.col, isEnemy: unit._enemySide });
+        const mid = ((e.size || 1) - 1) / 2;
+        if (fx) fx.push({ id: now + "szc" + unit.uid + e.uid, row: e.row + mid, col: e.col + mid, t: now, isShock: true, fromRow: target.row, fromCol: target.col, isEnemy: unit._enemySide });
         left--;
-      }
-      // A boss standing against the target is a chain target too.
-      const boss = unit._boss;
-      if (left > 0 && boss && boss.hp > 0 && distToBoss(boss, target.row, target.col) <= 1) {
-        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, unit._allies || []) * mult));
-        damageBoss(boss, dmg);
-        credit(dmg);
-        if (fx) fx.push({ id: now + "szcb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isShock: true, fromRow: target.row, fromCol: target.col, isEnemy: unit._enemySide });
       }
       return 0;
     },

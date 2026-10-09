@@ -16,12 +16,13 @@
 // damage per USE, ramping up to +100%. The ramp counts casts, applies from
 // the second cast on, and resets each battle (fresh units).
 
-import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
-import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
+import { abilityRoll } from "../damage.js";
+import { unitDist, occupiesAny } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyStatMod, applyFrostbite } from "../status.js";
 import { damageUnit } from "../hp.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
+import { hasRule, isBoss } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -57,7 +58,7 @@ export function makeWaddlepopModule(cfg) {
 
     /** Ice Lob lvl 5: every landed hit chills -- one Speed Down stack. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "spd", pct: -SPEED_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
@@ -69,49 +70,43 @@ export function makeWaddlepopModule(cfg) {
      * ranged reach opens it).
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const snow = 1 + Math.min(SNOWBALL_MAX_PCT, (unit._snowballPct || 0)) / 100;
       const mult = (specialDmgByLevel[idx] / BASIC_DMG_BASELINE) * snow;
       const frostbites = idx >= MAX_IDX;
 
-      // Closest targetable foe; the boss (via its body) as fallback center.
-      let best = null, bestD = Infinity;
+      // Closest targetable foe in reach -- minions first, a boss only when no
+      // minion is -- is the splash's centre (a boss's top-left body cell).
+      let best = null, bestD = Infinity, bossBest = null, bossD = Infinity;
       for (const e of aliveE) {
         if (isIntangible(e)) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
-        if (d <= RANGED_RANGE && d < bestD) { bestD = d; best = e; }
+        const d = unitDist(unit, e);
+        if (d > RANGED_RANGE) continue;
+        if (isBoss(e)) { if (d < bossD) { bossD = d; bossBest = e; } }
+        else if (d < bestD) { bestD = d; best = e; }
       }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      const bossCenter = !best && bossD <= RANGED_RANGE;
-      if (!best && !bossCenter) return;
+      const centre = best || bossBest;
+      if (!centre) return;
 
-      const cr = bossCenter ? boss.row : best.row;
-      const cc = bossCenter ? boss.col : best.col;
+      const cr = centre.row, cc = centre.col;
       const cells = [];
       for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) cells.push(cr + dr + "," + (cc + dc));
       const cellSet = new Set(cells);
 
-      // Damage every enemy inside the splash (center included) + the boss if
-      // its body overlaps; chill each unit hit, frostbite them at max level.
+      // Damage every enemy whose body is inside the splash (centre included);
+      // chill each one hit, frostbite them at max level.
       for (const e of aliveE) {
-        if (isIntangible(e) || !cellSet.has(e.row + "," + e.col)) continue;
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
+        if (isIntangible(e) || !occupiesAny(e, cellSet)) continue;
+        const dmg = Math.max(1, Math.round(abilityRoll(unit, e) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
-        applyStatMod(e, { kind: "spd", pct: -SPEED_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
-        if (frostbites) applyFrostbite(e);
-        newFx.push({ id: now + "cb" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (boss && boss.hp > 0) {
-        let overlaps = false;
-        for (const cell of cellSet) { const [r, c] = cell.split(",").map(Number); if (bossOccupies(boss, r, c)) { overlaps = true; break; } }
-        if (overlaps) {
-          const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, ctx.aliveP) * mult));
-          damageBoss(boss, dmg);
-          ctx.addDamageDealt(dmg);
-          newFx.push({ id: now + "cbb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        if (!hasRule(e, "ignoresOnHitEffects")) {
+          applyStatMod(e, { kind: "spd", pct: -SPEED_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
+          if (frostbites) applyFrostbite(e);
         }
+        const mid = ((e.size || 1) - 1) / 2;
+        newFx.push({ id: now + "cb" + unit.uid + e.uid, row: e.row + mid, col: e.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
 
       // Ice spikes on all splash cells, then the snowball ramps for next time.

@@ -14,20 +14,21 @@
 // advances the simulation and reports what happened.
 
 import { CREATURE_MAP } from "../data/creatures.js";
-import { BOSS_SIZE, STATUS_TICKS } from "./constants.js";
+import { STATUS_TICKS } from "./constants.js";
 import { displaceUnit, awayFrom, setDisplaceGrid } from "./displace.js";
 import {
   aChebDist, aCardinalDist, aBestStep,
   bossOccupies, distToBoss, nearestOpenBossAdj, nearestOpenCell,
-  cellsOf, unitDist, unitCardinalDist, attackRangeOf,
+  cellsOf, unitDist, unitCardinalDist, attackRangeOf, occupiesAny,
 } from "./geometry.js";
 import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, isIntangible, statModMultiplier, tickOverTime, consumeBlind, tickRestrained, applyStatMod, isFeared, refreshAuraFields, stealBuff, onUnitMoved, applyTimedDebuff, onUnitTeleported, applyTaunt, tickBurn, isEnemyOf, applyBurn, transferDebuffs, healReceivedMultiplier } from "./status.js";
 import { damageUnit, onHitLanded, addStackingShield, applyProtect, applyShield, isBossUnit, healUnit, setHazardLookup, onUnitDefeated, onShieldBroken, retaliationMultiplier } from "./hp.js";
 import { abilityHasTag } from "./abilityTags.js";
-import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster, setBattleTick, triggersOn, asEffect, beginAbilityUse, setBattleBoss } from "./applier.js";
+import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster, setBattleTick, triggersOn, asEffect, beginAbilityUse, setTickPlayers } from "./applier.js";
+import { isBoss, actsLast } from "./classifications.js";
 import { isSpecialSealed, gainSpecialCharge, bankOverflowCharge } from "./charge.js";
 import { tickMinionSpecials } from "./minions.js";
-import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown, lowHpSpdHastePct, defenseOf } from "./damage.js";
+import { basicUnitDamage, attackCooldown, lowHpSpdHastePct, defenseOf } from "./damage.js";
 
 /**
  * Cast a creature's Special. POLICY: the one place a Special fires, for both
@@ -36,25 +37,91 @@ import { basicUnitDamage, basicDamageToBoss, damageBoss, attackCooldown, lowHpSp
  * (see asEcho in applier.js) -- same targeting, at the echo's effectiveness.
  */
 function castSpecial(abilMod, u, ctx) {
-  runCast(u, () => withActiveAbility(u, "special", () => abilMod.special(u, ctx)));
+  const cast = runCast(u, () => withActiveAbility(u, "special", () => abilMod.special(u, ctx)));
   // The echo is a use of the Special in its own right: the per-cast gear
   // below ("whenever this creature uses a Special ability") triggers again.
-  if (u.gear?.echoSpecialPct && u.hp > 0) runCast(u, () => asEcho(u, () => abilMod.special(u, ctx)));
+  if (cast && u.gear?.echoSpecialPct && u.hp > 0) runCast(u, () => asEcho(u, () => abilMod.special(u, ctx)));
 }
 
-/** One cast of a Special, then its per-cast gear. Every enemy the cast
- * damages is collected (by the listener after afterSpecialCast) for it. */
+/**
+ * One cast of a Special, then its per-cast gear. Every enemy the cast
+ * damages is collected (by the listener after afterSpecialCast) for it.
+ *
+ * A module's special() may return `false` to say this call cast nothing -- a
+ * boss kit runs its Special every turn and only some turns start a cast (see
+ * asCreatureModule in bosses/registry.js). Such a call skips every per-cast
+ * effect. Returns whether it was a cast.
+ */
+/** Lightning strikes held back until the acting creature's turn ends (set
+ * only during the acts-last pass). */
+let deferredStrikes = null;
 function runCast(u, cast) {
   // Each cast is one use of the Special (Cantor's Beads spreads per use).
   beginAbilityUse(u);
+  // Where it cast FROM -- every tile of its body: a Special that moves the
+  // caster (Zephyr Step, Charging Pierce, the Earth boss's charge) still used
+  // it on that ground -- see lightningStrikesCaster.
+  const castFrom = cellsOf(u);
   u._specialHits = new Set();
+  let result;
   try {
-    cast();
+    result = cast();
   } finally {
     const hits = [...u._specialHits];
     u._specialHits = null;
-    withApplier(u, () => withActiveAbility(u, "special", () => asEffect(() => afterSpecialCast(u, hits))));
+    if (result !== false) withApplier(u, () => withActiveAbility(u, "special", () => asEffect(() => afterSpecialCast(u, hits))));
   }
+  if (result === false) return false;
+  // An acts-last creature (the boss) is struck at the END of its turn, after
+  // its Basic -- the order its fights were tuned against (see the acts-last
+  // pass in runBattleTick).
+  if (deferredStrikes) deferredStrikes.push([u, castFrom]);
+  else lightningStrikesCaster(u, castFrom);
+  return true;
+}
+
+/** Lightning Hazard: what a cast on one costs, as a share of the hazard's move
+ * damage. Deliberately small -- the strike is an annoyance and a setup (it
+ * keeps a caster on the ground other abilities read, like Stormsight), not a
+ * nuke that punishes the cast outright. */
+const LIGHTNING_CAST_DMG_MULT = 0.5;
+
+/**
+ * Lightning Hazard: whatever uses a Special while standing on one is struck
+ * once the cast has resolved -- the cast still goes off; this is a price, not
+ * a counter. Once per cast, so an Echo Conch echo (a cast in its own right)
+ * pays again, and once however many Lightning Hazards overlap (the strongest
+ * one strikes), the same rule as the move trigger.
+ *
+ * Only the hazard's victims are struck, as with Fire and Wind: a hazard laid by
+ * the player side strikes the enemy side and vice versa. Every caster on the
+ * board reaches this: creatures -- the boss included -- through runCast, and
+ * Vine minions through their Entangle (tickMinionSpecials).
+ *
+ * What counts is the ground the caster used the Special FROM -- every tile of
+ * its body, captured before the cast: "a creature on it uses a Special". A
+ * Special that moves its caster -- the Earth boss's charge, Zephyr Step --
+ * does not carry it out of reach. The strike lands wherever it ended up.
+ */
+function lightningCastDamage(cells, onPlayerSide) {
+  let dmg = 0;
+  for (const hz of tickCtx.state.hazards || []) {
+    if (hz.kind !== "lightning" || hz.enemySide !== onPlayerSide) continue;
+    if (cells.some((c) => hz.cells.has(c))) dmg = Math.max(dmg, hz.dmg);
+  }
+  return dmg ? Math.max(1, Math.round(dmg * LIGHTNING_CAST_DMG_MULT)) : 0;
+}
+
+function lightningStrikesCaster(u, castFrom = cellsOf(u)) {
+  if (!tickCtx || u.hp <= 0) return;
+  const { state, newFx, now } = tickCtx;
+  const onPlayerSide = state.playerUnits.includes(u);
+  const dmg = lightningCastDamage(castFrom, onPlayerSide);
+  if (!dmg) return;
+  damageUnit(u, dmg, { effectDamage: true });
+  // The flash at the body's centre (a 2x2 boss's is between its four tiles).
+  const mid = ((u.size || 1) - 1) / 2;
+  newFx.push({ id: now + "hzcast" + u.uid, row: u.row + mid, col: u.col + mid, t: now, isShock: true, fromRow: u.row, fromCol: u.col, isEnemy: !onPlayerSide });
 }
 
 /**
@@ -120,10 +187,8 @@ function afterSpecialCast(u, hits) {
     const { state } = tickCtx;
     const playerSide = state.playerUnits.includes(u);
     for (const e of playerSide ? state.enemyUnits : state.playerUnits) {
-      if (e.hp > 0 && aChebDist(e.row, e.col, u.row, u.col) <= 1) applyTaunt(e, u, g.specialTauntNearbyTicks);
+      if (e.hp > 0 && unitDist(u, e) <= 1) applyTaunt(e, u, g.specialTauntNearbyTicks);
     }
-    const boss = playerSide && state.boss && state.boss.hp > 0 ? state.boss : null;
-    if (boss && distToBoss(boss, u.row, u.col) <= 1) applyTaunt(boss, u, g.specialTauntNearbyTicks);
   }
   if (u._shadowStrikeUsed) u._shadowStrike = u._shadowStrikeUsed = false;
   // Ambush Fang: the first ability of the battle was this Special; spent.
@@ -168,7 +233,8 @@ onUnitDefeated((target, killer, info) => {
         for (const e of foesBeside(w, target, new Set([target]))) applyBurn(e, w.atk);
       });
     }
-    if (!transferred && w.gear?.defeatDebuffTransfer && target.uid != null) {
+    // A defeated boss has never handed its debuffs on.
+    if (!transferred && w.gear?.defeatDebuffTransfer && !isBoss(target)) {
       const to = closestFoeOf(w, target);
       if (to) {
         transferred = true;
@@ -207,10 +273,10 @@ function battleRosterOf(state) {
 /** Effect damage from `u` to a foe (creature or boss), with its hit flash. */
 function hitFoe(u, e, dmg) {
   const { state, newFx, now } = tickCtx;
-  const dealt = e.uid == null ? damageBoss(e, dmg, { effectDamage: true }) : damageUnit(e, dmg, { effectDamage: true });
+  const dealt = damageUnit(e, dmg, { effectDamage: true });
   if (state.playerUnits.includes(u)) creditDamage(state, u.creatureId, dealt, "passive");
-  const size = e.size || (e.uid == null ? BOSS_SIZE : 1);
-  newFx.push({ id: now + "gearhit" + u.uid + (e.uid || "boss") + Math.random(), row: e.row + (size - 1) / 2, col: e.col + (size - 1) / 2, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: !state.playerUnits.includes(u) });
+  const size = e.size || 1;
+  newFx.push({ id: now + "gearhit" + u.uid + e.uid + Math.random(), row: e.row + (size - 1) / 2, col: e.col + (size - 1) / 2, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: !state.playerUnits.includes(u) });
 }
 
 /** Living, targetable foes of `u` (the boss included, on the player side),
@@ -220,10 +286,8 @@ function foesWithDist(u, row, col, exclude = null) {
   const playerSide = state.playerUnits.includes(u);
   const out = [];
   for (const e of playerSide ? state.enemyUnits : state.playerUnits) {
-    if (e.hp > 0 && e !== exclude && !isIntangible(e)) out.push({ e, d: aChebDist(row, col, e.row, e.col) });
+    if (e.hp > 0 && e !== exclude && !isIntangible(e)) out.push({ e, d: unitDist({ row, col }, e) });
   }
-  const boss = playerSide && state.boss && state.boss.hp > 0 && state.boss !== exclude ? state.boss : null;
-  if (boss) out.push({ e: boss, d: distToBoss(boss, row, col) });
   return out;
 }
 
@@ -255,8 +319,10 @@ function bonusBasicHit(u, target) {
   u._attackRiders = true;
   try {
     withApplier(u, () => withActiveAbility(u, "basic", () => {
-      const players = state.playerUnits.filter((p) => p.hp > 0);
-      const dmg = target.uid == null ? basicDamageToBoss(u, target, players) : basicUnitDamage(u, target);
+      // Outside the turn order, so a boss's Dark Shroud counts the party that
+      // stands now (see unitDamage).
+      const party = battleRosterOf(state).filter((o) => o.hp > 0 && isEnemyOf(target, o));
+      const dmg = basicUnitDamage(u, target, party);
       riderHit(u, target, dmg, true);
     }));
   } finally {
@@ -272,7 +338,7 @@ const WIND_HAZARD_ATK_RATE = 0.04;
 const WIND_PUSH_EVERY = 3;
 function layWindHazard(u, targets) {
   const cells = [];
-  for (const t of targets) for (const cell of cellsOf(t.uid == null ? { ...t, size: BOSS_SIZE } : t)) cells.push(cell);
+  for (const t of targets) for (const cell of cellsOf(t)) cells.push(cell);
   if (!cells.length || !tickCtx) return;
   const { state } = tickCtx;
   (state.hazards || (state.hazards = [])).push({
@@ -302,7 +368,7 @@ function startOfBattleGearNow(u) {
   if (protect && tickCtx) {
     const side = tickCtx.state.playerUnits.includes(u) ? tickCtx.state.playerUnits : tickCtx.state.enemyUnits;
     for (const a of side) {
-      if (a === u || a.hp <= 0 || aChebDist(a.row, a.col, u.row, u.col) > 1) continue;
+      if (a === u || a.hp <= 0 || unitDist(a, u) > 1) continue;
       asPassive(u, () => applyProtect(a, u, protect));
     }
   }
@@ -446,10 +512,10 @@ function settleBasicAttack(u) {
       // Magpie Brooch: one stolen buff per item due.
       for (const g of due("stealBuffEvery")) stealBuff(target, u);
       // Voltaic Fang: every Nth attack briefly Stuns its target (not a boss --
-      // a boss obeys no control effect but Taunt). Items due together add
+      // applyTimedDebuff checks its Stun immunity). Items due together add
       // their Stun lengths into one Stun.
       const stun = due("stunEvery").reduce((t, g) => t + (g.stunEveryTicks || 2), 0);
-      if (stun && target.uid != null && target.hp > 0) applyTimedDebuff(target, "stunTicks", Math.max(target.stunTicks || 0, stun));
+      if (stun && target.hp > 0) applyTimedDebuff(target, "stunTicks", Math.max(target.stunTicks || 0, stun));
       // Tempest Blade: a Basic tagged Pierce leaves a Wind Hazard under
       // everything it hit.
       if (gear.pierceWindHazard && abilityHasTag(u, "basic", "pierce")) layWindHazard(u, [...struck]);
@@ -457,7 +523,7 @@ function settleBasicAttack(u) {
       // attacker (a Displace -- see displace.js) per item due, stopping once
       // it is beside.
       for (const g of due("pullEvery")) {
-        if (target.uid == null || target.hp <= 0 || aChebDist(u.row, u.col, target.row, target.col) <= 1) break;
+        if (target.hp <= 0 || aChebDist(u.row, u.col, target.row, target.col) <= 1) break;
         const [pr, pc] = awayFrom(target.row, target.col, u.row, u.col);
         displaceUnit(target, pr, pc, { source: u });
       }
@@ -491,14 +557,9 @@ function foesOnCells(u, cells, exclude) {
   const { state } = tickCtx;
   const playerSide = state.playerUnits.includes(u);
   const foes = (playerSide ? state.enemyUnits : state.playerUnits).filter((e) => e.hp > 0 && !isIntangible(e) && !exclude.has(e));
-  const boss = playerSide && state.boss && state.boss.hp > 0 && !exclude.has(state.boss) ? state.boss : null;
   const out = [];
   for (const cell of cells) {
     for (const e of foes) if (!out.includes(e) && cellsOf(e).includes(cell)) out.push(e);
-    if (boss && !out.includes(boss)) {
-      const [r, c] = cell.split(",").map(Number);
-      if (bossOccupies(boss, r, c)) out.push(boss);
-    }
   }
   return out;
 }
@@ -508,39 +569,33 @@ function foesOnCells(u, cells, exclude) {
 function foesBeside(u, center, exclude) {
   const { state } = tickCtx;
   const playerSide = state.playerUnits.includes(u);
-  const foes = (playerSide ? state.enemyUnits : state.playerUnits).filter((e) => e.hp > 0 && !isIntangible(e) && !exclude.has(e));
-  const centerIsBoss = center.uid == null;
-  const dist = (e) => (centerIsBoss ? distToBoss(center, e.row, e.col) : aChebDist(center.row, center.col, e.row, e.col));
-  const out = foes.filter((e) => dist(e) <= 1).sort((a, b) => dist(a) - dist(b));
-  const boss = playerSide && state.boss && state.boss.hp > 0 ? state.boss : null;
-  if (boss && !centerIsBoss && !exclude.has(boss) && distToBoss(boss, center.row, center.col) <= 1) out.push(boss);
-  return out;
+  const foes = (playerSide ? state.enemyUnits : state.playerUnits).filter((e) => e.hp > 0 && !isIntangible(e) && !exclude.has(e) && e !== center);
+  // Body to body, so a 2x2 boss -- as the centre or as a foe -- counts by every
+  // tile of itself. A stable sort: equally near foes keep list order.
+  return foes.filter((e) => unitDist(center, e) <= 1).sort((a, b) => unitDist(center, a) - unitDist(center, b));
 }
 
 /** One rider hit of a Basic attack (see settleBasicAttack). */
 function riderHit(u, target, dmg, withOnHit) {
   const { state, newFx, now } = tickCtx;
-  const isBoss = target.uid == null;
   dmg = Math.max(1, Math.round(dmg));
-  const dealt = isBoss ? damageBoss(target, dmg) : damageUnit(target, dmg);
-  const hit = isBoss ? target : target._redirectedTo || target;
-  if (!isBoss && hit._dodgedHit) return;
+  const dealt = damageUnit(target, dmg);
+  const hit = target._redirectedTo || target;
+  if (hit._dodgedHit) return;
   let bonus = 0;
   const mod = withOnHit ? getPlayerAbilityModule(u.creatureId) : null;
   if (mod?.onHit) {
     bonus = mod.onHit(u, hit, dealt) || 0;
-    if (bonus) withActiveAbility(u, "unique", () => (isBoss ? damageBoss(hit, bonus) : damageUnit(hit, bonus)));
+    if (bonus) withActiveAbility(u, "unique", () => damageUnit(hit, bonus));
   }
   const playerSide = state.playerUnits.includes(u);
   if (playerSide) {
     creditDamage(state, u.creatureId, dealt, "basic");
     creditDamage(state, u.creatureId, bonus, "passive");
   }
-  const size = hit.size || (isBoss ? 2 : 1);
-  newFx.push({ id: now + "rider" + u.uid + (hit.uid || "boss") + Math.random(), row: hit.row + (size - 1) / 2, col: hit.col + (size - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: !playerSide });
+  const size = hit.size || 1;
+  newFx.push({ id: now + "rider" + u.uid + hit.uid + Math.random(), row: hit.row + (size - 1) / 2, col: hit.col + (size - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: !playerSide });
 }
-import { getBossModule } from "./bosses/registry.js";
-import { makeBossContext } from "./bosses/context.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 
 /** A minion's or boss's Burn with no stored source ATK: the old 10-ATK floor
@@ -572,18 +627,31 @@ function creditDamage(state, creatureId, amount, source) {
   row[source] += amount;
 }
 
+/** The foes a creature's module sees on its turn: everyone on the other side
+ * who was up when the tick began, less a boss already defeated this tick
+ * (the old boss branches all checked it was still standing). A minion that
+ * fell earlier in the tick stays in the list, as it always has -- dropping it
+ * too would be the cleaner rule, but changes fights, so it is its own call. */
+function standingFoes(aliveE) {
+  return aliveE.filter((e) => e.hp > 0 || !isBoss(e));
+}
+
 /**
  * Context passed to a creature's `special(unit, ctx)` / `basicAttack(unit, ctx)`
  * / `onTick(unit, ctx)` ability hooks. Modules are side-agnostic: `aliveP` is
  * always the acting unit's OWN side and `aliveE` its foes, so the same module
  * drives player and enemy creatures alike -- callers pass the lists swapped
- * (with `isEnemySide: true`) for enemy units. Enemy-side hooks never see a
- * boss (it's their ally) and never write to the player damage chart.
+ * (with `isEnemySide: true`) for enemy units -- an enemy creature sees its
+ * boss among its allies -- and enemy-side hooks never write to the player
+ * damage chart.
  */
-function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep, isEnemySide = false, damageSource = "special" }) {
+function makePlayerAbilityContext({ unit, aliveE, aliveP, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, doStep, isEnemySide = false, damageSource = "special" }) {
   return {
-    aliveE, aliveP, boss, gridRows, gridCols, newFx, now, canMove,
+    aliveE, aliveP, gridRows, gridCols, newFx, now, canMove,
     blocked,
+    // The engine's occupancy set. Boss kits move their 2x2 bodies (and shove
+    // creatures) by reading and writing it directly (see bosses/registry.js).
+    allOcc,
     isEnemySide,
     addDamageDealt(amount) {
       if (isEnemySide) return;
@@ -625,8 +693,10 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       (isEnemySide ? state.enemyUnits : state.playerUnits).push(su);
       for (const cell of cellsOf(su)) allOcc.add(cell);
     },
-    /** Ground Hazard. `kind` is "water" or "fire" -- see the Hazards pass in
-     * runBattleTick for what each one does. `dmg` is per trigger. */
+    /** Ground Hazard. `kind` is "water", "fire" or "lightning" -- see the
+     * Hazards pass in runBattleTick (and lightningStrikesCaster) for what each
+     * one does. `dmg` is per trigger. The layer is recorded as `ownerUid`, for
+     * passives that read only their own hazards (Stormsight). */
     addHazard(cells, ticks, dmg, kind) {
       // A hazard laid by an echoed Special hurts at the echo's effectiveness
       // (its later ticks run with no applier, so it is baked in here).
@@ -634,12 +704,16 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, boss, allOcc, newFx, n
       // more potent -- more damage, and (water) a deeper Haste Down.
       const potency = 1 + ((kind === "fire" ? unit.gear?.fireHazardPct : kind === "water" ? unit.gear?.waterHazardPct : 0) || 0) / 100;
       dmg = Math.max(1, Math.round(dmg * effectiveness() * potency));
-      (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide, hasteDownPct: HAZARD_HASTE_DOWN_PCT * potency });
+      (state.hazards || (state.hazards = [])).push({ cells: new Set(cells), ticksLeft: ticks, dmg, kind, enemySide: isEnemySide, ownerUid: unit.uid, hasteDownPct: HAZARD_HASTE_DOWN_PCT * potency });
     },
     /** Is a Hazard of this kind covering (row,col)? For passives that read the
      * ground -- Cinder Scent hunts whatever is standing in fire. */
     hazardsOn(row, col, kind) {
       return (state.hazards || []).some((h) => h.kind === kind && h.cells.has(row + "," + col));
+    },
+    /** hazardsOn, narrowed to the hazards THIS unit laid. */
+    ownHazardOn(row, col, kind) {
+      return (state.hazards || []).some((h) => h.kind === kind && h.ownerUid === unit.uid && h.cells.has(row + "," + col));
     },
     /** Take one BFS step toward (tr,tc); no-ops when rooted. */
     stepToward(tr, tc) {
@@ -760,15 +834,14 @@ export function specialChargeReady(u) {
  *
  * This is the default for creatures whose special isn't implemented yet;
  * implemented abilities can override it per-module via `specialInRange(u,
- * {aliveE, aliveP, boss})` (e.g. Emberstar's dash is an engage tool that
+ * {aliveE, aliveP})` (e.g. Emberstar's dash is an engage tool that
  * deliberately fires from anywhere).
  */
-export function specialTargetInRange(u, allies, enemies, boss) {
+export function specialTargetInRange(u, allies, enemies) {
   const range = attackRangeOf(u);
   for (const e of enemies) {
     if (unitDist(u, e) <= range) return true;
   }
-  if (boss && boss.hp > 0 && distToBoss(boss, u.row, u.col) <= range) return true;
   if (CREATURE_MAP[u.creatureId]?.role === "Support") {
     for (const a of allies) {
       if (a !== u && a.hp > 0 && unitDist(u, a) <= range) return true;
@@ -976,10 +1049,18 @@ export function runBattleTick(state, config) {
    * them (Fear, Restrained) always point at the opposite roster. */
   const unitByUid = (uid) =>
     state.playerUnits.find((u) => u.uid === uid) || state.enemyUnits.find((u) => u.uid === uid);
-  const boss = state.boss;
+  // The boss is a creature on the enemy side (the "boss" classification --
+  // battle/classifications.js). The player side's default attack flow still
+  // gives it priority when it is in reach (below), and the boss itself takes
+  // its turn last (the acts-last pass at the end of the tick).
+  const boss = aliveE.find((u) => isBoss(u)) || null;
+  // Every other enemy: what the player side's default flow fights and chases
+  // before closing on the boss.
+  const aliveMinions = aliveE.filter((u) => !isBoss(u));
   const newFx = [];
   if (!aliveP.length) return { newFx, now, acted: false };
   setBattleRoster([...state.playerUnits, ...state.enemyUnits]);
+  setTickPlayers(aliveP);
 
   const allOcc = new Set();
   for (const u of [...aliveP, ...aliveE]) for (const cell of cellsOf(u)) allOcc.add(cell);
@@ -988,13 +1069,12 @@ export function runBattleTick(state, config) {
   tickCtx = { state, newFx, now, allOcc, gridRows, gridCols, bossOcc };
   setDisplaceGrid({ allOcc, gridRows, gridCols, bossOcc, tick: state.tick, now });
   setBattleTick(state.tick);
-  setBattleBoss(state.boss);
   // Is a creature (or the boss, by its body) on a Hazard of this kind? For
   // gear that reads the ground (see setHazardLookup in hp.js).
   setHazardLookup((u, kind) => {
     const hz = state.hazards;
     if (!hz || !hz.length) return false;
-    const cells = cellsOf(u.uid == null ? { ...u, size: BOSS_SIZE } : u);
+    const cells = cellsOf(u);
     return hz.some((h) => h.kind === kind && cells.some((c) => h.cells.has(c)));
   });
 
@@ -1002,7 +1082,10 @@ export function runBattleTick(state, config) {
   const blocked = (r, c) =>
     r < 0 || r >= gridRows || c < 0 || c >= gridCols ||
     (bossAlive && bossOccupies(boss, r, c)) ||
-    allOcc.has(r + "," + c);
+    // A boss struck down this tick stops blocking at once (its tiles are still
+    // in allOcc until the next tick, like any fallen creature's; the boss's
+    // have always freed up the moment it fell).
+    (allOcc.has(r + "," + c) && !(boss && boss.hp <= 0 && cellsOf(boss).includes(r + "," + c)));
 
   // ── 1. Player units ──────────────────────────────────────────────────────
   for (const u of aliveP) {
@@ -1046,7 +1129,7 @@ export function runBattleTick(state, config) {
     // Always-on passives (e.g. Bloomibis's Guardian Grove aura) run every tick,
     // before the special/basic flow, independent of cooldowns and movement.
     if (abilMod?.onTick) {
-      const tickCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "passive", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+      const tickCtx = makePlayerAbilityContext({ unit: u, aliveE: standingFoes(aliveE), aliveP, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "passive", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
       abilMod.onTick(u, tickCtx);
     }
 
@@ -1070,17 +1153,18 @@ export function runBattleTick(state, config) {
     // bar entirely: they fire whenever their module's own gate passes.
     const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange) && !isSpecialSealed(u);
     if (specialChargeReady(u) || chargelessReady) {
-      const rangeBoss = bossAlive ? boss : null;
+      // The boss is in aliveE like any enemy (it is a creature), so no separate
+      // boss is handed to the range checks.
       const inRange = abilMod?.specialInRange
-        ? abilMod.specialInRange(u, { aliveE, aliveP, boss: rangeBoss, gridRows, gridCols })
-        : specialTargetInRange(u, aliveP, aliveE, rangeBoss);
+        ? abilMod.specialInRange(u, { aliveE: standingFoes(aliveE), aliveP, gridRows, gridCols })
+        : specialTargetInRange(u, aliveP, standingFoes(aliveE));
       if (abilMod?.special) {
         // Rooted units still cast: Root holds a creature in place, it does not
         // silence it (see isRooted in status.js). Repositioning specials are
         // held back inside the context instead -- ctx.relocate refuses while
         // Rooted -- so the creature acts without ever leaving its tile.
         if (inRange) {
-          const specialCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "special", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+          const specialCtx = makePlayerAbilityContext({ unit: u, aliveE: standingFoes(aliveE), aliveP, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "special", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
           // Spent BEFORE the cast, so charge gained during or right after
           // it (a defeat it lands, Overdrive Sigil) is banked past the reset
           // rather than added to a full bar about to be wiped.
@@ -1101,7 +1185,7 @@ export function runBattleTick(state, config) {
     // the default "attack the nearest thing" flow below -- it owns targeting,
     // damage/healing, and chase-movement for this unit's turn.
     if (abilMod?.basicAttack) {
-      const basicCtx = makePlayerAbilityContext({ unit: u, aliveE, aliveP, boss, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "basic", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+      const basicCtx = makePlayerAbilityContext({ unit: u, aliveE: standingFoes(aliveE), aliveP, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "basic", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
       abilMod.basicAttack(u, basicCtx);
       continue;
     }
@@ -1111,20 +1195,20 @@ export function runBattleTick(state, config) {
     // minion that taunted it); so does a ranged unit retaliating against a
     // melee attacker, or any unit with a Marked foe already in reach (the
     // minion-fight branch below).
-    if (distB <= range && bossAlive && !tauntedFoe(u, aliveE) && !retaliationFoe(u, aliveE) && !markedFoeInRange(u, aliveE)) {
+    if (distB <= range && bossAlive && !tauntedFoe(u, aliveMinions) && !retaliationFoe(u, aliveMinions) && !markedFoeInRange(u, aliveMinions)) {
       if (u.atkCd <= 0 && missBlindedSwing(u, boss.row + 0.5, boss.col + 0.5, penalty, newFx, now, false)) continue;
       if (u.atkCd <= 0) {
         // The swing itself is basic damage; an onHit bonus rides along with it
         // but belongs to the passive that granted it.
         let basicDmg = 0, passiveDmg = 0;
         for (let i = 0; i < hits && boss.hp > 0; i++) {
-          const dmgToBoss = Math.max(1, Math.round(basicDamageToBoss(u, boss, aliveP) * dmgMultVs(boss) / hits));
-          damageBoss(boss, dmgToBoss);
+          const dmgToBoss = Math.max(1, Math.round(basicUnitDamage(u, boss) * dmgMultVs(boss) / hits));
+          damageUnit(boss, dmgToBoss);
           basicDmg += dmgToBoss;
           const bonus = abilMod?.onHit ? abilMod.onHit(u, boss, dmgToBoss) : 0;
           // An on-hit rider is the Unique's damage (charted "passive"), not
           // another Basic hit -- Basic- and tag-keyed gear leave it alone.
-          if (bonus) { withActiveAbility(u, "unique", () => damageBoss(boss, bonus)); passiveDmg += bonus; }
+          if (bonus) { withActiveAbility(u, "unique", () => damageUnit(boss, bonus)); passiveDmg += bonus; }
         }
         creditDamage(state, u.creatureId, basicDmg, "basic");
         creditDamage(state, u.creatureId, passiveDmg, "passive");
@@ -1136,8 +1220,8 @@ export function runBattleTick(state, config) {
     }
 
     // Otherwise fight the minions.
-    if (aliveE.length) {
-      const { atkTgt, moveTgt } = selectTarget(u, aliveE);
+    if (aliveMinions.length) {
+      const { atkTgt, moveTgt } = selectTarget(u, aliveMinions);
       const tgt = atkTgt || moveTgt;
       if (tgt) {
         const dist = atkTgt ? unitCardinalDist(u, atkTgt) : unitDist(u, tgt);
@@ -1201,8 +1285,11 @@ export function runBattleTick(state, config) {
   // creatures have no module yet -- those keep the placeholder behavior of
   // flashing the ready marker and recharging). Their context is built with
   // the sides swapped: a module's `aliveP` is always the acting unit's own
-  // side. Enemies never target their own boss, so hooks see `boss: null`.
+  // side, so an enemy creature finds its boss among its allies.
   for (const u of aliveE) {
+    // A creature classed to act last (the boss) takes its whole turn -- its
+    // timers included -- in the acts-last pass at the end of the tick.
+    if (actsLast(u)) continue;
     setActiveAbility(null);
     setApplier(null);
     u.atkCd = Math.max(0, u.atkCd - 1);
@@ -1221,7 +1308,7 @@ export function runBattleTick(state, config) {
     const abilMod = getPlayerAbilityModule(u.creatureId);
     const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
     const dmgMultVs = (target) => (abilMod?.dmgMultForAttack ? abilMod.dmgMultForAttack(u, target) : 1);
-    const enemyCtx = () => makePlayerAbilityContext({ unit: u, aliveE: aliveP, aliveP: aliveE, boss: null, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, isEnemySide: true, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+    const enemyCtx = () => makePlayerAbilityContext({ unit: u, aliveE: aliveP, aliveP: aliveE, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, isEnemySide: true, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
 
     if (abilMod?.onTick) abilMod.onTick(u, enemyCtx());
 
@@ -1234,8 +1321,8 @@ export function runBattleTick(state, config) {
     const chargelessReady = !u.abilChargeMax && !!(abilMod?.special && abilMod.specialInRange) && !isSpecialSealed(u);
     if (specialChargeReady(u) || chargelessReady) {
       const inRange = abilMod?.specialInRange
-        ? abilMod.specialInRange(u, { aliveE: aliveP, aliveP: aliveE, boss: null, gridRows, gridCols })
-        : specialTargetInRange(u, aliveE, aliveP, null);
+        ? abilMod.specialInRange(u, { aliveE: aliveP, aliveP: aliveE, gridRows, gridCols })
+        : specialTargetInRange(u, aliveE, aliveP);
       if (abilMod?.special) {
         // Same as the player side: Rooted casts, it just can not relocate.
         if (inRange) {
@@ -1305,7 +1392,7 @@ export function runBattleTick(state, config) {
   setActiveAbility(null);
 
   // ── 3. Minion specials ───────────────────────────────────────────────────
-  tickMinionSpecials(aliveE, aliveP, newFx, now);
+  tickMinionSpecials(aliveE, aliveP, newFx, now, lightningStrikesCaster);
 
   // ── 4. Status effects ────────────────────────────────────────────────────
   // Auras are fields, not buffs written onto the units they help, so what each
@@ -1320,7 +1407,7 @@ export function runBattleTick(state, config) {
     const pct = src.gear?.auraAllyRegenPctPerTick || 0;
     if (!pct || src.hp <= 0 || !src.aura || !((src.aura.ticks || 0) > 0)) continue;
     for (const a of side) {
-      if (a.hp <= 0 || a.hp >= a.maxHp || (a.healImmuneTicks || 0) > 0 || aChebDist(a.row, a.col, src.row, src.col) > src.aura.range) continue;
+      if (a.hp <= 0 || a.hp >= a.maxHp || (a.healImmuneTicks || 0) > 0 || unitDist(a, src) > src.aura.range) continue;
       const amt = Math.max(1, Math.round(((a.maxHp * pct) / 100) * healReceivedMultiplier(a)));
       asPassive(src, () => asEffect(() => healUnit(a, amt)));
     }
@@ -1328,8 +1415,9 @@ export function runBattleTick(state, config) {
 
   tickStatusEffects(aliveP, boss, newFx, now);
 
-  // Player-inflicted Burn (e.g. Emberstar's Burning Bond) on minions/boss.
-  // Separate from tickStatusEffects above, which only handles boss->player DoT.
+  // Player-inflicted Burn (e.g. Emberstar's Burning Bond) on the enemy side,
+  // the boss included -- it is an enemy creature like any other. Separate from
+  // tickStatusEffects above, which ticks the player side's.
   for (const u of aliveE) {
     // Expiry takes every stack with it (see tickBurn in status.js).
     if (tickBurn(u, (dmg) => damageUnit(u, dmg, { effectDamage: true }), UNSOURCED_BURN_DMG)) {
@@ -1342,16 +1430,6 @@ export function runBattleTick(state, config) {
     const hurt = (dmg) => damageUnit(u, dmg, { effectDamage: true });
     tickOverTime(u, "dot", hurt, newFx, now, "p");
     tickOverTime(u, "poison", hurt, newFx, now, "p");
-  }
-  if (bossAlive && tickBurn(boss, (dmg) => damageBoss(boss, dmg), UNSOURCED_BURN_DMG)) {
-    newFx.push({ id: now + "pbrn" + "boss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
-  }
-  if (bossAlive) {
-    // Boss damage skips damageUnit (it has its own shield pool), and it has
-    // no uid of its own, so both are passed in explicitly.
-    const hurtBoss = (dmg) => damageBoss(boss, dmg);
-    tickOverTime(boss, "dot", hurtBoss, newFx, now, "p", "boss");
-    tickOverTime(boss, "poison", hurtBoss, newFx, now, "p", "boss");
   }
 
   // ── Ground Hazards ───────────────────────────────────────────────────────
@@ -1368,6 +1446,9 @@ export function runBattleTick(state, config) {
   //     their cast timers do not read unit Haste (same policy as Haste Down).
   //   fire (Charging Pierce's trail) -- damage to enemies standing on it,
   //     boss included, every tick.
+  //   lightning (Storm Lance) -- nothing while a creature merely stands
+  //     there; it strikes a creature that USES A SPECIAL on it instead, which
+  //     happens at the cast, not here (lightningStrikesCaster, beside runCast).
   if (state.hazards && state.hazards.length) {
     const stepped = new Set();
     state.hazards = state.hazards.filter((hz) => {
@@ -1378,39 +1459,27 @@ export function runBattleTick(state, config) {
       // the hazard, so the move check just below makes it hurt.
       if (hz.kind === "wind" && (hz.age = (hz.age || 0) + 1) % WIND_PUSH_EVERY === 0) {
         const back = hz.enemySide ? 1 : -1;
-        for (const u of victims) if (u.hp > 0 && hz.cells.has(u.row + "," + u.col)) displaceUnit(u, back, 0);
+        for (const u of victims) if (u.hp > 0 && occupiesAny(u, hz.cells)) displaceUnit(u, back, 0);
       }
       for (const u of victims) {
         // Moving across any hazard hurts.
         if (!stepped.has(u.uid) && u._lastStepTick === state.tick && hz.cells.has(u.prevRow + "," + u.prevCol)) {
           stepped.add(u.uid);
           damageUnit(u, hz.dmg, { effectDamage: true });
-          newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isBurn: hz.kind === "fire", isFrost: hz.kind === "water", isGust: hz.kind === "wind", fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
+          newFx.push({ id: now + "hzrd" + u.uid, row: u.row, col: u.col, t: now, isBurn: hz.kind === "fire", isFrost: hz.kind === "water", isGust: hz.kind === "wind", isShock: hz.kind === "lightning", fromRow: u.prevRow, fromCol: u.prevCol, isEnemy: !hz.enemySide });
         }
         // Fire also burns whoever is standing in it.
-        if (hz.kind === "fire" && hz.cells.has(u.row + "," + u.col)) {
+        if (hz.kind === "fire" && occupiesAny(u, hz.cells)) {
           damageUnit(u, hz.dmg, { effectDamage: true });
           newFx.push({ id: now + "hzstand" + u.uid, row: u.row, col: u.col, t: now, isBurn: true, fromRow: u.row, fromCol: u.col, isEnemy: true });
         }
       }
       if (hz.kind === "water") {
         for (const u of [...aliveP, ...aliveE]) {
-          if (hz.cells.has(u.row + "," + u.col)) {
+          if (occupiesAny(u, hz.cells)) {
             // Terrain, not an inflicted debuff: debuff immunity lets it by.
             applyStatMod(u, { kind: "haste", pct: -(hz.hasteDownPct || HAZARD_HASTE_DOWN_PCT), src: "hazard", ticks: HAZARD_HASTE_TICKS, environmental: true });
           }
-        }
-      }
-      if (hz.kind === "fire" && bossAlive && !hz.enemySide) {
-        let onIt = false;
-        for (let dr = 0; dr < BOSS_SIZE && !onIt; dr++) {
-          for (let dc = 0; dc < BOSS_SIZE && !onIt; dc++) {
-            if (hz.cells.has((boss.row + dr) + "," + (boss.col + dc))) onIt = true;
-          }
-        }
-        if (onIt) {
-          damageBoss(boss, hz.dmg);
-          newFx.push({ id: now + "hzboss", row: boss.row, col: boss.col, t: now, isBurn: true, fromRow: boss.row, fromCol: boss.col, isEnemy: true });
         }
       }
       hz.ticksLeft--;
@@ -1445,43 +1514,54 @@ export function runBattleTick(state, config) {
   if (state.playerUnits.some((u) => u._summonOf != null)) state.playerUnits = pruneSummons(state.playerUnits);
   if (state.enemyUnits.some((u) => u._summonOf != null)) state.enemyUnits = pruneSummons(state.enemyUnits);
 
-  // ── 5. Boss ──────────────────────────────────────────────────────────────
-  if (bossAlive) {
-    boss.atkCd = Math.max(0, boss.atkCd - 1);
-    boss.moveCd = Math.max(0, boss.moveCd - 1);
-    boss.specialCd = Math.max(0, boss.specialCd - 1);
-    tickTimedMods(boss);
-
-    const mod = getBossModule(boss._bossKey);
-    if (mod) {
-      const ctx = makeBossContext({ boss, aliveP, aliveE, allOcc, newFx, now, gridRows, gridCols });
-      if (mod.onInit && !boss._initDone) {
-        mod.onInit(ctx);
-        boss._initDone = true;
+  // ── 5. Acts-last creatures (the boss) ────────────────────────────────────
+  // A creature classed to act last (battle/classifications.js) takes its whole
+  // turn here -- after every other creature, the hazards and the status ticks,
+  // the order the boss fights were built on -- through its creature module
+  // like anyone else's: onTick (its own clocks, timed effects and upkeep), its
+  // Special through castSpecial, then its Basic. Like every other turn this
+  // tick, it runs for each creature that was alive when the tick began.
+  for (const u of aliveE) {
+    if (!actsLast(u)) continue;
+    const mod = getPlayerAbilityModule(u.creatureId);
+    if (!mod) continue;
+    // Its own body is not in its way: a 2x2 kit moves by checking the tiles it
+    // is moving into (see asCreatureModule in bosses/registry.js).
+    for (const c of cellsOf(u)) allOcc.delete(c);
+    const canMove = !isRooted(u);
+    const ctx = makePlayerAbilityContext({ unit: u, aliveE: aliveP, aliveP: aliveE, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, isEnemySide: true, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+    if (mod.onTick) mod.onTick(u, ctx);
+    // It is the one acting now: hits it lands name it as the attacker
+    // (Thornback Plate counters it). A Lightning Hazard strike its Special
+    // earns lands after the whole turn -- Special, Basic, then the ground --
+    // and outside its own applier: the ground strikes it, not itself.
+    deferredStrikes = [];
+    withApplier(u, () => {
+      if (mod.special) castSpecial(mod, u, ctx);
+      if (mod.basicAttack) {
+        setActiveAbility(u, "basic");
+        beginAbilityUse(u);
+        mod.basicAttack(u, ctx);
       }
-      if (mod.onStatusTick) mod.onStatusTick(ctx);
-      // The boss is the one acting now: hits it lands name it as the
-      // attacker (Thornback Plate counters it). It wears no gear, so nothing
-      // else about its turn changes.
-      withApplier(boss, () => {
-        if (mod.special) mod.special(ctx);
-        if (mod.basic) mod.basic(ctx);
-      });
-    }
+    });
+    setActiveAbility(null);
+    const strikes = deferredStrikes;
+    deferredStrikes = null;
+    for (const [caster, castFrom] of strikes) lightningStrikesCaster(caster, castFrom);
+    for (const c of cellsOf(u)) allOcc.add(c);
   }
 
   return { newFx, now, acted: true };
 }
 
 /**
- * Win/lose check. Returns "won" when the boss and all minions are down,
- * "lost" when the party is wiped, otherwise null.
+ * Win/lose check. Returns "won" when every enemy is down -- the boss is one
+ * of them -- "lost" when the party is wiped, otherwise null.
  */
 export function battleOutcome(state) {
-  const bossAlive = !!(state.boss && state.boss.hp > 0);
   const anyEnemy = state.enemyUnits.some((u) => u.hp > 0);
   const anyPlayer = state.playerUnits.some((u) => u.hp > 0);
-  if (!bossAlive && !anyEnemy) return "won";
+  if (!anyEnemy) return "won";
   if (!anyPlayer) return "lost";
   return null;
 }

@@ -7,7 +7,7 @@
 
 import { BOSS_SIZE } from "../constants.js";
 import { distToBoss, bossOccupies, aStepToward } from "../geometry.js";
-import { statModMultiplier, isIntangible } from "../status.js";
+import { statModMultiplier, isIntangible, consumeBlind } from "../status.js";
 
 /** Standard damage roll: attack * random spread * ability multiplier, min 1. */
 export function rollDamage(atk, mult, base = 0.8, spread = 0.4) {
@@ -35,13 +35,14 @@ function bossCritMultiplier(boss) {
 }
 
 /**
- * TAUNT IS THE ONE CONTROL EFFECT A BOSS OBEYS.
+ * TAUNT AND BLIND ARE THE CONTROL EFFECTS A BOSS OBEYS.
  *
- * Everything else in the CC family -- Stun, Root, Fear, Restrained -- still
- * bounces off a boss, because those stop it acting and a boss that can be
- * stopped stops being a boss. Taunt only redirects the same attacks it was
- * going to make anyway, so it costs the fight nothing except who gets hit,
- * which is exactly the decision a tank is supposed to be making.
+ * The rest of the CC family -- Stun, Root, Fear, Restrained -- still bounces
+ * off a boss, because those stop it acting and a boss that can be stopped
+ * stops being a boss. Taunt only redirects the same attacks it was going to
+ * make anyway, so it costs the fight nothing except who gets hit, which is
+ * exactly the decision a tank is supposed to be making; Blind costs it one
+ * Basic swing (see missesBlinded below).
  *
  * Enforced here rather than in each boss module because ctx.targetsWithin and
  * ctx.byDistance are the only two ways a module chooses a victim -- collapsing
@@ -70,6 +71,21 @@ export function makeBossContext({ boss, aliveP, aliveE, allOcc, newFx, now, grid
      * ATK-debuffed, e.g. Starlit's Radiant Exchange), times its crit. */
     dmg: (mult, base, spread) =>
       Math.max(1, Math.round(rollDamage(boss.atk * statModMultiplier(boss, "atk"), mult, base, spread) * bossCritMultiplier(boss))),
+    /**
+     * Blind, the boss's way: call at the moment a Basic swings. When the boss
+     * is Blinded the whole swing misses -- every target, every rider -- and
+     * the Blind is spent; the cooldown is still paid, exactly as a creature's
+     * Blinded Basic (missBlindedSwing in battle/tick.js). Returns true when
+     * the swing missed, so the kit simply returns.
+     */
+    missesBlinded(cooldown, toward = null) {
+      if (!consumeBlind(boss)) return false;
+      boss.atkCd = cooldown;
+      boss.lastAttackTime = now;
+      const at = toward || { row: boss.row + 0.5, col: boss.col + 0.5 };
+      newFx.push({ id: now + "miss" + boss.uid, row: at.row, col: at.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true, isMiss: true });
+      return true;
+    },
     /** Chebyshev distance from a cell to the boss body. */
     distToBoss: (r, c) => distToBoss(boss, r, c),
     /** True when the cell is inside the boss body. */

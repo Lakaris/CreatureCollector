@@ -20,11 +20,12 @@
 // event; the stat gains multiply battle-start snapshots rather than
 // compounding on live values, so repeated feeds stay exact.
 
-import { attackRoll, playerDamageToBoss, damageBoss } from "../damage.js";
-import { unitDist, distToBoss } from "../geometry.js";
+import { abilityRoll } from "../damage.js";
+import { unitDist } from "../geometry.js";
 import { MELEE_RANGE, BASIC_DMG_BASELINE } from "../constants.js";
 import { isIntangible, applyDot, clearDot, healReceivedMultiplier } from "../status.js";
 import { damageUnit, healUnit } from "../hp.js";
+import { isBoss } from "../classifications.js";
 
 /** Displayed damage by level; the engine scales off the base level's value. */
 const BASIC_DMG_BY_LEVEL = [14, 18, 23, 29, 29];
@@ -66,12 +67,11 @@ export function makeBonebeakModule(cfg) {
     unit.def = Math.round(unit._feastBaseDef * (1 + (n * defPctByLevel[idx]) / 100));
   }
 
-  /** Everything still standing, both sides plus the boss. */
+  /** Everything still standing, both sides (a boss included). */
   function aliveCount(ctx) {
     let n = 0;
     for (const u of ctx.aliveP) if (u.hp > 0) n++;
     for (const e of ctx.aliveE) if (e.hp > 0) n++;
-    if (ctx.boss && ctx.boss.hp > 0) n++;
     return n;
   }
 
@@ -131,38 +131,33 @@ export function makeBonebeakModule(cfg) {
      * survivor with fresh stacks.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const spreads = idx >= MAX_IDX;
 
-      let best = null, bestD = Infinity;
+      // The closest MINION in reach; a boss only when no minion is.
+      let best = null, bestD = Infinity, bossBest = null, bossBestD = Infinity;
       for (const e of aliveE) {
         if (e.hp <= 0 || isIntangible(e)) continue;
         const d = unitDist(unit, e);
-        if (d <= MELEE_RANGE && d < bestD) { bestD = d; best = e; }
+        if (d > MELEE_RANGE) continue;
+        if (isBoss(e)) { if (d < bossBestD) { bossBestD = d; bossBest = e; } }
+        else if (d < bestD) { bestD = d; best = e; }
       }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-
-      // The boss can be gorged on too; it carries stacks like anyone else.
-      if (!best && bossD <= MELEE_RANGE) {
-        const eaten = clearDot(boss);
-        const dmg = Math.max(1, Math.round(playerDamageToBoss(unit, boss, ctx.aliveP) * mult * (1 + (eaten * GORGE_BONUS_PCT_PER_STACK) / 100)));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "gg" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isDark: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        return;
-      }
+      if (!best) best = bossBest; // the boss can be gorged on too; it carries stacks like anyone
       if (!best) return;
 
       const eaten = clearDot(best);
-      const dmg = Math.max(1, Math.round(attackRoll(unit) * mult * (1 + (eaten * GORGE_BONUS_PCT_PER_STACK) / 100)));
+      const dmg = Math.max(1, Math.round(abilityRoll(unit, best) * mult * (1 + (eaten * GORGE_BONUS_PCT_PER_STACK) / 100)));
       const dealt = damageUnit(best, dmg);
       ctx.addDamageDealt(dealt);
-      newFx.push({ id: now + "gg" + unit.uid + best.uid, row: best.row, col: best.col, t: now, isDark: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+      const mid = ((best.size || 1) - 1) / 2;
+      newFx.push({ id: now + "gg" + unit.uid + best.uid, row: best.row + mid, col: best.col + mid, t: now, isDark: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
-      if (spreads && best.hp <= 0) {
-        const survivors = aliveE.filter((e) => e !== best && e.hp > 0 && !isIntangible(e));
+      if (spreads && best.hp <= 0 && !isBoss(best)) {
+        // The rot seeds a surviving MINION -- never a boss, as it always has.
+        const survivors = aliveE.filter((e) => e !== best && e.hp > 0 && !isIntangible(e) && !isBoss(e));
         if (survivors.length) {
           const victim = survivors[Math.floor(Math.random() * survivors.length)];
           applyDot(victim, SPREAD_STACKS);

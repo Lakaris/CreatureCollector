@@ -203,7 +203,9 @@
       "PowerShell(Add-Type -AssemblyName System.Drawing; $b=New-Object System.Drawing.Bitmap \"$PWD\\\\images\\\\item_icons\\\\flairbanana.png\"; \"$\\($b.Width\\)x$\\($b.Height\\) format=$\\($b.PixelFormat\\)\"; \"corner alpha: \"+$b.GetPixel\\(2,2\\).A+\"  center: \"+$b.GetPixel\\([int]\\($b.Width/2\\),[int]\\($b.Height/2\\)\\).A; $b.Dispose\\(\\))",
       "PowerShell(\\(Get-Command node -ErrorAction SilentlyContinue\\).Source; node --version)",
       "Bash(python3 -)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(grep -o '{id:\"[a-z]*\",name:\"[A-Za-z]*\",emoji:\"[^\"]*\",type:\"Fire\",rarity:\"[a-z]*\"' src/data/creatures.js)",
+      "Bash(grep -n \"^import\\\\|^//\")"
     ]
   }
 }

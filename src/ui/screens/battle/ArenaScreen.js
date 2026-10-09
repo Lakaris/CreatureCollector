@@ -282,8 +282,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   function runArenaTick(){
     const s=arenaBRef.current;if(!s)return;
     // Same engine as Dungeon/Daily Boss -- player abilities, statuses, and
-    // targeting behave identically everywhere; Arena just has no boss unit
-    // (s.boss is undefined, which the engine treats as "no boss").
+    // targeting behave identically everywhere; Arena just has no boss among
+    // its enemy creatures.
     const {newFx,now}=runBattleTick(s,{gridRows:ARENA_GRID_ROWS,gridCols:ARENA_GRID_COLS});
     if(newFx.length)setArenaAtkEffects(prev=>[...prev.filter(e=>now-e.t<700),...newFx]);
     setArenaBSnap({

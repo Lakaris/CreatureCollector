@@ -20,10 +20,11 @@
 // generates -- a fully wound-up hit on a nearly dead target wastes most of its
 // damage -- so the max tier turns its own worst case into an area attack.
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyWhileActiveStatMod, isIntangible } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -94,7 +95,7 @@ export function makeClubtailModule(cfg) {
      * already been spent.
      */
     dmgMultForAttack(unit, target) {
-      if (target && target.uid != null) {
+      if (target && !hasRule(target, "ignoresOnHitEffects")) {
         unit._preHitUid = target.uid;
         unit._preHitHp = target.hp;
       }
@@ -118,7 +119,7 @@ export function makeClubtailModule(cfg) {
       const each = Math.max(1, Math.round(excess / SPLASH_TILES));
       for (const e of unit._splashFoes) {
         if (e.uid === target.uid || e.hp <= 0 || isIntangible(e)) continue;
-        if (aChebDist(target.row, target.col, e.row, e.col) > SPLASH_RANGE) continue;
+        if (unitDist(target, e) > SPLASH_RANGE) continue;
         const spilt = damageUnit(e, each);
         if (unit._credit) unit._credit(spilt);
         unit._splashFx.push({ id: unit._splashNow + "dw" + unit.uid + e.uid, row: e.row, col: e.col, t: unit._splashNow, isSplash: true, fromRow: target.row, fromCol: target.col, isEnemy: unit._splashEnemySide });

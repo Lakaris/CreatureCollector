@@ -1,3 +1,5 @@
+import { isBoss } from "./classifications.js";
+import { unitDist } from "./geometry.js";
 // The acting-creature context, and the gear effects that depend on it.
 //
 // Most effects are applied through shared helpers (applyStatMod,
@@ -70,17 +72,6 @@ export function withActiveAbility(unit, key, fn) {
   }
 }
 
-// The boss of this battle, if any is alive (it is not in the roster) --
-// refreshed by tick.js each tick, for gear that counts the enemies around a
-// creature (Pangolin Plate). The boss is an enemy of the player side only.
-let boss = null;
-export function setBattleBoss(b) {
-  boss = b && b.hp > 0 ? b : null;
-}
-export function battleBoss() {
-  return boss && boss.hp > 0 ? boss : null;
-}
-
 // Every creature in the battle, both sides -- refreshed by tick.js each tick
 // -- for gear that reacts to things happening to OTHERS (Warlord's Trophy
 // counts every defeat on the field).
@@ -90,6 +81,17 @@ export function setBattleRoster(units) {
 }
 export function battleRoster() {
   return roster;
+}
+
+/** The player-side creatures alive when this tick began -- the list the boss
+ * damage formula reads (the Dark boss's Dark Shroud counts their debuffs).
+ * Fixed for the whole tick, so a creature defeated mid-tick still counts. */
+let tickPlayers = [];
+export function setTickPlayers(units) {
+  tickPlayers = units || [];
+}
+export function tickStartPlayers() {
+  return tickPlayers;
 }
 
 /** True when two units fight on the same side (uids start "p" / "e"). */
@@ -195,7 +197,7 @@ export function asAssist(helper, fn) {
 /**
  * Echo Conch: run `fn` (the unit's Special, cast again) as an echo. While it
  * runs, everything the unit deals, heals, or shields is scaled by
- * `effectiveness()` -- damageUnit / damageBoss, healUnit, applyShield,
+ * `effectiveness()` -- damageUnit, healUnit, applyShield,
  * applyHealOverTime and ground hazards all read it. Durations, stacks, and
  * stat-mod magnitudes are untouched: "effectiveness" is healing and damage.
  * An echo is a Special, never a Basic, and never echoes itself.
@@ -354,11 +356,11 @@ export function resistsDebuff(target, { environmental = false } = {}) {
 /** Sunforge Crown: `target` stands inside the active Aura of a living ally
  * (itself included) that wears it. */
 function auraShelters(target) {
-  if (target.uid == null) return false;
+  if (isBoss(target)) return false;
   for (const a of roster) {
     if (!a.gear?.auraDebuffImmunity || a.hp <= 0 || !a.aura || !((a.aura.ticks || 0) > 0)) continue;
     if (a !== target && !sameSide(a, target)) continue;
-    if (Math.max(Math.abs(a.row - target.row), Math.abs(a.col - target.col)) <= a.aura.range) return true;
+    if (unitDist(a, target) <= a.aura.range) return true;
   }
   return false;
 }

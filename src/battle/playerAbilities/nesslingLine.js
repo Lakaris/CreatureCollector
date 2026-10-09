@@ -1,6 +1,6 @@
 // Nessling line: Loch Spout / Deep Submerge / Stirring Depths.
 //
-// Loch Spout is a ranged jet at the FARTHEST enemy in range (boss included);
+// Loch Spout is a ranged jet at the FARTHEST enemy in range;
 // it owns targeting and chase movement like other basicAttack overrides. At
 // max level every landed hit also inflicts a Haste Down stack (-5% charge
 // rate per stack -- see statModMultiplier "haste" in battle/status.js).
@@ -18,8 +18,8 @@
 // Shell's reflect). A tank being focused refills Deep Submerge much faster
 // than the base charge rate alone.
 
-import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
-import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
+import { basicUnitDamage, attackRoll, attackCooldown } from "../damage.js";
+import { unitDist, occupies } from "../geometry.js";
 import { RANGED_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { speedPenalty, isStunned, isIntangible, applyStatMod, healReceivedMultiplier, consumeBlind, applyTaunt } from "../status.js";
 import { damageUnit, healUnit } from "../hp.js";
@@ -52,31 +52,28 @@ export function makeNesslingModule(cfg) {
   const { basicDmgByLevel, specialHealByLevel } = cfg;
   return {
     /**
-     * Loch Spout: hit the FARTHEST foe within ranged reach (the boss counts
-     * via its 2x2 body); chase the nearest foe when nothing is in range.
+     * Loch Spout: hit the FARTHEST foe within ranged reach (a 2x2 boss by
+     * its nearest tile); chase the nearest foe when nothing is in range.
      * Holds completely still (and silent) while submerged.
      */
     basicAttack(unit, ctx) {
       if (isIntangible(unit)) return; // submerged: no attacks, no movement
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
 
-      let best = null, bestD = -1;
+      let tgt = null, bestD = -1;
       for (const e of aliveE) {
         if (isIntangible(e)) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
-        if (d <= RANGED_RANGE && d > bestD) { bestD = d; best = { unit: e }; }
+        const d = unitDist(unit, e);
+        if (d <= RANGED_RANGE && d > bestD) { bestD = d; tgt = e; }
       }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : -1;
-      if (bossD >= 0 && bossD <= RANGED_RANGE && bossD > bestD) { bestD = bossD; best = { isBoss: true }; }
 
-      if (!best) {
+      if (!tgt) {
         let chase = null, chaseD = Infinity;
         for (const e of aliveE) {
           if (isIntangible(e)) continue;
-          const d = aChebDist(unit.row, unit.col, e.row, e.col);
+          const d = unitDist(unit, e);
           if (d < chaseD) { chaseD = d; chase = e; }
         }
-        if (boss && boss.hp > 0 && bossD < chaseD) chase = { row: boss.row, col: boss.col };
         if (chase) ctx.stepToward(chase.row, chase.col);
         return;
       }
@@ -88,22 +85,13 @@ export function makeNesslingModule(cfg) {
       const mult = basicDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const hastes = idx >= MAX_IDX;
 
-      if (best.isBoss) {
-        // Bosses take the hit but skip Haste Down: their cast timers don't
-        // read unit charge speed (the CC-immunity policy, which only Taunt
-        // is exempt from).
-        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      } else {
-        const tgt = best.unit;
-        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, tgt) * mult));
-        const dealt = damageUnit(tgt, dmg);
-        if (dealt) ctx.addDamageDealt(dealt);
-        if (hastes) applyStatMod(tgt, { kind: "haste", pct: -HASTE_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
-        newFx.push({ id: now + unit.uid, row: tgt.row, col: tgt.col, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
+      const dmg = Math.max(1, Math.round(basicUnitDamage(unit, tgt) * mult));
+      const dealt = damageUnit(tgt, dmg);
+      if (dealt) ctx.addDamageDealt(dealt);
+      // A creature immune to Haste Down (a boss) shrugs it off in applyStatMod.
+      if (hastes) applyStatMod(tgt, { kind: "haste", pct: -HASTE_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
+      const mid = ((tgt.size || 1) - 1) / 2;
+      newFx.push({ id: now + unit.uid, row: tgt.row + mid, col: tgt.col + mid, t: now, isRanged: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       unit.atkCd = attackCooldown(unit, speedPenalty(unit));
     },
 
@@ -131,7 +119,7 @@ export function makeNesslingModule(cfg) {
       if (!unit._submergePending || isIntangible(unit)) return;
       unit._submergePending = false;
 
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = SPECIAL_DMG / BASIC_DMG_BASELINE;
       const debuffs = idx >= MAX_IDX;
@@ -141,30 +129,14 @@ export function makeNesslingModule(cfg) {
       const frontCol = unit.col + dir;
 
       for (const e of aliveE) {
-        if (e.col !== frontCol || Math.abs(e.row - unit.row) > 1 || isIntangible(e)) continue;
+        if (isIntangible(e) || ![-1, 0, 1].some((dr) => occupies(e, unit.row + dr, frontCol))) continue;
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         if (dealt) ctx.addDamageDealt(dealt);
         applyTaunt(e, unit);
         if (debuffs) applyStatMod(e, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
-        newFx.push({ id: now + "dse" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (boss && boss.hp > 0) {
-        let overlaps = false;
-        for (let dr = -1; dr <= 1 && !overlaps; dr++) {
-          if (bossOccupies(boss, unit.row + dr, frontCol)) overlaps = true;
-        }
-        if (overlaps) {
-          // The boss takes the strike, the Taunt AND the Attack Down: Taunt
-          // is the one control effect a boss obeys, and bosses have always
-          // read ATK stat mods.
-          const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-          damageBoss(boss, dmg);
-          ctx.addDamageDealt(dmg);
-          applyTaunt(boss, unit);
-          if (debuffs) applyStatMod(boss, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
-          newFx.push({ id: now + "dsb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        }
+        const mid = ((e.size || 1) - 1) / 2;
+        newFx.push({ id: now + "dse" + unit.uid + e.uid, row: e.row + mid, col: e.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
     },
   };

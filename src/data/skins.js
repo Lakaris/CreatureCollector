@@ -201,10 +201,10 @@ export const SKIN_SETS=[
   {id:"griffin_night",name:"Nightfall",tier:"rare",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌙"},lumimajor:{emoji:"⭐"}}},
   {id:"griffin_void",name:"Void",tier:"epic",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌑"},lumimajor:{emoji:"💀"}}},
   {id:"griffin_cosmic",name:"Cosmic",tier:"legendary",chain:["auravast","lumimajor"],appearances:{auravast:{emoji:"🌌"},lumimajor:{emoji:"🌠"}}},
-  // blazephoenix / solarpyre
-  {id:"bphoenix_frost",name:"Frosted",tier:"rare",chain:["blazephoenix","solarpyre"],appearances:{blazephoenix:{emoji:"❄️"},solarpyre:{emoji:"🧊"}}},
-  {id:"bphoenix_void",name:"Void",tier:"epic",chain:["blazephoenix","solarpyre"],appearances:{blazephoenix:{emoji:"🌑"},solarpyre:{emoji:"💀"}}},
-  {id:"bphoenix_cosmic",name:"Cosmic",tier:"legendary",chain:["blazephoenix","solarpyre"],appearances:{blazephoenix:{emoji:"🌌"},solarpyre:{emoji:"🌠"}}},
+  // emberant / formicinder
+  {id:"fireant_frost",name:"Frosted",tier:"rare",chain:["emberant","formicinder"],appearances:{emberant:{emoji:"❄️"},formicinder:{emoji:"🧊"}}},
+  {id:"fireant_void",name:"Void",tier:"epic",chain:["emberant","formicinder"],appearances:{emberant:{emoji:"🌑"},formicinder:{emoji:"💀"}}},
+  {id:"fireant_cosmic",name:"Cosmic",tier:"legendary",chain:["emberant","formicinder"],appearances:{emberant:{emoji:"🌌"},formicinder:{emoji:"🌠"}}},
   // ignissaur / pyresaur
   {id:"ignis_frost",name:"Frosted",tier:"rare",chain:["ignissaur","pyresaur"],appearances:{ignissaur:{emoji:"❄️"},pyresaur:{emoji:"🧊"}}},
   {id:"ignis_void",name:"Void",tier:"epic",chain:["ignissaur","pyresaur"],appearances:{ignissaur:{emoji:"🌑"},pyresaur:{emoji:"💀"}}},

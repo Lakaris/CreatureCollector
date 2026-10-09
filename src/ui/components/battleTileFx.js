@@ -53,6 +53,8 @@ const HAZARD_FIELD = {
   fire: { bg: "rgba(249,115,22,0.20)", edge: "rgba(234,88,12,0.45)" },
   water: { bg: "rgba(125,211,252,0.20)", edge: "rgba(14,165,233,0.45)" },
   wind: { bg: "rgba(203,213,225,0.24)", edge: "rgba(148,163,184,0.5)" },
+  // The same yellow as the isShock pulse it flashes when it strikes.
+  lightning: { bg: "rgba(250,204,21,0.20)", edge: "rgba(234,179,8,0.5)" },
 };
 
 export function renderHazardField(hazards, tile) {

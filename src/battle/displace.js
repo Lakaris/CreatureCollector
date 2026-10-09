@@ -23,6 +23,7 @@ import { damageUnit } from "./hp.js";
 import { withApplier } from "./applier.js";
 import { resistsDisplacement, announceDisplaced } from "./immobilize.js";
 import { applyTimedDebuff } from "./status.js";
+import { isImmune } from "./classifications.js";
 
 /** Impact damage, as a share of the pushing creature's Attack. */
 export const IMPACT_ATK_PCT = 20;
@@ -38,7 +39,7 @@ export function setDisplaceGrid(g) {
  */
 export function displaceUnit(u, dr, dc, { tiles = 1, source = null } = {}) {
   const out = { moved: 0, impact: false };
-  if (!grid || !u || u.uid == null || u.hp <= 0 || (u.size || 1) > 1 || (!dr && !dc)) return out;
+  if (!grid || !u || isImmune(u, "displace") || u.hp <= 0 || (!dr && !dc)) return out;
   if (resistsDisplacement(u)) return out;
   const { allOcc, gridRows, gridCols, bossOcc, tick, now } = grid;
   const fromRow = u.row, fromCol = u.col;

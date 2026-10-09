@@ -15,8 +15,8 @@
 // Twin Reap is the Fork: the two diagonal rays ahead of the mantis, to the
 // board's edge (forkCells in geometry.js). Everything standing on either ray
 // takes the hit, and at max level is briefly Stunned. A boss whose body
-// crosses a ray is hit too, but not Stunned -- bosses obey no control but
-// Taunt. Like Cone, it is oriented along rows, the battle axis.
+// crosses a ray is hit too, but not Stunned -- bosses can not be Stunned.
+// Like Cone, it is oriented along rows, the battle axis.
 //
 // Unfettered runs every tick: flat bonus Speed, and the two bypass flags the
 // engine reads -- `_pierceShield`, which the attack loop passes into
@@ -24,8 +24,8 @@
 // override checks first. The Taunt still lands and still counts down; the
 // mantis just declines to let it choose its target.
 
-import { aChebDist, forkCells, bossOccupies } from "../geometry.js";
-import { attackRoll, damageBoss } from "../damage.js";
+import { forkCells, occupiesAny } from "../geometry.js";
+import { attackRoll } from "../damage.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, canBeExecuted } from "../hp.js";
 import { applyWhileActiveStatMod, applyTimedDebuff, isIntangible } from "../status.js";
@@ -96,7 +96,7 @@ export function makeSicklewingModule(cfg) {
      * which, for rays that start one tile out, is when they have targets.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now, gridRows, gridCols } = ctx;
+      const { aliveE, newFx, now, gridRows, gridCols } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const stuns = idx >= MAX_IDX;
@@ -111,19 +111,11 @@ export function makeSicklewingModule(cfg) {
 
       for (const e of aliveE) {
         if (e.hp <= 0 || isIntangible(e)) continue;
-        if (!cellSet.has(e.row + "," + e.col)) continue;
+        if (!occupiesAny(e, cellSet)) continue;
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
         const dealt = damageUnit(e, dmg);
         ctx.addDamageDealt(dealt);
         if (stuns && !e._dodgedHit) applyTimedDebuff(e, "stunTicks", Math.max(e.stunTicks || 0, STUN_TICKS));
-      }
-      // A boss whose body crosses either ray takes the hit; no Stun, since
-      // bosses obey no control effect but Taunt.
-      if (boss && boss.hp > 0 && cells.some(([r, c]) => bossOccupies(boss, r, c))) {
-        const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "trb" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isGust: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       }
     },
   };

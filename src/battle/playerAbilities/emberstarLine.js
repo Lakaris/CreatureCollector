@@ -5,8 +5,8 @@
 // the numbers that differ stage-to-stage (only the DEF-synergy table here).
 
 import { getRootDef } from "../../core/creatures.js";
-import { attackRoll, damageBoss } from "../damage.js";
-import { bossOccupies } from "../geometry.js";
+import { attackRoll } from "../damage.js";
+import { occupies } from "../geometry.js";
 import { BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyBurn } from "../status.js";
@@ -104,8 +104,8 @@ export function makeEmberstarModule(defBonusByLevel) {
      * (see specialTargetInRange in battle/tick.js) it fires whenever any foe
      * exists at all.
      */
-    specialInRange(unit, { aliveE, boss }) {
-      return aliveE.length > 0 || !!(boss && boss.hp > 0);
+    specialInRange(unit, { aliveE }) {
+      return aliveE.length > 0;
     },
 
     /**
@@ -117,14 +117,14 @@ export function makeEmberstarModule(defBonusByLevel) {
      * along the path (handled by the caller via ctx.addFireTrail).
      */
     special(unit, ctx) {
-      const { aliveE, boss, gridRows, gridCols, newFx, now } = ctx;
+      const { aliveE, gridRows, gridCols, newFx, now } = ctx;
       // The damage IS the charge -- it lands on everything the dash passes
       // through -- so a Rooted Emberstar has no charge to make and does
       // nothing at all, rather than striking a lane it never crossed.
       if (!ctx.canMove) return;
 
-      const enemyPoints = aliveE.filter((e) => e.hp > 0).map((e) => ({ row: e.row, col: e.col }));
-      if (boss && boss.hp > 0) enemyPoints.push({ row: boss.row + 0.5, col: boss.col + 0.5 });
+      // Aim at the centre of each foe's body (half a tile in for a 2x2 boss).
+      const enemyPoints = aliveE.filter((e) => e.hp > 0).map((e) => { const mid = ((e.size || 1) - 1) / 2; return { row: e.row + mid, col: e.col + mid }; });
       if (!enemyPoints.length) return;
 
       let nearest = null, bestD = Infinity;
@@ -145,7 +145,9 @@ export function makeEmberstarModule(defBonusByLevel) {
       const offsets = width === 3 ? [-1, 0, 1] : [0];
 
       const trailCells = [];
-      let hitBoss = false;
+      // Once per creature however many of its tiles the lanes cross -- a 2x2
+      // body spans two tiles of any row or column.
+      const struck = new Set();
       let landing = null;
 
       for (const off of offsets) {
@@ -161,12 +163,8 @@ export function makeEmberstarModule(defBonusByLevel) {
           newFx.push({ id: now + "charge" + unit.uid + r + "_" + c, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
           const dmg = Math.max(1, Math.round(attackRoll(unit) * dmgMult));
-          const minion = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
-          if (minion) damageUnit(minion, dmg);
-          if (!hitBoss && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
-            damageBoss(boss, dmg);
-            hitBoss = true;
-          }
+          const foe = aliveE.find((e) => e.hp > 0 && !struck.has(e) && occupies(e, r, c));
+          if (foe) { struck.add(foe); damageUnit(foe, dmg); }
         }
         if (off === 0) landing = last;
       }

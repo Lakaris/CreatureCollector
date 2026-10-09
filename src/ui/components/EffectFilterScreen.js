@@ -49,7 +49,7 @@ export function effectFilterCatalog() {
   // leaves behind rather than a status it inflicts, and grouping them keeps
   // the Effects list to things that live on a creature.
   const hazardLabels = new Set(
-    ["firehazard", "waterhazard", "windhazard"].map((k) => ABILITY_TAG_DEFS[k]?.label).filter(Boolean)
+    ["firehazard", "waterhazard", "windhazard", "lightninghazard"].map((k) => ABILITY_TAG_DEFS[k]?.label).filter(Boolean)
   );
   const carried = new Set();
   for (const def of ALL_DEX_FORMS) {

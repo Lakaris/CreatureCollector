@@ -23,7 +23,7 @@ export const BANNERS=[
   {
     id:"stormwyvern",
     name:"Storm Banner",
-    sub:"Boosted odds for Stormwyvern! ⚡",
+    sub:"Boosted odds for Zephyrcoo! 🌪️",
     color:"#E6F0FB",border:"#A8CEEE",titleColor:"#1A3A5C",
     featured:"stormwyvern",
     rates:[

@@ -20,10 +20,11 @@
 // read off the guardian at damage time (see attackerDamageMultiplier in
 // battle/hp.js), so it appears and vanishes exactly with the Protect.
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { applyProtect } from "../hp.js";
 import { applyExpose, applyHealOverTime } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -69,7 +70,7 @@ export function makeCinderbillModule(cfg) {
 
     /** Lava Spit lvl 5: every landed hit leaves the target Exposed. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyExpose(target);
       }
       return 0;
@@ -96,7 +97,7 @@ export function makeCinderbillModule(cfg) {
 
       for (const a of aliveP) {
         if (a.uid === unit.uid || a.hp <= 0) continue;
-        if (aChebDist(unit.row, unit.col, a.row, a.col) > BESIDE_RANGE) continue;
+        if (unitDist(unit, a) > BESIDE_RANGE) continue;
         applyProtect(a, unit, stacks);
         applyHealOverTime(a, perTick, STATUS_TICKS);
         newFx.push({ id: now + "mm" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });

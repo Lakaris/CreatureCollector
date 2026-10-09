@@ -18,8 +18,8 @@
 // critDmg stat. It is stored against a remembered base so re-applying it
 // every tick can never compound.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { attackRoll, damageBoss, playerDamageToBoss, withGuaranteedCrit } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { abilityRoll, withGuaranteedCrit } from "../damage.js";
 import { MELEE_RANGE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit, applyShield } from "../hp.js";
 import { dispelBuffs, isIntangible } from "../status.js";
@@ -76,7 +76,7 @@ export function makeAurorionModule(cfg) {
      * something is actually beside it.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = specialDmgByLevel[idx] / BASIC_DMG_BASELINE;
       const dispels = idx >= MAX_IDX;
@@ -84,29 +84,17 @@ export function makeAurorionModule(cfg) {
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
         if (isIntangible(e)) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d <= MELEE_RANGE && d < bestD) { bestD = d; best = e; }
-      }
-      const bd = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      if (bd <= MELEE_RANGE && bd < bestD) {
-        // Bosses carry stat mods and their own Shield pool, so the strip
-        // lands on them too -- it is what answers Holy Radiance's stacking
-        // Shield (battle/bosses/light.js).
-        if (dispels) dispelBuffs(boss);
-        const dmg = withGuaranteedCrit(unit, () =>
-          Math.max(1, Math.round(playerDamageToBoss(unit, boss, ctx.aliveP) * mult)));
-        damageBoss(boss, dmg);
-        ctx.addDamageDealt(dmg);
-        newFx.push({ id: now + "sp" + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-        return;
       }
       if (!best) return;
 
       if (dispels) dispelBuffs(best);
-      const dmg = withGuaranteedCrit(unit, () => Math.max(1, Math.round(attackRoll(unit) * mult)));
+      const dmg = withGuaranteedCrit(unit, () => Math.max(1, Math.round(abilityRoll(unit, best) * mult)));
       const dealt = damageUnit(best, dmg);
       if (dealt) ctx.addDamageDealt(dealt);
-      newFx.push({ id: now + "sp" + unit.uid + best.uid, row: best.row, col: best.col, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+      const mid = ((best.size || 1) - 1) / 2;
+      newFx.push({ id: now + "sp" + unit.uid + best.uid, row: best.row + mid, col: best.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
     },
   };
 }

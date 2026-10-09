@@ -135,6 +135,7 @@ export default {
     const adj = ctx.targetsWithin(MELEE_RANGE);
 
     if (adj.length > 0 && boss.atkCd <= 0) {
+      if (ctx.missesBlinded(Math.max(5, 12 - hasteBonus), adj[0])) return;
       for (const u of adj) {
         damageUnit(u, ctx.dmg(0.14));
         applyTimedDebuff(u, "slowTicks", STATUS_TICKS);

@@ -313,7 +313,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     const s = bRef.current; if (!s) return;
     // Same engine as Dungeon/Daily Boss -- player abilities, statuses, and
     // targeting behave identically everywhere; the Labyrinth just has no boss
-    // unit (s.boss is undefined, which the engine treats as "no boss").
+    // among its enemy creatures.
     const { newFx, now } = runBattleTick(s, { gridRows: ARENA_GRID_ROWS, gridCols: ARENA_GRID_COLS });
     if (newFx.length) setAtkEffects((prev) => [...prev.filter((e) => now - e.t < 700), ...newFx]);
     setBSnap({

@@ -48,6 +48,7 @@ export default {
     const adj = ctx.targetsWithin(MELEE_RANGE);
     if (adj.length > 0 && boss.atkCd <= 0) {
       const tgt = adj[0];
+      if (ctx.missesBlinded(12, tgt)) return;
       damageUnit(tgt, ctx.dmg(0.12));
       boss.atkCd = 12;
       newFx.push({ id: now + "dstrike", row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });

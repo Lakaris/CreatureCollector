@@ -97,6 +97,7 @@ export default {
 
     const hits = aliveP.filter((u) => tiles.some(([r, c]) => u.row === r && u.col === c));
     if (!hits.length) return;
+    if (ctx.missesBlinded(9, hits[0])) return;
 
     // Power stacks from Holy Radiance are the only multiplier here. The old
     // Bulwark added a 1.4x while shielded; that passive is gone (it is now the

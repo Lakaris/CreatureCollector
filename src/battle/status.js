@@ -4,9 +4,10 @@
 // more than a level-1 boss's. When the boss is dead they fall back to a flat 2.
 
 import { damageUnit, FORTIFY_STACK_CAP, clearProtect, healUnit, clearShield, applyShield, onHitLanded, tickShieldTimers, healDoneMultiplier, clearSeeded, onHealed, canBeExecuted, onUnitDefeated, onShieldBroken, addDispelLayer } from "./hp.js";
-import { aChebDist } from "./geometry.js";
+import { aChebDist, unitDist } from "./geometry.js";
 // constants.js imports nothing, so this cannot cycle.
 import { STATUS_TICKS } from "./constants.js";
+import { isBoss, isImmune, hasRule } from "./classifications.js";
 import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, sameSide, extraAllyFor, asSpread, battleRoster, shieldAmount, battleTick, gearTriggers, asEffect } from "./applier.js";
 import { onDisplaced } from "./immobilize.js";
 // damage.js imports this module too; defenseOf is only called at run time,
@@ -92,7 +93,7 @@ export function applyBurn(target, sourceAtk) {
 /**
  * POLICY: every Burn tick goes through here -- a creature's, a minion's, and
  * the boss's alike -- so gear that reads a Burn's source sees them all.
- * `damage` deals the tick (damageUnit or damageBoss); `fallback` is the
+ * `damage` deals the tick (damageUnit); `fallback` is the
  * damage when no source ATK was stored (the fire boss's own Burn). Returns
  * whether it ticked.
  *   - Everflame Crown: its source's Burn deals more.
@@ -125,8 +126,12 @@ export function tickBurn(u, damage, fallback) {
  * The new timer replaces the old, per the control-effects-don't-stack policy.
  * Returns false when the debuff was resisted.
  */
+/** Timed debuff fields that an immunity (battle/classifications.js) blocks. */
+const TIMED_DEBUFF_IMMUNITY = { stunTicks: "stun", slowTicks: "slow", markedTicks: "marked" };
+
 export function applyTimedDebuff(u, field, ticks, { stretch = false } = {}) {
   if (!u || resistsDebuff(u)) return false;
+  if (TIMED_DEBUFF_IMMUNITY[field] && isImmune(u, TIMED_DEBUFF_IMMUNITY[field])) return false;
   debuffLanded(u, !((u[field] || 0) > 0));
   const base = ticks;
   if (field === "stunTicks") ticks = Math.max(u.stunTicks || 0, stunDuration(u, ticks));
@@ -154,15 +159,16 @@ function stunDuration(u, ticks) {
  * copied calls this once it has landed, with how to land the same debuff on
  * someone else. The copy is the wearer's own (it is the applier, so its gear
  * shapes it), and a copy is never itself mirrored -- two Mirrors facing each
- * other trade one copy each. `control` marks effects a boss ignores (every
- * control effect but Taunt), which are not copied onto one.
+ * other trade one copy each. `control` marks effects a boss ignores (the
+ * control effects but Taunt and Blind), which are not copied onto one.
  */
 let mirroring = false;
 function mirrorDebuff(target, land, { control = false } = {}) {
   if (mirroring || !target?.gear?.mirrorDebuffs || !(target.hp > 0)) return;
   const a = currentApplier();
   if (!a || a === target || !(a.hp > 0) || sameSide(a, target)) return;
-  if (control && a.uid == null) return;
+  // A boss ignores the rest of the control family, so none is mirrored onto one.
+  if (control && isBoss(a)) return;
   mirroring = true;
   try {
     withApplier(target, () => land(a));
@@ -189,7 +195,7 @@ function debuffLanded(target, isNew) {
     asPassive(target, () => applyShield(target, (defenseOf(target) * shieldPct) / 100, STATUS_TICKS));
   }
   // The inflicting side -- Umbral Thread / Voidthread Cloak: a heal.
-  if (!a || a.uid == null || a.hp <= 0) return;
+  if (!a || a.hp <= 0) return;
   const pct = a.gear?.newDebuffHealPct || 0;
   if (!pct || (a.healImmuneTicks || 0) > 0) return;
   const amount = Math.round(((a.maxHp * pct) / 100) * healReceivedMultiplier(a));
@@ -244,22 +250,13 @@ function tickSeeded(u) {
   const potency = 1 + (gear.seedPotencyPct || 0) / 100;
   const drain = Math.max(1, Math.round(((u.maxHp || 0) * (gear.seedDrainPct || 0) * potency) / 100));
   withApplier(seeder, () => {
-    if (u.uid == null) damageBossHp(u, drain);
-    else damageUnit(u, drain, { effectDamage: true });
+    damageUnit(u, drain, { effectDamage: true });
   });
   if ((seeder.healImmuneTicks || 0) <= 0) {
     const heal = Math.round(((seeder.maxHp * (gear.seedHealPct || 0) * potency) / 100) * healReceivedMultiplier(seeder));
     if (heal > 0) asPassive(seeder, () => healUnit(seeder, heal));
   }
   if (u.hp <= 0) clearSeeded(u);
-}
-
-/** A boss's Health pool has its own shield and no damageUnit; Seeded drains
- * it the way the bosses' own damage-over-time ticks do (straight to the
- * pool, shield first). */
-function damageBossHp(boss, dmg) {
-  if (boss.shield > 0) boss.shield = Math.max(0, boss.shield - dmg);
-  else boss.hp = Math.max(0, boss.hp - dmg);
 }
 
 /** Sprout Locket: the first enemy this creature damages is Seeded; once
@@ -274,7 +271,7 @@ onHitLanded((attacker, target) => {
 /** Tideweave Wrap: each enemy a Special damages heals the caster. */
 onHitLanded((attacker, target, info) => {
   const pct = attacker.gear?.specialHitHealPct || 0;
-  if (!pct || info.ability !== "special" || info.effectDamage || attacker.uid == null || attacker.hp <= 0) return;
+  if (!pct || info.ability !== "special" || info.effectDamage || attacker.hp <= 0) return;
   if ((attacker.healImmuneTicks || 0) > 0) return;
   const amount = Math.round(((attacker.maxHp * pct) / 100) * healReceivedMultiplier(attacker));
   if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount));
@@ -316,10 +313,10 @@ onHitLanded((attacker, target, info) => {
  * Up (one stack from this source, refreshed, standard duration). */
 onHitLanded((attacker, target, info) => {
   const pct = attacker.gear?.critBesideAtkUpPct || 0;
-  if (!pct || !info.crit || info.effectDamage || attacker.uid == null || !(attacker.hp > 0)) return;
+  if (!pct || !info.crit || info.effectDamage || !(attacker.hp > 0)) return;
   withApplier(attacker, () => asEffect(() => {
     for (const a of battleRoster()) {
-      if (a === attacker || a.hp <= 0 || !sameSide(a, attacker) || aChebDist(a.row, a.col, attacker.row, attacker.col) > 1) continue;
+      if (a === attacker || a.hp <= 0 || !sameSide(a, attacker) || unitDist(a, attacker) > 1) continue;
       applyStatMod(a, { kind: "atk", pct, src: attacker.uid + ":solar", ticks: STATUS_TICKS });
     }
   }));
@@ -329,7 +326,7 @@ onHitLanded((attacker, target, info) => {
  * from this source, refreshed). A boss's shield pool is not a Shield. */
 export const SHIELD_DOWN_PCT = 20;
 onHitLanded((attacker, target, info) => {
-  if (!attacker.gear?.shieldDownOnHit || info.effectDamage || target.uid == null || target.hp <= 0) return;
+  if (!attacker.gear?.shieldDownOnHit || info.effectDamage || isImmune(target, "shielddown") || target.hp <= 0) return;
   withApplier(attacker, () => applyStatMod(target, { kind: "shield", pct: -SHIELD_DOWN_PCT, src: attacker.uid + ":nightshade", ticks: STATUS_TICKS }));
 });
 
@@ -358,11 +355,10 @@ onUnitDefeated((target, killer, info) => {
   }
 });
 
-/** True when `other` fights against `u` -- the boss (no uid) is an enemy of
- * the player side only. */
+/** True when `other` fights against `u` (sides read off the uid; see
+ * sameSide). */
 export function isEnemyOf(u, other) {
   if (!u?.uid || !other || u === other) return false;
-  if (other.uid == null) return u.uid[0] === "p";
   return !sameSide(u, other);
 }
 
@@ -370,7 +366,7 @@ export function isEnemyOf(u, other) {
  * weakest ally (lowest current Health, the wearer included) recovers a share
  * of that Shield at its largest. */
 onShieldBroken((u, peak) => {
-  if (u.uid == null) return;
+  if (isBoss(u)) return;
   for (const w of battleRoster()) {
     const pct = w.gear?.shieldBreakHealPct || 0;
     if (!pct || w.hp <= 0 || (w !== u && !sameSide(w, u))) continue;
@@ -475,7 +471,7 @@ export function dispelOneDebuff(u) {
 export function transferDebuffs(from, to) {
   if (!from || !to || to === from || !(to.hp > 0)) return;
   const T = STATUS_TICKS;
-  const boss = to.uid == null;
+  const boss = isBoss(to);
   const land = (had, fn) => {
     if (resistsDebuff(to)) return;
     debuffLanded(to, !had);
@@ -546,7 +542,7 @@ export function transferDebuffs(from, to) {
 function debuffsDispelled(n) {
   const a = currentApplier();
   const pct = a?.gear?.dispelShieldPct || 0;
-  if (!pct || !(n > 0) || a.uid == null || !(a.hp > 0)) return;
+  if (!pct || !(n > 0) || !(a.hp > 0)) return;
   asPassive(a, () => addDispelLayer(a, shieldAmount((a.maxHp * pct * n) / 100), a.gear.dispelShieldMaxPct || pct, STATUS_TICKS));
 }
 
@@ -596,7 +592,7 @@ onHitLanded((attacker, target, info) => {
 /** Clay Bangle: each damaging ability hit has a chance to Slow its target. */
 onHitLanded((attacker, target, info) => {
   const pct = attacker.gear?.slowOnHitChancePct || 0;
-  if (!pct || info.effectDamage || target.uid == null || target.hp <= 0) return;
+  if (!pct || info.effectDamage || isImmune(target, "slow") || target.hp <= 0) return;
   if (Math.random() * 100 < pct) applyTimedDebuff(target, "slowTicks", STATUS_TICKS);
 });
 
@@ -672,7 +668,8 @@ function stealableBuffs(from) {
     } });
   }
   // The whole Shield, stacking layer and all, arrives as one ordinary Shield.
-  if ((from.shield || 0) > 0 && from.uid != null) out.push({ take: (to) => {
+  // A boss's Shield is a pool, not a Shield (shieldIsPool), and is not taken.
+  if ((from.shield || 0) > 0 && !hasRule(from, "shieldIsPool")) out.push({ take: (to) => {
     const amount = from.shield, ticks = from.shieldTicks || STATUS_TICKS;
     clearShield(from);
     applyShield(to, amount, ticks);
@@ -717,7 +714,7 @@ onHitLanded((attacker, target, info) => {
   // the damage of its abilities when it fights in Melee (a Melee creature).
   const melee = !info.effectDamage && !attacker.isRanged ? attacker.gear?.meleeLifestealPct || 0 : 0;
   const pct = (attacker.gear?.lifestealPct || 0) + melee;
-  if (!pct || attacker.uid == null || attacker.hp <= 0 || !(info.dmg > 0)) return;
+  if (!pct || attacker.hp <= 0 || !(info.dmg > 0)) return;
   if ((attacker.healImmuneTicks || 0) > 0) return;
   const amount = Math.round(((info.dmg * pct) / 100) * healReceivedMultiplier(attacker));
   if (amount > 0) asPassive(attacker, () => healUnit(attacker, amount, { lifesteal: true }));
@@ -729,7 +726,7 @@ onHitLanded((attacker, target, info) => {
  */
 onHitLanded((attacker, target, info) => {
   const pct = attacker.gear?.critShredPct || 0;
-  if (!pct || !info.crit || info.effectDamage || target.uid == null) return;
+  if (!pct || !info.crit || info.effectDamage || isImmune(target, "critshred")) return;
   applyCritShred(target, pct, attacker.gear.critShredMaxPct || pct);
 });
 
@@ -784,7 +781,7 @@ export function isRooted(u) {
  * run. Rooted-and-feared means it simply cowers in place.
  */
 export function applyFear(u, sourceUid, ticks) {
-  if (!u || u.uid == null || resistsDebuff(u)) return;
+  if (!u || isImmune(u, "fear") || resistsDebuff(u)) return;
   debuffLanded(u, !((u.fearTicks || 0) > 0));
   u.fearTicks = ticks;
   u.fearSourceUid = sourceUid;
@@ -858,6 +855,8 @@ function sameEffect(a, kind, pct) {
 export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false }) {
   if (!pct) return;
   if (pct < 0 && resistsDebuff(u, { environmental })) return;
+  if (pct < 0 && kind === "haste" && isImmune(u, "hastedown")) return;
+  if (pct < 0 && kind === "spd" && isImmune(u, "speeddown")) return;
   const baseTicks = ticks;
   // Duration and extra-stack gear on whoever is applying this (see
   // battle/applier.js). The Chalices' extra stack is the one exception to
@@ -888,7 +887,7 @@ export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = fals
     ionSharing = true;
     try {
       for (const a of battleRoster()) {
-        if (a === u || a.hp <= 0 || !sameSide(a, u) || aChebDist(a.row, a.col, u.row, u.col) > 1) continue;
+        if (a === u || a.hp <= 0 || !sameSide(a, u) || unitDist(a, u) > 1) continue;
         applyStatMod(a, { kind, pct, src, ticks, holdDuration: true });
       }
     } finally {
@@ -987,10 +986,11 @@ export function tickStatMods(u, negativeOnly = false) {
 /**
  * POLICY: every Taunt goes through applyTaunt.
  *
- * Works on a boss as well as a creature -- Taunt is the ONE control effect a
- * boss obeys (see tauntedTarget in bosses/context.js for why), and the boss's
- * tauntTicks expires through the same tickTimedMods timer everything else
- * uses. Every other CC still bounces off a boss.
+ * Works on a boss as well as a creature -- Taunt is one of the two control
+ * effects a boss obeys, with Blind (see tauntedTarget in bosses/context.js
+ * for why), and the boss's tauntTicks expires through the same
+ * tickTimedMods timer everything else uses. The rest of the control family
+ * still bounces off a boss.
  *
  * A new Taunt replaces the old outright rather than stacking, matching the
  * control-effect policy.
@@ -1094,7 +1094,7 @@ export function refreshAuraFields(units, foes) {
     if (!face) return;
     for (const u of units) {
       if (u.hp <= 0) continue;
-      if (aChebDist(src.row, src.col, u.row, u.col) > src.aura.range) continue;
+      if (unitDist(src, u) > src.aura.range) continue;
       u._auraAtkPct += sign * (face.atkPct || 0);
       u._auraCritDmgPct += sign * (face.critDmgPct || 0);
       u._auraHastePct += sign * (face.hastePct || 0);
@@ -1193,6 +1193,7 @@ export function dartShredMultiplier(u) {
  * Scoped to basic attacks: specials are abilities, not attacks.
  */
 export function applyBlind(u) {
+  if (isImmune(u, "blind")) return;
   if (resistsDebuff(u)) return;
   debuffLanded(u, !u.blinded);
   u.blinded = true;
@@ -1200,7 +1201,7 @@ export function applyBlind(u) {
   // source, refreshed, standard duration).
   const a = currentApplier();
   if (a && a !== u && a.gear?.blindDefDown) applyStatMod(u, { kind: "def", pct: -15, src: a.uid + ":curse", ticks: STATUS_TICKS });
-  mirrorDebuff(u, (m) => applyBlind(m), { control: true });
+  mirrorDebuff(u, (m) => applyBlind(m)); // a boss obeys Blind, so it is copied onto one
 }
 
 export function isBlinded(u) {
@@ -1283,8 +1284,8 @@ export function clearOverTime(u, flavor) {
  * Tick one flavor on one target: damage scaled by stacks, decrement, and drop
  * the stacks when the timer runs out. Returns true if it fired.
  *
- * `damage` is injected because units go through damageUnit and the boss
- * through damageBoss; `uid` likewise, because the boss has none of its own.
+ * `damage` is injected so the caller picks the damage options; `uid` names
+ * the effect for its flash.
  */
 export function tickOverTime(u, flavor, damage, newFx, now, fxPrefix = "", uid = u.uid) {
   const f = OVER_TIME_FLAVORS[flavor];
@@ -1319,13 +1320,13 @@ export function applyFrostbite(u) {
   u.frostbiteTicks = debuffTicks(u, 6, "frostbite");
   mirrorDebuff(u, (m) => applyFrostbite(m));
   // Absolute Zero: reaching max stacks shatters them all into a brief Stun
-  // (not on a boss -- it obeys no control effect but Taunt).
+  // (not on a boss -- applyTimedDebuff checks its Stun immunity).
   const a = currentApplier();
   const stun = a && a !== u ? a.gear?.frostbiteShatterStunTicks || 0 : 0;
   if (stun && u.frostbiteStacks >= FROSTBITE_STACK_CAP) {
     u.frostbiteTicks = 0;
     u.frostbiteStacks = 0;
-    if (u.uid != null && u.hp > 0) applyTimedDebuff(u, "stunTicks", stun);
+    if (u.hp > 0) applyTimedDebuff(u, "stunTicks", stun);
   }
 }
 export function frostbiteMultiplier(attackerIsWater, defender) {
@@ -1405,7 +1406,7 @@ export function applyHealOverTime(u, perTick, ticks = 6) {
  */
 export function applyRoot(u, ticks, { undispellable = false } = {}) {
   // A self-applied stance Root is not inflicted, so resistsDebuff lets it by.
-  if (resistsDebuff(u)) return;
+  if (resistsDebuff(u) || isImmune(u, "root")) return;
   debuffLanded(u, !((u.rootTicks || 0) > 0));
   u.rootTicks = Math.max(u.rootTicks || 0, ticks);
   u.rootUndispellable = !!undispellable;
@@ -1514,7 +1515,7 @@ function syncRestrained(u) {
  * per entry so the leash check doesn't need to look the applier's kit back up.
  */
 export function applyRestrained(target, srcUid, stacks, slowPct, range) {
-  if (!target || target.uid == null || resistsDebuff(target)) return;
+  if (!target || isImmune(target, "restrained") || resistsDebuff(target)) return;
   debuffLanded(target, !((target.restrainedStacks || 0) > 0));
   const list = target.restrained || (target.restrained = []);
   let entry = list.find((r) => r.src === srcUid);
@@ -1547,7 +1548,7 @@ export function tickRestrained(units, findUnit) {
     const kept = list.filter((r) => {
       const src = findUnit(r.src);
       if (!src || src.hp <= 0) return false;
-      return aChebDist(src.row, src.col, u.row, u.col) <= r.range;
+      return unitDist(src, u) <= r.range;
     });
     if (kept.length === list.length) continue;
     u.restrained = kept;

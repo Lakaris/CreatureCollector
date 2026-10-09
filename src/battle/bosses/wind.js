@@ -109,6 +109,7 @@ export default {
     }
 
     const tgt = adj[0];
+    if (ctx.missesBlinded(11, tgt)) return;
     damageUnit(tgt, ctx.dmg(0.14));
     newFx.push({ id: now + "gsthit" + tgt.uid, row: tgt.row, col: tgt.col, t: now, isRanged: false, fromRow: boss.row + 0.5, fromCol: boss.col + 0.5, isEnemy: true });
     knockAway(tgt, ctx); // pushes its own gust-trail / collision-burst fx

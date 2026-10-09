@@ -6,8 +6,11 @@
 import { CREATURE_MAP } from "../data/creatures.js";
 import { damageUnit } from "./hp.js";
 
-/** Vine minions: Entangle hits all 8 surrounding tiles every 15 ticks. */
-export function tickMinionSpecials(aliveE, aliveP, newFx, now) {
+/** Vine minions: Entangle hits all 8 surrounding tiles every 15 ticks.
+ * `onCast(u)` runs after each Entangle -- a Special like any other, so the
+ * battle can react to it (a Lightning Hazard strikes the caster). Passed in
+ * rather than imported, since battle/tick.js imports this module. */
+export function tickMinionSpecials(aliveE, aliveP, newFx, now, onCast) {
   for (const u of aliveE) {
     if (!u.isVineMinion) continue;
     u.specialCd = Math.max(0, (u.specialCd || 0) - 1);
@@ -22,6 +25,7 @@ export function tickMinionSpecials(aliveE, aliveP, newFx, now) {
       newFx.push({ id: now + "ve" + u.uid + p.uid, row: p.row, col: p.col, t: now, isRanged: false, fromRow: u.row, fromCol: u.col, isEnemy: true });
     }
     u.specialCd = 15;
+    if (onCast) onCast(u);
   }
 }
 

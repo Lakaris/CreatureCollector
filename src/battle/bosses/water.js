@@ -42,6 +42,7 @@ export default {
   basic(ctx) {
     const { boss, aliveP, newFx, now, gridRows, gridCols } = ctx;
     if (!aliveP.length || boss.atkCd > 0) return;
+    if (ctx.missesBlinded(12)) return; // all three bolts miss
 
     const fromR = boss.row + 0.5, fromC = boss.col + 0.5;
     for (let i = 0; i < 3; i++) {

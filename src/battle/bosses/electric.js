@@ -87,6 +87,7 @@ export default {
 
     const nearest = ctx.byDistance()[0];
     if (!nearest) return; // every player Intangible
+    if (ctx.missesBlinded(11, nearest)) return;
     const dr = nearest.row - (boss.row + 0.5);
     const dc = nearest.col - (boss.col + 0.5);
 

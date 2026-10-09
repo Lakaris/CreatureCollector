@@ -12,7 +12,7 @@
 // Sovereign Call has two branches and picks whichever the board allows. Its
 // first job is to Taunt -- drag an enemy onto the creature built to eat it.
 // When nothing can be Taunted (everything already is, or the only thing left
-// is a boss, which is immune to control like every other CC), the call turns
+// is something that can not be Taunted), the call turns
 // inward instead and raises an Aura: a field two tiles across that lifts the
 // Attack and Critical Damage of every ally standing in it. So the ability is
 // never dead -- a board with nothing to Taunt is exactly the board where the
@@ -27,12 +27,13 @@
 // refreshes Sovereign Call outright, so a fresh mark is immediately followed
 // by a fresh Taunt.
 
-import { aChebDist, distToBoss } from "../geometry.js";
-import { basicUnitDamage, basicDamageToBoss, damageBoss } from "../damage.js";
+import { unitDist } from "../geometry.js";
+import { basicUnitDamage } from "../damage.js";
 import { STATUS_TICKS, ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { asAssist } from "../applier.js";
 import { applyStatMod, applyAura, applyTaunt, isTauntable } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -91,7 +92,7 @@ export function makeAuravastModule(cfg) {
 
     /** Twin Radiance lvl 5: every landed hit shaves the victim's Defense. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
@@ -117,7 +118,7 @@ export function makeAuravastModule(cfg) {
       for (const a of aliveP) {
         if (a.hp <= 0 || a.uid === unit.uid) continue;
         if (!(a._lastHitAt > seen) || a._lastHitByUid == null) continue;
-        if (aChebDist(unit.row, unit.col, a.row, a.col) > GUARD_WATCH_RANGE) continue;
+        if (unitDist(unit, a) > GUARD_WATCH_RANGE) continue;
         const foe = aliveE.find((e) => e.uid === a._lastHitByUid && e.hp > 0);
         if (!foe) continue;
         unit._swornMarkUid = foe.uid;
@@ -141,45 +142,34 @@ export function makeAuravastModule(cfg) {
       let best = null, bestD = Infinity;
       for (const e of aliveE) {
         if (!isTauntable(e)) continue;
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
+        const d = unitDist(unit, e);
         if (d < bestD) { bestD = d; best = e; }
       }
-      // A boss is a Taunt target like anything else, and competes on distance
-      // with the minions rather than being a fallback.
-      const boss = ctx.boss;
-      if (isTauntable(boss)) {
-        const bd = distToBoss(boss, unit.row, unit.col);
-        if (bd < bestD) { bestD = bd; best = boss; }
-      }
+      // (A boss is a Taunt target like anything else, and competes on distance.)
 
       if (best) {
-        const onBoss = best === boss;
-        // A boss sits on a 2x2 body, so its marker goes at the body's centre.
-        const fxRow = onBoss ? best.row + 0.5 : best.row;
-        const fxCol = onBoss ? best.col + 0.5 : best.col;
+        // A 2x2 boss's marker goes at its body's centre.
+        const mid = ((best.size || 1) - 1) / 2;
+        const fxRow = best.row + mid, fxCol = best.col + mid;
         applyTaunt(best, unit);
-        newFx.push({ id: now + "sc" + unit.uid + (onBoss ? "boss" : best.uid), row: fxRow, col: fxCol, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        newFx.push({ id: now + "sc" + unit.uid + best.uid, row: fxRow, col: fxCol, t: now, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
 
         // Max tier: pull a nearby ally in to swing at the same target.
         if (idx >= MAX_IDX) {
           let helper = null, helperD = Infinity;
           for (const a of aliveP) {
             if (a.hp <= 0 || a.uid === unit.uid) continue;
-            const d = aChebDist(unit.row, unit.col, a.row, a.col);
+            const d = unitDist(unit, a);
             if (d <= ASSIST_RANGE && d < helperD) { helperD = d; helper = a; }
           }
           if (helper && best.hp > 0) {
-            // A boss takes damage through damageBoss and its own shield pool,
-            // never damageUnit (see battle/hp.js).
             // An Assist is the helper's own Basic ability (see asAssist), so
             // its Basic-crit gear pays out on this swing.
-            const dealt = asAssist(helper, () => onBoss
-              ? damageBoss(best, Math.max(1, Math.round(basicDamageToBoss(helper, best, aliveP))))
-              : damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best)))));
+            const dealt = asAssist(helper, () => damageUnit(best, Math.max(1, Math.round(basicUnitDamage(helper, best)))));
             // Credited to the griffin: this damage is Sovereign Call's doing,
             // and the chart tracks the ability that caused it.
             ctx.addDamageDealt(dealt || 0);
-            newFx.push({ id: now + "sca" + helper.uid + (onBoss ? "boss" : best.uid), row: fxRow, col: fxCol, t: now, fromRow: helper.row, fromCol: helper.col, isEnemy: !!ctx.isEnemySide });
+            newFx.push({ id: now + "sca" + helper.uid + best.uid, row: fxRow, col: fxCol, t: now, fromRow: helper.row, fromCol: helper.col, isEnemy: !!ctx.isEnemySide });
           }
         }
         return;

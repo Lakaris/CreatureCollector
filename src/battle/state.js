@@ -3,10 +3,12 @@
 import { CREATURE_MAP } from "../data/creatures.js";
 import { computeCombatStats } from "../core/stats.js";
 import { calcStats, getSpecialCharge, getSpecialChargeAt, MAX_ABILITY_LEVEL } from "../core/creatures.js";
-import { COOLDOWN_TICKS_AT_SPD_1 } from "./constants.js";
+import { COOLDOWN_TICKS_AT_SPD_1, BOSS_SIZE } from "./constants.js";
+import { getBossStats } from "../data/bosses.js";
 import { getPlayerAbilityModule } from "./playerAbilities/registry.js";
 import { gearBattleBonus } from "../core/equipment.js";
 import { withApplier } from "./applier.js";
+import { isBoss } from "./classifications.js";
 
 /**
  * Player HP is multiplied by this so fights last a reasonable number of ticks.
@@ -152,6 +154,8 @@ export function makeArenaBattle(
       uid: "e" + i,
       creatureId: edef.id,
       size: edef?.__giant ? 2 : 1,
+      // A Labyrinth Boss creature (see CLASSIFICATIONS.giant).
+      ...(edef?.__giant ? { classes: ["giant"] } : {}),
       row,
       col,
       prevRow: row,
@@ -189,4 +193,60 @@ export function makeArenaBattle(
   }
 
   return { playerUnits, enemyUnits, tick: 0 };
+}
+
+/**
+ * A boss, built as the creature it is: a "__boss_<kit>" unit (data/creatures.js)
+ * on the enemy side, 2x2, classed "boss" (battle/classifications.js), whose
+ * behaviour is its kit in battle/bosses/<kit>.js. `bossDef` is the
+ * DUNGEON_BOSSES entry it takes its stats from; `kitKey` the kit it runs (the
+ * Daily boss borrows a dungeon boss's stats but always runs "daily").
+ *
+ * Bosses wear no gear yet, but the unit is shaped like any other creature's --
+ * equipping one later is a matter of giving it a `gear` object.
+ *
+ * Its three cooldowns are its kit's own clocks (the kit counts them down on its
+ * turn), not the engine's attack/charge timers, so Haste and Speed effects
+ * never reach them -- the same as before bosses were creatures.
+ */
+export function makeBossUnit(bossDef, level, row, col, { kitKey = bossDef.key, now = Date.now() } = {}) {
+  const s = getBossStats(bossDef, level);
+  return {
+    uid: "eboss",
+    creatureId: "__boss_" + kitKey,
+    classes: ["boss"],
+    size: BOSS_SIZE,
+    row, col, prevRow: row, prevCol: col,
+    lastMoveTime: now,
+    lastAttackTime: 0,
+    deathTime: 0,
+    hp: s.hp, maxHp: s.hp,
+    atk: s.atk,
+    // Bosses take damage unmitigated (the classification's rule), so the
+    // Defense stat a boss's data carries is not used in the fight.
+    def: 0,
+    spd: 1,
+    abilitySpeed: 1,
+    crit: s.crit, critDmg: s.critDmg,
+    isRanged: false,
+    // The kit's own clocks: Basic, movement, Special. The Special opens on 10.
+    atkCd: 0, moveCd: 0, specialCd: 10,
+    // No charge bar: a boss's Special runs off its kit's own cooldown.
+    abilCharge: 0, abilChargeMax: 0,
+    abilityLevels: { basic: 0, special: 0, unique: 0 },
+    _bossKey: kitKey,
+  };
+}
+
+/** Put a boss into a battle built by makeArenaBattle. It joins LAST, after any
+ * minions -- every "nearest/weakest enemy" tie has always gone to a minion
+ * over the boss, and list order is what decides a tie. */
+export function addBossToBattle(state, bossUnit) {
+  state.enemyUnits.push(bossUnit);
+  return bossUnit;
+}
+
+/** The battle's boss -- the enemy creature classed "boss" -- or null. */
+export function bossOf(state) {
+  return (state?.enemyUnits || []).find(isBoss) || null;
 }

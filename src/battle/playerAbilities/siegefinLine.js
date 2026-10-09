@@ -20,10 +20,11 @@
 // attackRangeOf in battle/geometry.js), so a maxed Siegefin picks off things
 // that have not even noticed it.
 
-import { aChebDist } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { STATUS_TICKS, ENDURING_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
 import { applyStatMod, applyWhileActiveStatMod, applyRoot, dispelDebuffs, isRooted, isIntangible } from "../status.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js).
@@ -89,7 +90,7 @@ export function makeSiegefinModule(cfg) {
      * The struck target is not splashed twice.
      */
     onHit(unit, target, dealt) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "heal", pct: -HEAL_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       if (!isRooted(unit) || dealt <= 0 || !target || !unit._splashFoes) return 0;
@@ -97,7 +98,7 @@ export function makeSiegefinModule(cfg) {
       const splash = Math.max(1, Math.round(dealt * SPLASH_DMG_MULT));
       for (const e of unit._splashFoes) {
         if (e.uid === target.uid || e.hp <= 0 || isIntangible(e)) continue;
-        if (aChebDist(target.row, target.col, e.row, e.col) > SPLASH_RANGE) continue;
+        if (unitDist(target, e) > SPLASH_RANGE) continue;
         damageUnit(e, splash);
         unit._splashFx.push({ id: unit._splashNow + "hf" + unit.uid + e.uid, row: e.row, col: e.col, t: unit._splashNow, isSplash: true, fromRow: target.row, fromCol: target.col, isEnemy: unit._splashEnemySide });
       }

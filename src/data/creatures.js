@@ -17,6 +17,7 @@
 // Type bosses carry the same pair, in data/bosses.js.
 
 import { TYPE_ORDER } from "./types.js";
+import { DUNGEON_BOSSES } from "./bosses.js";
 
 export const CREATURES=[
   {id:"emberpup",name:"Emberpup",emoji:"🐶",type:"Fire",rarity:"common",description:"A scrappy fire pup that chases its own tail, sometimes igniting it.",
@@ -1290,8 +1291,8 @@ export const CREATURES=[
   // Pin and friends) multiplies the rate, and a chained swing banks one stack
   // per creature it reaches. That is what the 50 cap is sized for; the bare
   // ability hits one enemy and the card says 1, which is why the text names
-  // no gear. Grant it from the on-hit hook when this line is implemented, so
-  // every chained hit counts itself.
+  // no gear. It is granted from the on-hit hook (battle/playerAbilities/
+  // frizzlambLine.js), so every chained hit counts itself.
   {id:"frizzlamb",name:"Frizzlamb",emoji:"🐑",type:"Electric",rarity:"epic",description:"A lamb whose fleece stands permanently on end. It has never been successfully petted, and the attempts have stopped.",
    stats:{hp:92,atk:60,def:63,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1412,13 +1413,15 @@ export const CREATURES=[
      special:{name:"Grave Lantern",charge:16,upgrades:["If there are less than 2 Wisps, summon 1 Wisp with 25 Health.","If there are less than 2 Wisps, summon 1 Wisp with 32 Health.","If there are less than 2 Wisps, summon 1 Wisp with 40 Health.","If there are less than 2 Wisps, summon 1 Wisp with 50 Health.","If there are less than 2 Wisps, summon 1 Wisp with 50 Health. It gains 100% Ability Charge."]},
      unique:{name:"Lantern Keeper",upgrades:["Summon 1 Wisp with 25 Health and it gains 100% Ability Charge.","Summon 1 Wisp with 32 Health and it gains 100% Ability Charge.","Summon 1 Wisp with 40 Health and it gains 100% Ability Charge.","Summon 1 Wisp with 50 Health and it gains 100% Ability Charge.","Summon 2 Wisps with 50 Health and they gain 100% Ability Charge."]}
    },role:"Tank",attackType:"Melee",evolutionOf:"doomshade",shardsToAscend:30,ascensionsToEvolve:null},
-  {id:"stormwyvern",name:"Stormwyvern",emoji:"🐉",type:"Wind",rarity:"legendary",description:"Ancient ruler of storm clouds. Its wingspan generates hurricanes.",
+  // (Ids still say "stormwyvern"/"tempestlord" -- the line was re-themed into a
+  // storm cuckoo, and creature ids never change, for save compat.)
+  {id:"stormwyvern",name:"Zephyrcoo",emoji:"🐦‍⬛",type:"Wind",rarity:"legendary",description:"A storm-grey cuckoo that has never once built a nest of its own. It slips into other creatures' places so smoothly that they usually thank it for the trouble.",
    stats:{hp:113,atk:103,def:87,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Storm Fang",upgrades:["40 dmg wind","55 dmg","70 dmg","88 dmg","Hits chain to 2 additional nearby foes for 40% dmg"]},
-     special:{name:"Tempest Wings",charge:12,upgrades:["Push foes back","Push + 30 dmg","Push + 42 dmg","Push + 55 dmg","Creates a wind wall blocking projectiles for 3s"]},
-     unique:{name:"Storm Lord",upgrades:["Passive: nearby allies gain +12 ATK and +10 SPD","Nearby allies gain +18 ATK and +16 SPD","Nearby allies gain +24 ATK and +22 SPD","Nearby allies gain +32 ATK and +28 SPD; Stormwyvern itself gains +15 SPD","Nearby allies gain +42 ATK and +36 SPD; Stormwyvern gains +25 SPD; allies also deal +10% wind damage"]}
-   },role:"Support",attackType:"Melee",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"tempestlord"},
+     basic:{name:"Gust Peck",upgrades:["Heal 4 HP; 16 dmg","Heal 5 HP; 18 dmg","Heal 6 HP; 20 dmg","Heal 7 HP; 23 dmg","Heal 7 HP; 23 dmg"]},
+     special:{name:"Nest Swap",charge:26,upgrades:["If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 5% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 10% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 15% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 20% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 20% Speed and Haste. If there are no Swappable creatures, all Nearby allies instead temporarily gain 20% Speed and Haste"]},
+     unique:{name:"Brood Ward",upgrades:["Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 20% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 30% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 40% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 50% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 50% Health. This effect begins with 1 use. This creature gains a Shield whenever it Swaps"]}
+   },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"tempestlord"},
   {id:"celestialux",name:"Celestialux",emoji:"✨",type:"Light",rarity:"legendary",description:"A being of pure starlight existing between dimensions. Its true form cannot be seen — only felt.",
    stats:{hp:111,atk:103,def:86,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1427,13 +1430,13 @@ export const CREATURES=[
      unique:{name:"Starborn",upgrades:["Passive: all allies regenerate 2 HP/s","All allies regenerate 3 HP/s","All allies regenerate 4 HP/s; Celestialux's crits heal itself for 10 HP","All allies regenerate 6 HP/s; crits heal self for 18 HP","All allies regenerate 8 HP/s; crits heal self for 25 HP and also restore 3 HP to all allies"]}
    },role:"Support",attackType:"Ranged",shardsToAscend:30,ascensionsToEvolve:5,evolutionId:"nebulalux"},
   // Wind line 1 final
-  {id:"tempestlord",name:"Tempestlord",emoji:"🌪️",type:"Wind",rarity:"legendary",description:"The storm given eternal form. Where Tempestlord passes, the age of clear skies ends permanently.",
+  {id:"tempestlord",name:"Tempestine",emoji:"🐦‍⬛",type:"Wind",rarity:"legendary",description:"The myths say a god once wore this shape so he could be sheltered from his own storm. Tempestine has spent every storm since returning the favour, swooping into the place of whoever is about to fall.",
    stats:{hp:135,atk:124,def:105,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Gale Sovereign",upgrades:["55 dmg wind; chain 3 foes 60%","70 dmg","88 dmg","110 dmg","Chain all enemies; each hit applies -8% SPD stack; no cap"]},
-     special:{name:"Eternal Tempest",charge:22,upgrades:["All allies +55 ATK+45 SPD+30% wind dmg 7s","Aura stronger","Even stronger","Max","Permanent aura; also grant +20% Ability Speed; allies immune to wind dmg"]},
-     unique:{name:"Storm Sovereign",upgrades:["Passive: all allies +55 ATK+45 SPD; Tempestlord generates endless gale zone 30/s; enemies -40% SPD","Allies +68 ATK+56 SPD; zone 38/s; -50%","Allies +84 ATK+70 SPD; zone 48/s; -60%","Allies +104 ATK+88 SPD; zone 60/s; -72%","Allies +128 ATK+108 SPD; zone 75/s; -84%; Tempestlord revives 3 times each as a category-5 tornado"]}
-   },role:"Support",attackType:"Melee",evolutionOf:"stormwyvern",shardsToAscend:30,ascensionsToEvolve:null},
+     basic:{name:"Gust Peck",upgrades:["Heal 4 HP; 16 dmg","Heal 5 HP; 18 dmg","Heal 6 HP; 20 dmg","Heal 7 HP; 23 dmg","Heal 7 HP; 23 dmg"]},
+     special:{name:"Nest Swap",charge:26,upgrades:["If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 5% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 10% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 15% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 20% Speed and Haste","If this creature's Passive ability has 0 uses, regain 1 use of it and Swap places with the Swapped creature. The Swapped creature temporarily gains 20% Speed and Haste. If there are no Swappable creatures, all Nearby allies instead temporarily gain 20% Speed and Haste"]},
+     unique:{name:"Brood Ward",upgrades:["Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 20% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 30% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 40% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 50% Health. This effect begins with 1 use","Whenever an ally falls below 30% Health, this creature Swaps places with them and they recover 50% Health. This effect begins with 1 use. This creature gains a Shield whenever it Swaps"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"stormwyvern",shardsToAscend:30,ascensionsToEvolve:null},
   // Light line 1 final
   {id:"nebulalux",name:"Nebulalux",emoji:"🌌",type:"Light",rarity:"legendary",description:"Celestialux absorbed an entire nebula. It now contains more light than a small galaxy and shares all of it.",
    stats:{hp:134,atk:123,def:103,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -1442,21 +1445,46 @@ export const CREATURES=[
      special:{name:"Stellar Veil",charge:18,upgrades:["Reflect 40% dmg; heal 25 HP per reflected hit","Reflect 50%; heal 34","Reflect 62%; heal 44","Reflect 76%; heal 57","Reflect 92%; heal 74; reflected dmg also blinds attacker 3s; allies immune to reflected dmg"]},
      unique:{name:"Cosmic Born",upgrades:["Passive: all allies +18 HP/s regen; Nebulalux crits heal all allies 45 HP; immune to all dmg 15% chance","Regen +24/s; crit heal 58; immune 20%","Regen +30/s; crit heal 74; immune 26%","Regen +38/s; crit heal 94; immune 32%","Regen +48/s; crit heal 118; immune 40%; Nebulalux revives 3 times each time healing all allies to full HP"]}
    },role:"Support",attackType:"Ranged",evolutionOf:"celestialux",shardsToAscend:30,ascensionsToEvolve:null},
-  // Fire line 1
-  {id:"blazephoenix",name:"Blazephoenix",emoji:"🦅",type:"Fire",rarity:"legendary",description:"A phoenix hatched from the heart of a dying star. It considers extinction and rebirth a perfectly normal Tuesday.",
-   stats:{hp:109,atk:112,def:61,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+  // Fire line 1 -- fire ants: Legendary, 2 stages, one kit shared verbatim. A
+  // ranged Fire Support that doesn't burn things itself so much as hand the
+  // flame out: its own healing is deliberately small, and its value is in
+  // making the rest of the team set enemies alight and hit them harder for it.
+  //
+  // The animal is doing work here: a queen's value is her colony, not her own
+  // bite. The two stages are the real life cycle -- a winged princess, then a
+  // queen who has shed her wings to found a colony -- and every ability is a
+  // colony behaviour: Formic Spray is the acid formicine ants fire at range,
+  // Kindled Brood is the queen feeding and arming the workers around her, and
+  // Alarm Pheromone is the scent that sends a whole colony onto one target.
+  //
+  // Statline: moved from Attacker to Support keeping the hp+atk+def budget
+  // (282 / 338), split on the healing-legendary ratio Bloomibis and Animavis
+  // use (~44 / 29 / 28%).
+  //
+  // Implementation notes:
+  //   - Kindled Brood's "inflict Burn when dealing damage" is a buff on each
+  //     Nearby ally for the standard duration ("temporarily" is not one of the
+  //     duration-ladder words, so it reads as unmarked: STATUS_TICKS). An
+  //     ability that ALREADY inflicts Burn lays one extra stack instead.
+  //   - "Max stacks of Burn" is BURN_STACK_CAP (10) in battle/status.js.
+  //   - Alarm Pheromone's max-tier detonation is meant to be modest damage on a
+  //     relatively long cooldown, on top of the once-per-enemy limit the card
+  //     states. The cooldown is design intent, not card text -- the card does
+  //     not mention it -- so it lives here for whoever implements the line.
+  {id:"emberant",name:"Emberant",emoji:"🐜",type:"Fire",rarity:"legendary",description:"A fire ant princess still wearing the wings she'll shed to found a colony. Every worker in reach already treats her like a queen, and the ground around her is warm to stand on.",
+   stats:{hp:123,atk:81,def:78,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Solar Talon",upgrades:["26 dmg+burn 8/s 3s; arc 2 foes","33 dmg","42 dmg","54 dmg","Burn 12/s 4s; arc all nearby; burn spread to 1 foe per arc"]},
-     special:{name:"Rebirth Flame",charge:22,upgrades:["Blazephoenix becomes fire; emerges 3s later full HP; 80 dmg AOE on emerge","Emerge 100 dmg","Emerge 124 dmg","Emerge 154 dmg","Emerge stuns all 2s; burn all 6s; strip all buffs"]},
-     unique:{name:"Eternal Flame",upgrades:["Passive: revives once per fight; each revival stronger+32% ATK; burn ignores 30% DEF; fire dmg +35%","Ignores 38%; +44%","Ignores 46%; +55%","Ignores 56%; +68%","Ignores 68%; +84%; Blazephoenix revives endlessly until 3 revivals; final death is a supernova 300 dmg all"]}
-   },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"solarpyre"},
-  {id:"solarpyre",name:"Solarpyre",emoji:"🌟",type:"Fire",rarity:"legendary",description:"Blazephoenix's true form. A solar storm wearing feathers. Astronomers have filed formal complaints.",
-   stats:{hp:130,atk:134,def:74,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+     basic:{name:"Formic Spray",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg and inflict Burn"]},
+     special:{name:"Kindled Brood",charge:20,upgrades:["Heal 12 HP","Heal 16 HP","Heal 20 HP","Heal 24 HP","Heal 24 HP"]},
+     unique:{name:"Alarm Pheromone",upgrades:["Nearby allies deal 5% more damage to Burning enemies","Nearby allies deal 10% more damage to Burning enemies","Nearby allies deal 15% more damage to Burning enemies","Nearby allies deal 20% more damage to Burning enemies","Nearby allies deal 20% more damage to Burning enemies. If an ally attempts to inflict Burn while the enemy is at max stacks of Burn, they detonate and deal damage to all Nearby enemies and all their Burn is dispelled. This effect can only happen once per enemy"]}
+   },role:"Support",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"formicinder"},
+  {id:"formicinder",name:"Formicinder",emoji:"🐜",type:"Fire",rarity:"legendary",description:"The wings are gone and the colony is hers. She doesn't fight so much as lend her sting to everything around her, and whatever they bite starts to smoulder.",
+   stats:{hp:147,atk:97,def:94,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Solar Talon",upgrades:["40 dmg+burn 12/s 4s; arc all; burn can't be removed","50 dmg","62 dmg","78 dmg","Burn 18/s 5s; all arcs crit; crits trigger free arc chain"]},
-     special:{name:"Solar Rebirth",charge:18,upgrades:["Transform to pure solar energy; emerge 4s later full HP; 140 dmg AOE+burn all 8s","Emerge 175 dmg","Emerge 218 dmg","Emerge 272 dmg","Emerge 340 dmg; stun all 3s; strip all buffs; arena on fire 6s 40/s after emerge"]},
-     unique:{name:"Living Star",upgrades:["Passive: revives endlessly (3 revivals); each revival: +40% ATK+burn ignores +15% DEF; fire +50%; crits spread burn to all nearby","Fire +62%; burn DEF ignore +20% stacking","Fire +76%; +26% stacking","Fire +94%; +33% stacking","Fire +115%; +42% stacking; Solarpyre revives at full power; final revival: permanent star form dealing 80/s to all enemies"]}
-   },role:"Attacker",attackType:"Ranged",evolutionOf:"blazephoenix",shardsToAscend:30,ascensionsToEvolve:null},
+     basic:{name:"Formic Spray",upgrades:["16 dmg","18 dmg","20 dmg","23 dmg","23 dmg and inflict Burn"]},
+     special:{name:"Kindled Brood",charge:20,upgrades:["Heal 12 HP","Heal 16 HP","Heal 20 HP","Heal 24 HP","Heal 24 HP"]},
+     unique:{name:"Alarm Pheromone",upgrades:["Nearby allies deal 5% more damage to Burning enemies","Nearby allies deal 10% more damage to Burning enemies","Nearby allies deal 15% more damage to Burning enemies","Nearby allies deal 20% more damage to Burning enemies","Nearby allies deal 20% more damage to Burning enemies. If an ally attempts to inflict Burn while the enemy is at max stacks of Burn, they detonate and deal damage to all Nearby enemies and all their Burn is dispelled. This effect can only happen once per enemy"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"emberant",shardsToAscend:30,ascensionsToEvolve:null},
   // Fire line 2
   {id:"ignissaur",name:"Ignissaur",emoji:"🐲",type:"Fire",rarity:"legendary",description:"A dragon forged in the earth's mantle and never told it could leave. Surprisingly well-adjusted about it.",
    stats:{hp:116,atk:125,def:77,spd:1,abilitySpeed:1,crit:4,critDmg:30},
@@ -1687,20 +1715,46 @@ export const CREATURES=[
      special:{name:"Vortex Form",charge:20,upgrades:["Become wind; attack from everywhere simultaneously; 60 dmg 6 hits+pull+slow 80% 5s","72 dmg","88 dmg","106 dmg","8 hits; slow 100% (root); silence 3s; all hits strip 1 buff; emerge dealing 120 additional dmg"]},
      unique:{name:"Vortex Sovereign",upgrades:["Passive: immune to ground+all targeting between attacks; +55% dodge; aura 110/s; enemies -80% SPD+ATK; SPD scales dmg +2%/5 SPD","Dodge +65%; aura 138/s; -100%","Dodge +78%; aura 172/s; -124%","Dodge +94%; aura 215/s; -155%","Dodge +114%; aura 270/s; -194%; Vortexwyrm exists as wind at all times; physically cannot be hit unless it chooses; revives 3 times each as a world-cyclone"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"maelstrake",shardsToAscend:30,ascensionsToEvolve:null},
-  // Electric line 1
-  {id:"voltravene",name:"Voltravene",emoji:"⚡",type:"Electric",rarity:"legendary",description:"A hydra with a head for every type of lightning. Scientists documented it once. Their equipment never worked again.",
+  // Electric line 1 -- three-headed storm dragons: Legendary, 2 stages, one kit
+  // shared verbatim. A ranged Attacker built around the Lightning Hazard.
+  //
+  // The three heads ARE the Basic: each picks its own target -- the Weakest,
+  // the Closest and the Farthest enemy -- and when two picks are the same
+  // creature, it takes both hits. All three are ONE attack (one use of the
+  // Basic), so per-attack gear counts it once while per-hit effects count each
+  // head. Each hit is priced at a third of a normal Legendary Attacker's Basic,
+  // so three on one target matches it -- until the max tier, whose second and
+  // third hits on the same enemy deal +50% / +100%, which makes this the
+  // strongest single-target Basic in the game (63 vs 43 at max) and puts it
+  // ahead against bosses, where every head always hits the same body.
+  //
+  // Implemented in battle/playerAbilities/voltraveneLine.js; the Lightning
+  // Hazard itself lives in battle/tick.js (lightningStrikesCaster). Notes:
+  //   - Trident Arc's max tier says "each additional ATTACK" -- that means each
+  //     additional HEAD's hit on the same enemy, even though in engine terms
+  //     all three heads are one attack. Second hit +50%, third +100%.
+  //   - Storm Lance lays the Hazard from its max tier, along the ray it struck
+  //     (the card says only "temporarily leave", matching Dread Howl's Fire
+  //     Hazard wording). It is the only source, so Stormsight has nothing to
+  //     read until then.
+  //   - "Can always target them" lets the Basic reach an enemy on a Hazard
+  //     from any range.
+  //   - Stormsight's max tier counts enemies standing in Hazards THIS creature
+  //     laid -- not any Lightning Hazard -- and is flat Speed (2% each),
+  //     recounted as enemies step on and off; a flat stat bump, so no pill.
+  {id:"voltravene",name:"Voltravene",emoji:"🐲",type:"Electric",rarity:"legendary",description:"A young storm dragon with three heads that have never agreed on anything, least of all which enemy to bite. They settle it the obvious way and bite all three.",
    stats:{hp:110,atk:121,def:80,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Thunder Bite",upgrades:["22 dmg+arc all 70%; paralyze 22% 1.5s; each head targets different foe","28 dmg","36 dmg","46 dmg","Arc all 100%; paralyze 32% 2s; stun on paralyze 0.5s; each arc chains to 2 more"]},
-     special:{name:"Lightning Regen",charge:22,upgrades:["Regrow 1 head; +12% ATK+8% DEF per head; release 60 dmg lightning burst per head","Burst 75 dmg per head","Burst 94 dmg","Burst 118 dmg","Burst 148 dmg; also paralyze all nearby 2s; instantly regrow to 6 heads"]},
-     unique:{name:"Thunder Regen",upgrades:["Passive: regrow 1 head/7s (max 6); each head +14% ATK+10% DEF+arc aura 20/s+paralyze 12%/s; lightning zone at all times","Head +18%+13%; aura 26/s; paralyze 16%/s","Head +22%+16%; aura 34/s; paralyze 21%/s","Head +28%+20%; aura 44/s; paralyze 27%/s","Head +35%+25%; aura 56/s; paralyze 35%/s; at 6 heads immune to electric dmg; revives once regrowing all heads+EMP 300 dmg all"]}
+     basic:{name:"Trident Arc",upgrades:["10 dmg","11 dmg","13 dmg","14 dmg","14 dmg. If an enemy is damaged multiple times, deal 50% more damage for each additional attack"]},
+     special:{name:"Storm Lance",charge:10,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and temporarily leave a Lightning Hazard"]},
+     unique:{name:"Stormsight",upgrades:["This creature's Basic ability deals 5% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 10% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 15% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 20% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 20% more damage to enemies standing on a Lightning Hazard and can always target them. For each enemy in a Lightning Hazard it created, gain 2% Speed"]}
    },role:"Attacker",attackType:"Ranged",shardsToAscend:20,ascensionsToEvolve:5,evolutionId:"arcmajor"},
-  {id:"arcmajor",name:"Arcmajor",emoji:"🐉",type:"Electric",rarity:"legendary",description:"Thunderhydra's final form. Nine heads, nine storms. Meteorologists have collectively retired.",
+  {id:"arcmajor",name:"Arcmajor",emoji:"🐉",type:"Electric",rarity:"legendary",description:"Grown into its storm, the three heads finally work as one: each chooses its own prey, and the sky answers all of them at once. The ground it leaves behind keeps humming.",
    stats:{hp:132,atk:146,def:96,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Storm Bite",upgrades:["35 dmg+arc all 100%; paralyze 40% 2.5s; stun 1s on paralyze; all 9 heads attack; each chain to all","44 dmg","56 dmg","70 dmg","Paralyze 55% 3s; stun 1.5s; each arc also strips 1 buff; arcs deal full dmg to all"]},
-     special:{name:"World Lightning",charge:16,upgrades:["Release 9-head lightning; 120 dmg per head to 1 foe each; stun all 2s; regrow to 9 heads","150 dmg per head","188 dmg","235 dmg","295 dmg; all enemies paralyzed 3s+stripped all buffs; heal all allies 80 HP; all lightning arcs chain to each other"]},
-     unique:{name:"Storm Sovereign",upgrades:["Passive: regrow 1 head/2s; each head +42% ATK+30% DEF+arc aura 68/s+paralyze 40%/s; 9 heads: immune to all electric; EMP every 8s 150 dmg+stun 2s all","Head +52%+38%; aura 86/s; 190 dmg EMP","Head +65%+48%; aura 108/s; 238 dmg","Head +80%+60%; aura 135/s; 298 dmg","Head +100%+75%; aura 170/s; 375 dmg; Stormhydra revives 3 times each EMP stunning all enemies 5s+dealing 500 dmg"]}
+     basic:{name:"Trident Arc",upgrades:["10 dmg","11 dmg","13 dmg","14 dmg","14 dmg. If an enemy is damaged multiple times, deal 50% more damage for each additional attack"]},
+     special:{name:"Storm Lance",charge:10,upgrades:["55 dmg","62 dmg","70 dmg","80 dmg","80 dmg and temporarily leave a Lightning Hazard"]},
+     unique:{name:"Stormsight",upgrades:["This creature's Basic ability deals 5% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 10% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 15% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 20% more damage to enemies standing on a Lightning Hazard and can always target them","This creature's Basic ability deals 20% more damage to enemies standing on a Lightning Hazard and can always target them. For each enemy in a Lightning Hazard it created, gain 2% Speed"]}
    },role:"Attacker",attackType:"Ranged",evolutionOf:"voltravene",shardsToAscend:30,ascensionsToEvolve:null},
   // Electric line 2
   {id:"arcsurge",name:"Arcsurge",emoji:"🦅",type:"Electric",rarity:"legendary",description:"A phoenix that died in a lightning bolt and came back as one. Power grids nationwide have filed grievances.",
@@ -1854,6 +1908,20 @@ CREATURE_MAP["__vine_minion"]={id:"__vine_minion",emoji:"🌱",name:"Vine Minion
 // in the Dex, hatches, or collections. Its real Health comes from the
 // summoning ability's tier; stats here are only a fallback shape.
 CREATURE_MAP["__wisp"]={id:"__wisp",emoji:"🕯️",name:"Wisp",type:"Dark",role:"Tank",attackType:"Melee",stats:{hp:25,atk:0,def:0,spd:1,abilitySpeed:1,crit:4,critDmg:30},abilities:{basic:{name:"Beckon",description:"Taunt an enemy"},special:{name:"Ghostly Step",charge:10,description:"Teleport beside a random enemy"},unique:{name:"Grave Grudge",description:"Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health"}}};
+
+/**
+ * Bosses are creatures too: one "__boss_<kit>" entry per boss kit, generated
+ * from DUNGEON_BOSSES (data/bosses.js) so a boss's name, type, stats and card
+ * text live in one place. Battle-only like the two above -- never in the Dex,
+ * hatches, or the collection. What makes them bosses is their `classes`
+ * (battle/classifications.js) and their 2x2 `size`; their behaviour is the
+ * kit in battle/bosses/<kit>.js. The Daily boss runs the shared "daily" kit
+ * under whichever dungeon boss's name and stats the day borrows.
+ */
+for (const b of DUNGEON_BOSSES) {
+  CREATURE_MAP["__boss_" + b.key] = { id: "__boss_" + b.key, emoji: "👾", name: b.name, type: b.type, role: "Boss", attackType: "Melee", size: 2, classes: ["boss"], stats: b.baseStats, abilities: b.abilities };
+}
+CREATURE_MAP["__boss_daily"] = { id: "__boss_daily", emoji: "👾", name: "Daily Boss", type: "Daily", role: "Boss", attackType: "Melee", size: 2, classes: ["boss"], stats: DUNGEON_BOSSES[0].baseStats, abilities: DUNGEON_BOSSES[0].abilities };
 
 /**
  * Stand-in for content whose creature has been retired, until the real

@@ -19,11 +19,12 @@
 // Slipstream passively amplifies all of Breezekit's damage by +5%..+20%, and
 // at max level extends its attack reach (and pierce depth) by one tile.
 
-import { basicUnitDamage, basicDamageToBoss, damageBoss, attackRoll, attackCooldown } from "../damage.js";
+import { basicUnitDamage, attackRoll, attackCooldown } from "../damage.js";
 import { speedPenalty, applyStatMod, consumeBlind } from "../status.js";
-import { aChebDist, distToBoss, bossOccupies } from "../geometry.js";
-import { BOSS_SIZE, STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
+import { aChebDist, unitDist, occupies } from "../geometry.js";
+import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { damageUnit } from "../hp.js";
+import { hasRule, isBoss } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -55,40 +56,29 @@ function reachOf(unit) {
 }
 
 /** Gust Swipe lvl 5: one DEF Down stack per Breezekit, refreshed per hit.
- * Bosses are skipped -- they have no DEF stat for the shred to act on. */
+ * A boss shrugs it off (ignoresOnHitEffects in battle/classifications.js). */
 function applyDefShred(unit, target) {
-  if (!target || target.uid == null) return;
+  if (!target || hasRule(target, "ignoresOnHitEffects")) return;
   applyStatMod(target, { kind: "def", pct: -DEF_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
 }
 
-/** The 8 cells around a minion, or the ring around the boss's 2x2 body. */
-function cellsBeside(candidate) {
+/** The ring of cells around a foe's body (8 for a 1x1, 12 for a 2x2 boss). */
+function cellsBeside(u) {
   const out = [];
-  if (candidate.isBossCandidate) {
-    const b = candidate.boss;
-    for (let r = b.row - 1; r <= b.row + BOSS_SIZE; r++) {
-      for (let c = b.col - 1; c <= b.col + BOSS_SIZE; c++) {
-        if (r >= b.row && r < b.row + BOSS_SIZE && c >= b.col && c < b.col + BOSS_SIZE) continue;
-        out.push([r, c]);
-      }
-    }
-    return out;
-  }
-  const u = candidate.unit;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      if (!dr && !dc) continue;
-      out.push([u.row + dr, u.col + dc]);
+  const size = u.size || 1;
+  for (let r = u.row - 1; r <= u.row + size; r++) {
+    for (let c = u.col - 1; c <= u.col + size; c++) {
+      if (r >= u.row && r < u.row + size && c >= u.col && c < u.col + size) continue;
+      out.push([r, c]);
     }
   }
   return out;
 }
 
-/** Zephyr Step's candidates: every living foe (boss included), weakest first. */
-function candidatesByHp(aliveE, boss) {
-  const list = aliveE.map((unit) => ({ unit, hp: unit.hp }));
-  if (boss && boss.hp > 0) list.push({ isBossCandidate: true, boss, hp: boss.hp });
-  return list.sort((a, z) => a.hp - z.hp);
+/** Zephyr Step's candidates: every living foe, weakest first. The sort is
+ * stable, so a boss (last in the enemy list) loses Health ties. */
+function candidatesByHp(aliveE) {
+  return aliveE.filter((u) => u.hp > 0).sort((a, z) => a.hp - z.hp);
 }
 
 export function makeBreezekitModule(cfg) {
@@ -100,29 +90,30 @@ export function makeBreezekitModule(cfg) {
      * of reach). Also owns chase movement, like other basicAttack overrides.
      */
     basicAttack(unit, ctx) {
-      const { aliveE, aliveP, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const reach = reachOf(unit);
 
-      // Closest attackable foe: minions must sit on a straight or diagonal
-      // line (always true at reach 1); the boss counts via its 2x2 body.
-      let best = null, bestD = Infinity;
+      // Closest attackable foe: a creature must sit on a straight or diagonal
+      // line (always true at reach 1). A boss is swiped wherever its body is
+      // in reach, wins ties, and takes the swipe alone (no pierce through it).
+      let best = null, bestD = Infinity, boss = null, bossD = Infinity;
       for (const e of aliveE) {
+        const d = unitDist(unit, e);
+        if (isBoss(e)) { if (e.hp > 0 && d < bossD) { bossD = d; boss = e; } continue; }
         const dr = e.row - unit.row, dc = e.col - unit.col;
         const aligned = dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc);
-        const d = aChebDist(unit.row, unit.col, e.row, e.col);
         if (aligned && d <= reach && d < bestD) { bestD = d; best = { unit: e, dr: Math.sign(dr), dc: Math.sign(dc) }; }
       }
-      const bossD = boss && boss.hp > 0 ? distToBoss(boss, unit.row, unit.col) : Infinity;
-      if (bossD <= reach && bossD <= bestD) best = { isBoss: true };
+      if (boss && bossD <= reach && bossD <= bestD) best = { unit: boss, solo: true };
 
       if (!best) {
         // Nothing in reach: chase the nearest foe.
         let chase = null, chaseD = Infinity;
         for (const e of aliveE) {
-          const d = aChebDist(unit.row, unit.col, e.row, e.col);
+          if (isBoss(e) && e.hp <= 0) continue;
+          const d = unitDist(unit, e);
           if (d < chaseD) { chaseD = d; chase = e; }
         }
-        if (boss && boss.hp > 0 && bossD < chaseD) chase = { row: boss.row, col: boss.col };
         if (chase) ctx.stepToward(chase.row, chase.col);
         return;
       }
@@ -136,33 +127,28 @@ export function makeBreezekitModule(cfg) {
       const shreds = idx >= MAX_IDX;
       let totalDmg = 0;
 
-      if (best.isBoss) {
-        const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
-        damageBoss(boss, dmg);
+      if (best.solo) {
+        const victim = best.unit;
+        const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
+        damageUnit(victim, dmg);
         totalDmg += dmg;
-        if (shreds) applyDefShred(unit, boss);
-        newFx.push({ id: now + unit.uid, row: boss.row + 0.5, col: boss.col + 0.5, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        if (shreds) applyDefShred(unit, victim);
+        const mid = ((victim.size || 1) - 1) / 2;
+        newFx.push({ id: now + unit.uid, row: victim.row + mid, col: victim.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
       } else {
         // Walk the swipe line: the target's cell plus `reach` cells behind it.
         const steps = bestD + reach;
-        let hitBossOnLine = false;
+        const struck = new Set(); // once per creature, however many tiles it spans
         for (let k = 1; k <= steps; k++) {
           const r = unit.row + best.dr * k, c = unit.col + best.dc * k;
-          const victim = aliveE.find((e) => e.hp > 0 && e.row === r && e.col === c);
-          if (victim) {
-            const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
-            damageUnit(victim, dmg);
-            totalDmg += dmg;
-            if (shreds) applyDefShred(unit, victim);
-            newFx.push({ id: now + unit.uid + "gs" + k, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
-          }
-          if (!hitBossOnLine && boss && boss.hp > 0 && bossOccupies(boss, r, c)) {
-            const dmg = Math.max(1, Math.round(basicDamageToBoss(unit, boss, aliveP) * mult));
-            damageBoss(boss, dmg);
-            totalDmg += dmg;
-            if (shreds) applyDefShred(unit, boss);
-            hitBossOnLine = true;
-          }
+          const victim = aliveE.find((e) => e.hp > 0 && !struck.has(e) && occupies(e, r, c));
+          if (!victim) continue;
+          struck.add(victim);
+          const dmg = Math.max(1, Math.round(basicUnitDamage(unit, victim) * mult));
+          damageUnit(victim, dmg);
+          totalDmg += dmg;
+          if (shreds) applyDefShred(unit, victim);
+          newFx.push({ id: now + unit.uid + "gs" + k, row: r, col: c, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         }
       }
 
@@ -174,16 +160,12 @@ export function makeBreezekitModule(cfg) {
      * Zephyr Step holds its charge until some foe qualifies: either Breezekit
      * already stands beside one, or one has a free adjacent tile to land on.
      */
-    specialInRange(unit, { aliveE, aliveP, boss, gridRows, gridCols }) {
-      const occ = new Set([...aliveE, ...aliveP].map((o) => o.row + "," + o.col));
+    specialInRange(unit, { aliveE, aliveP, gridRows, gridCols }) {
+      const everyone = [...aliveE, ...aliveP];
       const open = (r, c) =>
-        r >= 0 && r < gridRows && c >= 0 && c < gridCols && !occ.has(r + "," + c) &&
-        !(boss && boss.hp > 0 && bossOccupies(boss, r, c));
-      for (const cand of candidatesByHp(aliveE, boss)) {
-        const besideAlready = cand.isBossCandidate
-          ? distToBoss(cand.boss, unit.row, unit.col) <= 1
-          : aChebDist(unit.row, unit.col, cand.unit.row, cand.unit.col) <= 1;
-        if (besideAlready || cellsBeside(cand).some(([r, c]) => open(r, c))) return true;
+        r >= 0 && r < gridRows && c >= 0 && c < gridCols && !everyone.some((o) => occupies(o, r, c));
+      for (const foe of candidatesByHp(aliveE)) {
+        if (unitDist(unit, foe) <= 1 || cellsBeside(foe).some(([r, c]) => open(r, c))) return true;
       }
       return false;
     },
@@ -195,19 +177,15 @@ export function makeBreezekitModule(cfg) {
      * Speed Up on cast.
      */
     special(unit, ctx) {
-      const { aliveE, boss, newFx, now } = ctx;
+      const { aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const mult = (specialDmgByLevel[idx] / BASIC_DMG_BASELINE) * slipstreamMult(unit);
 
-      for (const cand of candidatesByHp(aliveE, boss)) {
-        const besideAlready = cand.isBossCandidate
-          ? distToBoss(cand.boss, unit.row, unit.col) <= 1
-          : aChebDist(unit.row, unit.col, cand.unit.row, cand.unit.col) <= 1;
-
+      for (const foe of candidatesByHp(aliveE)) {
         let dest = null;
-        if (!besideAlready) {
-          // ctx.blocked covers bounds, every unit's cell, and the boss body.
-          const openCells = cellsBeside(cand).filter(([r, c]) => !ctx.blocked(r, c));
+        if (unitDist(unit, foe) > 1) {
+          // ctx.blocked covers bounds and the body of every unit.
+          const openCells = cellsBeside(foe).filter(([r, c]) => !ctx.blocked(r, c));
           if (!openCells.length) continue;
           openCells.sort((a, z) => aChebDist(unit.row, unit.col, a[0], a[1]) - aChebDist(unit.row, unit.col, z[0], z[1]));
           dest = openCells[0];
@@ -220,18 +198,16 @@ export function makeBreezekitModule(cfg) {
         if (dest && !ctx.relocate(dest[0], dest[1])) continue;
 
         const dmg = Math.max(1, Math.round(attackRoll(unit) * mult));
-        if (cand.isBossCandidate) damageBoss(cand.boss, dmg);
-        else damageUnit(cand.unit, dmg);
+        damageUnit(foe, dmg);
         ctx.addDamageDealt(dmg);
 
         if (idx >= MAX_IDX) {
           applyStatMod(unit, { kind: "spd", pct: SPEED_UP_PCT, src: unit.uid, ticks: STATUS_TICKS });
         }
 
-        const tr = cand.isBossCandidate ? cand.boss.row + 0.5 : cand.unit.row;
-        const tc = cand.isBossCandidate ? cand.boss.col + 0.5 : cand.unit.col;
+        const mid = ((foe.size || 1) - 1) / 2;
         newFx.push({ id: now + "zs" + unit.uid, row: unit.row, col: unit.col, t: now, isRanged: true, fromRow, fromCol, isEnemy: !!ctx.isEnemySide });
-        newFx.push({ id: now + "zshit" + unit.uid, row: tr, col: tc, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
+        newFx.push({ id: now + "zshit" + unit.uid, row: foe.row + mid, col: foe.col + mid, t: now, isRanged: false, fromRow: unit.row, fromCol: unit.col, isEnemy: !!ctx.isEnemySide });
         return;
       }
     },

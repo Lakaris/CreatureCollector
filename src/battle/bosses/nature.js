@@ -47,6 +47,8 @@ export default {
 
     const tgt = ctx.byDistance()[0];
     if (!tgt) return; // every player Intangible
+    // A missed swing neither ramps nor resets the Life Drain stacks.
+    if (ctx.missesBlinded(10, tgt)) return;
     // Staying on one target ramps the damage; switching resets it.
     if (boss.lifeTarget === tgt.uid) boss.lifeStacks = Math.min((boss.lifeStacks || 0) + 1, 10);
     else {

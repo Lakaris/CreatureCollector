@@ -19,11 +19,12 @@
 // no context to find allies with) and paid out on the next onTick, the same
 // one-tick handoff Deep Submerge uses.
 
-import { aChebDist, bossOccupies } from "../geometry.js";
+import { unitDist } from "../geometry.js";
 import { STATUS_TICKS, BASIC_DMG_BASELINE } from "../constants.js";
 import { applyStatMod, healReceivedMultiplier, applyBlind } from "../status.js";
 // Aliased: this module already exports a healUnit of its own that wraps this one.
 import { healUnit as applyHeal } from "../hp.js";
+import { hasRule } from "../classifications.js";
 
 /** Displayed damage by level; the engine deals stat-based damage scaled by the
  * current level's value over BASIC_DMG_BASELINE (see battle/constants.js). */
@@ -85,7 +86,7 @@ export function makeDustlingModule(cfg) {
 
     /** Dust Flick lvl 5: every landed hit sands down the victim's Attack. */
     onHit(unit, target) {
-      if (target && target.uid != null && abilityIdx(unit, "basic") >= MAX_IDX) {
+      if (target && !hasRule(target, "ignoresOnHitEffects") && abilityIdx(unit, "basic") >= MAX_IDX) {
         applyStatMod(target, { kind: "atk", pct: -ATK_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
       return 0;
@@ -103,7 +104,7 @@ export function makeDustlingModule(cfg) {
     },
 
     special(unit, ctx) {
-      const { aliveP, aliveE, boss, newFx, now } = ctx;
+      const { aliveP, aliveE, newFx, now } = ctx;
       const idx = abilityIdx(unit, "special");
       const heal = specialHealByLevel[idx];
       const blinds = idx >= MAX_IDX;
@@ -117,26 +118,15 @@ export function makeDustlingModule(cfg) {
       // full amount, so it is not also healed for half.
       for (const a of aliveP) {
         if (a.uid === centre.uid || a.hp <= 0) continue;
-        if (aChebDist(centre.row, centre.col, a.row, a.col) > SPLASH_RANGE) continue;
+        if (unitDist(centre, a) > SPLASH_RANGE) continue;
         healUnit(a, heal / 2);
         newFx.push({ id: now + "pva" + unit.uid + a.uid, row: a.row, col: a.col, t: now, isHeal: true, fromRow: centre.row, fromCol: centre.col, isEnemy: !!ctx.isEnemySide });
       }
       for (const e of aliveE) {
-        if (aChebDist(centre.row, centre.col, e.row, e.col) > SPLASH_RANGE) continue;
+        if (unitDist(centre, e) > SPLASH_RANGE) continue;
         applyStatMod(e, { kind: "heal", pct: -HEAL_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
         if (blinds) applyBlind(e);
         newFx.push({ id: now + "pve" + unit.uid + e.uid, row: e.row, col: e.col, t: now, isRanged: false, fromRow: centre.row, fromCol: centre.col, isEnemy: !!ctx.isEnemySide });
-      }
-      if (boss && boss.hp > 0) {
-        // The boss reads stat mods, so Healing Down sticks; Blind does not,
-        // since boss swings don't run through the unit attack path.
-        let overlaps = false;
-        for (let dr = -SPLASH_RANGE; dr <= SPLASH_RANGE && !overlaps; dr++) {
-          for (let dc = -SPLASH_RANGE; dc <= SPLASH_RANGE && !overlaps; dc++) {
-            if (bossOccupies(boss, centre.row + dr, centre.col + dc)) overlaps = true;
-          }
-        }
-        if (overlaps) applyStatMod(boss, { kind: "heal", pct: -HEAL_DOWN_PCT, src: unit.uid, ticks: STATUS_TICKS });
       }
     },
 

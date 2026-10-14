@@ -11,6 +11,14 @@ import { DEV_MODE } from "../../config.js";
 
 const PURPLE="#534AB7";const GOLD="#d97706";const NODE_COL_W=56;const BOX_MAX=200;
 
+/** How long the gift stays on Home once its 10th day's reward is claimed. */
+export const NEW_PLAYER_GIFT_GRACE_MS=24*60*60*1000;
+/** Has the gift gone away for good? (its countdown -- newPlayerGiftEndsAt --
+ * started and ran out; 0 means it ended before the countdown existed). */
+export function newPlayerGiftGone(endsAt,now=Date.now()){
+  return endsAt!=null&&now>=endsAt;
+}
+
 function NewPlayerGiftScreen({onBack}){
   const {
     setCurrencies,
@@ -19,12 +27,30 @@ function NewPlayerGiftScreen({onBack}){
     newPlayerGiftDoubled, setNewPlayerGiftDoubled,
     newPlayerGiftClaimed, setNewPlayerGiftClaimed,
     newPlayerGiftPaidClaimed, setNewPlayerGiftPaidClaimed,
+    newPlayerGiftEndsAt, setNewPlayerGiftEndsAt,
+    newPlayerGiftLastChanceSeen, setNewPlayerGiftLastChanceSeen,
   } = useGame();
   const [rewardItems,setRewardItems]=React.useState(null);
   const [visibleCount,setVisibleCount]=React.useState(0);
   const [rewardPopup,setRewardPopup]=React.useState(null);
+  const [lastChanceOpen,setLastChanceOpen]=React.useState(false);
   const today=easternNoonDayKey();
   const LEN=NEW_PLAYER_GIFT_REWARDS.length;
+  // Claiming the 10th day's reward starts the 24-hour countdown after which
+  // the gift leaves Home for good (shown above its Home button). Started once;
+  // a later claim never pushes it back.
+  function startCountdownIfLastDay(claimedIdx){
+    if(claimedIdx===LEN-1&&newPlayerGiftEndsAt==null)setNewPlayerGiftEndsAt(Date.now()+NEW_PLAYER_GIFT_GRACE_MS);
+  }
+  // Last chance to upgrade: the first visit to this page once the 10th day
+  // has unlocked opens with an offer (unless Premium is already bought) --
+  // the page and its Premium column go away once the gift ends. Shown once
+  // ever (newPlayerGiftLastChanceSeen is saved), after the day check below
+  // has moved the frontier.
+  React.useEffect(()=>{
+    if(newPlayerGiftLastChanceSeen||newPlayerGiftDoubled)return;
+    if(newPlayerGiftDay>=LEN-1){setNewPlayerGiftLastChanceSeen(true);setLastChanceOpen(true);}
+  },[newPlayerGiftDay,newPlayerGiftDoubled,newPlayerGiftLastChanceSeen]);
   // newPlayerGiftDay is the FRONTIER: how many days have unlocked so far.
   // Advances by exactly one real day per visit on a new calendar day (never
   // more, matching the old single-claim-per-visit pacing -- absence doesn't
@@ -55,6 +81,7 @@ function NewPlayerGiftScreen({onBack}){
     const reward=NEW_PLAYER_GIFT_REWARDS[i].reward;
     applyRewards(setCurrencies,reward);
     setNewPlayerGiftClaimed(prev=>{const a=[...prev];a[i]=true;return a;});
+    startCountdownIfLastDay(i);
     setRewardItems(Object.entries(reward));
     setVisibleCount(0);
   }
@@ -84,6 +111,7 @@ function NewPlayerGiftScreen({onBack}){
     });
     if(!any)return;
     applyRewards(setCurrencies,granted);
+    if(newPlayerGiftDay>=LEN-1&&!newPlayerGiftClaimed[LEN-1])startCountdownIfLastDay(LEN-1);
     setNewPlayerGiftClaimed(prev=>prev.map((c,i)=>i<=newPlayerGiftDay?true:c));
     if(newPlayerGiftDoubled)setNewPlayerGiftPaidClaimed(prev=>prev.map((c,i)=>i<=newPlayerGiftDay?true:c));
     setRewardItems(Object.entries(granted));
@@ -100,6 +128,17 @@ function NewPlayerGiftScreen({onBack}){
   // repeated presses genuinely stack, each one revealing another day's
   // rewards as claimable so bulk-testing Collect All is possible.
   function debugAdvanceDay(){setNewPlayerGiftDay(d=>Math.min(LEN,d+1));}
+  // The last-chance upgrade offer (see the effect above). Upgrading unlocks
+  // the Premium reward of every unlocked day, already-claimed days included.
+  const lastChancePopup=lastChanceOpen&&!newPlayerGiftDoubled&&React.createElement("div",{onClick:()=>setLastChanceOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
+    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"26px 22px 20px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
+      React.createElement("div",{style:{fontSize:46,lineHeight:1,marginBottom:10}},"✨"),
+      React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111",marginBottom:8}},"Last chance to upgrade!"),
+      React.createElement("div",{style:{fontSize:14,color:"#555",lineHeight:1.5}},"Upgrade now to double all rewards including the days you've already claimed"),
+      React.createElement("button",{onClick:()=>{purchaseDouble();setLastChanceOpen(false);},style:{width:"100%",marginTop:18,padding:"12px 0",borderRadius:14,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#f59e0b,#f97316)",color:"#fff",fontWeight:700,fontSize:14,boxShadow:"0 4px 16px rgba(249,115,22,0.3)"}},"✨ Double All Rewards — $4.99"),
+      React.createElement("button",{onClick:()=>setLastChanceOpen(false),style:{width:"100%",marginTop:8,padding:"10px 0",borderRadius:12,border:"none",cursor:"pointer",background:"none",color:"#888",fontWeight:700,fontSize:13}},"Maybe later")
+    )
+  );
   const popup=rewardPopup&&React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
     React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
       React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},iconText(rewardPopup.emoji||REWARD_LABELS[rewardPopup.key]?.split(" ")[0]||"🎁")),
@@ -240,7 +279,8 @@ function NewPlayerGiftScreen({onBack}){
       ),
       finished&&React.createElement("div",{style:{marginTop:16,textAlign:"center",fontSize:13,color:"#aaa",fontWeight:600}},"🏆 New player gift complete")
     ),
-    popup
+    popup,
+    lastChancePopup
   );
 }
 

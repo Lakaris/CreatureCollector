@@ -12,7 +12,7 @@ export function CurrencyChip({ emoji, value }) {
   );
 }
 
-function ScreenHeader({ title, onBack, backDisabled, right, edgeToEdge = true }) {
+function ScreenHeader({ title, onBack, backDisabled, left, right, edgeToEdge = true }) {
   return React.createElement("div", {
     style: {
       display: "flex", alignItems: "center", gap: 12,
@@ -27,6 +27,9 @@ function ScreenHeader({ title, onBack, backDisabled, right, edgeToEdge = true })
       disabled: backDisabled,
       style: { background: "none", border: "none", cursor: backDisabled ? "not-allowed" : "pointer", fontSize: 20, color: backDisabled ? "#ccc" : "#555", padding: 0, lineHeight: 1 }
     }, React.createElement("i", { className: "ti ti-arrow-left" })),
+    // Buttons on the left (Home's Settings and Daily). Not inside the title,
+    // whose overflow is hidden for its ellipsis and would clip round buttons.
+    left && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0 } }, left),
     // Single line + ellipsis so a wide right side (badges, dev pills) can
     // never wrap the title and change the bar's height.
     React.createElement("div", { style: { fontSize: 18, fontWeight: 700, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, title),

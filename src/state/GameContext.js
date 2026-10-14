@@ -448,6 +448,17 @@ export function GameProvider({ children }) {
   // battlepassClaimed/battlepassPaidClaimed.
   const [newPlayerGiftClaimed, setNewPlayerGiftClaimed] = useState(() => initialSave?.newPlayerGiftClaimed ?? Array(10).fill(false));
   const [newPlayerGiftPaidClaimed, setNewPlayerGiftPaidClaimed] = useState(() => initialSave?.newPlayerGiftPaidClaimed ?? Array(10).fill(false));
+  // When the gift's Home button goes away for good (a timestamp): 24 hours
+  // after the 10th day's reward is claimed -- see NewPlayerGiftScreen. null =
+  // the countdown hasn't started. A save from before this existed that had
+  // already finished the gift (10th day unlocked and claimed, button already
+  // gone) starts out expired (0), so that button doesn't come back.
+  // The Welcome Gift's "Last chance to upgrade!" popup has been shown -- it
+  // only ever appears once (see NewPlayerGiftScreen).
+  const [newPlayerGiftLastChanceSeen, setNewPlayerGiftLastChanceSeen] = useState(() => initialSave?.newPlayerGiftLastChanceSeen ?? false);
+  const [newPlayerGiftEndsAt, setNewPlayerGiftEndsAt] = useState(() =>
+    initialSave?.newPlayerGiftEndsAt !== undefined ? initialSave.newPlayerGiftEndsAt
+    : initialSave && (initialSave.newPlayerGiftDay ?? 0) >= 10 && initialSave.newPlayerGiftClaimed?.[9] ? 0 : null);
   const [dailyMissionsDate, setDailyMissionsDate] = useState(() => initialSave?.dailyMissionsDate ?? null);
   const [dailyMissionsSnapshot, setDailyMissionsSnapshot] = useState(() => initialSave?.dailyMissionsSnapshot ?? {
     eggsHatched: 0, dungeonsCleared: 0, arenaFights: 0,
@@ -538,7 +549,7 @@ export function GameProvider({ children }) {
     dungeonBossLevels, passRechargeCount, lastDungeonPassGain, lastPassRechargeReset, dailyBossData, dailyBossLevel, dungeonsUnlocked, dailyBossUnlocked, arenaUnlocked, treasureUnlocked, dungeonStarterPackPurchased, newFeaturePillsSeen,
     eggsHatched, dungeonsCleared, dungeonAutoFights, arenaFights, labyrinthFights, bananasUsed, candyUsed, dailyBossFights, plotsGrown, fieldHarvests,
     petLevelUps, equipLevelUps, fertilizerUsed, everCompletedDailyQuests,
-    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, dailyClaimed, dailyClaimedCycle, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, newPlayerGiftClaimed, newPlayerGiftPaidClaimed, dailyMissionsDate, dailyMissionsSnapshot,
+    questBatchIdx, claimedQuests, dailyDay, dailyLastClaimed, dailyClaimed, dailyClaimedCycle, newPlayerGiftDay, newPlayerGiftLastClaimed, newPlayerGiftDoubled, newPlayerGiftClaimed, newPlayerGiftPaidClaimed, newPlayerGiftEndsAt, newPlayerGiftLastChanceSeen, dailyMissionsDate, dailyMissionsSnapshot,
     dailyMissionsDone, dailyCompletionClaimed, dailySelectedMissions, lastFreeBananaDate,
     battlepassLastReset, battlepassClaimed, battlepassPaidClaimed, battlepassPremium, battlepassPoints,
     collectedTreasures, completedTreasureSets,
@@ -708,6 +719,7 @@ export function GameProvider({ children }) {
     newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed,
     newPlayerGiftDoubled, setNewPlayerGiftDoubled,
     newPlayerGiftClaimed, setNewPlayerGiftClaimed, newPlayerGiftPaidClaimed, setNewPlayerGiftPaidClaimed,
+    newPlayerGiftEndsAt, setNewPlayerGiftEndsAt, newPlayerGiftLastChanceSeen, setNewPlayerGiftLastChanceSeen,
     dailyMissionsDate, setDailyMissionsDate,
     dailyMissionsSnapshot, setDailyMissionsSnapshot,
     dailyMissionsDone, setDailyMissionsDone,

@@ -98,7 +98,12 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
   if(selected&&owned[selected])return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
     pendingEvo&&React.createElement("div",{className:"modal-overlay"},
       React.createElement("div",{className:"modal-box"},
-        React.createElement("span",{className:"modal-emoji"},pendingEvo.toEmoji),
+        // The new form as the player will see it -- an equipped skin shows in
+        // its new form's version (see the evolve in CreatureDetail).
+        React.createElement("div",{className:"modal-emoji",style:{display:"flex",justifyContent:"center"}},
+          owned[pendingEvo.newId]
+            ?React.createElement(CreatureIcon,{def:CREATURE_MAP[pendingEvo.newId],ownedData:owned[pendingEvo.newId],unlockedSkins:unlockedSkins||[],size:72})
+            :pendingEvo.toEmoji),
         React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:4}},pendingEvo.toName),
         React.createElement("p",{style:{fontSize:14,color:"#444",marginBottom:12,lineHeight:1.6}},
           pendingEvo.fromName+" has evolved into "+pendingEvo.toName+"!"
@@ -126,7 +131,7 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
         // swipe order too or the evolved creature would fall out of the list
         // (indexOf -1) and swiping would dead-end until the detail is closed.
         setFrozenNavIds(prev=>prev?prev.map(id=>id===selected?newId:id):prev);
-        setSelected(newId);setPendingEvo({fromName,toName,toEmoji,statsBefore,statsAfter});
+        setSelected(newId);setPendingEvo({newId,fromName,toName,toEmoji,statsBefore,statsAfter});
       },
       onBananaUsed,
       onCandyUsed,

@@ -4,6 +4,7 @@ import React, { useState } from "../../../react.js";
 import { useGame } from "../../../state/GameContext.js";
 import { SKIN_TIER_CONFIG, SKIN_FAIL_SHARDS } from "../../../data/rarity.js";
 import { getChain, getSkinsForCreature } from "../../../core/creatures.js";
+import { CREATURE_MAP } from "../../../data/creatures.js";
 import { rollSkinForCreature } from "../../../core/gacha.js";
 
 function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep}){
@@ -81,6 +82,26 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
   }
 
   const activeSkinId=ownedData.activeSkin&&ownedData.activeSkin.setId;
+  // Which stage's look is being worn -- this creature's own unless an
+  // earlier evolution's was picked below.
+  const activeStage=(ownedData.activeSkin&&ownedData.activeSkin.variantId)||def.id;
+  // The stages this creature can look like: its own and every earlier one in
+  // its line (never a stage it hasn't reached). Purely cosmetic.
+  const lookStages=chain.slice(0,Math.max(0,chain.indexOf(def.id))+1);
+  // A row of small buttons, one per stage, under the active card: the Default
+  // card's picks an earlier evolution's default look, a skin's picks that
+  // stage's version of the skin.
+  const stageRow=(emojiOf,onPick,isActive)=>lookStages.length>1&&React.createElement("div",{className:"variant-row"},
+    lookStages.map(cid=>{
+      const emoji=emojiOf(cid);
+      if(!emoji)return null;
+      return React.createElement("button",{
+        key:cid,title:CREATURE_MAP[cid]?.name,
+        className:"variant-btn"+(isActive(cid)?" active-var":""),
+        onClick:e=>{e.stopPropagation();onPick(cid);}
+      },emoji);
+    })
+  );
 
   return React.createElement("div",{className:"card",style:{marginBottom:10}},
     React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
@@ -174,12 +195,14 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
     ),
     React.createElement("div",{className:"skin-grid"},
       React.createElement("div",{
-        className:"skin-card"+(activeSkinId===null?" active-skin":""),
+        className:"skin-card"+(!activeSkinId?" active-skin":""),
         onClick:clearSkin
       },
-        React.createElement("div",{className:"skin-emoji"},def.emoji),
+        React.createElement("div",{className:"skin-emoji"},(CREATURE_MAP[activeSkinId?def.id:activeStage]||def).emoji),
         React.createElement("div",{className:"skin-name"},"Default"),
-        React.createElement("span",{className:"badge badge-common"},"Base")
+        React.createElement("span",{className:"badge badge-common"},"Base"),
+        // An earlier evolution's default look (setId null + that stage).
+        !activeSkinId&&stageRow(cid=>CREATURE_MAP[cid]?.emoji,cid=>cid===def.id?clearSkin():selectSkin(null,cid),cid=>cid===activeStage)
       ),
       chainSkins.map(skin=>{
         const unlocked=unlockedSkins.includes(skin.id);
@@ -195,15 +218,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
           React.createElement("div",{className:"skin-name"},skin.name),
           React.createElement("span",{className:"badge "+SKIN_TIER_CONFIG[skin.tier].color},SKIN_TIER_CONFIG[skin.tier].label),
           !unlocked&&React.createElement("div",{style:{fontSize:10,color:"#888",marginTop:3}},"🔮 "+cost),
-          isActive&&chain.length>1&&React.createElement("div",{className:"variant-row"},
-            chain.filter(cid=>skin.appearances[cid]).map(cid=>
-              React.createElement("button",{
-                key:cid,
-                className:"variant-btn"+(ownedData.activeSkin&&ownedData.activeSkin.variantId===cid?" active-var":""),
-                onClick:e=>{e.stopPropagation();selectSkin(skin.id,cid);}
-              },skin.appearances[cid].emoji)
-            )
-          )
+          isActive&&stageRow(cid=>skin.appearances[cid]?.emoji,cid=>selectSkin(skin.id,cid),cid=>cid===activeStage)
         );
       })
     ),

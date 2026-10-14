@@ -9,6 +9,19 @@ import { easternNoonDayKey } from "../../core/dates.js";
 import { formatNum } from "../../core/format.js";
 import { DEV_MODE } from "../../config.js";
 
+/**
+ * Is a Daily reward waiting to be claimed? True while any day the calendar
+ * has reached is still unclaimed, and on a new day the screen hasn't been
+ * opened for yet -- opening it then always unlocks a day (see the frontier
+ * effect in DailyScreen). Drives the red dot on Home's Daily button.
+ */
+export function dailyRewardWaiting({ dailyDay, dailyLastClaimed, dailyClaimed }) {
+  if (dailyLastClaimed !== easternNoonDayKey()) return true;
+  const cycleSlot = (dailyDay || 0) % 30;
+  for (let i = 0; i <= cycleSlot; i++) if (!(dailyClaimed || [])[i]) return true;
+  return false;
+}
+
 function DailyScreen({onBack}){
   const {
     setCurrencies,

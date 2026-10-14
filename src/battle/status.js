@@ -8,7 +8,7 @@ import { aChebDist, unitDist } from "./geometry.js";
 // constants.js imports nothing, so this cannot cycle.
 import { STATUS_TICKS } from "./constants.js";
 import { isBoss, isImmune, hasRule } from "./classifications.js";
-import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, sameSide, extraAllyFor, asSpread, battleRoster, shieldAmount, battleTick, gearTriggers, asEffect } from "./applier.js";
+import { debuffTicks, buffTicks, debuffStacks, buffStacks, withApplier, resistsDebuff, effectiveness, asPassive, currentApplier, activeAbilityOf, sameSide, extraAllyFor, asSpread, battleRoster, shieldAmount, battleTick, gearTriggers, asEffect } from "./applier.js";
 import { onDisplaced } from "./immobilize.js";
 // damage.js imports this module too; defenseOf is only called at run time,
 // never while either module is loading, so the cycle is safe.
@@ -72,13 +72,85 @@ export function tickStatusEffects(aliveP, boss, newFx, now) {
  * The damage it ticks scales off `burnSourceAtk`, the latest applier's ATK.
  * (The fire boss writes its own boss-ATK Burn directly; bosses wear no gear.)
  */
-export const BURN_STACK_CAP = 10;
+/**
+ * POLICY: an effect's stacks come from SOURCES, and a source is one
+ * creature's one ability -- its Basic, its Special or its Passive. Each source
+ * holds at most one stack of an effect on a target (or the number its own
+ * text names, e.g. "inflict 2 stacks"): applying it again only refreshes the
+ * timer. So a creature with Poison on its Basic and its Special can keep two
+ * stacks of Poison on one enemy, and two creatures four. Gear an ability's hit
+ * triggers counts as part of that ability; the Chalices' extra stack adds one
+ * to whatever the source holds.
+ *
+ * Covers the stat mods (applyStatMod) and the counter debuffs -- Burn,
+ * Poison, Damage Over Time, Frostbite and Expose (landSourceStacks below).
+ * Mechanics that ARE a build-up stay counters: Restrained (Overload Sting
+ * fires at 20), Fortify, Protect.
+ */
+export function effectSourceKey() {
+  const a = currentApplier();
+  if (!a) return "env";
+  return a.uid + ":" + (activeAbilityOf(a) || "other") + sourceSuffix;
+}
+
+/**
+ * Run `fn` with its effects landing as a SEPARATE source of the same ability
+ * -- a granted rider that is "an additional stack" on top of what the ability
+ * itself inflicts (Kindled Brood's Burn: an ability that already Burns lays
+ * a second stack). Only counter debuffs read it (landSourceStacks).
+ */
+let sourceSuffix = "";
+export function withSourceSuffix(suffix, fn) {
+  const prev = sourceSuffix;
+  sourceSuffix = prev + suffix;
+  try {
+    return fn();
+  } finally {
+    sourceSuffix = prev;
+  }
+}
+
+/**
+ * Land `n` stacks of a counter debuff (`field`, timed by `ticksField`) from
+ * the current source, capped at `cap`. The source's earlier stacks count
+ * toward its `n`, so reapplying only adds what it doesn't already hold.
+ * Stacks are tallied per source in `_<field>Src`, reset whenever the effect
+ * is not running (expired, dispelled, consumed). Call BEFORE refreshing the
+ * timer. Returns how many new stacks landed.
+ */
+function landSourceStacks(u, field, ticksField, n, cap) {
+  const mapKey = "_" + field + "Src";
+  const running = (u[ticksField] || 0) > 0;
+  if (!running || !u[mapKey]) u[mapKey] = {};
+  const bySource = u[mapKey];
+  const k = effectSourceKey();
+  const held = bySource[k] || 0;
+  const add = Math.max(0, n - held);
+  if (add) bySource[k] = n;
+  u[field] = Math.min(cap, (running ? u[field] || 0 : 0) + add);
+  return add;
+}
+
+/** Listeners for a Burn attempted on a target already at max stacks --
+ * `fn(applier, target)`, true to consume the attempt. Registered at load by
+ * the ability modules (Alarm Pheromone), like onHitLanded. */
+const burnAtCapListeners = [];
+export function onBurnAtCap(fn) {
+  burnAtCapListeners.push(fn);
+}
+
+export const BURN_STACK_CAP = 5;
 export function applyBurn(target, sourceAtk) {
+  // An attempt on a target already at max stacks may be answered instead
+  // (Alarm Pheromone's detonation): a listener returning true consumes it.
+  if ((target.burnTicks || 0) > 0 && (target.burnStacks || 0) >= BURN_STACK_CAP) {
+    for (const fn of burnAtCapListeners) if (fn(currentApplier(), target)) return;
+  }
   if (resistsDebuff(target)) return;
   const fresh = !((target.burnTicks || 0) > 0);
   debuffLanded(target, fresh);
+  landSourceStacks(target, "burnStacks", "burnTicks", debuffStacks(target, 1), BURN_STACK_CAP);
   target.burnTicks = debuffTicks(target, STATUS_TICKS, "burn");
-  target.burnStacks = Math.min((target.burnStacks || 0) + debuffStacks(target, 1), BURN_STACK_CAP);
   target.burnSourceAtk = sourceAtk;
   // Who inflicted it -- the latest applier, like the source ATK -- for gear
   // that reads its own Burns (Ashen Locket, Everflame Crown).
@@ -96,6 +168,10 @@ export function applyBurn(target, sourceAtk) {
  * `damage` deals the tick (damageUnit); `fallback` is the
  * damage when no source ATK was stored (the fire boss's own Burn). Returns
  * whether it ticked.
+ * Each stack ticks for another BURN_ATK_RATE of the latest burner's Attack,
+ * like Poison and Damage Over Time per stack (keep the Burn tag's `stacking`
+ * in core/abilityText.js in sync). The fallback is flat -- the boss's own Burn
+ * has no stacks.
  *   - Everflame Crown: its source's Burn deals more.
  *   - Ashen Locket: its source recovers Health per tick.
  */
@@ -103,7 +179,7 @@ export const BURN_ATK_RATE = 0.035;
 export function tickBurn(u, damage, fallback) {
   if (!((u.burnTicks || 0) > 0)) return false;
   const src = u.burnSource || null;
-  let dmg = u.burnSourceAtk ? Math.max(1, Math.round(u.burnSourceAtk * BURN_ATK_RATE)) : fallback;
+  let dmg = u.burnSourceAtk ? Math.max(1, Math.round(u.burnSourceAtk * BURN_ATK_RATE * Math.max(1, u.burnStacks || 0))) : fallback;
   const more = src?.gear?.burnDmgPct || 0;
   if (more) dmg = Math.max(1, Math.round(dmg * (1 + more / 100)));
   damage(dmg);
@@ -212,7 +288,7 @@ export const EXPOSE_STACK_CAP = 5;
 export function applyExpose(u, stacks = 1) {
   if (!u || resistsDebuff(u)) return;
   debuffLanded(u, !((u.exposeTicks || 0) > 0));
-  u.exposeStacks = Math.min(EXPOSE_STACK_CAP, ((u.exposeTicks || 0) > 0 ? u.exposeStacks || 0 : 0) + debuffStacks(u, stacks));
+  landSourceStacks(u, "exposeStacks", "exposeTicks", debuffStacks(u, stacks), EXPOSE_STACK_CAP);
   u.exposeTicks = debuffTicks(u, STATUS_TICKS);
   mirrorDebuff(u, (m) => applyExpose(m, stacks));
 }
@@ -496,7 +572,7 @@ export function transferDebuffs(from, to) {
   });
   for (const m of from.statMods || []) {
     if (m.pct >= 0) continue;
-    land(!!to.statMods && to.statMods.some((x) => sameEffect(x, m.kind, m.pct)), () => pushStatMod(to, m.kind, m.pct, m.src, T));
+    land(!!to.statMods && to.statMods.some((x) => sameEffect(x, m.kind, m.pct, m.exact)), () => pushStatMod(to, m.kind, m.pct, m.src, T, m.exact));
   }
   if (from.seeded && from.seededBy && from.seededBy.hp > 0 && from.seededBy !== to) {
     const seeder = from.seededBy;
@@ -759,6 +835,7 @@ export function countBuffs(u) {
   if (u.aura) n++;
   if ((u.immortalTicks || 0) > 0) n++;
   if ((u.intangibleTicks || 0) > 0) n++;
+  if ((u.kindledTicks || 0) > 0) n++;
   if ((u.windbreakTicks || 0) > 0) n++;
   return n;
 }
@@ -842,9 +919,12 @@ const STACK_TABLES = {
   "def-": [15, 20, 25, 30, 40],
 };
 
-/** Same stat, same direction = the same effect for stacking/cap purposes. */
-function sameEffect(a, kind, pct) {
-  return a.kind === kind && (a.pct < 0) === (pct < 0);
+/** Same stat, same direction = the same effect for stacking/cap purposes. An
+ * `exact` mod (a kit's own named percentage, e.g. Venom Barbs' "5% less
+ * Attack") is its own effect: it never counts as an Attack Down / Defense Down
+ * stack, and its percent is used as written instead of STACK_TABLES. */
+function sameEffect(a, kind, pct, exact = false) {
+  return a.kind === kind && (a.pct < 0) === (pct < 0) && !!a.exact === !!exact;
 }
 
 /**
@@ -852,11 +932,17 @@ function sameEffect(a, kind, pct) {
  * `src` is the applier's uid; anything falsy is treated as one shared
  * anonymous source.
  */
-export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false }) {
+export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false, exact = false }) {
   if (!pct) return;
   if (pct < 0 && resistsDebuff(u, { environmental })) return;
   if (pct < 0 && kind === "haste" && isImmune(u, "hastedown")) return;
   if (pct < 0 && kind === "spd" && isImmune(u, "speeddown")) return;
+  // One stack per ABILITY (see effectSourceKey): a source given as the
+  // acting creature itself is narrowed to the ability it is using, so its
+  // Basic and its Special each hold their own stack. Named sub-sources
+  // ("aura"+uid, ":curse", ":mirror") are left as they are.
+  const a = currentApplier();
+  if (a && src === a.uid) { const ab = activeAbilityOf(a); if (ab) src = a.uid + ":" + ab; }
   const baseTicks = ticks;
   // Duration and extra-stack gear on whoever is applying this (see
   // battle/applier.js). The Chalices' extra stack is the one exception to
@@ -867,11 +953,11 @@ export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = fals
   const debuff = pct < 0;
   if (!holdDuration) ticks = debuff ? debuffTicks(u, ticks) : buffTicks(u, ticks);
   const stacks = debuff ? debuffStacks(u, 1) : buffStacks(u, 1);
-  const had = !!u.statMods && u.statMods.some((m) => sameEffect(m, kind, pct));
-  let added = pushStatMod(u, kind, pct, src, ticks);
-  for (let i = 1; i < stacks; i++) added = pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks) || added;
+  const had = !!u.statMods && u.statMods.some((m) => sameEffect(m, kind, pct, exact));
+  let added = pushStatMod(u, kind, pct, src, ticks, exact);
+  for (let i = 1; i < stacks; i++) added = pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks, exact) || added;
   if (debuff) debuffLanded(u, added && !had);
-  if (debuff && !environmental) mirrorDebuff(u, (m) => applyStatMod(m, { kind, pct, src: u.uid + ":mirror", ticks: baseTicks, holdDuration }));
+  if (debuff && !environmental) mirrorDebuff(u, (m) => applyStatMod(m, { kind, pct, src: u.uid + ":mirror", ticks: baseTicks, holdDuration, exact }));
   // Cantor's Beads: this ability use's buff reaches one more ally, once per
   // stat (never a while-active stack -- those are re-stamped every tick and
   // would never fall off).
@@ -912,17 +998,17 @@ export function applyWhileActiveStatMod(u, { kind, pct, src }) {
 
 /** One source's stack: refresh it if present, else add it within the cap.
  * Returns true when a NEW stack landed (not a refresh, not refused at cap). */
-function pushStatMod(u, kind, pct, src, ticks) {
+function pushStatMod(u, kind, pct, src, ticks, exact = false) {
   const mods = (u.statMods ||= []);
-  const mine = mods.find((m) => sameEffect(m, kind, pct) && m.src === src);
+  const mine = mods.find((m) => sameEffect(m, kind, pct, exact) && m.src === src);
   if (mine) { mine.pct = pct; mine.ticks = ticks; return false; }
-  const stacks = mods.filter((m) => sameEffect(m, kind, pct));
+  const stacks = mods.filter((m) => sameEffect(m, kind, pct, exact));
   if (stacks.length >= STAT_MOD_STACK_CAP) {
     const weakest = stacks.reduce((a, b) => (Math.abs(a.pct) <= Math.abs(b.pct) ? a : b));
     if (Math.abs(pct) <= Math.abs(weakest.pct)) return false;
     mods.splice(mods.indexOf(weakest), 1);
   }
-  mods.push({ kind, pct, src, ticks });
+  mods.push(exact ? { kind, pct, src, ticks, exact: true } : { kind, pct, src, ticks });
   return true;
 }
 
@@ -938,8 +1024,9 @@ export function statModMultiplier(u, kind) {
     const stacks = u.statMods.filter((m) => m.kind === kind && (m.pct < 0) === negative);
     if (!stacks.length) continue;
     const table = STACK_TABLES[kind + (negative ? "-" : "+")];
-    if (table) sum += (negative ? -1 : 1) * table[Math.min(stacks.length, table.length) - 1];
-    else for (const m of stacks) sum += m.pct;
+    const tabled = table ? stacks.filter((m) => !m.exact) : [];
+    if (tabled.length) sum += (negative ? -1 : 1) * table[Math.min(tabled.length, table.length) - 1];
+    for (const m of stacks) if (!table || m.exact) sum += m.pct;
   }
   const mult = 1 + sum / 100;
   // Speed keeps a floor so stacked slows can never freeze a unit outright;
@@ -950,7 +1037,14 @@ export function statModMultiplier(u, kind) {
 /** Active stack count for one effect (kind + direction); for the info panel. */
 export function statModStacks(u, kind, negative) {
   if (!u.statMods) return 0;
-  return u.statMods.filter((m) => m.kind === kind && (m.pct < 0) === negative).length;
+  return u.statMods.filter((m) => m.kind === kind && (m.pct < 0) === negative && !m.exact).length;
+}
+
+/** Summed percent of the `exact` mods on one stat (see sameEffect) -- they are
+ * not stacks of the named effect, so the info panel shows them as a percent. */
+export function exactStatModPct(u, kind) {
+  if (!u.statMods) return 0;
+  return u.statMods.reduce((sum, m) => (m.kind === kind && m.exact ? sum + m.pct : sum), 0);
 }
 
 /** True if any negative stat mod is active (they count as cleansable debuffs). */
@@ -1124,6 +1218,8 @@ export function tickTimedMods(u) {
   if ((u.rootTicks || 0) > 0 && !--u.rootTicks) u.rootUndispellable = false;
   if ((u.fearTicks || 0) > 0 && !--u.fearTicks) u.fearSourceUid = null;
   if ((u.intangibleTicks || 0) > 0) u.intangibleTicks--;
+  // Kindled (Kindled Brood): this creature's damage inflicts Burn.
+  if ((u.kindledTicks || 0) > 0) u.kindledTicks--;
   if ((u.markedTicks || 0) > 0) u.markedTicks--;
   if ((u.frostbiteTicks || 0) > 0) {
     u.frostbiteTicks--;
@@ -1248,7 +1344,7 @@ export function applyOverTime(u, flavor, stacks = 1) {
   if (resistsDebuff(u)) return;
   const f = OVER_TIME_FLAVORS[flavor];
   debuffLanded(u, !((u[f.ticks] || 0) > 0));
-  u[f.stacks] = Math.min(DOT_STACK_CAP, (u[f.stacks] || 0) + debuffStacks(u, stacks));
+  landSourceStacks(u, f.stacks, f.ticks, debuffStacks(u, stacks), DOT_STACK_CAP);
   // Hex Nail / Nettle Pin stretch their own flavor ("dot" / "poison").
   u[f.ticks] = debuffTicks(u, OVER_TIME_TICKS, flavor);
   // Pollen Pouch: its Poison carries a Healing Down (one stack from this
@@ -1257,7 +1353,20 @@ export function applyOverTime(u, flavor, stacks = 1) {
   if (flavor === "poison" && a && a !== u && a.gear?.poisonHealDown) {
     applyStatMod(u, { kind: "heal", pct: -GEAR_HEAL_DOWN_PCT, src: a.uid + ":pollen", ticks: STATUS_TICKS });
   }
+  if (flavor === "poison" && a && a !== u) for (const fn of poisonListeners) fn(a, u);
   mirrorDebuff(u, (m) => applyOverTime(m, flavor, stacks));
+}
+
+/**
+ * Kits that react to THEIR OWN Poison landing (Venom Barbs) register here --
+ * `fn(applier, target)` runs after every Poison a creature inflicts on another
+ * (not when resisted), from any of its abilities or its gear. Registered at
+ * load, the same pattern as onHitLanded in hp.js, so status.js never imports
+ * the ability modules.
+ */
+const poisonListeners = [];
+export function onPoisonInflicted(fn) {
+  poisonListeners.push(fn);
 }
 /** Healing Down magnitude for gear that inflicts it -- the kits' own 20%. */
 const GEAR_HEAL_DOWN_PCT = 20;
@@ -1316,7 +1425,7 @@ export const FROSTBITE_STACK_CAP = 5;
 export function applyFrostbite(u) {
   if (resistsDebuff(u)) return;
   debuffLanded(u, !((u.frostbiteTicks || 0) > 0));
-  u.frostbiteStacks = Math.min(FROSTBITE_STACK_CAP, (u.frostbiteStacks || 0) + debuffStacks(u, 1));
+  landSourceStacks(u, "frostbiteStacks", "frostbiteTicks", debuffStacks(u, 1), FROSTBITE_STACK_CAP);
   u.frostbiteTicks = debuffTicks(u, 6, "frostbite");
   mirrorDebuff(u, (m) => applyFrostbite(m));
   // Absolute Zero: reaching max stacks shatters them all into a brief Stun
@@ -1432,6 +1541,7 @@ export function dispelBuffs(u) {
   u.hotTicks = 0;
   u.hotAmount = 0;
   u.immortalTicks = 0;
+  u.kindledTicks = 0;
 }
 
 export function dispelDebuffs(u) {

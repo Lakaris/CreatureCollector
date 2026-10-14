@@ -298,7 +298,10 @@ function App() {
   // destination tab and never overlaps anything.
   function navHandoff(text, tabId, textBottom = 150) {
     const idx = TABS.findIndex((t) => t.id === tabId);
-    const leftPct = ((idx + 0.5) / TABS.length) * 100 + "vw";
+    // Percent, not vw: this is position:fixed inside the scaled app (see
+    // ui/uiScale.js), so a percentage tracks the nav bar it points at while a
+    // viewport unit drifts away from it whenever the app is scaled.
+    const leftPct = ((idx + 0.5) / TABS.length) * 100 + "%";
     return React.createElement(
       React.Fragment,
       null,

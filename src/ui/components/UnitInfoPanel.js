@@ -3,7 +3,7 @@
 // snapshot each render, so HP/debuffs stay live while it's open.
 
 import React from "../../react.js";
-import { statModStacks, overTimeStacks } from "../../battle/status.js";
+import { statModStacks, overTimeStacks, exactStatModPct } from "../../battle/status.js";
 import { protectStacks } from "../../battle/hp.js";
 
 /** The over-time debuffs (battle/status.js): one identical effect, two names,
@@ -33,6 +33,7 @@ export const DEBUFF_DEFS = [
   { key: "exposeStacks", icon: "🎯", label: "Exposed" },
   { key: "seeded", icon: "🌰", label: "Seeded" },
   { key: "hotTicks", icon: "💗", label: "Heal Over Time" },
+  { key: "kindledTicks", icon: "🐜", label: "Kindled" },
 ];
 
 /** Stackable stat modifiers (battle/status.js statMods): shown with a ×n
@@ -52,6 +53,8 @@ const STAT_MOD_ROWS = [
   { kind: "haste", negative: true, icon: "⏳", label: "Haste Down" },
   { kind: "critDmg", negative: false, icon: "💥", label: "Critical Damage Up" },
 ];
+
+const EXACT_STAT_ROWS = [["atk", "Attack", "📉"], ["def", "Defense", "🛡️"], ["spd", "Speed", "🐌"]];
 
 /** Build the status list UnitInfoPanel expects from a unit's raw tick fields. */
 export function debuffsFor(u) {
@@ -80,6 +83,12 @@ export function debuffsFor(u) {
   for (const r of STAT_MOD_ROWS) {
     const n = statModStacks(u, r.kind, r.negative);
     if (n > 0) rows.push({ key: r.kind + (r.negative ? "-" : "+"), icon: r.icon, label: r.label + (n > 1 ? " ×" + n : "") });
+  }
+  // A kit's own exact percentage (Venom Barbs' "5% less Attack") is not a
+  // stack of Attack Down, so it reads as the percent itself.
+  for (const [kind, name, icon] of EXACT_STAT_ROWS) {
+    const pct = exactStatModPct(u, kind);
+    if (pct) rows.push({ key: kind + "=", icon, label: name + " " + (pct > 0 ? "+" : "−") + Math.abs(pct) + "%" });
   }
   return rows;
 }

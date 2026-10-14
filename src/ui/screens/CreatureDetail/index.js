@@ -256,8 +256,12 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       e.shards=e.shards-shardsUsed;e.ascensions=newAsc;
       if(willEvolve){
         const evoDef=CREATURE_MAP[def.evolutionId];
+        // Evolving shows off the new form: an earlier stage's look (picked on
+        // the Skins tab) is dropped, and an equipped skin stays on in its new
+        // form's version.
+        const evoLook=e.activeSkin&&e.activeSkin.setId?{setId:e.activeSkin.setId,variantId:evoDef.id}:null;
         const evo={...makeOwnedCreature(evoDef),level:e.level,ascensions:e.ascensions,shards:e.shards,
-          abilityLevels:{...e.abilityLevels},nextStatIdx:e.nextStatIdx,activeSkin:e.activeSkin};
+          abilityLevels:{...e.abilityLevels},nextStatIdx:e.nextStatIdx,activeSkin:evoLook};
         const next={...prev};delete next[e.id];next[evoDef.id]=evo;
         return next;
       }

@@ -252,27 +252,33 @@ export const CREATURES=[
      special:{name:"Hunker In",charge:14,upgrades:["Gain 2 stacks of Fortify.","Gain 3 stacks of Fortify.","Gain 4 stacks of Fortify.","Gain 5 stacks of Fortify.","Gain 5 stacks of Fortify. When Fortify is removed, dispel all debuffs on this creature."]},
      unique:{name:"Windbreak",upgrades:["Nearby allies receive 2% less damage. Doubled while this creature has Fortify.","Nearby allies receive 4% less damage. Doubled while this creature has Fortify.","Nearby allies receive 7% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify.","Nearby allies receive 10% less damage. Doubled while this creature has Fortify. Inflict Frostbite when attacked."]}
    },role:"Tank",attackType:"Melee",evolutionOf:"frostkeep",shardsToAscend:18,ascensionsToEvolve:null},
-  // Nature line 2
+  // Water line -- Puddlet (heron) line. Spear Flurry's card number is the TOTAL
+  // of its 3 hits, the rule every multi-hit follows. Battle module:
+  // battle/playerAbilities/puddletLine.js.
+  //   - Skewer: the Pierced enemies are ONLY the ones behind the initial target
+  //     (the 1 -- 2 at max -- that the attack passes through). The "% more damage"
+  //     applies to those enemies alone; the initial target takes the hit as
+  //     normal.
   {id:"puddlet",name:"Puddlet",emoji:"🐣",type:"Water",rarity:"epic",description:"A fluffy heron hatchling with more legs than balance. It practices spear-fishing in puddles and mostly stabs its own reflection.",
    stats:{hp:53,atk:57,def:34,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers target for 0.5s"]},
-     special:{name:"Plunge Strike",charge:12,upgrades:["Dive; 30 dmg on impact","38 dmg","48 dmg","60 dmg","Also soaks target, slowing it 20% for 2s"]},
-     unique:{name:"Patient Hunter",upgrades:["Passive: +10% dmg to enemies below half HP","+14%","+18%","+24%","+30%; first strike each battle always crits"]}
+     basic:{name:"Beak Jab",upgrades:["14 dmg","18 dmg","23 dmg","29 dmg","29 dmg and inflict Defense Down"]},
+     special:{name:"Spear Flurry",charge:12,upgrades:["36 dmg","45 dmg","57 dmg","69 dmg","69 dmg. For each enemy hit, temporarily gain 1% Speed"]},
+     unique:{name:"Skewer",upgrades:["All attacks Pierce 1 enemy. Pierced enemies receive 5% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 10% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 15% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 20% more damage","All attacks Pierce 2 enemies. Pierced enemies receive 20% more damage"]}
    },role:"Attacker",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"wadewing"},
   {id:"wadewing",name:"Wadewing",emoji:"🐦",type:"Water",rarity:"epic",description:"Puddlet grown into its stilts. It stands motionless in the shallows until something forgets it's there.",
    stats:{hp:85,atk:91,def:54,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers target 0.5s"]},
-     special:{name:"Skimming Strike",charge:8,upgrades:["Skim; 34 dmg and knock the target back 1 tile","44 dmg","56 dmg","70 dmg","Knocks back 2 tiles"]},
-     unique:{name:"Stillwater Poise",upgrades:["Passive: after standing still for 2s, next attack deals +30% dmg","+40%","+50%","+65%","+80%; and cannot miss"]}
+     basic:{name:"Beak Jab",upgrades:["14 dmg","18 dmg","23 dmg","29 dmg","29 dmg and inflict Defense Down"]},
+     special:{name:"Spear Flurry",charge:12,upgrades:["36 dmg","45 dmg","57 dmg","69 dmg","69 dmg. For each enemy hit, temporarily gain 1% Speed"]},
+     unique:{name:"Skewer",upgrades:["All attacks Pierce 1 enemy. Pierced enemies receive 5% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 10% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 15% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 20% more damage","All attacks Pierce 2 enemies. Pierced enemies receive 20% more damage"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"puddlet",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"heronarch"},
   {id:"heronarch",name:"Heronarch",emoji:"🦢",type:"Water",rarity:"epic",description:"The river's crowned sentinel. Every strike is a single perfect line. Fish reportedly organize petitions about it.",
    stats:{hp:132,atk:140,def:88,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Beak Jab",upgrades:["10 dmg","13 dmg","17 dmg","22 dmg","Staggers 0.5s"]},
-     special:{name:"Tidal Lance",charge:8,upgrades:["Lance; 80 dmg to the target and the tile behind it","100 dmg","124 dmg","152 dmg","Hits everything in the row behind the target"]},
-     unique:{name:"River Sovereign",upgrades:["Passive: attacks deal +15% dmg and ignore 15% of DEF","+20% dmg; ignore 20%","+26% dmg; ignore 25%","+32% dmg; ignore 30%","+40% dmg; ignore 40%; once per battle, survives a killing blow at 1 HP"]}
+     basic:{name:"Beak Jab",upgrades:["14 dmg","18 dmg","23 dmg","29 dmg","29 dmg and inflict Defense Down"]},
+     special:{name:"Spear Flurry",charge:12,upgrades:["36 dmg","45 dmg","57 dmg","69 dmg","69 dmg. For each enemy hit, temporarily gain 1% Speed"]},
+     unique:{name:"Skewer",upgrades:["All attacks Pierce 1 enemy. Pierced enemies receive 5% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 10% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 15% more damage","All attacks Pierce 1 enemy. Pierced enemies receive 20% more damage","All attacks Pierce 2 enemies. Pierced enemies receive 20% more damage"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"wadewing",shardsToAscend:20,ascensionsToEvolve:null},
   // Earth line 2
   {id:"mudboar",name:"Mudboar",emoji:"🐗",type:"Earth",rarity:"common",description:"A stocky mud boar with rock-hard skin. It rolls into foes like a living boulder.",
@@ -369,8 +375,8 @@ export const CREATURES=[
   // bat is wearing (Bloodthirster's 20%, Vampiric Band's Overheal share). That
   // is deliberate: the passive is the reason to build lifesteal onto this line
   // rather than a flat number bolted to one ability. Route it through
-  // healUnit's `lifesteal` flag (battle/hp.js) when this line is implemented,
-  // so gear and ability drain both pick it up from one place.
+  // healUnit's `lifesteal` flag (battle/hp.js), so gear and ability drain both
+  // pick it up from one place. Battle module: battle/playerAbilities/dusklingLine.js.
   {id:"duskling",name:"Duskling",emoji:"🦇",type:"Dark",rarity:"common",description:"A palm-sized bat pup that roosts upside down in places nobody agreed to. It flickers in and out of shadow, mostly by accident.",
    stats:{hp:45,atk:45,def:22,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1113,26 +1119,34 @@ export const CREATURES=[
      special:{name:"Ancient Constrict",charge:14,upgrades:["Constrict all nearby; 110 dmg+DEF-30% 6s+poison 10/s 5s","132 dmg","158 dmg","190 dmg","Constrict silences; strip all buffs; poison can't be cured"]},
      unique:{name:"Forest Sovereign",upgrades:["Passive: poison always at max stacks; rooted foes +35% dmg; +25 HP/s per entangled enemy","Rooted +44%; +30/s","Rooted +54%; +36/s","Rooted +66%; +44/s","Rooted +80%; +54/s; Rootlord revives once growing a full forest that roots all enemies 4s+deals 200 poison dmg"]}
    },role:"Attacker",attackType:"Melee",evolutionOf:"thorncoil",shardsToAscend:20,ascensionsToEvolve:null},
-  // Nature line 2
-  {id:"sporolith",name:"Sporolith",emoji:"🧱",type:"Nature",rarity:"epic",description:"A golem built by the forest itself from centuries of accumulated moss. It is very slow and profoundly unkillable.",
+  // Nature line 2 -- Pricklet (poisonous crested porcupine) line. Ids keep the
+  // old Sporolith line's sporolith/stonewarden/jadolith. Battle module:
+  // battle/playerAbilities/prickletLine.js.
+  //   - Bristle Up's retaliation is a Reflect-type effect (it carries the
+  //     Reflect pill) but scales off this creature's Defense, not the damage
+  //     taken. "Temporarily" reads as the standard duration (STATUS_TICKS).
+  //   - Venom Barbs' Attack cut is a stat mod from this creature's Passive
+  //     (its own stack source, per the per-ability stacking policy).
+  {id:"sporolith",name:"Pricklet",emoji:"🦔",type:"Nature",rarity:"epic",description:"A crested porcupine kit whose quills are still soft enough to bend. The venom, unfortunately, came in right on schedule.",
    stats:{hp:129,atk:65,def:98,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Moss Slam",upgrades:["14 dmg; stagger 0.5s; heal 1 ally 18 HP","18 dmg","23 dmg","30 dmg","Stagger 1s; heal all allies 10 HP"]},
-     special:{name:"Living Moss",charge:10,upgrades:["Aura; all allies +20 HP/s 6s+DEF+40","Regen 28/s; DEF+55","Regen 36/s; DEF+72","Regen 46/s; DEF+90","Regen 58/s; DEF+110; also remove all debuffs from all allies"]},
-     unique:{name:"Ancient Moss",upgrades:["Passive: all allies +18 HP/s; -20 dmg taken by allies; Mossgolem immune to CC","Allies +24/s; -28 dmg","Allies +30/s; -36 dmg; Mossgolem CC immune","Allies +38/s; -46 dmg","Allies +48/s; -58 dmg; Nature allies heal 15 HP per ability cast; Mossgolem revives once healing all 80 HP"]}
+     basic:{name:"Barbed Jab",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg and inflict Poison"]},
+     special:{name:"Bristle Up",charge:10,upgrades:["Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 15% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 18% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 21% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense and inflict Poison on them"]},
+     unique:{name:"Venom Barbs",upgrades:["Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 5% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 10% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 15% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack. Whenever this creature is attacked by an enemy with max stacks of Poison, it dispels all debuffs on itself"]}
    },role:"Tank",attackType:"Melee",shardsToAscend:15,ascensionsToEvolve:10,evolutionId:"stonewarden"},
-  {id:"stonewarden",name:"Stonewarden",emoji:"🧱",type:"Nature",rarity:"epic",description:"Mossgolem's moss compressed into dense stone. It is slower now, and roughly five times harder to kill.",
+  {id:"stonewarden",name:"Bristlecrest",emoji:"🦔",type:"Nature",rarity:"epic",description:"Pricklet's crest has stiffened into a crown of barbed quills, every tip stained green. It raises them at anyone who stares too long.",
    stats:{hp:176,atk:89,def:134,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Moss Slam",upgrades:["14 dmg; stagger 0.5s; heal 1 ally 18 HP","18 dmg","23 dmg","30 dmg","Stagger 1s; heal all allies 10 HP"]},
-     special:{name:"Living Moss",charge:10,upgrades:["Aura; all allies +20 HP/s 6s+DEF+40","Regen 28/s; DEF+55","Regen 36/s; DEF+72","Regen 46/s; DEF+90","Regen 58/s; DEF+110; also remove all debuffs from all allies"]},
-     unique:{name:"Stone Warden",upgrades:["Passive: all allies +24 HP/s; -28 dmg taken by allies; Stonewarden CC immune; 12 thorns on hit","Allies +30/s; -36 dmg; thorns 18","Allies +38/s; -46 dmg; thorns 25","Allies +48/s; -58 dmg; thorns 34","Allies +60/s; -72 dmg; thorns 44; Nature allies heal 12 HP per ability cast; revives once healing all 100 HP"]}
-   },role:"Tank",attackType:"Melee",evolutionOf:"sporolith",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"jadolith"},  {id:"jadolith",name:"Jadolith",emoji:"🏔️",type:"Nature",rarity:"epic",description:"Mossgolem crystallized into living jade. An immovable monument that refuses to stop healing people.",
+     basic:{name:"Barbed Jab",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg and inflict Poison"]},
+     special:{name:"Bristle Up",charge:10,upgrades:["Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 15% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 18% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 21% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense and inflict Poison on them"]},
+     unique:{name:"Venom Barbs",upgrades:["Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 5% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 10% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 15% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack. Whenever this creature is attacked by an enemy with max stacks of Poison, it dispels all debuffs on itself"]}
+   },role:"Tank",attackType:"Melee",evolutionOf:"sporolith",shardsToAscend:18,ascensionsToEvolve:25,evolutionId:"jadolith"},
+  {id:"jadolith",name:"Toxicrest",emoji:"🦔",type:"Nature",rarity:"epic",description:"A porcupine that has made peace with being unhuggable. The quills it leaves in its attackers keep working long after it has waddled away.",
    stats:{hp:208,atk:104,def:158,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
-     basic:{name:"Jade Slam",upgrades:["18 dmg; stagger 1s; heal all allies 15 HP","23 dmg","30 dmg","38 dmg","Stagger 1.5s; heal all 25 HP; DEF-12% on target"]},
-     special:{name:"Jade Bloom",charge:14,upgrades:["All allies +35 HP/s 7s+DEF+70; dispel all","Regen 46/s; DEF+92","Regen 58/s; DEF+116","Regen 72/s; DEF+142","Regen 90/s; DEF+175; revive 1 fallen ally 25% HP; grant all invincible 1s"]},
-     unique:{name:"Jade Sovereign",upgrades:["Passive: all allies +32 HP/s; -35 all dmg to allies; thorns 40 dmg; absorb 25% ally dmg taken","Allies +42/s; -45; thorns 52; absorb 30%","Allies +54/s; -56; thorns 66; absorb 36%","Allies +68/s; -70; thorns 82; absorb 44%","Allies +85/s; -85; thorns 100; absorb 54%; Jadegiant revives twice each time healing all allies 150 HP"]}
+     basic:{name:"Barbed Jab",upgrades:["14 dmg","15 dmg","17 dmg","20 dmg","20 dmg and inflict Poison"]},
+     special:{name:"Bristle Up",charge:10,upgrades:["Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 15% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 18% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 21% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense","Gain Defense Up. Temporarily, when attacked, deal damage to the attacker equal to 25% of this creature's Defense and inflict Poison on them"]},
+     unique:{name:"Venom Barbs",upgrades:["Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 5% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 10% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 15% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack","Whenever this creature inflicts Poison on an enemy, that enemy temporarily has 20% less Attack. Whenever this creature is attacked by an enemy with max stacks of Poison, it dispels all debuffs on itself"]}
    },role:"Tank",attackType:"Melee",evolutionOf:"stonewarden",shardsToAscend:20,ascensionsToEvolve:null},
   // Nature line 3
   {id:"venomfiend",name:"Venomfiend",emoji:"🐸",type:"Nature",rarity:"epic",description:"A toad whose skin secretes a venom so potent it dissolved its own classification in the biology textbooks.",
@@ -1415,6 +1429,7 @@ export const CREATURES=[
    },role:"Tank",attackType:"Melee",evolutionOf:"doomshade",shardsToAscend:30,ascensionsToEvolve:null},
   // (Ids still say "stormwyvern"/"tempestlord" -- the line was re-themed into a
   // storm cuckoo, and creature ids never change, for save compat.)
+  // Battle module: battle/playerAbilities/zephyrcooLine.js.
   {id:"stormwyvern",name:"Zephyrcoo",emoji:"🐦‍⬛",type:"Wind",rarity:"legendary",description:"A storm-grey cuckoo that has never once built a nest of its own. It slips into other creatures' places so smoothly that they usually thank it for the trouble.",
    stats:{hp:113,atk:103,def:87,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{
@@ -1466,11 +1481,12 @@ export const CREATURES=[
   //     Nearby ally for the standard duration ("temporarily" is not one of the
   //     duration-ladder words, so it reads as unmarked: STATUS_TICKS). An
   //     ability that ALREADY inflicts Burn lays one extra stack instead.
-  //   - "Max stacks of Burn" is BURN_STACK_CAP (10) in battle/status.js.
+  //   - "Max stacks of Burn" is BURN_STACK_CAP (5) in battle/status.js.
   //   - Alarm Pheromone's max-tier detonation is meant to be modest damage on a
   //     relatively long cooldown, on top of the once-per-enemy limit the card
   //     states. The cooldown is design intent, not card text -- the card does
-  //     not mention it -- so it lives here for whoever implements the line.
+  //     not mention it (DETONATE_COOLDOWN_TICKS in the battle module,
+  //     battle/playerAbilities/emberantLine.js).
   {id:"emberant",name:"Emberant",emoji:"🐜",type:"Fire",rarity:"legendary",description:"A fire ant princess still wearing the wings she'll shed to found a colony. Every worker in reach already treats her like a queen, and the ground around her is warm to stand on.",
    stats:{hp:123,atk:81,def:78,spd:1,abilitySpeed:1,crit:4,critDmg:30},
    abilities:{

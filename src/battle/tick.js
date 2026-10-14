@@ -25,7 +25,7 @@ import { tickStatusEffects, isRooted, speedPenalty, tickTimedMods, isStunned, is
 import { damageUnit, onHitLanded, addStackingShield, applyProtect, applyShield, isBossUnit, healUnit, setHazardLookup, onUnitDefeated, onShieldBroken, retaliationMultiplier } from "./hp.js";
 import { abilityHasTag } from "./abilityTags.js";
 import { setApplier, withApplier, setActiveAbility, withActiveAbility, asEcho, asPassive, effectiveness, shieldAmount, setBasicAttackEndHandler, setBattleRoster, setBattleTick, triggersOn, asEffect, beginAbilityUse, setTickPlayers } from "./applier.js";
-import { isBoss, actsLast } from "./classifications.js";
+import { isBoss, actsLast, isImmune } from "./classifications.js";
 import { isSpecialSealed, gainSpecialCharge, bankOverflowCharge } from "./charge.js";
 import { tickMinionSpecials } from "./minions.js";
 import { basicUnitDamage, attackCooldown, lowHpSpdHastePct, defenseOf } from "./damage.js";
@@ -576,6 +576,17 @@ function foesBeside(u, center, exclude) {
 }
 
 /** One rider hit of a Basic attack (see settleBasicAttack). */
+/**
+ * Basic damage a module's onHit dealt to OTHER enemies during the swing (a
+ * Pierce through the target -- Skewer), banked on `u._extraBasicDmg` so the
+ * damage chart credits it to the Basic like the hit itself. Read and cleared.
+ */
+function takeExtraBasicDmg(u) {
+  const n = u._extraBasicDmg || 0;
+  u._extraBasicDmg = 0;
+  return n;
+}
+
 function riderHit(u, target, dmg, withOnHit) {
   const { state, newFx, now } = tickCtx;
   dmg = Math.max(1, Math.round(dmg));
@@ -675,6 +686,30 @@ function makePlayerAbilityContext({ unit, aliveE, aliveP, allOcc, newFx, now, gr
       allOcc.add(nr + "," + nc);
       onUnitMoved(unit);
       onUnitTeleported(unit);
+      return true;
+    },
+    /**
+     * Swap: the acting unit and `other` trade places (Nest Swap, Brood Ward).
+     * Refused when either is Rooted -- Root stops movement by ANY means -- or
+     * when `other` is immune (a boss: the "swap" classification immunity), or
+     * when either is bigger than one tile. Both count as having moved (a
+     * Lightning Hazard under either fires). Returns whether it happened.
+     */
+    swapWith(other) {
+      if (!other || other === unit || other.hp <= 0 || unit.hp <= 0) return false;
+      if (isRooted(unit) || isRooted(other) || isImmune(other, "swap") || isImmune(unit, "swap")) return false;
+      if ((unit.size || 1) > 1 || (other.size || 1) > 1) return false;
+      const [ur, uc, or, oc] = [unit.row, unit.col, other.row, other.col];
+      for (const [u2, r, c, fr, fc] of [[unit, or, oc, ur, uc], [other, ur, uc, or, oc]]) {
+        u2.prevRow = fr;
+        u2.prevCol = fc;
+        u2.lastMoveTime = now;
+        u2.row = r;
+        u2.col = c;
+      }
+      // Both tiles stay occupied -- the two creatures only trade them.
+      onUnitMoved(unit);
+      onUnitMoved(other);
       return true;
     },
     /** Add a freshly-summoned unit (e.g. Doomshade's Wisp) to the acting
@@ -936,6 +971,19 @@ function markedFoeInRange(u, foes) {
  * this redirects the attack only -- it never pulls the vulture toward a
  * rotting target it cannot already reach.
  */
+/** The lowest-Health targetable foe in `u`'s attack reach (the cardinal reach
+ * a ranged attack uses, body distance for melee), or null. */
+function weakestFoeInReach(u, foes) {
+  const range = attackRangeOf(u);
+  let best = null;
+  for (const f of foes) {
+    if (f.hp <= 0 || isIntangible(f)) continue;
+    const d = u.isRanged ? unitCardinalDist(u, f) : unitDist(u, f);
+    if (d <= range && (!best || f.hp < best.hp)) best = f;
+  }
+  return best;
+}
+
 function dotFoeInRange(u, foes) {
   const range = attackRangeOf(u);
   let best = null, bestD = Infinity;
@@ -1004,6 +1052,13 @@ function selectTarget(u, foes) {
         atkTgt: u.isRanged && unitCardinalDist(u, mk) <= attackRangeOf(u) ? mk : null,
         moveTgt: mk,
       };
+    }
+    // Weakest (Duskling's line, `prefersWeakestTargets`): the attack goes to
+    // the foe with the lowest current Health already in reach, without
+    // moving for it -- movement still closes on the nearest foe.
+    if (u.prefersWeakestTargets) {
+      const weak = weakestFoeInReach(u, foes);
+      if (weak) return { atkTgt: u.isRanged ? weak : null, moveTgt: weak };
     }
     // Death Feast's preference, same shape as Marked and ranked below it:
     // switch onto a rotting foe already in reach, without moving for it.
@@ -1125,6 +1180,11 @@ export function runBattleTick(state, config) {
     // Recomputed per hit with the target in hand -- some passives scale off
     // the target's state (e.g. Ignissaur's Stoked Flames reads Burn stacks).
     const dmgMultVs = (target) => (abilMod?.dmgMultForAttack ? abilMod.dmgMultForAttack(u, target) : 1);
+    // basicOutOfReach: a module's Basic that does something else when no foe
+    // is in reach (Gust Peck heals an ally). Returns whether it acted -- the
+    // Basic was used, so its cooldown is paid instead of stepping forward.
+    const outOfReach = () => !!abilMod?.basicOutOfReach && !!abilMod.basicOutOfReach(u, makePlayerAbilityContext({ unit: u, aliveE: standingFoes(aliveE), aliveP, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, damageSource: "basic", doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) }));
+    const usedOutOfReach = () => { if (u.atkCd > 0 || !outOfReach()) return false; u.atkCd = attackCooldown(u, penalty); u.lastAttackTime = now; return true; };
 
     // Always-on passives (e.g. Bloomibis's Guardian Grove aura) run every tick,
     // before the special/basic flow, independent of cooldowns and movement.
@@ -1195,7 +1255,7 @@ export function runBattleTick(state, config) {
     // minion that taunted it); so does a ranged unit retaliating against a
     // melee attacker, or any unit with a Marked foe already in reach (the
     // minion-fight branch below).
-    if (distB <= range && bossAlive && !tauntedFoe(u, aliveMinions) && !retaliationFoe(u, aliveMinions) && !markedFoeInRange(u, aliveMinions)) {
+    if (distB <= range && bossAlive && !tauntedFoe(u, aliveMinions) && !retaliationFoe(u, aliveMinions) && !markedFoeInRange(u, aliveMinions) && !(u.prefersWeakestTargets && weakestFoeInReach(u, aliveMinions))) {
       if (u.atkCd <= 0 && missBlindedSwing(u, boss.row + 0.5, boss.col + 0.5, penalty, newFx, now, false)) continue;
       if (u.atkCd <= 0) {
         // The swing itself is basic damage; an onHit bonus rides along with it
@@ -1210,7 +1270,7 @@ export function runBattleTick(state, config) {
           // another Basic hit -- Basic- and tag-keyed gear leave it alone.
           if (bonus) { withActiveAbility(u, "unique", () => damageUnit(boss, bonus)); passiveDmg += bonus; }
         }
-        creditDamage(state, u.creatureId, basicDmg, "basic");
+        creditDamage(state, u.creatureId, basicDmg + takeExtraBasicDmg(u), "basic");
         creditDamage(state, u.creatureId, passiveDmg, "passive");
         u.atkCd = attackCooldown(u, penalty);
         u.lastAttackTime = now;
@@ -1253,7 +1313,7 @@ export function runBattleTick(state, config) {
             // The reflect is the DEFENDER's damage (a defeat credits it).
             if (reflect) withApplier(hit, () => damageUnit(u, reflect, { effectDamage: true }));
           }
-          creditDamage(state, u.creatureId, basicDmg, "basic");
+          creditDamage(state, u.creatureId, basicDmg + takeExtraBasicDmg(u), "basic");
           creditDamage(state, u.creatureId, passiveDmg, "passive");
           // Who last swung at this creature, and when. Stamped for passives
           // that watch their ALLIES rather than themselves (Sworn Guard) --
@@ -1266,6 +1326,8 @@ export function runBattleTick(state, config) {
           u.lastAttackTime = now;
           // 2x2 targets (Labyrinth Boss creatures) get the hit flash at their body center.
           newFx.push({ id: now + u.uid, row: tgt.row + ((tgt.size || 1) - 1) / 2, col: tgt.col + ((tgt.size || 1) - 1) / 2, t: now, isRanged: u.isRanged, fromRow: u.row, fromCol: u.col, isEnemy: false });
+        } else if (dist > range && usedOutOfReach()) {
+          // Acted in place of the step (basicOutOfReach above).
         } else if (canMove && dist > range) {
           stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
         }
@@ -1274,6 +1336,7 @@ export function runBattleTick(state, config) {
     }
 
     // No minions left: close on the boss, but only if not already in range.
+    if (bossAlive && distB > range && usedOutOfReach()) continue;
     if (bossAlive && canMove && distB > range) {
       const dest = nearestOpenBossAdj(boss, u.row, u.col, allOcc, gridRows, gridCols);
       if (dest) stepUnit(u, dest[0], dest[1], blocked, allOcc, now, state.tick);
@@ -1309,6 +1372,7 @@ export function runBattleTick(state, config) {
     const hits = abilMod?.hitsForAttack ? abilMod.hitsForAttack(u) : 1;
     const dmgMultVs = (target) => (abilMod?.dmgMultForAttack ? abilMod.dmgMultForAttack(u, target) : 1);
     const enemyCtx = () => makePlayerAbilityContext({ unit: u, aliveE: aliveP, aliveP: aliveE, allOcc, newFx, now, gridRows, gridCols, state, blocked, canMove, isEnemySide: true, doStep: (tr, tc) => stepUnit(u, tr, tc, blocked, allOcc, now, state.tick) });
+    const usedOutOfReach = () => { if (u.atkCd > 0 || !abilMod?.basicOutOfReach || !abilMod.basicOutOfReach(u, enemyCtx())) return false; u.atkCd = attackCooldown(u, penalty); u.lastAttackTime = now; return true; };
 
     if (abilMod?.onTick) abilMod.onTick(u, enemyCtx());
 
@@ -1381,6 +1445,8 @@ export function runBattleTick(state, config) {
       u.atkCd = attackCooldown(u, penalty);
       u.lastAttackTime = now;
       newFx.push({ id: now + u.uid, row: tgt.row, col: tgt.col, t: now, isRanged: u.isRanged, fromRow: u.row + ((u.size || 1) - 1) / 2, fromCol: u.col + ((u.size || 1) - 1) / 2, isEnemy: true });
+    } else if (dist > range && usedOutOfReach()) {
+      // Acted in place of the step (basicOutOfReach -- see the player loop).
     } else if (canMove && dist > range) {
       stepUnit(u, tgt.row, tgt.col, blocked, allOcc, now, state.tick);
     }

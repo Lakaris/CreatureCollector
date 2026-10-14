@@ -61,11 +61,11 @@ export const CLASSIFICATIONS = {
   },
   // The Labyrinth's Boss creature (every 10th floor): an ordinary enemy
   // creature on a 2x2 body, NOT a Dungeon boss -- it is Stunned, Rooted and
-  // Feared like any creature. It only can not be pushed or executed, and
-  // counts as a boss for the effects that exclude bosses.
+  // Feared like any creature. It only can not be pushed, Swapped or executed,
+  // and counts as a boss for the effects that exclude bosses.
   giant: {
     label: "Labyrinth Boss",
-    immune: ["displace", "execute"],
+    immune: ["displace", "swap", "execute"],
     countsAsBoss: true,
   },
 };

@@ -98,6 +98,17 @@ function claimCrit(attacker) {
  *   - Berserk Core: + on the Basic ability.
  * Effect damage (DoTs, reflects, hazards) takes only the echo scaling.
  */
+/**
+ * A creature passive that makes its allies hit harder registers `fn(attacker,
+ * target)` here, returning the percent to add (0 for none). Read for every
+ * ability hit by attackerDamageMultiplier above (never effect damage).
+ * Registered at load by the ability module, the same pattern as onHitLanded.
+ */
+const damageBonusSources = [];
+export function onDamageBonus(fn) {
+  damageBonusSources.push(fn);
+}
+
 export function attackerDamageMultiplier(target, { effectDamage = false, crit = false } = {}) {
   let mult = effectiveness();
   const attacker = currentApplier();
@@ -109,6 +120,12 @@ export function attackerDamageMultiplier(target, { effectDamage = false, crit = 
   // leave a stale bonus behind on the same ally, since only one guards it.
   const guardian = attacker.protect?.src;
   if (guardian && guardian._protectDmgPct) mult *= 1 + guardian._protectDmgPct / 100;
+  // Creature passives that raise OTHER creatures' damage (Alarm Pheromone),
+  // registered by their modules -- see onDamageBonus below.
+  for (const fn of damageBonusSources) {
+    const pct = fn(attacker, target);
+    if (pct) mult *= 1 + pct / 100;
+  }
   const gear = attacker.gear;
   if (!gear) return mult;
   const ability = activeAbilityOf(attacker);
@@ -332,6 +349,11 @@ export const EXPOSE_DMG_PCT = 20;
 export function spendExpose(target, effectDamage) {
   if (effectDamage || !((target.exposeTicks || 0) > 0) || !((target.exposeStacks || 0) > 0)) return 1;
   if (!--target.exposeStacks) target.exposeTicks = 0;
+  // The spent stack comes off a source's tally too (see landSourceStacks in
+  // status.js), so that ability can land Expose again.
+  const bySource = target._exposeStacksSrc;
+  const k = bySource && Object.keys(bySource).find((s) => bySource[s] > 0);
+  if (k && !--bySource[k]) delete bySource[k];
   return 1 + EXPOSE_DMG_PCT / 100;
 }
 
@@ -710,6 +732,10 @@ export function healUnit(u, amount, { lifesteal = false, hotFrom = null } = {}) 
   // The healer's gear -- Lifebinder Pendant's healing done, an echoed
   // Special's (Echo Conch) reduced effectiveness -- and the receiver's:
   // Sunbeam Locket's healing received.
+  // Insatiable (Duskling's line): lifesteal on this creature is more
+  // effective -- every source alike, ability drain and gear (its module sets
+  // `lifestealMorePct`).
+  if (lifesteal && u.lifestealMorePct) amount *= 1 + u.lifestealMorePct / 100;
   const received = 1 + (u.gear?.healReceivedPct || 0) / 100;
   const giver = hotFrom ? 1 : healDoneMultiplier() * effectiveness();
   amount = Math.max(1, Math.round(amount * giver * received));

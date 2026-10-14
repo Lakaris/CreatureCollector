@@ -72,6 +72,25 @@ export function withActiveAbility(unit, key, fn) {
   }
 }
 
+/**
+ * Run `fn` as `unit`'s ability `key` NESTED inside whatever is happening --
+ * a reaction mid-way through someone else's attack (a Reflect-type
+ * retaliation, a Passive answering its own Poison). Unlike withActiveAbility
+ * it never ends the interrupted Basic attack: that attack carries on, and its
+ * per-attack gear still sees it once. Sets the applier too.
+ */
+export function withNestedAbility(unit, key, fn) {
+  const prevActive = active, prevApplier = current;
+  active = { unit, key };
+  current = unit;
+  try {
+    return fn();
+  } finally {
+    active = prevActive;
+    current = prevApplier;
+  }
+}
+
 // Every creature in the battle, both sides -- refreshed by tick.js each tick
 // -- for gear that reacts to things happening to OTHERS (Warlord's Trophy
 // counts every defeat on the field).

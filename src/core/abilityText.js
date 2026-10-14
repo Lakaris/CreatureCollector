@@ -135,7 +135,9 @@ export const ABILITY_TAG_DEFS = {
   multihit: { label: "Multi-hit", description: "Strikes several times in one use." },
   closest: { label: "Closest", description: "Targets the closest enemy in range." },
   farthest: { label: "Farthest", description: "Targets the farthest enemy in range." },
-  burn: { label: "Burn", description: "Deals damage over time." },
+  // Each stack ticks for another BURN_ATK_RATE (3.5%) of the burner's Attack
+  // (tickBurn in battle/status.js) -- keep the totals below in sync.
+  burn: { label: "Burn", maxStacks: 5, stackingLabel: "Damage per tick (of the burner's Attack)", stacking: [3.5, 7, 10.5, 14, 17.5], description: "Deals damage over time; each stack increases damage." },
   // Label only -- the blue charge pill draws its own ⚡ (see CreatureDetail
   // and DexEntry); this is just the heading of the popup it opens.
   energy: { label: "Energy", description: "Energy needed to use this ability." },
@@ -553,6 +555,23 @@ const ZEPHYRCOO_PHRASES = {
   },
 };
 
+// Puddlet (heron) line: Beak Jab is a plain hit on the generic phrase, its max
+// tier's Defense Down arriving as a rider. Spear Flurry strikes 3 times, so it
+// needs its own phrase -- the card number is the TOTAL, the rule every
+// multi-hit follows. Skewer is written out per tier.
+const PUDDLET_PHRASES = {
+  basic: null,
+  special: { phrase: "Deal damage to an enemy 3 times" },
+};
+
+// Pricklet (poisonous crested porcupine) line -- ids sporolith/stonewarden/
+// jadolith. Barbed Jab is a plain hit on the generic phrase, its max tier's
+// Poison arriving as a rider. Bristle Up and Venom Barbs are written out per
+// tier.
+const PRICKLET_PHRASES = {
+  basic: null,
+};
+
 // Gillet (axolotl) line: Water Jet is a plain hit on the generic phrase. Swell
 // carries two numbers ("Heal 20 HP; 14 dmg") so it rides the dual-badge
 // healDamage shape. Its max tier folds the knockback in beside the damage
@@ -767,6 +786,12 @@ const PLAIN_ABILITY_PHRASES = {
   thunderfleece: FRIZZLAMB_PHRASES,
   stormwyvern: ZEPHYRCOO_PHRASES,
   tempestlord: ZEPHYRCOO_PHRASES,
+  puddlet: PUDDLET_PHRASES,
+  wadewing: PUDDLET_PHRASES,
+  heronarch: PUDDLET_PHRASES,
+  sporolith: PRICKLET_PHRASES,
+  stonewarden: PRICKLET_PHRASES,
+  jadolith: PRICKLET_PHRASES,
 };
 
 /**
@@ -1141,6 +1166,35 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       tags.push("line", "heal");
       if (abilityLevel == null || abilityLevel >= 4) tags.push("displace");
     }
+  }
+  const isPuddletLine = getRootDef(creatureId)?.id === "puddlet";
+  if (isPuddletLine) {
+    // Beak Jab only shreds Defense from its 4th upgrade on. Spear Flurry's
+    // Speed at max is its own small percentage, not the Speed Up buff, so it
+    // names no pill (the same rule as Insatiable's Haste).
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("defensedown");
+    }
+    if (key === "special") tags.push("closest");
+    if (key === "unique") tags.push("pierce");
+  }
+  const isPrickletLine = getRootDef(creatureId)?.id === "sporolith";
+  if (isPrickletLine) {
+    // Barbed Jab and Bristle Up only Poison from their 4th upgrade on. Bristle
+    // Up's Defense-scaled retaliation is a kind of Reflect, so it carries the
+    // Reflect pill. Venom Barbs' Attack cut is its own percentage, not the
+    // stacking Attack Down table, so it names no pill; its max tier's self-
+    // dispel carries Dispel Debuff.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("poison");
+    }
+    if (key === "special") {
+      tags.push("defenseup", "reflect");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("poison");
+    }
+    if (key === "unique" && (abilityLevel == null || abilityLevel >= 4)) tags.push("dispeldebuff");
   }
   const isZephyrcooLine = getRootDef(creatureId)?.id === "stormwyvern";
   if (isZephyrcooLine) {

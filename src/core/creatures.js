@@ -123,14 +123,37 @@ export function calcStats(def, ownedData) {
   return s;
 }
 
-/** The appearance record of the equipped-and-unlocked skin, or null for none. */
+/** Is `stageId` this creature's own stage or an earlier one in its line? A
+ * creature may wear an earlier stage's look, never a stage it hasn't reached. */
+function isOwnOrEarlierStage(def, stageId) {
+  const chain = getChain(def.id);
+  const at = chain.indexOf(stageId);
+  return at !== -1 && at <= chain.indexOf(def.id);
+}
+
+/**
+ * The appearance record the creature wears, or null for its own default look.
+ * Purely cosmetic -- nothing about the creature changes but how it is drawn.
+ * `ownedData.activeSkin` is {setId, variantId}:
+ *   - an equipped (and unlocked) skin, shown as stage `variantId`'s version of
+ *     that skin (its own stage when unset);
+ *   - setId null: stage `variantId`'s DEFAULT look -- an earlier evolution's
+ *     plain appearance, chosen on the Skins tab.
+ * A variant past the creature's own stage is ignored (shows its own stage).
+ */
 function activeSkinAppearance(def, ownedData, unlockedSkins) {
   if (!def || !ownedData || !ownedData.activeSkin) return null;
   const { setId, variantId } = ownedData.activeSkin;
+  const stage = variantId && isOwnOrEarlierStage(def, variantId) ? variantId : def.id;
+  if (!setId) {
+    if (stage === def.id) return null;
+    const stageDef = CREATURE_MAP[stage];
+    return stageDef ? { emoji: stageDef.emoji, art: CREATURE_ART[stage] } : null;
+  }
   if (!unlockedSkins || !unlockedSkins.includes(setId)) return null;
   const skinSet = SKIN_SETS.find((s) => s.id === setId);
   if (!skinSet) return null;
-  return skinSet.appearances[variantId || def.id] || null;
+  return skinSet.appearances[stage] || null;
 }
 
 /**

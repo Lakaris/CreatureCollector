@@ -588,10 +588,14 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             React.createElement("button",{onClick:()=>setDBossMinimized(p=>{const next=!p;if(!next)expandDPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dBossMinimized?"＋":"－"),
             // Emoji, level, then name on one row -- same header shape as the
             // minion cards below, so the column reads as one kind of card.
-            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:dBossMinimized?0:12,paddingRight:24}},
+            // When the column is too narrow for the whole name, the row wraps
+            // and the name drops whole onto the next line rather than being
+            // cut short ("Lv. 1 F..."); it only truncates if it can't fit even
+            // a full line on its own.
+            React.createElement("div",{style:{display:"flex",flexWrap:"wrap",alignItems:"center",columnGap:8,rowGap:4,marginBottom:dBossMinimized?0:12,paddingRight:24}},
               React.createElement("div",{style:{fontSize:24,lineHeight:1,flexShrink:0}},TYPE_EMOJI[boss?.type]||"👾"),
               React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:700,flexShrink:0}},"Lv. "+bossLevel),
-              React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},boss?.name)
+              React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",maxWidth:"100%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},boss?.name)
             ),
             !dBossMinimized&&boss?.abilities&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
               [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>{

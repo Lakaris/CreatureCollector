@@ -278,6 +278,15 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   }
 
   const [tab,setTab]=useState("levelup");
+  // Tutorial "level up your creature" step: the Level Up card sits below the
+  // portrait, stats and gear, so on a phone its button (and the arrow pointing
+  // at it) start off-screen. Bring it into view once the page has laid out.
+  const levelUpCardRef=useRef(null);
+  useEffect(()=>{
+    if(tutorialStep!=="levelupCreature"||tab!=="levelup")return;
+    const t=setTimeout(()=>levelUpCardRef.current?.scrollIntoView({behavior:"smooth",block:"center"}),250);
+    return()=>clearTimeout(t);
+  },[tutorialStep,tab]);
   const [previewPip,setPreviewPip]=useState({});
   const [holdEquip,setHoldEquip]=useState(null);
   const [equipSlotPicker,setEquipSlotPicker]=useState(null); // slot index being picked
@@ -1000,7 +1009,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       })
     ),
     tab==="levelup"&&React.createElement(React.Fragment,null,
-      React.createElement("div",{className:"card",style:{marginBottom:10,position:"relative"}},
+      React.createElement("div",{className:"card",ref:levelUpCardRef,style:{marginBottom:10,position:"relative"}},
         tutorialStep==="levelupCreature"&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:74,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
         React.createElement("div",{className:"section-label"},"Level Up"),
         isMaxLevel

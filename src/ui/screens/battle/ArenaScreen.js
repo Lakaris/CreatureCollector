@@ -5,7 +5,7 @@ import { iconText } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
-import { ARENA_TABS, ARENA_TAB_TYPE } from "../../../data/bosses.js";
+import { ARENA_TABS, ARENA_TAB_TYPE, ARENA_TAB_ENEMY_TYPES } from "../../../data/bosses.js";
 import { REWARD_DESC } from "../../../data/quests.js";
 import { applyRewards } from "../../../core/rewards.js";
 import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
@@ -353,11 +353,13 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   }
   React.useEffect(()=>()=>stopArenaLoops(),[]);
 
-  const TYPE_MAP={fire:"Fire",water:"Water",earth:"Earth",electric:"Electric",dark:"Dark",light:"Light",ice:"Water",nature:"Nature",all:null};
+  // Enemies come from the tab's enemy pool (ARENA_TAB_ENEMY_TYPES), which is
+  // separate from the type the player must deploy (ARENA_TAB_TYPE).
   function getEnemiesForStage(tabId,stageNum,arenaLevel){
-    const type=TYPE_MAP[tabId];
-    const firstEvos=type?CREATURES.filter(c=>c.type===type&&!c.evolutionOf):CREATURES.filter(c=>!c.evolutionOf);
-    const secondEvos=type?CREATURES.filter(c=>c.type===type&&c.evolutionOf&&c.evolutionId):CREATURES.filter(c=>c.evolutionOf&&c.evolutionId);
+    const types=ARENA_TAB_ENEMY_TYPES[tabId]||null;
+    const inPool=c=>!types||types.includes(c.type);
+    const firstEvos=CREATURES.filter(c=>inPool(c)&&!c.evolutionOf);
+    const secondEvos=CREATURES.filter(c=>inPool(c)&&c.evolutionOf&&c.evolutionId);
     if(!firstEvos.length)return[];
     const seed=tabId.split("").reduce((a,c)=>a+c.charCodeAt(0),0)*31+stageNum*17;
     // how many 2nd evos to sprinkle in

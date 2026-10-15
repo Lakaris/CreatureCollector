@@ -46,7 +46,9 @@ const SAVE_KEY = "cc_save_v1";
 // Bumped to 2 when creature ids were renamed to match their names (ids key
 // every owned creature and every deployment grid, so a v1 save points at
 // creatures that no longer exist).
-const SAVE_VERSION = 2;
+// Bumped to 3 when every unimplemented creature line was removed from the
+// roster -- a fresh start for everyone.
+const SAVE_VERSION = 3;
 const SET_FIELDS = [
   "everOwnedCreatureIds", "equipFavorites", "claimedQuests",
   "dailyMissionsDone", "collectedTreasures", "completedTreasureSets",
@@ -104,8 +106,7 @@ function stripRetiredEquipment(parsed) {
  *
  * Generic on purpose -- it costs one map lookup per stored id and makes every
  * future rename safe without a SAVE_VERSION bump, so the rest of a player's
- * progress survives instead of the whole save being thrown away. Retired ids
- * (RETIRED_CREATURE_IDS) still resolve to the placeholder, so they are kept.
+ * progress survives instead of the whole save being thrown away.
  */
 function stripUnknownCreatures(parsed) {
   const known = (id) => !!CREATURE_MAP[id];

@@ -145,10 +145,19 @@ export const ARENA_TABS=[
   {id:"dark",label:"Dark",emoji:"🌑"},
 ];
 
-// Arena tab id -> creature type it restricts deployment to ("all" has no
-// restriction and is absent). "ice" is the arena tab id for the Water-type
+// Arena tab id -> creature type it restricts the PLAYER's deployment to ("all"
+// has no restriction and is absent). It says nothing about the enemies -- see
+// ARENA_TAB_ENEMY_TYPES below. "ice" is the arena tab id for the Water-type
 // arena (ARENA_TABS labels it "Water" but keeps the legacy id). Lives here
 // beside ARENA_TABS because GameContext needs it too, for the per-tab
 // deployment migration.
 export const ARENA_TAB_TYPE={fire:"Fire",nature:"Nature",earth:"Earth",electric:"Electric",ice:"Water",light:"Light",dark:"Dark"};
+
+// Arena tab id -> the creature types its ENEMIES are drawn from. Independent of
+// ARENA_TAB_TYPE: that one only restricts what the player may deploy, and an
+// arena's opponents can be any types at all. A tab with no entry (or null)
+// draws from every type, like the open Arena. For now each type arena still
+// fields its own type, so every stage keeps the lineup it always had -- change
+// an entry here (e.g. fire:["Water","Earth"]) to give that arena other foes.
+export const ARENA_TAB_ENEMY_TYPES={fire:["Fire"],nature:["Nature"],earth:["Earth"],electric:["Electric"],ice:["Water"],light:["Light"],dark:["Dark"]};
 

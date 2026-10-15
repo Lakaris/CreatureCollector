@@ -419,14 +419,6 @@ const NESSLING_PHRASES = {
   },
 };
 
-// Scrapcaw line (ids still say scrapcaw/corvoid/murderking -- creature ids
-// never change): both attacks are plain damage phrases; Shadow Pact's
-// per-Dark-ally percentages vary per tier, so the passive renders raw.
-const MURKWING_PHRASES = {
-  basic: null,
-  special: { phrase: "Deal damage to an enemy and call all allies beside you to Assist" },
-};
-
 // Iglet line: only the basic gets a plain phrase (generic damage) -- Hunker
 // In's stack counts and Windbreak's percentages vary per tier, so both render
 // their own sentences raw.
@@ -720,9 +712,6 @@ const PLAIN_ABILITY_PHRASES = {
   cragfist: CRAGLING_PHRASES,
   cloudvault: CRAGLING_PHRASES,
   skysage: CRAGLING_PHRASES,
-  scrapcaw: MURKWING_PHRASES,
-  corvoid: MURKWING_PHRASES,
-  murderking: MURKWING_PHRASES,
   iglet: IGLET_PHRASES,
   shellter: IGLET_PHRASES,
   frostkeep: IGLET_PHRASES,
@@ -1306,13 +1295,6 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("stun");
     }
     if (key === "unique") tags.push("dodge");
-  }
-  const isMurkwingLine = getRootDef(creatureId)?.id === "scrapcaw";
-  if (isMurkwingLine) {
-    if (key === "basic") tags.push("closest");
-    // Beside is a targeting pill (it picks the allies called); Assist is the
-    // effect. Shadow Pact deliberately carries no tags.
-    if (key === "special") tags.push("beside", "assist");
   }
   const isIgletLine = getRootDef(creatureId)?.id === "iglet";
   if (isIgletLine) {

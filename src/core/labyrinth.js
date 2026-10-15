@@ -85,7 +85,7 @@ export const DIFFICULTY_RATIO_ANCHORS = [
 // either a 1-hit throwaway or, worse, a real threat) so a level-1 starter
 // with just the tutorial's Iron Band needs a few hits per enemy but is
 // never at real risk. See getEnemyLayoutForDepth's depth===1 case for the
-// matching 2-enemy layout (Duskling + Sparkit) these multipliers are
+// matching 2-enemy layout (Duskling + Cirruskit) these multipliers are
 // calibrated against.
 const FLOOR_1_DIFFICULTY = { hpMult: -0.25, atkMult: -0.83, defMult: -0.32 };
 

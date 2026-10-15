@@ -32,18 +32,58 @@ function seedFor(depth) {
 }
 
 /** Deterministic enemy pool for a depth: any-type creatures, with the mix of
- * base/mid/final evolution forms shifting per getEnemyEvolutionMixForDepth. */
-function getEnemiesForDepth(depth) {
+ * base/mid/final evolution forms shifting per getEnemyEvolutionMixForDepth.
+ *
+ * VARIETY RULE: duplicates are occasional. About DUPLICATE_FLOOR_PCT of floors
+ * (picked by their own seed, so a floor never changes) carry exactly ONE pair
+ * of twins; every other floor is six different creatures. The Boss creature
+ * counts -- it takes the last slot on boss floors (`boss`). A seeded pick that
+ * would break the rule steps on to the next creature in its pool, and a
+ * twin floor whose picks happened to all differ gets its twin by repeating an
+ * earlier enemy of the same evolution stage, so the stage mix never moves. */
+const DUPLICATE_FLOOR_PCT = 15;
+function isTwinFloor(depth) {
+  return ((depth * 2246822519) >>> 0) % 100 < DUPLICATE_FLOOR_PCT;
+}
+function getEnemiesForDepth(depth, boss = null) {
   const firstEvos = CREATURES.filter((c) => !c.evolutionOf);
   const midEvos = CREATURES.filter((c) => c.evolutionOf && c.evolutionId);
   const finalEvos = CREATURES.filter((c) => c.evolutionOf && !c.evolutionId);
   if (!firstEvos.length) return [];
   const seed = seedFor(depth);
-  const { base: nBase, mid: nMid, final: nFinal } = getEnemyEvolutionMixForDepth(depth);
+  const { final: nFinal, mid: nMid } = getEnemyEvolutionMixForDepth(depth);
+  const slots = boss ? 5 : 6;
+  const counts = new Map(boss ? [[boss.id, 1]] : []);
+  const twinFloor = isTwinFloor(depth);
+  // A floor without twins starts with its one allowed pair already "spent".
+  let pairUsed = !twinFloor;
   const enemies = [];
-  for (let i = 0; i < nFinal && finalEvos.length; i++) enemies.push(finalEvos[Math.abs(seed + i * 29) % finalEvos.length]);
-  for (let i = 0; i < nMid && midEvos.length; i++) enemies.push(midEvos[Math.abs(seed + i * 19) % midEvos.length]);
-  for (let i = enemies.length; i < 6; i++) enemies.push(firstEvos[Math.abs(seed + i * 13) % firstEvos.length]);
+  const pick = (pool, idx) => {
+    for (let step = 0; step < pool.length; step++) {
+      const c = pool[(idx + step) % pool.length];
+      const n = counts.get(c.id) || 0;
+      if (n === 0 || (n === 1 && !pairUsed)) {
+        if (n === 1) pairUsed = true;
+        counts.set(c.id, n + 1);
+        enemies.push(c);
+        return;
+      }
+    }
+  };
+  for (let i = 0; i < nFinal && finalEvos.length && enemies.length < slots; i++) pick(finalEvos, Math.abs(seed + i * 29) % finalEvos.length);
+  for (let i = 0; i < nMid && midEvos.length && enemies.length < slots; i++) pick(midEvos, Math.abs(seed + i * 19) % midEvos.length);
+  for (let i = enemies.length; i < slots; i++) pick(firstEvos, Math.abs(seed + i * 13) % firstEvos.length);
+  // A twin floor whose picks all came out different: the latest enemy that
+  // shares an evolution stage with an earlier one (or with the Boss) becomes a
+  // copy of it, so the floor still has its one pair and the same stage mix.
+  if (twinFloor && !pairUsed) {
+    const stageOf = (c) => (!c.evolutionOf ? 0 : c.evolutionId ? 1 : 2);
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      const twin = enemies.slice(0, j).find((c) => stageOf(c) === stageOf(enemies[j]))
+        || (boss && stageOf(boss) === stageOf(enemies[j]) ? boss : null);
+      if (twin) { enemies[j] = twin; break; }
+    }
+  }
   return enemies;
 }
 
@@ -53,11 +93,9 @@ function getEnemiesForDepth(depth) {
 // __giant handling). The rotations are curated for variety -- consecutive
 // boss floors differ in type, role, AND range -- and the evolution stage
 // tracks the floor's normal enemy mix (base forms early, finals late).
-// "__placeholder" slots held the retired Squallhawk line; they stand in until
-// the replacement creatures land (see RETIRED_CREATURE_IDS in data/creatures.js).
-const LAB_BOSS_ROTATION_BASE = ["pebbit", "sparkshell", "bloomibis", "emberstar", "nessling", "vacurach", "starlit", "shockstinger", "__placeholder", "morusk"];
-const LAB_BOSS_ROTATION_MID = ["magmastar", "lochcoil", "__placeholder", "bulwarden", "starbright", "umbrachnid", "voltlasher", "bathydrake", "vowbruin", "cragfist"];
-const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "dynashell", "animavis", "blastar", "nessarch", "abyrach", "starburn", "galvascorpion", "__placeholder", "ivormar"];
+const LAB_BOSS_ROTATION_BASE = ["pebbit", "sparkshell", "bloomibis", "emberstar", "nessling", "duskling", "starlit", "shockstinger", "coatlet", "morusk"];
+const LAB_BOSS_ROTATION_MID = ["magmastar", "lochcoil", "plumecoatl", "bulwarden", "starbright", "nightbat", "voltlasher", "wadewing", "vowbruin", "cragfist"];
+const LAB_BOSS_ROTATION_FINAL = ["gemtitan", "dynashell", "animavis", "blastar", "nessarch", "nightstalker", "starburn", "galvascorpion", "quetzalis", "ivormar"];
 
 /** The predetermined Boss creature for a depth, or null off boss floors. */
 function getLabyrinthBossForDepth(depth) {
@@ -71,8 +109,7 @@ function getEnemyLayoutForDepth(depth) {
   // Floor 1 is hand-placed: 2 fixed enemies (Duskling + Cirruskit) instead of
   // the usual seeded 6-enemy roster (see FLOOR_1_DIFFICULTY in
   // core/labyrinth.js for the matching stat tuning -- both were calibrated
-  // together). Cirruskit took the second slot when the Sparkit line was
-  // retired; it is the closest stand-in the roster still has.
+  // together).
   if (depth === 1) {
     const duskling = CREATURE_MAP["duskling"];
     const cirruskit = CREATURE_MAP["cirruskit"];
@@ -81,17 +118,16 @@ function getEnemyLayoutForDepth(depth) {
     if (cirruskit) layout["1,3"] = cirruskit;
     return layout;
   }
-  let enemies = getEnemiesForDepth(depth);
+  // Boss floors: the Boss creature claims a 2x2 block first (its cells are
+  // marked used, so regular enemies place around it -- never overlapping),
+  // and takes the last of the six enemy slots.
+  const bossDef = getLabyrinthBossForDepth(depth);
+  const enemies = getEnemiesForDepth(depth, bossDef);
   if (!enemies.length) return {};
   const baseSeed = seedFor(depth);
   const COLS = ARENA_GRID_COLS;
   const grid = {}; const used = new Set();
-  // Boss floors: the Boss creature claims a 2x2 block first (its cells are
-  // marked used, so regular enemies place around it -- never overlapping),
-  // and one regular enemy slot is dropped to make room.
-  const bossDef = getLabyrinthBossForDepth(depth);
   if (bossDef) {
-    enemies = enemies.slice(0, 5);
     const anchorCol = ((baseSeed >>> 4) % (COLS - 1));
     grid["0," + anchorCol] = { ...bossDef, __giant: true };
     for (const [r, c] of [[0, anchorCol], [0, anchorCol + 1], [1, anchorCol], [1, anchorCol + 1]]) used.add(r + "," + c);

@@ -102,7 +102,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
         )
       ),
       // minHeight reserves room for the longest description in the roster
-      // (3 lines at this font/width, e.g. Skyeel's) so the card is sized for
+      // (3 lines at this font/width) so the card is sized for
       // the worst case up front instead of growing when a longer one loads --
       // most descriptions are 2 lines and just leave a little breathing room.
       React.createElement("p",{style:{fontSize:12,color:"#666",lineHeight:1.6,textAlign:"center",minHeight:"57.6px"}},def.description)

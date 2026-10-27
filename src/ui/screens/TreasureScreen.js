@@ -1,6 +1,7 @@
 // Ore opening, treasure collection, and set-completion rewards.
 
 import React from "../../react.js";
+import { iconText, currencyIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { TREASURE_RARITIES, TREASURE_SETS, TREASURES } from "../../data/treasures.js";
 import { applyRewards } from "../../core/rewards.js";
@@ -19,7 +20,7 @@ function TreasureScreen({onBack}){
   const [redeemOpen,setRedeemOpen]=React.useState(false);
   const oreCount=currencies.mysteriousOre||0;
   const deluxeOreCount=currencies.deluxeOre||0;
-  const rainbowOreCount=currencies.rainbowOre||0;
+  const prismaticOreCount=currencies.prismaticOre||0;
   React.useEffect(()=>{
     if(!openResults||multiVisible>=openResults.length)return;
     const t=setTimeout(()=>setMultiVisible(v=>v+1),180);
@@ -46,7 +47,7 @@ function TreasureScreen({onBack}){
       React.createElement("button",{onClick:()=>{claimSetReward(setCompletePopup);setSetCompletePopup(null);},style:{width:"100%",padding:"13px",background:"linear-gradient(135deg,#f59e0b,#fbbf24)",color:"#fff",border:"none",borderRadius:14,fontWeight:800,fontSize:16,cursor:"pointer",boxShadow:"0 4px 16px rgba(245,158,11,0.4)"}},"🏆 Claim Reward")
     )
   );
-  const ORE_CURRENCY={normal:"mysteriousOre",deluxe:"deluxeOre",rainbow:"rainbowOre"};
+  const ORE_CURRENCY={normal:"mysteriousOre",deluxe:"deluxeOre",prismatic:"prismaticOre"};
   function doOpenOre(oreType){
     const key=ORE_CURRENCY[oreType];
     if((currencies[key]||0)<1)return;
@@ -106,8 +107,8 @@ function TreasureScreen({onBack}){
   function openOre10(){doOpenOre10("normal");}
   function openDeluxe(){doOpenOre("deluxe");}
   function openDeluxe10(){doOpenOre10("deluxe");}
-  function openRainbow(){doOpenOre("rainbow");}
-  function openRainbow10(){doOpenOre10("rainbow");}
+  function openPrismatic(){doOpenOre("prismatic");}
+  function openPrismatic10(){doOpenOre10("prismatic");}
   function claimSetReward(set){
     const entries=Object.entries(set.reward);
     applyRewards(setCurrencies,Object.fromEntries(entries));
@@ -162,7 +163,7 @@ function TreasureScreen({onBack}){
   const REDEEM_ITEMS=[
     {key:"mysteriousOre", label:"Mysterious Ore",        emoji:"🪨", cost:50,  color:"#111",   border:"#e8e8e8", btnBg:"linear-gradient(135deg,#f59e0b,#fbbf24)"},
     {key:"deluxeOre",     label:"Deluxe Mysterious Ore", emoji:"💎", cost:200, color:"#1d4ed8", border:"#93c5fd", btnBg:"linear-gradient(135deg,#2563eb,#60a5fa)"},
-    {key:"rainbowOre",    label:"Rainbow Mysterious Ore",emoji:"🌈", cost:500, color:"#be185d", border:"#f9a8d4", btnBg:"linear-gradient(135deg,#ec4899,#a855f7)"},
+    {key:"prismaticOre",    label:"Prismatic Mysterious Ore",emoji:"🌈", cost:500, color:"#be185d", border:"#f9a8d4", btnBg:"linear-gradient(135deg,#ec4899,#a855f7)"},
   ];
   const shards=currencies.treasureShards||0;
   const redeemPopupEl=redeemOpen&&React.createElement("div",{onClick:()=>setRedeemOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:400,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
@@ -179,7 +180,7 @@ function TreasureScreen({onBack}){
         REDEEM_ITEMS.map(item=>{
           const canAfford=shards>=item.cost;
           return React.createElement("div",{key:item.key,style:{display:"flex",alignItems:"center",gap:12,background:"#fafafa",border:"1.5px solid "+item.border,borderRadius:14,padding:"12px 14px"}},
-            React.createElement("div",{style:{fontSize:30,lineHeight:1,flexShrink:0}},item.emoji),
+            React.createElement("div",{style:{fontSize:30,lineHeight:1,flexShrink:0}},currencyIcon(item.key,item.emoji)),
             React.createElement("div",{style:{flex:1}},
               React.createElement("div",{style:{fontSize:13,fontWeight:700,color:item.color,marginBottom:2}},item.label),
               React.createElement("div",{style:{fontSize:12,color:"#888"}},"✨ "+item.cost+" Shards")
@@ -215,26 +216,26 @@ function TreasureScreen({onBack}){
         const ORE_TYPES=[
           {key:"mysteriousOre",  label:"Mysterious Ore",       emoji:"🪨", desc:"All rarities",                   color:"#111",   border:"#e8e8e8", btnBg:"linear-gradient(135deg,#f59e0b,#fbbf24)", btnIcon:"✨", shadow:"rgba(0,0,0,0.06)",   open:openOre,    open10:openOre10,    count:oreCount},
           {key:"deluxeOre",      label:"Deluxe Mysterious Ore",emoji:"💎", desc:"Rare, Epic & Legendary only",    color:"#1d4ed8",border:"#93c5fd", btnBg:"linear-gradient(135deg,#2563eb,#60a5fa)", btnIcon:"💎", shadow:"rgba(37,99,235,0.08)", open:openDeluxe, open10:openDeluxe10, count:deluxeOreCount},
-          {key:"rainbowOre",     label:"Rainbow Mysterious Ore",emoji:"🌈",desc:"Guaranteed missing treasure",    color:"#be185d",border:"#f9a8d4", btnBg:"linear-gradient(135deg,#ec4899,#a855f7)", btnIcon:"🌈", shadow:"rgba(236,72,153,0.08)",open:openRainbow,open10:openRainbow10,count:rainbowOreCount},
+          {key:"prismaticOre",     label:"Prismatic Mysterious Ore",emoji:"🌈",desc:"Guaranteed missing treasure",    color:"#be185d",border:"#f9a8d4", btnBg:"linear-gradient(135deg,#ec4899,#a855f7)", btnIcon:"🌈", shadow:"rgba(236,72,153,0.08)",open:openPrismatic,open10:openPrismatic10,count:prismaticOreCount},
         ];
         const ore=ORE_TYPES[oreTypeIndex];
-        const allRainbowCollected=ore.key==="rainbowOre"&&TREASURES.every(t=>collectedTreasures.has(t.id));
-        const canOpen=ore.count>=1&&!allRainbowCollected;
-        const canOpen10=ore.count>=10&&!allRainbowCollected;
+        const allPrismaticCollected=ore.key==="prismaticOre"&&TREASURES.every(t=>collectedTreasures.has(t.id));
+        const canOpen=ore.count>=1&&!allPrismaticCollected;
+        const canOpen10=ore.count>=10&&!allPrismaticCollected;
         const arrowBtn=(label,onClick)=>React.createElement("button",{onClick,style:{background:"rgba(0,0,0,0.06)",border:"none",borderRadius:12,width:44,height:44,cursor:"pointer",fontSize:22,fontWeight:700,color:"#555",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},label);
         return React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"12px 8px",marginBottom:20,border:"1.5px solid "+ore.border,boxShadow:"0 1px 4px "+ore.shadow,display:"flex",alignItems:"center",gap:8}},
           arrowBtn("‹",()=>setOreTypeIndex(i=>(i+2)%3)),
           // Center content
           React.createElement("div",{style:{flex:1,textAlign:"center"}},
             React.createElement("div",{style:{position:"relative",display:"inline-block",marginBottom:8}},
-              React.createElement("div",{style:{fontSize:72,lineHeight:1}},ore.emoji),
+              React.createElement("div",{style:{fontSize:72,lineHeight:1}},currencyIcon(ore.key,ore.emoji)),
               React.createElement("div",{style:{position:"absolute",bottom:0,right:-6,background:"#333",color:"#fff",fontWeight:800,fontSize:13,minWidth:24,height:24,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 6px",border:"2px solid #fff"}},formatNum(ore.count))
             ),
             React.createElement("div",{style:{fontSize:15,fontWeight:800,color:ore.color,marginBottom:2}},ore.label),
-            React.createElement("div",{style:{fontSize:12,color:allRainbowCollected?"#10b981":"#aaa",marginBottom:14}},allRainbowCollected?"✅ All treasures collected!":ore.desc),
+            React.createElement("div",{style:{fontSize:12,color:allPrismaticCollected?"#10b981":"#aaa",marginBottom:14}},allPrismaticCollected?iconText("✅ All treasures collected!"):ore.desc),
             React.createElement("div",{style:{display:"flex",gap:8,justifyContent:"center"}},
-              React.createElement("button",{onClick:ore.open,disabled:!canOpen,style:{padding:"9px 22px",background:canOpen?ore.btnBg:"#e0e0e0",color:canOpen?"#fff":"#aaa",border:"none",borderRadius:10,fontWeight:700,fontSize:13,cursor:canOpen?"pointer":"default"}},ore.btnIcon+" Open"),
-              React.createElement("button",{onClick:ore.open10,disabled:!canOpen10,style:{padding:"9px 22px",background:canOpen10?ore.btnBg:"#e0e0e0",color:canOpen10?"#fff":"#aaa",border:"none",borderRadius:10,fontWeight:700,fontSize:13,cursor:canOpen10?"pointer":"default"}},ore.btnIcon+" Open 10")
+              React.createElement("button",{onClick:ore.open,disabled:!canOpen,style:{padding:"9px 22px",background:canOpen?ore.btnBg:"#e0e0e0",color:canOpen?"#fff":"#aaa",border:"none",borderRadius:10,fontWeight:700,fontSize:13,cursor:canOpen?"pointer":"default"}},currencyIcon(ore.key,ore.btnIcon)," Open"),
+              React.createElement("button",{onClick:ore.open10,disabled:!canOpen10,style:{padding:"9px 22px",background:canOpen10?ore.btnBg:"#e0e0e0",color:canOpen10?"#fff":"#aaa",border:"none",borderRadius:10,fontWeight:700,fontSize:13,cursor:canOpen10?"pointer":"default"}},currencyIcon(ore.key,ore.btnIcon)," Open 10")
             )
           ),
           arrowBtn("›",()=>setOreTypeIndex(i=>(i+1)%3))
@@ -274,7 +275,7 @@ function TreasureScreen({onBack}){
                 ?React.createElement("div",{style:{width:54,height:54,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"#f5f5f5",border:"2px solid #ddd",borderRadius:10,position:"relative",opacity:0.6}},
                   React.createElement("div",{style:{fontSize:20,lineHeight:1,textAlign:"center",width:"100%"}},set.rewardEmoji),
                   React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textAlign:"center",lineHeight:1.2,maxWidth:48}},set.rewardLabel.split(" ")[0]),
-                  React.createElement("div",{style:{position:"absolute",top:-6,right:-6,fontSize:13}},"✅")
+                  React.createElement("div",{style:{position:"absolute",top:-6,right:-6,fontSize:13}},iconText("✅"))
                 )
                 :React.createElement("div",{style:{width:54,height:54,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,background:"#f5f3ff",border:"2px solid #ddd6fe",borderRadius:10}},
                   React.createElement("div",{style:{fontSize:20,lineHeight:1,textAlign:"center",width:"100%"}},set.rewardEmoji),

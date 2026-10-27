@@ -1,7 +1,7 @@
 // Flair tab: feed bananas to unlock titles, auras, backgrounds, and items.
 
 import React, { useState, useEffect } from "../../../react.js";
-import { iconText } from "../../components/IconText.js";
+import { iconText, uiIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
@@ -15,7 +15,9 @@ import AutoFitText from "../../../ui/components/AutoFitText.js";
  * which are far too narrow for "Background". */
 const CAT_LABEL={titles:"Title",aura:"Aura",background:"Background",item:"Item"};
 const CAT_LABEL_SHORT={titles:"Title",aura:"Aura",background:"BG",item:"Item"};
-const CAT_EMOJI={titles:"📛",aura:"✨",background:"🖼️",item:"🌿"};
+// Category icons (images/ui_icons/flair), shown where a flair has no art of
+// its own -- every title, and any aura/background/item still on emoji.
+const CAT_EMOJI={titles:uiIcon("flair/titles","Title"),aura:uiIcon("flair/auras","Aura"),background:uiIcon("flair/backgrounds","Background"),item:uiIcon("flair/items","Item")};
 // Whether the Feed tab shows the "Equipped" row (hidden for now).
 const SHOW_EQUIPPED_ROW=false;
 
@@ -200,7 +202,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
                     ? (()=>{
                         const r0=feedResult.results[0];
                         return React.createElement("div",{style:{textAlign:"center"}},
-                          React.createElement("div",{style:{fontSize:72,lineHeight:1,marginBottom:12}},r0.won.emoji||r0.emoji),
+                          React.createElement("div",{style:{fontSize:72,lineHeight:1,marginBottom:12}},r0.won.emoji||CAT_EMOJI[categoryOf(r0)]),
                           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:RARITY_COLORS_FLAIR[r0.rarity],textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4}},
                             r0.rarity+" · "+(r0.cat==="titles"?"Title":r0.cat==="aura"?"Aura":r0.cat==="background"?"Background":"Item")
                           ),
@@ -391,7 +393,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
                         React.createElement("span",{style:{fontSize:16,fontWeight:800}},cost)
                       )
                 ),
-                showFeedGuideArrow&&label==="Feed ×1"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
+                showFeedGuideArrow&&label==="Feed ×1"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️"))
               );
             return React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:14,width:"100%"}},
               feedBtn("Feed ×1",need1,dis1,()=>{doFeed(1);if(flairGuideStep==="feed")setFlairGuideStep(null);},{"data-guide-target":"feed"}),

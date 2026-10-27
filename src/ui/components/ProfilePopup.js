@@ -2,6 +2,7 @@
 // tabs below, each a scrollable list of selectable options.
 
 import React from "../../react.js";
+import { iconText } from "./IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
 import { getChain, getSkinsForCreature } from "../../core/creatures.js";
@@ -136,7 +137,7 @@ function ProfilePopup({ onClose }) {
               style: { display: "flex", alignItems: "center", justifyContent: "space-between", textAlign: "left", padding: "8px 12px", borderRadius: 8, border: profileTitle === name ? "2px solid #7c4dff" : "2px solid #e8e8e8", background: !unlocked ? "#f5f5f5" : (profileTitle === name ? "#f3eeff" : "#fafafa"), fontSize: 13, fontWeight: 600, color: !unlocked ? "#bbb" : "#333", cursor: unlocked ? "pointer" : "default" }
             },
               name,
-              !unlocked && React.createElement("span", { style: { fontSize: 13 } }, "🔒")
+              !unlocked && React.createElement("span", { style: { fontSize: 13 } }, iconText("🔒"))
             );
           })
         )

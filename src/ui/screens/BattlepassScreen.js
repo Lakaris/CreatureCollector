@@ -111,8 +111,8 @@ function BattlepassScreen({onBack}){
                 React.createElement("span",{key:"emoji",style:{fontSize:30,filter:locked?"grayscale(70%)":"none"}},currencyIcon(rewardKey,rewardEmoji))
               ]
         ),
-        locked?React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#999",background:"#eaeaea",borderRadius:8,padding:"3px 10px",lineHeight:1.3,textAlign:"center"}},"🔒 Premium")
-          :claimed?React.createElement("span",{style:{fontSize:16,color:"#aaa"}},"✓")
+        locked?React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#999",background:"#eaeaea",borderRadius:8,padding:"3px 10px",lineHeight:1.3,textAlign:"center"}},iconText("🔒 Premium"))
+          :claimed?React.createElement("span",{style:{fontSize:16,color:"#aaa"}},iconText("✓"))
           :canClaim?React.createElement("button",{onClick:e=>{e.stopPropagation();isPaid?claimPaid(i):claimFree(i);},style:{fontSize:13,padding:"6px 16px",borderRadius:10,border:"none",background:PURPLE,color:"#fff",fontWeight:700,cursor:"pointer"}},"CLAIM")
           :React.createElement("span",{style:{fontSize:13,color:"#ccc"}},"Locked")
       )
@@ -211,7 +211,7 @@ function BattlepassScreen({onBack}){
                 display:"flex",alignItems:"center",justifyContent:"center",
                 fontSize:12,fontWeight:800,color:textColor,
                 boxShadow:done&&!fullyDone?"0 2px 8px rgba(83,74,183,0.3)":"none"
-              }},fullyDone?"✓":(i+1))
+              }},fullyDone?iconText("✓"):(i+1))
             ),
             React.createElement(RewardBox,{i,isPaid:true})
           );

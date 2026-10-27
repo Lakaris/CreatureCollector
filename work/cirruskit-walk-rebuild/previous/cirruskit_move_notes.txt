@@ -1,0 +1,15 @@
+Cirruskit movement animation — simple walk in place
+
+24 frames, 512 x 512 pixels each, arranged in a 6 x 4 grid. Transparent PNG spritesheet: cirruskit_move.png. Timing: 64 ms per frame, 1536 ms per loop. Read left to right, then top to bottom.
+
+Cirruskit walks in place with four alternating paw lifts, a body bob up to 3 pixels, small forward/backward paw movement, and a tail swish up to 6 pixels. The first frame matches the idle base exactly. The loop has no duplicated final frame or adjacent repeated poses; the neutral contact pose appears again halfway through the cycle.
+
+The animation uses the original idle base artwork. The face and complete cream mane move together so their colors, shadows and all three tan swirls stay consistent. Motion is confined to the legs, body bob and tail. The tail/body attachment stays anchored so outlines do not split. Each frame is rendered directly from the source rather than from the preceding frame.
+
+A single stepping-pose guide was made with the built-in image editor. The guide is kept in ../../work/cirruskit-walk/step-pose-guide.png and the exact prompt is in ../../work/cirruskit-walk/image-edit-prompt.txt. Generated reference pixels are not substituted into the animation.
+
+The game's move state is connected in src/data/creatureArt.js with the same 24 frames, 6 columns and 64 ms holds. Existing idle and flavor assets are unchanged.
+
+Validation: correct sheet dimensions and transparency, exact base starting pose, all exported cells match their source frames, no clipped canvas edges or detached marks, matching game/JSON/APNG timing, and a last-to-first change within the ordinary range of adjacent changes at 130 px. Across the 24 frames, 354,336 mane pixels and 962,856 face pixels match the original source exactly after the body bob. Enlarged stepping poses and 130 px contact frames were inspected.
+
+The HTML preview shows game size and full size, with pause, previous/next frame, a frame slider and dark-background controls.

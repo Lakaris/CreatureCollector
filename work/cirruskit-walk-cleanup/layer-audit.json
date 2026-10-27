@@ -1,0 +1,31 @@
+{
+  "gaitAndPivotsUnchanged": true,
+  "tailAndForegroundLayersUnchanged": true,
+  "limbs": {
+    "nearHind": {
+      "outlinedRows": 74,
+      "outlineFailures": [],
+      "opaqueInterior": 5307,
+      "translucentInterior": 0
+    },
+    "nearFront": {
+      "outlinedRows": 85,
+      "outlineFailures": [],
+      "opaqueInterior": 6474,
+      "translucentInterior": 0
+    },
+    "farHind": {
+      "outlinedRows": 50,
+      "outlineFailures": [],
+      "opaqueInterior": 1863,
+      "translucentInterior": 0
+    },
+    "farFront": {
+      "outlinedRows": 77,
+      "outlineFailures": [],
+      "opaqueInterior": 4355,
+      "translucentInterior": 0
+    }
+  },
+  "fixedBellyPixelChecks": 243480
+}

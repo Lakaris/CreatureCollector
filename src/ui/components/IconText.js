@@ -19,6 +19,7 @@
 import React from "../../react.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
+import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { exclusivityAxis } from "../../core/equipment.js";
 
 const ITEM_ICONS = [
@@ -40,7 +41,36 @@ const ITEM_ICONS = [
   { re: /🔷/u, src: "images/item_icons/flairshard.png", alt: "Flair Shard" },
   { re: /🪴/u, src: "images/item_icons/ancientfertilizer.png", alt: "Ancient Fertilizer" },
   { re: /🌈/u, src: "images/item_icons/rainbowmelon.png", alt: "Rainbow Melon" },
+  // Interface symbols (images/ui_icons/symbols). The arrows are the
+  // tutorial's bouncing pointers; ✓ and ✅ are both "done".
+  { re: /🔒/u, src: "images/ui_icons/symbols/locked.png", alt: "Locked" },
+  { re: /🔓/u, src: "images/ui_icons/symbols/unlocked.png", alt: "Unlocked" },
+  { re: /✅|✓/u, src: "images/ui_icons/symbols/checkmark.png", alt: "Done" },
+  { re: /✕/u, src: "images/ui_icons/symbols/x.png", alt: "Close" },
+  { re: /⚠️?/u, src: "images/ui_icons/symbols/warning.png", alt: "Warning" },
+  { re: /✦/u, src: "images/ui_icons/symbols/fourpointstar.png", alt: "" },
+  { re: /⬇️?/u, src: "images/ui_icons/symbols/tutorialarrowdown.png", alt: "" },
+  { re: /⬆️?/u, src: "images/ui_icons/symbols/tutorialarrowup.png", alt: "" },
+  { re: /⬅️?/u, src: "images/ui_icons/symbols/tutorialarrowleft.png", alt: "" },
+  { re: /➡️?/u, src: "images/ui_icons/symbols/tutorialarrowright.png", alt: "" },
+  // Battle actions (images/ui_icons/actions).
+  { re: /⏱️?/u, src: "images/ui_icons/actions/time.png", alt: "Time" },
+  { re: /🗑️?/u, src: "images/ui_icons/actions/clearteam.png", alt: "Clear" },
+  { re: /🏳️?/u, src: "images/ui_icons/actions/retreat.png", alt: "Forfeit" },
 ];
+
+/** A creature's ascension shard icon, by the creature's rarity -- the
+ * picture for what the game writes as 🔶. */
+export function shardIcon(rarity) {
+  const r = rarity === "legendary" || rarity === "epic" ? rarity : "common";
+  return iconImg({ src: "images/item_icons/" + r + "ascensionshard.png", alt: "Shards" });
+}
+
+/** An interface icon from images/ui_icons (`name` like "menu/home"),
+ * em-sized like iconText's pictures. */
+export function uiIcon(name, alt) {
+  return iconImg({ src: "images/ui_icons/" + name + ".png", alt: alt || "" });
+}
 
 // Currency art by currency key (the keys of `currencies`, REWARD_LABELS and
 // reward tables). Gear Shards (⚔️ / 🔧), Dungeon Passes (🎫) and the element
@@ -56,13 +86,19 @@ const CURRENCY_ICONS = {
   melonWind: "windmelon", melonElectric: "electricmelon", melonLight: "lightmelon", melonDark: "darkmelon",
   melonRainbow: "rainbowmelon",
   ascensionMelon: "legendaryascensionmelon", ascensionMelonCommon: "commonascensionmelon", ascensionMelonEpic: "epicascensionmelon",
+  mysteriousOre: "mysteriousore", deluxeOre: "deluxeore", prismaticOre: "prismaticore",
+  gearBundle: "randomequipment",
 };
 
-/** A currency's icon by key, em-sized like iconText's pictures. A key without
- * art keeps its emoji as-is: the key says what it is, and its emoji may be
- * another currency's (Deluxe Ore is 💎, the Gems emoji). With no key at all,
- * fall back to iconText's emoji matching. */
+/** A reward's icon by key, em-sized like iconText's pictures. The key is a
+ * currency, or a gear id (gear given as a reward -- it draws that gear's own
+ * art, so any gear reward picks up its picture with no extra wiring). A key
+ * without art keeps its emoji as-is: the key says what it is, and its emoji
+ * may be another currency's (Deluxe Ore is 💎, the Gems emoji). With no key
+ * at all, fall back to iconText's emoji matching. */
 export function currencyIcon(key, fallback) {
+  const gear = key && EQUIPMENT_MAP[key];
+  if (gear && gear.image) return iconImg({ src: gear.image, alt: gear.name });
   const f = CURRENCY_ICONS[key];
   if (!f) return key ? fallback : iconText(fallback);
   return iconImg({ src: "images/item_icons/" + f + ".png", alt: key });

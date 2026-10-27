@@ -1,0 +1,250 @@
+{
+  "frames": 30,
+  "sameGaitPoseData": true,
+  "bodyAnchoredPixels": 10410,
+  "bodyAnchoredInkPixels": 5610,
+  "unchangedRearPixels": 3840000,
+  "originalPawSourcePixels": 48640,
+  "failures": [],
+  "perFrame": [
+    {
+      "frame": 1,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 2,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 3,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 4,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 5,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 6,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 7,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 8,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 9,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 10,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 11,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 12,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 13,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 14,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 15,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 16,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 17,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 18,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 19,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 20,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 21,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 22,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 23,
+      "enclosedGaps": [
+        [
+          360,
+          416
+        ],
+        [
+          357,
+          417
+        ],
+        [
+          358,
+          417
+        ],
+        [
+          359,
+          417
+        ],
+        [
+          360,
+          417
+        ],
+        [
+          361,
+          417
+        ],
+        [
+          358,
+          418
+        ],
+        [
+          359,
+          418
+        ],
+        [
+          360,
+          418
+        ],
+        [
+          361,
+          418
+        ],
+        [
+          358,
+          419
+        ],
+        [
+          359,
+          419
+        ],
+        [
+          360,
+          419
+        ],
+        [
+          361,
+          419
+        ],
+        [
+          359,
+          420
+        ],
+        [
+          360,
+          420
+        ],
+        [
+          361,
+          420
+        ],
+        [
+          360,
+          421
+        ],
+        [
+          361,
+          421
+        ],
+        [
+          361,
+          422
+        ],
+        [
+          362,
+          422
+        ],
+        [
+          362,
+          423
+        ]
+      ],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 24,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 25,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 26,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 27,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 28,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 29,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    },
+    {
+      "frame": 30,
+      "enclosedGaps": [],
+      "detachedDarkMarks": []
+    }
+  ]
+}

@@ -75,6 +75,22 @@ function sheetAnimation(art) {
   return name + " " + (art.totalMs / 1000).toFixed(3) + "s step-end " + (art.loop ? "infinite" : "1 forwards");
 }
 
+// Sheets loaded and decoded ahead of use, by src. Switching a showcase
+// creature to a sheet the browser hasn't decoded yet draws nothing for a
+// moment -- a white flash -- so every state's sheet is fetched as soon as the
+// creature is on show, and a play waits for its sheet before switching. The
+// Image objects stay referenced here so the decoded pictures stay cached.
+const preloaded = new Map();
+function preloadSheet(src) {
+  if (!preloaded.has(src)) {
+    const img = new Image();
+    img.src = src;
+    const ready = (img.decode ? img.decode() : new Promise((r) => { img.onload = img.onerror = r; })).catch(() => {});
+    preloaded.set(src, { img, ready });
+  }
+  return preloaded.get(src).ready;
+}
+
 /**
  * Drives showcase animations: flavor on a random timer, and any non-idle state
  * on tap. Returns the state playing now (null = resting) and a play count that
@@ -88,9 +104,19 @@ function useShowcase(enabled, def, ownedData, unlockedSkins) {
   const [playing, setPlaying] = useState(null);
   const sig = (def && def.id) + ":" + states.join();
 
+  // Warm every sheet this creature can switch to, idle included (it's
+  // remounted on the way back from a play).
+  useEffect(() => {
+    if (!states.length) return;
+    ["idle", ...states].forEach((s) => preloadSheet(getDisplayArt(def, ownedData, unlockedSkins, s).src));
+  }, [sig]);
+
+  // Switch only once the sheet is decoded, so the swap is instant.
   const start = (s) => {
-    setPlays((n) => n + 1);
-    setPlaying(s);
+    preloadSheet(getDisplayArt(def, ownedData, unlockedSkins, s).src).then(() => {
+      setPlays((n) => n + 1);
+      setPlaying(s);
+    });
   };
 
   useEffect(() => {

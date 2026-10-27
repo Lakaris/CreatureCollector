@@ -1,7 +1,7 @@
 // Creature detail screen: stats, levelling, evolution, equipment, and the skin/flair tabs.
 
 import React, { useState, useEffect, useRef } from "../../../react.js";
-import { iconText, currencyIcon, gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX as CARD_ICON_PX } from "../../components/IconText.js";
+import { iconText, currencyIcon, uiIcon, shardIcon, gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX as CARD_ICON_PX } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
@@ -30,7 +30,7 @@ import { formatNum } from "../../../core/format.js";
 // guided walkthrough points the player at equipping.
 const TUTORIAL_ITEM_ID="com_hp_atk";
 // Marker beside the rarity label in the header -- a climbing ladder of stones.
-const RARITY_GEM={common:"🪨",epic:"🔮",legendary:"💎"};
+const RARITY_GEM={common:uiIcon("rarities/common","Common"),epic:uiIcon("rarities/epic","Epic"),legendary:uiIcon("rarities/legendary","Legendary")};
 // The level-up detour only requires a single level-up before advancing --
 // the guided harvest's fixed food amount isn't guaranteed to afford more
 // than that (it doesn't scale with the food-cost curve in core/creatures.js),
@@ -236,6 +236,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   // Ascension melons are rarity-gated: this creature can only spend the melon
   // currency matching its own rarity.
   const ascMelon=getAscensionMelon(def.rarity);
+  // Text with the 🔶 shard marker drawn as this creature's rarity of shard
+  // (iconText can't, since the marker alone doesn't say which rarity).
+  const shardText=text=>{
+    const i=text.indexOf("🔶");
+    if(i<0)return iconText(text);
+    return React.createElement(React.Fragment,null,iconText(text.slice(0,i)),shardIcon(def.rarity),iconText(text.slice(i+2)));
+  };
   const isMaxAscension=ownedData.ascensions>=MAX_ASCENSION;
   function doAscend(){
     if(isMaxAscension)return;
@@ -508,7 +515,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             asc>0&&React.createElement("div",{style:{display:"flex",justifyContent:"center",marginBottom:4}},React.createElement(GearAscStars,{asc,size:16})),
             React.createElement("div",{style:{fontSize:16,fontWeight:700,color:lvl>=maxLvl?"#d97706":"#444",marginBottom:6}},"Lv "+lvl),
             React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:pi.effect?6:0}},equipBonusStr(bonuses)),
-            pi.effect&&React.createElement("div",{style:{fontSize:12,color:"#7F77DD",fontWeight:600}},"✦ "+pi.effect)
+            pi.effect&&React.createElement("div",{style:{fontSize:12,color:"#7F77DD",fontWeight:600}},iconText("✦ "+pi.effect))
           ),
           React.createElement("div",{style:{flex:1,minHeight:0}}),
           React.createElement("div",{style:{borderTop:"1px solid #eee",paddingTop:14,display:"flex",flexDirection:"column",gap:10,flexShrink:0}},
@@ -523,13 +530,13 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                       disabled:!canAffordUpgrade,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordUpgrade?"pointer":"default",background:canAffordUpgrade?"#534AB7":"#e0e0e0",color:canAffordUpgrade?"#fff":"#aaa",userSelect:"none"}
                     },"🔧 Upgrade "+formatNum(currencies.equipShards||0)+" / "+formatNum(upgradeCost))
                   )
-                : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},"✦ Max Level")
+                : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},iconText("✦ Max Level"))
             ),
             React.createElement("div",null,
               React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#666",marginBottom:6}},"ASCENSION"),
               asc<EQUIP_MAX_ASCENSION
-                ? React.createElement("button",{onClick:()=>doAscendEquip(pi.id),disabled:!canAffordAsc,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordAsc?"pointer":"default",background:canAffordAsc?"#f59e0b":"#e0e0e0",color:canAffordAsc?"#fff":"#aaa"}},"✦ Ascend "+copies+" / "+ascCost)
-                : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},"✦ Max Ascension")
+                ? React.createElement("button",{onClick:()=>doAscendEquip(pi.id),disabled:!canAffordAsc,style:{width:"100%",padding:"10px 0",fontSize:13,fontWeight:700,border:"none",borderRadius:9,cursor:canAffordAsc?"pointer":"default",background:canAffordAsc?"#f59e0b":"#e0e0e0",color:canAffordAsc?"#fff":"#aaa"}},iconText("✦ Ascend "+copies+" / "+ascCost))
+                : React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f59e0b"}},iconText("✦ Max Ascension"))
             )
           )
         )
@@ -639,7 +646,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               setEquipmentAscensions(newAsc);
             },
             style:{width:"100%",marginBottom:6,fontSize:12,fontWeight:800,color:"#fff",background:"#f59e0b",border:"none",borderRadius:9,cursor:"pointer",padding:"8px 0",letterSpacing:".03em"}
-          },"✦ Ascend All");
+          },iconText("✦ Ascend All"));
         })(),
         equipFiltersOpen&&React.createElement("div",null,
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
@@ -758,7 +765,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               onMouseDown:onPressStart,onMouseUp:onPressEnd,onMouseLeave:onPressEnd,
               onTouchStart:onPressStart,onTouchEnd:onPressEnd,onTouchCancel:onPressEnd,
               style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:tutorialBlocked?0.35:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled&&!tutorialBlocked)?"pointer":"default",width:"calc(50% - 4px)",minHeight:170,boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
-              showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+              showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
                 React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},"Lv "+lvl),
                 // Icon only, as on the Equipment page -- "Fire exclusive" in
@@ -791,7 +798,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               React.createElement("div",null,
                 React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#000"}},item.name),
                 React.createElement("div",{style:{fontSize:11,color:"#666",minHeight:27}},equipBonusStr(bonuses)),
-                React.createElement("div",{style:{fontSize:10,color:"#7F77DD",fontWeight:600,marginTop:2,minHeight:39,lineHeight:1.3}},item.effect?"✦ "+item.effect:"")
+                React.createElement("div",{style:{fontSize:10,color:"#7F77DD",fontWeight:600,marginTop:2,minHeight:39,lineHeight:1.3}},item.effect?iconText("✦ "+item.effect):"")
               ),
               React.createElement("div",{style:{minHeight:20,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},
                 canAscendItem&&React.createElement("span",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#f59e0b",borderRadius:6,padding:"1px 6px",letterSpacing:".04em",whiteSpace:"nowrap"}},"ASCEND READY"),
@@ -875,7 +882,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           "You have "+ownedData.shards+" shards."
         ),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},
-          iconText(confirmMelon.shardsUsed>0
+          shardText(confirmMelon.shardsUsed>0
             ?"This will use 🔶 "+confirmMelon.shardsUsed+" shards + "+ascMelon.emoji+" "+confirmMelon.melonsUsed+" melon"+(confirmMelon.melonsUsed>1?"s":"")+"."
             :ascMelon.emoji+" "+confirmMelon.melonsUsed+" melon"+(confirmMelon.melonsUsed>1?"s":"")+" will be used.")
         ),
@@ -968,7 +975,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             onMouseDown:cSlotPressStart,onMouseUp:cSlotPressEnd,onMouseLeave:cSlotPressEnd,
             onTouchStart:cSlotPressStart,onTouchEnd:cSlotPressEnd,onTouchCancel:cSlotPressEnd,
             style:{position:"relative",flex:1,background:item?"#f7f7ff":"#f5f5f5",border:"1.5px solid "+(item?"#d0ccf7":"#e0e0e0"),borderRadius:10,padding:"8px 10px",textAlign:"center",cursor:slotBlocked?"not-allowed":"pointer",userSelect:"none",opacity:(slotBlocked&&!levelupLock&&!(tutorialStep==="slot"&&slotIdx===0))?0.5:1}},
-            showSlotPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+            showSlotPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
             item
               ? React.createElement("div",null,
                   React.createElement("div",{style:{position:"relative",display:"inline-block"}},
@@ -1009,14 +1016,14 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             opacity:tabLocked?0.6:1,
             transition:"all .15s"}
         },
-          (showFlairGuideArrow||showCandyGuideArrow)&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+          (showFlairGuideArrow||showCandyGuideArrow)&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
           t.label
         );
       })
     ),
     tab==="levelup"&&React.createElement(React.Fragment,null,
       React.createElement("div",{className:"card",ref:levelUpCardRef,style:{marginBottom:10,position:"relative"}},
-        tutorialStep==="levelupCreature"&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:74,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+        tutorialStep==="levelupCreature"&&React.createElement("div",{style:{position:"absolute",left:"50%",bottom:74,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
         React.createElement("div",{className:"section-label"},"Level Up"),
         isMaxLevel
           ? React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:8}},"Lv "+ownedData.level+" — Max level reached")
@@ -1068,7 +1075,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           const label=melonsUsed>0
             ?action+" — 🔶 "+shardsUsed+(melonsUsed>0?" + "+ascMelon.emoji+" "+melonsUsed:"")
             :action+" — 🔶 "+needed+" Shards";
-          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend||ascendButtonLock,style:{marginBottom:0,opacity:ascendButtonLock?0.5:undefined}},iconText(label));
+          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend||ascendButtonLock,style:{marginBottom:0,opacity:ascendButtonLock?0.5:undefined}},shardText(label));
         })()
       )
     ),

@@ -1,7 +1,7 @@
 // Home tab: featured creature plus entries into quests, daily, and battle pass.
 
 import React from "../../react.js";
-import { iconText } from "../components/IconText.js";
+import { uiIcon, iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { FLAIR_AURA_MAP, backdropImage } from "../../data/flair.js";
@@ -68,18 +68,19 @@ function HomeScreen(){
   const def=ownedData?CREATURE_MAP[ownedData.id]:null;
   const auraDef=ownedData&&ownedData.equippedAura?FLAIR_AURA_MAP[ownedData.equippedAura]:null;
   const homeBackdrop=backdropImage(ownedData);
-  // One tile in Home's menu row: the emoji in a round badge tinted with the
-  // tile's own colour, its label below, a red notification badge on the
-  // corner when something is waiting, and room for an extra overlay (the
-  // Quests pointer). Dimmed and inert while the tutorial restricts Home.
-  // `sub` is a small second line under the label (Descend's floor); `active`
-  // overrides the tutorial lock for the one tile a tutorial step points at.
-  const homeTile=(emoji,label,tint,dot,onClick,extra,{sub=null,active=!tutorialRestricted}={})=>React.createElement("button",{
+  // One tile in Home's menu row: the icon on its own (no badge behind it),
+  // its label below, a red notification badge on the corner when something
+  // is waiting, and room for an extra overlay (the Quests pointer). Dimmed
+  // and inert while the tutorial restricts Home. `sub` is a small second
+  // line under the label (Descend's floor); `active` overrides the tutorial
+  // lock for the one tile a tutorial step points at.
+  const homeTile=(icon,label,dot,onClick,extra,{sub=null,active=!tutorialRestricted}={})=>React.createElement("button",{
     key:label,
     onClick:()=>{if(!active)return;onClick();},
-    style:{position:"relative",flex:1,maxWidth:86,minHeight:96,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",gap:7,padding:"12px 4px 10px",border:"none",borderRadius:18,background:"#fff",boxShadow:"0 2px 10px rgba(83,74,183,0.10)",fontFamily:"inherit",cursor:active?"pointer":"not-allowed",opacity:active?1:0.4}
+    style:{position:"relative",flex:1,maxWidth:86,minHeight:96,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",gap:5,padding:"10px 4px 10px",border:"none",borderRadius:18,background:"#fff",boxShadow:"0 2px 10px rgba(83,74,183,0.10)",fontFamily:"inherit",cursor:active?"pointer":"not-allowed",opacity:active?1:0.4}
   },
-    React.createElement("span",{style:{width:44,height:44,borderRadius:"50%",background:tint,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,lineHeight:1,flexShrink:0}},emoji),
+    // 48px box; the icon is 1.15em of the font size, so 42 fills it.
+    React.createElement("span",{style:{width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,lineHeight:1,flexShrink:0}},icon),
     React.createElement("span",{style:{fontSize:10.5,fontWeight:700,color:"#3f3a78",textAlign:"center",lineHeight:1.15}},label,
       sub&&React.createElement("span",{style:{display:"block",fontSize:9.5,fontWeight:600,color:"#6366f1",marginTop:2}},sub)),
     dot&&React.createElement("div",{style:{position:"absolute",top:-3,right:-3,width:12,height:12,borderRadius:"50%",background:"#ef4444",border:"2px solid #fff",boxSizing:"border-box"}}),
@@ -142,10 +143,10 @@ function HomeScreen(){
       React.createElement("div",{style:{fontSize:11.5,fontWeight:800,color:"#e11d48",fontVariantNumeric:"tabular-nums"}},pad(Math.floor(s/3600))+":"+pad(Math.floor(s%3600/60))+":"+pad(s%60))
     );
   })();
-  const descendTile=homeTile("🌀","Descend","#EEF2FF",false,
+  const descendTile=homeTile(uiIcon("actions/descend","Descend"),"Descend",false,
     ()=>{setGameMode("labyrinth");setTab("play");if(descendStep)setTutorialStep("labyrinth");},
     React.createElement(React.Fragment,null,
-      descendStep&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-36,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+      descendStep&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-36,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
       descendReward),
     {sub:"Floor "+(labyrinthDepth||1),active:!tutorialRestricted||descendStep});
   if(showQuests) return React.createElement(QuestsScreen,{onBack:()=>{
@@ -167,11 +168,11 @@ function HomeScreen(){
   // stretched Home; the background scene below needs the full height.
   return React.createElement("div",{style:{flex:1,height:"100%",display:"flex",flexDirection:"column"}},
     React.createElement(ScreenHeader,{title:"",left:React.createElement(React.Fragment,null,
-      topBarButton("⚙️","Settings",false,()=>setSettingsOpen(true)),
+      topBarButton(uiIcon("actions/settings","Settings"),"Settings",false,()=>setSettingsOpen(true)),
       // The Daily reward sits up here as a small button rather than a tile in
       // the menu row (Descend took its place there); its red dot still shows
       // while a reward is waiting to be claimed (see dailyRewardWaiting).
-      topBarButton("📅","Daily",dailyRewardWaiting({dailyDay,dailyLastClaimed,dailyClaimed}),()=>setShowDaily(true))
+      topBarButton(uiIcon("actions/dailycalendarrewards","Daily"),"Daily",dailyRewardWaiting({dailyDay,dailyLastClaimed,dailyClaimed}),()=>setShowDaily(true))
     ),right:React.createElement(React.Fragment,null,
       React.createElement(CurrencyChip,{currency:"equipShards",emoji:"⚔️",value:currencies.equipShards}),
       React.createElement(CurrencyChip,{currency:"food",emoji:"🍖",value:currencies.food}),
@@ -207,21 +208,21 @@ function HomeScreen(){
         "You see a mysterious cave entrance that you didn't see before."
       ),
       (!tutorialRestricted||dungeonRevealActive)&&tutorialStep!=="descend"&&React.createElement(React.Fragment,null,
-        homeTile("📋","Quests","#EEEDFE",hasReadyQuest,()=>{setShowQuests(true);setShowQuestsArrow(false);},
+        homeTile(uiIcon("actions/quests","Quests"),"Quests",hasReadyQuest,()=>{setShowQuests(true);setShowQuestsArrow(false);},
           // Points down at Quests after the player finishes a Daily/New
           // Player Gift popup -- unlike the tutorial's arrows, this doesn't
           // lock anything else; it just sticks around until Quests itself is
           // tapped.
-          !tutorialRestricted&&showQuestsArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-36,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")),
-        homeTile("🎫","Battle Pass","#FFF3D6",false,()=>setShowBattlepass(true)),
+          !tutorialRestricted&&showQuestsArrow&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-36,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️"))),
+        homeTile(uiIcon("actions/battlepass","Battle Pass"),"Battle Pass",false,()=>setShowBattlepass(true)),
         descendTile,
-        !giftGone&&homeTile("🎁","New Player Welcome Gift","#FDE7EC",easternNoonDayKey()!==newPlayerGiftLastClaimed,()=>setShowNewPlayerGift(true),giftCountdown)
+        !giftGone&&homeTile(uiIcon("actions/newplayerwelcomegift","New Player Welcome Gift"),"New Player Welcome Gift",easternNoonDayKey()!==newPlayerGiftLastClaimed,()=>setShowNewPlayerGift(true),giftCountdown)
       )
     ),
     tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:16,right:16,bottom:150,background:"#fff",border:"2px solid #534AB7",borderRadius:16,padding:"14px 16px",fontSize:14,color:"#333",lineHeight:1.4,boxShadow:"0 4px 16px rgba(0,0,0,0.14)",zIndex:6}},
       "Let's equip "+(def?def.name:"your creature")+" with the Iron Band you just got."
     ),
-    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:COLLECTION_TAB_LEFT_PCT,bottom:80,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️")
+    tutorialRestricted&&tutorialStep==="collection"&&React.createElement("div",{style:{position:"fixed",left:COLLECTION_TAB_LEFT_PCT,bottom:80,transform:"translate(-50%,0)",fontSize:32,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️"))
     )
   );
 }

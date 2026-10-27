@@ -10,7 +10,7 @@
 // whole screen is a debug tool and may be removed or toggled off later.
 
 import React, { useState, useRef, useEffect } from "../../../react.js";
-import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../../components/IconText.js";
+import { iconText, gearIcon, typeIcon, roleIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -533,7 +533,7 @@ function TestBattleScreen({ onBack }) {
         )
       ),
       outcome && React.createElement("div", { style: { position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.92)", zIndex: 210, gap: 14 } },
-        React.createElement("div", { style: { fontSize: 56 } }, outcome === "won" ? "✅" : "💀"),
+        React.createElement("div", { style: { fontSize: 56 } }, outcome === "won" ? iconText("✅") : "💀"),
         React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: outcome === "won" ? "#534AB7" : "#ef4444" } }, outcome === "won" ? "Players Win" : "Enemies Win"),
         React.createElement("div", { style: { display: "flex", gap: 10 } },
           React.createElement("button", { onClick: startFight, style: { padding: "10px 22px", background: "#534AB7", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "↺ Rematch"),
@@ -598,7 +598,7 @@ function TestBattleScreen({ onBack }) {
               React.createElement(CreatureIcon, { def, size: TILE, contain: true }),
               React.createElement("div", { style: { position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 14, height: 3, borderRadius: 2, background: p.side === "player" ? "#534AB7" : "#ef4444" } }),
               gearCount > 0 && React.createElement("div", { style: { position: "absolute", top: 1, right: 1, fontSize: 8, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 7, padding: "1px 4px", lineHeight: 1.3 } }, "🔧" + gearCount),
-              p.abil && React.createElement("div", { style: { position: "absolute", top: 1, left: 1, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : "✦"),
+              p.abil && React.createElement("div", { style: { position: "absolute", top: 1, left: 1, fontSize: 9, lineHeight: 1 } }, isMaxedKit(p.abil) ? "⭐" : iconText("✦")),
               ((p.level || 0) >= 1 || p.asc != null) && React.createElement("div", { style: { position: "absolute", bottom: 1, right: 1, fontSize: 7, fontWeight: 800, color: "#fff", background: "#3b82f6", borderRadius: 6, padding: "1px 3px", lineHeight: 1.3, whiteSpace: "nowrap" } }, ((p.level || 0) >= 1 ? "L" + p.level : "") + (p.asc != null ? "★" + p.asc : ""))
             )
           );
@@ -606,7 +606,7 @@ function TestBattleScreen({ onBack }) {
       ),
       React.createElement("div", { style: { display: "flex", gap: 8 } },
         React.createElement("button", { onClick: startFight, disabled: !playerCount || !enemyCount, style: { padding: "10px 26px", fontSize: 14, fontWeight: 800, background: (playerCount && enemyCount) ? "#534AB7" : "#ccc", color: "#fff", border: "none", borderRadius: 10, cursor: (playerCount && enemyCount) ? "pointer" : "default" } }, "▶ Play"),
-        React.createElement("button", { onClick: () => setTestGrid({}), disabled: !playerCount && !enemyCount, style: { padding: "10px 16px", fontSize: 13, fontWeight: 700, background: "#fff", color: (playerCount || enemyCount) ? "#534AB7" : "#ccc", border: "1.5px solid " + ((playerCount || enemyCount) ? "#534AB7" : "#ccc"), borderRadius: 10, cursor: "pointer" } }, "🗑 Clear")
+        React.createElement("button", { onClick: () => setTestGrid({}), disabled: !playerCount && !enemyCount, style: { padding: "10px 16px", fontSize: 13, fontWeight: 700, background: "#fff", color: (playerCount || enemyCount) ? "#534AB7" : "#ccc", border: "1.5px solid " + ((playerCount || enemyCount) ? "#534AB7" : "#ccc"), borderRadius: 10, cursor: "pointer" } }, iconText("🗑 Clear"))
       ),
       React.createElement("input", { placeholder: "Search creatures…", value: search, onChange: (e) => setSearch(e.target.value), style: { width: "100%", maxWidth: COLS * TILE, padding: "7px 10px", borderRadius: 8, border: "1px solid #ccc", fontSize: 13, boxSizing: "border-box" } }),
       // Roster filters: type / role / range / rarity chips + owned toggle.
@@ -768,7 +768,7 @@ function TestBattleScreen({ onBack }) {
                 React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                   React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, it.name + "  ·  Lv " + lvl),
                   React.createElement("div", { style: { fontSize: 10, color: "#666" } }, equipBonusStr(bonuses)),
-                  it.effect && React.createElement("div", { style: { fontSize: 9, color: "#7F77DD", fontWeight: 600 } }, "✦ " + it.effect)
+                  it.effect && React.createElement("div", { style: { fontSize: 9, color: "#7F77DD", fontWeight: 600 } }, iconText("✦ " + it.effect))
                 ),
                 React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: rarCfg ? rarCfg.color : "#888", flexShrink: 0 } }, rarCfg ? rarCfg.label : it.rarity)
               );

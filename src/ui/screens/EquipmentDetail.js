@@ -4,7 +4,7 @@
 // own Gear tab already treats equipment.
 
 import React from "../../react.js";
-import { gearIcon } from "../components/IconText.js";
+import { iconText, gearIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
@@ -141,12 +141,12 @@ function EquipmentDetail({ itemId, onBack }) {
         asc > 0 && React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 4 } }, React.createElement(GearAscStars, { asc, size: 16 })),
         React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: lvl >= maxLvl ? "#d97706" : "#444", marginBottom: 6 } }, "Lv " + lvl),
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: pi.effect ? 6 : 0 } }, equipBonusStr(bonuses)),
-        pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + pi.effect)
+        pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, iconText("✦ " + pi.effect))
       ),
       React.createElement("div", { style: { flex: 1, minHeight: 0 } }),
       React.createElement("div", { style: { borderTop: "1px solid #eee", paddingTop: 14, display: "flex", flexDirection: "column", gap: 10, flexShrink: 0 } },
         React.createElement("div", { style: { position: "relative" } },
-          tutorialStep === "upgradeItem" && React.createElement("div", { style: { position: "absolute", left: "50%", top: -6, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
+          tutorialStep === "upgradeItem" && React.createElement("div", { style: { position: "absolute", left: "50%", top: -6, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, iconText("⬇️")),
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "UPGRADE"),
           lvl < maxLvl
             ? React.createElement("div", null,
@@ -160,13 +160,13 @@ function EquipmentDetail({ itemId, onBack }) {
                   }, "🔧 Upgrade " + formatNum(currencies.equipShards || 0) + " / " + formatNum(upgradeCost));
                 })()
               )
-            : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Level")
+            : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, iconText("✦ Max Level"))
         ),
         React.createElement("div", null,
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#666", marginBottom: 6 } }, "ASCENSION"),
           asc < EQUIP_MAX_ASCENSION
-            ? React.createElement("button", { onClick: doAscendEquip, disabled: !canAffordAsc, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: canAffordAsc ? "pointer" : "default", background: canAffordAsc ? "#f59e0b" : "#e0e0e0", color: canAffordAsc ? "#fff" : "#aaa" } }, "✦ Ascend " + copies + " / " + ascCost)
-            : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, "✦ Max Ascension")
+            ? React.createElement("button", { onClick: doAscendEquip, disabled: !canAffordAsc, style: { width: "100%", padding: "10px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 9, cursor: canAffordAsc ? "pointer" : "default", background: canAffordAsc ? "#f59e0b" : "#e0e0e0", color: canAffordAsc ? "#fff" : "#aaa" } }, iconText("✦ Ascend " + copies + " / " + ascCost))
+            : React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#f59e0b" } }, iconText("✦ Max Ascension"))
         )
       )
     )

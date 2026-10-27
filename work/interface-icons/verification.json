@@ -1,0 +1,590 @@
+[
+  {
+    "name": "Common Ascension Shard",
+    "category": "items",
+    "path": "images/item_icons/commonascensionshard.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      55,
+      10,
+      200,
+      244
+    ]
+  },
+  {
+    "name": "Mysterious Ore",
+    "category": "items",
+    "path": "images/item_icons/mysteriousore.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      16,
+      245,
+      240
+    ]
+  },
+  {
+    "name": "Battlepass",
+    "category": "actions",
+    "path": "images/ui_icons/actions/battlepass.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      12,
+      11,
+      243,
+      245
+    ]
+  },
+  {
+    "name": "Random Equipment",
+    "category": "items",
+    "path": "images/item_icons/randomequipment.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      22,
+      245,
+      233
+    ]
+  },
+  {
+    "name": "Settings",
+    "category": "actions",
+    "path": "images/ui_icons/actions/settings.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      11,
+      246,
+      245
+    ]
+  },
+  {
+    "name": "Daily Calendar Rewards",
+    "category": "actions",
+    "path": "images/ui_icons/actions/dailycalendarrewards.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      10,
+      243,
+      244
+    ]
+  },
+  {
+    "name": "Epic Ascension Shard",
+    "category": "items",
+    "path": "images/item_icons/epicascensionshard.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      54,
+      10,
+      200,
+      245
+    ]
+  },
+  {
+    "name": "Legendary Ascension Shard",
+    "category": "items",
+    "path": "images/item_icons/legendaryascensionshard.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      54,
+      11,
+      200,
+      244
+    ]
+  },
+  {
+    "name": "Deluxe Ore",
+    "category": "items",
+    "path": "images/item_icons/deluxeore.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      16,
+      244,
+      239
+    ]
+  },
+  {
+    "name": "Prismatic Ore",
+    "category": "items",
+    "path": "images/item_icons/prismaticore.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      15,
+      245,
+      239
+    ]
+  },
+  {
+    "name": "Descend",
+    "category": "actions",
+    "path": "images/ui_icons/actions/descend.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      17,
+      245,
+      238
+    ]
+  },
+  {
+    "name": "New Player Welcome Gift",
+    "category": "actions",
+    "path": "images/ui_icons/actions/newplayerwelcomegift.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      12,
+      11,
+      245,
+      245
+    ]
+  },
+  {
+    "name": "Time",
+    "category": "actions",
+    "path": "images/ui_icons/actions/time.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      26,
+      11,
+      228,
+      244
+    ]
+  },
+  {
+    "name": "Clear Team",
+    "category": "actions",
+    "path": "images/ui_icons/actions/clearteam.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      20,
+      245,
+      234
+    ]
+  },
+  {
+    "name": "Retreat",
+    "category": "actions",
+    "path": "images/ui_icons/actions/retreat.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      20,
+      11,
+      236,
+      245
+    ]
+  },
+  {
+    "name": "Home",
+    "category": "menu",
+    "path": "images/ui_icons/menu/home.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      15,
+      244,
+      239
+    ]
+  },
+  {
+    "name": "Hatch",
+    "category": "menu",
+    "path": "images/ui_icons/menu/hatch.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      36,
+      11,
+      219,
+      244
+    ]
+  },
+  {
+    "name": "Collection",
+    "category": "menu",
+    "path": "images/ui_icons/menu/collection.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      12,
+      244,
+      243
+    ]
+  },
+  {
+    "name": "Play",
+    "category": "menu",
+    "path": "images/ui_icons/menu/play.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      13,
+      245,
+      242
+    ]
+  },
+  {
+    "name": "Farm",
+    "category": "menu",
+    "path": "images/ui_icons/menu/farm.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      22,
+      245,
+      233
+    ]
+  },
+  {
+    "name": "Equipment",
+    "category": "menu",
+    "path": "images/ui_icons/menu/equipment.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      32,
+      244,
+      223
+    ]
+  },
+  {
+    "name": "Store",
+    "category": "menu",
+    "path": "images/ui_icons/menu/store.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      14,
+      244,
+      241
+    ]
+  },
+  {
+    "name": "Titles",
+    "category": "flair",
+    "path": "images/ui_icons/flair/titles.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      67,
+      245,
+      188
+    ]
+  },
+  {
+    "name": "Auras",
+    "category": "flair",
+    "path": "images/ui_icons/flair/auras.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      21,
+      11,
+      233,
+      244
+    ]
+  },
+  {
+    "name": "Backgrounds",
+    "category": "flair",
+    "path": "images/ui_icons/flair/backgrounds.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      29,
+      246,
+      225
+    ]
+  },
+  {
+    "name": "Items",
+    "category": "flair",
+    "path": "images/ui_icons/flair/items.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      27,
+      245,
+      228
+    ]
+  },
+  {
+    "name": "Common Rarity",
+    "category": "rarities",
+    "path": "images/ui_icons/rarities/common.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      13,
+      245,
+      242
+    ]
+  },
+  {
+    "name": "Epic Rarity",
+    "category": "rarities",
+    "path": "images/ui_icons/rarities/epic.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      12,
+      245,
+      244
+    ]
+  },
+  {
+    "name": "Legendary Rarity",
+    "category": "rarities",
+    "path": "images/ui_icons/rarities/legendary.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      12,
+      28,
+      246,
+      227
+    ]
+  },
+  {
+    "name": "Sound",
+    "category": "settings",
+    "path": "images/ui_icons/settings/sound.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      43,
+      244,
+      213
+    ]
+  },
+  {
+    "name": "Notifications",
+    "category": "settings",
+    "path": "images/ui_icons/settings/notifications.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      15,
+      11,
+      238,
+      244
+    ]
+  },
+  {
+    "name": "Change Display Creature",
+    "category": "settings",
+    "path": "images/ui_icons/settings/changedisplaycreature.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      19,
+      10,
+      236,
+      244
+    ]
+  },
+  {
+    "name": "Checkmark",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/checkmark.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      40,
+      245,
+      214
+    ]
+  },
+  {
+    "name": "X",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/x.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      9,
+      14,
+      243,
+      242
+    ]
+  },
+  {
+    "name": "Warning",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/warning.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      11,
+      26,
+      244,
+      230
+    ]
+  },
+  {
+    "name": "Four-point Star",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/fourpointstar.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      17,
+      11,
+      240,
+      244
+    ]
+  },
+  {
+    "name": "Tutorial Arrow Up",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/tutorialarrowup.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      26,
+      11,
+      228,
+      244
+    ]
+  },
+  {
+    "name": "Tutorial Arrow Right",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/tutorialarrowright.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      10,
+      30,
+      244,
+      224
+    ]
+  },
+  {
+    "name": "Tutorial Arrow Down",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/tutorialarrowdown.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      24,
+      10,
+      232,
+      245
+    ]
+  },
+  {
+    "name": "Tutorial Arrow Left",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/tutorialarrowleft.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      9,
+      33,
+      244,
+      222
+    ]
+  },
+  {
+    "name": "Locked",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/locked.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      30,
+      11,
+      227,
+      245
+    ]
+  },
+  {
+    "name": "Unlocked",
+    "category": "symbols",
+    "path": "images/ui_icons/symbols/unlocked.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "bounds": [
+      32,
+      11,
+      223,
+      245
+    ]
+  }
+]

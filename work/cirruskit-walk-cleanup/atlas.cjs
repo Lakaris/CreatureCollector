@@ -1,0 +1,2 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
+(async()=>{const names=['nearHind','nearFront','farHind','farFront'];await sharp({create:{width:1024,height:1024,channels:4,background:{r:0,g:0,b:0,alpha:0}}}).composite(names.map((name,n)=>({input:`work/cirruskit-walk-cleanup/inputs/${name}.png`,left:n%2*512,top:Math.floor(n/2)*512}))).png().toFile('work/cirruskit-walk-cleanup/inputs/leg-atlas.png');})();

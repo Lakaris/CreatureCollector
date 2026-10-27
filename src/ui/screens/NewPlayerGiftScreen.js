@@ -256,7 +256,7 @@ function NewPlayerGiftScreen({onBack}){
                 display:"flex",alignItems:"center",justifyContent:"center",
                 fontSize:14,fontWeight:800,color:fullyDone?"#aaa":reachable?"#fff":"#c4b5fd",
                 boxShadow:reachable&&!fullyDone?"0 2px 8px rgba(83,74,183,0.3)":"none"
-              }},fullyDone?"✓":(i+1))
+              }},fullyDone?iconText("✓"):(i+1))
             ),
             // Premium reward (right) -- locked until purchased
             React.createElement("div",{
@@ -272,7 +272,7 @@ function NewPlayerGiftScreen({onBack}){
             },
               React.createElement("div",{style:{fontSize:28,lineHeight:1,filter:!premiumDone&&rightLocked?"grayscale(70%)":"none"}},currencyIcon(rewardKey,r.emoji)),
               React.createElement("div",{style:{fontSize:14,fontWeight:800,color:premiumDone?"#bbb":rightLocked?"#aaa":GOLD}},"x"+(baseQty*2)),
-              React.createElement("div",{style:{...badgeBase,color:rightLocked?"#999":"#fff",background:rightLocked?"#eaeaea":GOLD,visibility:(rightLocked||premiumClaimable)?"visible":"hidden"}},rightLocked?"🔒 Locked":"CLAIM")
+              React.createElement("div",{style:{...badgeBase,color:rightLocked?"#999":"#fff",background:rightLocked?"#eaeaea":GOLD,visibility:(rightLocked||premiumClaimable)?"visible":"hidden"}},rightLocked?iconText("🔒 Locked"):"CLAIM")
             )
           );
         })

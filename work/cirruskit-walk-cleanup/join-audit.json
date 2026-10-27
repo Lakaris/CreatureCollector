@@ -1,0 +1,10 @@
+{
+  "reviewedFrames": 30,
+  "lowerFramePixelsUnchanged": 1413120,
+  "pawColorPixelsUnchanged": 199448,
+  "changedPixels": 46251,
+  "upperLegAttachmentsStabilized": true,
+  "rearTailHipSeamRestoredFromBase": true,
+  "chestContourExtensionMaxPixels": 3,
+  "frameTimingUnchanged": true
+}

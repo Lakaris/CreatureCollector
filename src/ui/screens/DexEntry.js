@@ -1,7 +1,7 @@
 // Read-only dex page for one evolution chain.
 
 import React, { useState } from "../../react.js";
-import { typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
+import { iconText, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
@@ -223,7 +223,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
               onClick:()=>setSkinPreview(skin)
             },
               React.createElement("span",{style:{fontSize:28,width:36,textAlign:"center"}},
-                unlocked?(skin.appearances[def.id]||skin.appearances[chain[chain.length-1]])?.emoji||"🎨":"🔒"
+                unlocked?(skin.appearances[def.id]||skin.appearances[chain[chain.length-1]])?.emoji||"🎨":iconText("🔒")
               ),
               React.createElement("div",{style:{flex:1}},
                 React.createElement("div",{style:{fontSize:13,fontWeight:500,color:"#000",marginBottom:2}},skin.name),

@@ -1,0 +1,3 @@
+const fs=require('fs');
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
+(async()=>{const out='images/waddlepop/waddlepop_idle.png',backup='work/penguin-idle-designs/waddlepop-before-proportion-match.png';if(!fs.existsSync(backup))fs.copyFileSync(out,backup);await sharp('C:/Users/Annie/.codex/generated_images/01a17e8f-4dcd-7fb2-bf5e-79c211523db9/exec-d2e306ef-641a-4851-95b3-45b803fce456.png').resize(512,512).png().toFile(out);const m=await sharp(out).metadata();if(m.width!==512||m.height!==512||!m.hasAlpha)throw Error('Invalid output');console.log('Verified 512 x 512 RGBA PNG');})();

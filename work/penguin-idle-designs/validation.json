@@ -1,0 +1,34 @@
+[
+  {
+    "name": "waddlepop",
+    "path": "images/waddlepop/waddlepop_idle.png",
+    "width": 512,
+    "height": 512,
+    "transparentPixels": 181700,
+    "opaquePixels": 870
+  },
+  {
+    "name": "frostillery",
+    "path": "images/frostillery/frostillery_idle.png",
+    "width": 512,
+    "height": 512,
+    "transparentPixels": 170986,
+    "opaquePixels": 1055
+  },
+  {
+    "name": "bombardguin",
+    "path": "images/bombardguin/bombardguin_idle.png",
+    "width": 512,
+    "height": 512,
+    "transparentPixels": 166917,
+    "opaquePixels": 1119
+  },
+  {
+    "name": "cryogeddon",
+    "path": "images/cryogeddon/cryogeddon_idle.png",
+    "width": 512,
+    "height": 512,
+    "transparentPixels": 156178,
+    "opaquePixels": 1212
+  }
+]

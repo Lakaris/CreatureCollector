@@ -1,0 +1,43 @@
+{
+  "format": "gif",
+  "mediaType": "image/gif",
+  "width": 1600,
+  "height": 18000,
+  "space": "srgb",
+  "channels": 3,
+  "depth": "uchar",
+  "isProgressive": false,
+  "isPalette": true,
+  "bitsPerSample": 6,
+  "pages": 15,
+  "pageHeight": 1200,
+  "loop": 0,
+  "delay": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "background": {
+    "r": 130,
+    "g": 118,
+    "b": 164
+  },
+  "hasProfile": false,
+  "hasAlpha": false,
+  "autoOrient": {
+    "width": 1600,
+    "height": 18000
+  }
+}

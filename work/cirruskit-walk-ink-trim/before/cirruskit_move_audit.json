@@ -1,0 +1,511 @@
+{
+  "belly": {
+    "frames": 30,
+    "sameGaitPoseData": true,
+    "bodyAnchoredPixels": 10410,
+    "bodyAnchoredInkPixels": 5610,
+    "unchangedRearPixels": 3840000,
+    "originalPawSourcePixels": 48640,
+    "failures": [],
+    "perFrame": [
+      {
+        "frame": 1,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 2,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 3,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 4,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 5,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 6,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 7,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 8,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 9,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 10,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 11,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 12,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 13,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 14,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 15,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 16,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 17,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 18,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 19,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 20,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 21,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 22,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 23,
+        "enclosedGaps": [
+          [
+            360,
+            416
+          ],
+          [
+            357,
+            417
+          ],
+          [
+            358,
+            417
+          ],
+          [
+            359,
+            417
+          ],
+          [
+            360,
+            417
+          ],
+          [
+            361,
+            417
+          ],
+          [
+            358,
+            418
+          ],
+          [
+            359,
+            418
+          ],
+          [
+            360,
+            418
+          ],
+          [
+            361,
+            418
+          ],
+          [
+            358,
+            419
+          ],
+          [
+            359,
+            419
+          ],
+          [
+            360,
+            419
+          ],
+          [
+            361,
+            419
+          ],
+          [
+            359,
+            420
+          ],
+          [
+            360,
+            420
+          ],
+          [
+            361,
+            420
+          ],
+          [
+            360,
+            421
+          ],
+          [
+            361,
+            421
+          ],
+          [
+            361,
+            422
+          ],
+          [
+            362,
+            422
+          ],
+          [
+            362,
+            423
+          ]
+        ],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 24,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 25,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 26,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 27,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 28,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 29,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      },
+      {
+        "frame": 30,
+        "enclosedGaps": [],
+        "detachedDarkMarks": []
+      }
+    ]
+  },
+  "seams": {
+    "framesReviewed": 30,
+    "highlightedFrames": [
+      8,
+      28
+    ],
+    "sameGaitPoseData": true,
+    "originalRearLegArtworkRestored": true,
+    "stableFlankPatternPixelChecks": 33660,
+    "perFrame": [
+      {
+        "frame": 1,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 2,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 3,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 4,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 5,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 6,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 7,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 8,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 9,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 10,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 11,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 12,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 13,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 14,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 15,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 16,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 17,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 18,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 19,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 20,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 21,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 22,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 23,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 24,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 25,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 26,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 27,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 28,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 29,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 30,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      }
+    ]
+  },
+  "frames": 30,
+  "grid": [
+    6,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "frameDurationMs": 50,
+  "totalDurationMs": 1500,
+  "referenceFrames": 15,
+  "referenceFrameDurationMs": 100,
+  "referenceCycleDurationMatched": true,
+  "diagonalPairSynchronizationVerified": true,
+  "pairA": [
+    "nearFront",
+    "farHind"
+  ],
+  "pairB": [
+    "nearHind",
+    "farFront"
+  ],
+  "uniqueFrames": 30,
+  "noDuplicateFinalFrame": true,
+  "sourceColorChecks": {
+    "manePixels": 442920,
+    "facePixels": 1203570
+  },
+  "componentCounts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "smallComponents": [],
+  "loopSeamMeanDifferenceAt130px": 2.12767258382643,
+  "maxOrdinaryMeanDifferenceAt130px": 5.892702169625246,
+  "gameAndPreviewTimingMatch": true,
+  "idleAndFlavorUnchanged": true,
+  "method": "Separate stationary belly contour and moving upper-leg backing. Original paw texture retained, front shoulder attachment pinned to body. Prior rear/tail corrections and gait parameters retained."
+}

@@ -2,6 +2,7 @@
 // Global state lives in src/state/GameContext.js; screens read it directly,
 // so App only wires up navigation callbacks.
 import React from "./react.js";
+import { iconText } from "./ui/components/IconText.js";
 
 import { TYPE_EMOJI } from "./data/types.js";
 import { DUNGEON_BOSSES } from "./data/bosses.js";
@@ -68,7 +69,7 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
     return React.createElement(
       "div",
       { onClick: disabled ? undefined : onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", border: "2px solid #e0e0e0", cursor: disabled ? "default" : "pointer" } },
-      React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: 0.5 } }, "🔒"),
+      React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: 0.5 } }, iconText("🔒")),
       React.createElement(
         "div",
         { style: { flex: 1 } },
@@ -128,7 +129,7 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
             )
           )
     ),
-    delivered && React.createElement("div", { style: { fontSize: 20 } }, "✅"),
+    delivered && React.createElement("div", { style: { fontSize: 20 } }, iconText("✅")),
     canCollect && React.createElement("div", { style: { fontSize: 20 } }, "🎁"),
     !delivered &&
       !canCollect &&
@@ -327,7 +328,7 @@ function App() {
             zIndex: 60, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
           },
         },
-        "⬇️"
+        iconText("⬇️")
       )
     );
   }
@@ -518,7 +519,7 @@ function App() {
                 ? { ...CARD_BASE, opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
                 : { ...CARD_BASE, background: "#f5f5f5" },
             },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "🏟️" : "🔒"),
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "🏟️" : iconText("🔒")),
             React.createElement(
               "div",
               null,
@@ -548,7 +549,7 @@ function App() {
                 },
                 style: dungeonsUnlocked ? CARD_BASE : { ...CARD_BASE, background: "#f5f5f5" },
               },
-              React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: dungeonsUnlocked ? 1 : 0.5 } }, dungeonsUnlocked ? "🏰" : "🔒"),
+              React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: dungeonsUnlocked ? 1 : 0.5 } }, dungeonsUnlocked ? "🏰" : iconText("🔒")),
               React.createElement(
                 "div",
                 null,
@@ -575,7 +576,7 @@ function App() {
                     zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
                   },
                 },
-                "⬇️"
+                iconText("⬇️")
               )
           ),
           // Trials: the Arena's format, one track, enemies in equipment
@@ -593,7 +594,7 @@ function App() {
                 ? { ...CARD_BASE, opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
                 : { ...CARD_BASE, background: "#f5f5f5" },
             },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "⚔️" : "🔒"),
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "⚔️" : iconText("🔒")),
             React.createElement(
               "div",
               null,
@@ -622,7 +623,7 @@ function App() {
                 ? { ...CARD_BASE, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", border: "2px solid #fbbf24", opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
                 : { ...CARD_BASE, background: "#f5f5f5" },
             },
-            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: treasureUnlocked ? 1 : 0.5 } }, treasureUnlocked ? "💰" : "🔒"),
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: treasureUnlocked ? 1 : 0.5 } }, treasureUnlocked ? "💰" : iconText("🔒")),
             React.createElement(
               "div",
               null,

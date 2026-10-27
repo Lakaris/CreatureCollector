@@ -1,4 +1,5 @@
 /* Keyframes. The atk-, melee-, boss- and element- ones drive battle FX. */
+@keyframes navBadgePop{from{transform:scale(.7)}to{transform:scale(1)}}
 @keyframes revealPop{from{opacity:0;transform:scale(.8) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes eggShake{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(7deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
 @keyframes fadeIn{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}

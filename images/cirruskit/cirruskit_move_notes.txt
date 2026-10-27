@@ -1,15 +1,13 @@
-Cirruskit movement animation — simple walk in place
+Cirruskit walk — separate stationary belly and moving legs
 
-24 frames, 512 x 512 pixels each, arranged in a 6 x 4 grid. Transparent PNG spritesheet: cirruskit_move.png. Timing: 64 ms per frame, 1536 ms per loop. Read left to right, then top to bottom.
+30 transparent 512 x 512 frames in a 6 x 5 grid. Each frame lasts 50 ms; the loop lasts 1500 ms. Read left to right, top to bottom. No duplicate final frame.
 
-Cirruskit walks in place with four alternating paw lifts, a body bob up to 3 pixels, small forward/backward paw movement, and a tail swish up to 6 pixels. The first frame matches the idle base exactly. The loop has no duplicated final frame or adjacent repeated poses; the neutral contact pose appears again halfway through the cycle.
+The front belly curve now belongs to a separate stationary torso layer. The upper leg moves behind that curve, using the existing clean leg backing. The original lower-paw texture and outer leg artwork are retained. The near-front shoulder attachment stays with the body and blends into the lower leg movement. The gait parameters, diagonal pairs, pivots, body bob, tail sway and timing are unchanged.
 
-The animation uses the original idle base artwork. The face and complete cream mane move together so their colors, shadows and all three tan swirls stay consistent. Motion is confined to the legs, body bob and tail. The tail/body attachment stays anchored so outlines do not split. Each frame is rendered directly from the source rather than from the preceding frame.
+The stationary contour was rebuilt as a continuous curve, removing the second belly stroke carried by the old leg cutout. Small contact-edge sampling holes were closed in frames 1, 2, 4 and 22. The normal space between the crossing legs in frame 23 remains transparent.
 
-A single stepping-pose guide was made with the built-in image editor. The guide is kept in ../../work/cirruskit-walk/step-pose-guide.png and the exact prompt is in ../../work/cirruskit-walk/image-edit-prompt.txt. Generated reference pixels are not substituted into the animation.
+Checked all 30 frames, with particular attention to frames 22 and 23. 10,410 comparisons, including 5,610 dark-outline pixels, confirm that the visible belly stays in the same body-relative position. There are no isolated dark marks in the front-leg inspection area. 3,840,000 comparisons confirm that the rear half, including the previous tail/rear-leg correction, is unchanged. The source lower-paw pixels are unchanged. Face and mane color checks, connected-silhouette checks, loop continuity, and game/preview timing checks passed. Idle and flavor assets are unchanged. See cirruskit_move_audit.json for the complete results.
 
-The game's move state is connected in src/data/creatureArt.js with the same 24 frames, 6 columns and 64 ms holds. Existing idle and flavor assets are unchanged.
+Current rebuild: ../../work/cirruskit-walk-belly-separation/rebuild.cjs. The previous delivered spritesheet and metadata are backed up in its before/ folder. This revision changes the animation layer structure, contour and attachment weights using the existing source artwork and code-generated masks. No new image generation was used.
 
-Validation: correct sheet dimensions and transparency, exact base starting pose, all exported cells match their source frames, no clipped canvas edges or detached marks, matching game/JSON/APNG timing, and a last-to-first change within the ordinary range of adjacent changes at 130 px. Across the 24 frames, 354,336 mane pixels and 962,856 face pixels match the original source exactly after the body bob. Enlarged stepping poses and 130 px contact frames were inspected.
-
-The HTML preview shows game size and full size, with pause, previous/next frame, a frame slider and dark-background controls.
+The HTML preview provides synchronized reference timing, full-size and 130 px views, and frame inspection controls. Reload an already-open tab to load the updated sheet.

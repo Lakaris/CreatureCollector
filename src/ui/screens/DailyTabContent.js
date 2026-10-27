@@ -174,7 +174,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
           React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:6}},
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
               React.createElement("div",{style:{fontSize:13,fontWeight:600,color:ready&&!claimed?"#166534":"#222",flex:1}},m.label),
-              React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+" / "+prog.max)
+              React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},iconText(claimed?"✓ Claimed":prog.cur+" / "+prog.max))
             ),
             React.createElement("div",{style:{height:6,borderRadius:6,background:"#e8e8e8",overflow:"hidden"}},
               React.createElement("div",{style:{height:"100%",width:(pct*100)+"%",background:ready?"#22c55e":"#534AB7",borderRadius:6,transition:"width 0.3s"}})

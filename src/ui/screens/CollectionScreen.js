@@ -1,7 +1,7 @@
 // Grid of owned creatures with filters; opens detail or the dex.
 
 import React, { useState, useMemo, useEffect } from "../../react.js";
-import { typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
+import { iconText, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG, CORE_STAT_CYCLE, STAT_LABELS, STAT_COLORS } from "../../data/rarity.js";
@@ -221,7 +221,7 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Effects"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           [...activeEffects].sort().map(l=>
-            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},l+" ✕")
+            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},iconText(l+" ✕"))
           ),
           React.createElement("button",{className:"filter-chip",onClick:()=>setEffectsOpen(true)},"＋ Select")
         )
@@ -249,7 +249,7 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
               // NOTE: a sprite poster here would stretch to the card's aspect
               // ratio; square-box it when animated collection art first lands.
               art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def:d,ownedData:o,unlockedSkins,still:true,size:72,style:{position:"absolute",top:20,left:0,width:"100%",height:"calc(100% - "+(ASC_BAR_H+20)+"px)",objectPosition:"center bottom"}}),
-              showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+              showPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-38,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
               // Badge column, top-left: Type, then Role, then Range.
               React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},
                 React.createElement("span",{style:{fontSize:14,lineHeight:1}},typeIcon(d.type)),

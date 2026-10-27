@@ -1,0 +1,8 @@
+const fs=require('fs');
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
+(async()=>{
+const out='images/waddlepop/waddlepop_idle.png', backup='work/penguin-idle-designs/waddlepop-small-snowball.png';
+if(!fs.existsSync(backup))fs.copyFileSync(out,backup);
+await sharp('C:/Users/Annie/.codex/generated_images/01a17e8f-4dcd-7fb2-bf5e-79c211523db9/exec-52fb2a6d-b43e-4002-a83b-e8dbd91689d1.png').resize(512,512).png().toFile(out);
+const m=await sharp(out).metadata();if(m.width!==512||m.height!==512||!m.hasAlpha)throw Error('Invalid output');console.log('Saved 512 x 512 RGBA: '+out);
+})();

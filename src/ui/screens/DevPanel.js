@@ -370,10 +370,10 @@ function DevPanel(){
         )
       ),
       React.createElement("div",{className:"dev-row"},
-        React.createElement("span",{style:{color:"#aaa",fontSize:12}},"Rainbow Ore"),
+        React.createElement("span",{style:{color:"#aaa",fontSize:12}},"Prismatic Ore"),
         React.createElement("div",{style:{display:"flex",gap:4}},
-          React.createElement("button",{className:"dev-btn",onClick:()=>setCurrencies(c=>({...c,rainbowOre:(c.rainbowOre||0)+1}))},"+1"),
-          React.createElement("button",{className:"dev-btn",onClick:()=>setCurrencies(c=>({...c,rainbowOre:(c.rainbowOre||0)+10}))},"+10")
+          React.createElement("button",{className:"dev-btn",onClick:()=>setCurrencies(c=>({...c,prismaticOre:(c.prismaticOre||0)+1}))},"+1"),
+          React.createElement("button",{className:"dev-btn",onClick:()=>setCurrencies(c=>({...c,prismaticOre:(c.prismaticOre||0)+10}))},"+10")
         )
       )
     ),

@@ -1,0 +1,272 @@
+{
+  "seams": {
+    "framesReviewed": 30,
+    "highlightedFrames": [
+      8,
+      28
+    ],
+    "sameGaitPoseData": true,
+    "originalRearLegArtworkRestored": true,
+    "stableFlankPatternPixelChecks": 33660,
+    "perFrame": [
+      {
+        "frame": 1,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 2,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 3,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 4,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 5,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 6,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 7,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 8,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 9,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 10,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 11,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 12,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 13,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 14,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 15,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 16,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 17,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 18,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 19,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 20,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 21,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 22,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 23,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 24,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 25,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 26,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 27,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 28,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 29,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      },
+      {
+        "frame": 30,
+        "enclosedJointGaps": 0,
+        "gapLocations": [],
+        "detachedDarkMarks": 0
+      }
+    ]
+  },
+  "preservation": {
+    "frames": 30,
+    "approvedRearPixelsUnchanged": 5068800,
+    "unchangedRegion": {
+      "x": 0,
+      "y": 0,
+      "width": 330,
+      "height": 512
+    },
+    "gaitPoseDataUnchanged": true
+  },
+  "frames": 30,
+  "grid": [
+    6,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "frameDurationMs": 50,
+  "totalDurationMs": 1500,
+  "referenceFrames": 15,
+  "referenceFrameDurationMs": 100,
+  "referenceCycleDurationMatched": true,
+  "diagonalPairSynchronizationVerified": true,
+  "pairA": [
+    "nearFront",
+    "farHind"
+  ],
+  "pairB": [
+    "nearHind",
+    "farFront"
+  ],
+  "uniqueFrames": 30,
+  "noDuplicateFinalFrame": true,
+  "sourceColorChecks": {
+    "manePixels": 442920,
+    "facePixels": 1203570
+  },
+  "componentCounts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "smallComponents": [],
+  "loopSeamMeanDifferenceAt130px": 2.168639053254438,
+  "maxOrdinaryMeanDifferenceAt130px": 5.935404339250493,
+  "gameAndPreviewTimingMatch": true,
+  "idleAndFlavorUnchanged": true,
+  "method": "Continuous chest-to-front-leg artwork from the approved base replaces the belly backing across that leg. Approved rear region is pixel-identical to the preceding version; gait parameters and timing are unchanged."
+}

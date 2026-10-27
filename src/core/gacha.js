@@ -87,8 +87,8 @@ export function rollTreasure(collected, oreType = "normal") {
       ? rarityEntries.filter(([r]) => r !== "common")
       : rarityEntries;
 
-  if (oreType === "rainbow") {
-    // Rainbow ore only yields items you don't already have, re-weighted over
+  if (oreType === "prismatic") {
+    // Prismatic ore only yields items you don't already have, re-weighted over
     // whichever rarities still have something uncollected.
     const availByRarity = {};
     for (const [r] of eligible) {

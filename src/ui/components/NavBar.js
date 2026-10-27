@@ -4,14 +4,15 @@
 import React from "../../react.js";
 import { useGame } from "../../state/GameContext.js";
 
+// Each tab's art is images/ui_icons/menu/<id>.png.
 export const TABS = [
-  { id: "home", icon: "ti-home", label: "Home" },
-  { id: "hatch", icon: "ti-egg", label: "Hatch" },
-  { id: "collection", icon: "ti-layout-grid", label: "Collection" },
-  { id: "play", icon: "ti-sword", label: "Play" },
-  { id: "farm", icon: "ti-plant", label: "Farm" },
-  { id: "equipment", icon: "ti-tool", label: "Equipment" },
-  { id: "store", icon: "ti-shopping-cart", label: "Store" },
+  { id: "home", label: "Home" },
+  { id: "hatch", label: "Hatch" },
+  { id: "collection", label: "Collection" },
+  { id: "play", label: "Play" },
+  { id: "farm", label: "Farm" },
+  { id: "equipment", label: "Equipment" },
+  { id: "store", label: "Store" },
 ];
 
 // While the tutorial's restricted, every tab but the one it currently hands
@@ -74,17 +75,19 @@ function NavBar({ tab, setTab, onNavigate, style }) {
     React.createElement(
       "div",
       { className: "nav", style },
-      TABS.map((t) => {
+      TABS.map((t, i) => {
         const steps = TAB_TUTORIAL_STEPS[t.id] || {};
         const unlockedByTutorial = t.id === tab || Object.prototype.hasOwnProperty.call(steps, tutorialStep);
         const gate = TAB_PROGRESS_GATES[t.id];
         const progressLocked = gate && (labyrinthBestDepth || 1) < gate.minBestDepth;
         const locked = (tutorialRestricted && !unlockedByTutorial) || progressLocked;
+        const active = tab === t.id;
+        const iconSrc = "images/ui_icons/" + (locked ? "symbols/locked" : "menu/" + t.id) + ".png";
         return React.createElement(
           "button",
           {
             key: t.id,
-            className: "nav-btn" + (tab === t.id ? " active" : ""),
+            className: "nav-btn" + (active ? " active" : ""),
             disabled: locked && !progressLocked,
             onClick: () => {
               if (progressLocked) { setLockedMsg(gate.message); return; }
@@ -94,10 +97,42 @@ function NavBar({ tab, setTab, onNavigate, style }) {
               if (next) setTutorialStep(next);
               if (onNavigate) onNavigate();
             },
-            style: locked ? { opacity: 0.4, cursor: "not-allowed" } : undefined,
+            // Icon only -- the label stays as the button's accessible name and
+            // hover tooltip.
+            "aria-label": t.label,
+            title: t.label,
+            style: { position: "relative", ...(locked ? { opacity: 0.4, cursor: "not-allowed" } : null) },
           },
-          React.createElement("i", { className: "ti " + (locked ? "ti-lock" : t.icon), "aria-hidden": "true" }),
-          t.label
+          // 34px fills the height the 22px icon plus its text line used to
+          // take. The selected tab keeps an invisible 34px spacer so the bar
+          // never changes height, and draws its badge over it instead.
+          React.createElement("img", {
+            src: iconSrc,
+            alt: "", "aria-hidden": "true", draggable: false,
+            style: { display: "block", width: 34, height: 34, objectFit: "contain", margin: "0 auto", visibility: active ? "hidden" : "visible" },
+          }),
+          // Selected tab: a raised circle that pokes above the bar, holding a
+          // bigger icon with the tab's name under it. It mounts fresh on
+          // whichever tab is selected, so it pops in each time.
+          active && React.createElement("div", {
+            style: {
+              // Rises ~12px above the bar. On a 375px phone the end tabs'
+              // circles (Home, Store) would run off the screen edge, so those
+              // two shift 7px inward.
+              position: "absolute", left: "50%", bottom: -6, width: 76, height: 76,
+              marginLeft: -38 + (i === 0 ? 7 : i === TABS.length - 1 ? -7 : 0),
+              borderRadius: "50%", background: "#fff", border: "3px solid #e6e3fa", boxSizing: "border-box",
+              boxShadow: "0 -3px 10px rgba(83,74,183,0.15)",
+              // Packed toward the top rather than centred: the label then sits
+              // near the circle's middle, where it's wide enough for
+              // "COLLECTION" without running into the ring.
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", paddingTop: 3, gap: 0,
+              pointerEvents: "none", animation: "navBadgePop .22s ease-out",
+            },
+          },
+            React.createElement("img", { src: iconSrc, alt: "", draggable: false, style: { display: "block", width: 40, height: 40, objectFit: "contain" } }),
+            React.createElement("span", { style: { fontSize: 8, fontWeight: 800, color: "#534AB7", textTransform: "uppercase", letterSpacing: 0.2, lineHeight: 1, whiteSpace: "nowrap" } }, t.label)
+          )
         );
       })
     )

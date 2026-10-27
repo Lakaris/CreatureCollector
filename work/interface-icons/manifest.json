@@ -1,0 +1,313 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "style": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+  "items": [
+    {
+      "name": "Common Ascension Shard",
+      "filename": "commonascensionshard.png",
+      "group": "items",
+      "design": "A single thick broad upward-pointing crystal shard, pearl-white face and slate-gray facets, one chipped lower corner. One large double upward-chevron emblem in white with a slate border on the front. Generic magical ascension material for ALL creature types: no element, animal or leaf symbol.",
+      "destination": "images/item_icons/commonascensionshard.png"
+    },
+    {
+      "name": "Mysterious Ore",
+      "filename": "mysteriousore.png",
+      "group": "items",
+      "design": "One chunky irregular charcoal-gray ore rock with three large facets and one wide violet crystal seam visible across its front. One small exposed purple crystal wedge on its upper edge, integrated into the rock. Compact mystery treasure ore, no question mark, no extra stones.",
+      "destination": "images/item_icons/mysteriousore.png"
+    },
+    {
+      "name": "Battlepass",
+      "filename": "battlepass.png",
+      "group": "actions",
+      "design": "One chunky vertical royal-blue pennant badge with a forked bottom edge, broad gold border and a single large gold five-point star at its center. Small gold horizontal top bar. Simple premium reward-pass emblem, no lettering.",
+      "destination": "images/ui_icons/actions/battlepass.png"
+    },
+    {
+      "name": "Random Equipment",
+      "filename": "randomequipment.png",
+      "group": "items",
+      "design": "One chunky silver-gray shoulder armor plate with a broad bronze-gold rim. A single LARGE bold dark question mark, exact symbol '?', centered on its broad pale front surface. Readable random-equipment reward symbol. No weapon, extra armor or text.",
+      "destination": "images/item_icons/randomequipment.png"
+    },
+    {
+      "name": "Settings",
+      "filename": "settings.png",
+      "group": "actions",
+      "design": "One front-facing chunky steel-blue cogwheel with six broad rounded teeth and one LARGE circular transparent hole. One pale blue highlight and slate-blue shadow. Simple sturdy settings gear, no screws.",
+      "destination": "images/ui_icons/actions/settings.png"
+    },
+    {
+      "name": "Daily Calendar Rewards",
+      "filename": "dailycalendarrewards.png",
+      "group": "actions",
+      "design": "One square ivory calendar page with rounded lower corners, a thick red top header and TWO large dark binding loops. One large warm-gold five-point star centered on the blank page. No dates, grid, numbers or letters.",
+      "destination": "images/ui_icons/actions/dailycalendarrewards.png"
+    },
+    {
+      "name": "Epic Ascension Shard",
+      "filename": "epicascensionshard.png",
+      "group": "items",
+      "design": "Change only the gray and white crystal palette to saturated violet-magenta with deep-purple facets. Change the double upward-chevron emblem to pale warm gold with a dark-purple border. Preserve the same generic all-types shard and identical shape and scale.",
+      "reference": "Common Ascension Shard",
+      "destination": "images/item_icons/epicascensionshard.png"
+    },
+    {
+      "name": "Legendary Ascension Shard",
+      "filename": "legendaryascensionshard.png",
+      "group": "items",
+      "design": "Change only the gray and white crystal palette to rich golden yellow with deep-amber facets. Change the double upward-chevron emblem to warm ivory with an ochre border. Preserve the same generic all-types shard and identical shape and scale.",
+      "reference": "Common Ascension Shard",
+      "destination": "images/item_icons/legendaryascensionshard.png"
+    },
+    {
+      "name": "Deluxe Ore",
+      "filename": "deluxeore.png",
+      "group": "items",
+      "design": "Change the charcoal rock to deep navy-blue rock and the broad crystal seam and upper exposed crystal wedge to rich cyan-blue. Add a broad warm-gold edge on just the seam. Preserve the same ore shape, facets and proportions, no extra fragments.",
+      "reference": "Mysterious Ore",
+      "destination": "images/item_icons/deluxeore.png"
+    },
+    {
+      "name": "Prismatic Ore",
+      "filename": "prismaticore.png",
+      "group": "items",
+      "design": "Keep the same dark ore-rock silhouette. Change the broad crystal seam and exposed top crystal wedge to a single clear sequence of large rainbow facets: warm red, gold, green, cyan, violet. Charcoal-purple rock surrounds the rainbow. No glow or particles. Same proportions and scale.",
+      "reference": "Mysterious Ore",
+      "destination": "images/item_icons/prismaticore.png"
+    },
+    {
+      "name": "Descend",
+      "filename": "descend.png",
+      "group": "actions",
+      "design": "A small chunky stone cave doorway: three broad slate-blue arch stones around a dark-purple opening, containing THREE wide ivory stone steps descending inward. One broad golden downward arrow centered over the steps. Simple silhouette and big shapes, a labyrinth entrance rather than a castle.",
+      "destination": "images/ui_icons/actions/descend.png"
+    },
+    {
+      "name": "New Player Welcome Gift",
+      "filename": "newplayerwelcomegift.png",
+      "group": "actions",
+      "design": "One chunky turquoise gift box with a broad warm-gold ribbon and two large rounded bow loops. A single small coral-red five-point star seal centered where ribbon crosses the front. No loose confetti or extra objects.",
+      "destination": "images/ui_icons/actions/newplayerwelcomegift.png"
+    },
+    {
+      "name": "Time",
+      "filename": "time.png",
+      "group": "actions",
+      "design": "One round ivory stopwatch with a thick bronze-gold rim and one short gold top button. Two thick dark hands form an L, no numbers and no tick marks. Large clean face, front view.",
+      "destination": "images/ui_icons/actions/time.png"
+    },
+    {
+      "name": "Clear Team",
+      "filename": "clearteam.png",
+      "group": "actions",
+      "design": "A simple compact 2-by-2 arrangement of FOUR chunky pale-blue square grid tiles with thick plum outlines, partly overlapped at the lower right by ONE large pink eraser with a cream bevel. Clearly a grid being cleared. No creatures, faces, dust or little fragments.",
+      "destination": "images/ui_icons/actions/clearteam.png"
+    },
+    {
+      "name": "Retreat",
+      "filename": "retreat.png",
+      "group": "actions",
+      "design": "One thick orange-gold counterclockwise restart arrow bent into an almost complete circle with one LARGE wedge arrowhead at the upper left pointing back-left. Wide transparent gap between arrowhead and tail, large transparent central hole. No secondary objects.",
+      "destination": "images/ui_icons/actions/retreat.png"
+    },
+    {
+      "name": "Home",
+      "filename": "home.png",
+      "group": "menu",
+      "design": "One small cozy house with a broad coral-red triangular roof, cream walls and one large arched teal door. Front view, chunky squat proportions. No chimney, window, yard or scenery.",
+      "destination": "images/ui_icons/menu/home.png"
+    },
+    {
+      "name": "Hatch",
+      "filename": "hatch.png",
+      "group": "menu",
+      "design": "One cream egg with a broad zigzag crack around the upper third and the top shell tipped slightly upward, revealing a simple golden interior. Two broad tan shell patches. Egg and lid together as one compact icon, no creature, shards or sparkles.",
+      "destination": "images/ui_icons/menu/hatch.png"
+    },
+    {
+      "name": "Collection",
+      "filename": "collection.png",
+      "group": "menu",
+      "design": "Two chunky overlapping collector cards, rear card teal and front card warm ivory with a broad purple frame. One large purple paw print on the front card. No labels, text, stat lines or tiny decorative marks.",
+      "destination": "images/ui_icons/menu/collection.png"
+    },
+    {
+      "name": "Play",
+      "filename": "play.png",
+      "group": "menu",
+      "design": "Two simple chunky crossed swords with broad ivory-silver blades, bronze-gold guards and short teal handles. Blades point up, obvious X silhouette. Only two weapons, no shield or background.",
+      "destination": "images/ui_icons/menu/play.png"
+    },
+    {
+      "name": "Farm",
+      "filename": "farm.png",
+      "group": "menu",
+      "design": "One compact cross-section mound of warm-brown soil with one large bright-green two-leaf sprout growing from it. Thick stem and broad leaves, one pale-green highlight. No roots, pebbles, fence or scenery.",
+      "destination": "images/ui_icons/menu/farm.png"
+    },
+    {
+      "name": "Equipment",
+      "filename": "equipment.png",
+      "group": "menu",
+      "design": "One chunky silver-gray breastplate with a broad bronze-gold rim and two simple squared shoulder tabs. Front view, teal neck opening and one broad slate-blue shadow. No question mark, straps, rivets or heraldry.",
+      "destination": "images/ui_icons/menu/equipment.png"
+    },
+    {
+      "name": "Store",
+      "filename": "store.png",
+      "group": "menu",
+      "design": "One compact wooden market stall with a red-and-cream striped canopy, two broad posts and a golden counter. Only THREE wide canopy stripes. A single large gold coin resting on the counter, no merchandise or text.",
+      "destination": "images/ui_icons/menu/store.png"
+    },
+    {
+      "name": "Titles",
+      "filename": "titles.png",
+      "group": "flair",
+      "design": "One short thick ivory parchment name ribbon with broad gold edging, gently curled ends, and a single centered purple five-point star in place of writing. Wide compact banner silhouette, no letters or seals.",
+      "destination": "images/ui_icons/flair/titles.png"
+    },
+    {
+      "name": "Auras",
+      "filename": "auras.png",
+      "group": "flair",
+      "design": "One bold circular magical aura ring, thick violet outer edge and cyan inner edge with a LARGE fully transparent center. The top and sides have three large smooth flame-like protrusions integrated into the ring. Hard-edged flat cel colors, no blur, particles, extra symbols or glow.",
+      "destination": "images/ui_icons/flair/auras.png"
+    },
+    {
+      "name": "Backgrounds",
+      "filename": "backgrounds.png",
+      "group": "flair",
+      "design": "One chunky rectangular golden picture frame, containing an extremely simple landscape of two broad green hills, flat pale-blue sky and one large golden sun. No clouds, trees, textures or extra scenery. Landscape is entirely inside frame, transparent outside.",
+      "destination": "images/ui_icons/flair/backgrounds.png"
+    },
+    {
+      "name": "Items",
+      "filename": "items.png",
+      "group": "flair",
+      "design": "One cute broad purple magician's top hat with a wide curved brim, a thick golden hatband and one large cyan four-point star on its front. Simple cosmetic accessory, no wand, sparkles or character.",
+      "destination": "images/ui_icons/flair/items.png"
+    },
+    {
+      "name": "Common Rarity",
+      "filename": "common.png",
+      "group": "rarities",
+      "design": "One simple round silver-gray medal badge, thick slate border, one large warm-ivory five-point star in the center. Flat bottom, no ribbon tails, no letters or tiny details. Broad quiet neutral colors.",
+      "destination": "images/ui_icons/rarities/common.png"
+    },
+    {
+      "name": "Epic Rarity",
+      "filename": "epic.png",
+      "group": "rarities",
+      "design": "One chunky diamond-shaped violet medal badge, broad lavender rim and one large pale-gold five-point star in its center. Four rounded corners. Bold purple rarity emblem, no ribbon tails or tiny ornament.",
+      "destination": "images/ui_icons/rarities/epic.png"
+    },
+    {
+      "name": "Legendary Rarity",
+      "filename": "legendary.png",
+      "group": "rarities",
+      "design": "One broad golden crown with THREE large points, amber lower band and one large warm-ivory diamond inset centered on the band. Bold squat crown silhouette, no tiny gems or floating sparkles.",
+      "destination": "images/ui_icons/rarities/legendary.png"
+    },
+    {
+      "name": "Sound",
+      "filename": "sound.png",
+      "group": "settings",
+      "design": "One chunky teal speaker with a broad flared cone facing right, plus TWO thick separated curved turquoise sound-wave arcs to its right. Simple audio-on symbol, no musical notes or additional objects.",
+      "destination": "images/ui_icons/settings/sound.png"
+    },
+    {
+      "name": "Notifications",
+      "filename": "notifications.png",
+      "group": "settings",
+      "design": "One chunky golden notification bell, rounded dome, flared rim, one round amber clapper and one short top loop. No red notification dot, numbers, ringing lines or additional ornaments.",
+      "destination": "images/ui_icons/settings/notifications.png"
+    },
+    {
+      "name": "Change Display Creature",
+      "filename": "changedisplaycreature.png",
+      "group": "settings",
+      "design": "One simple friendly teal cat-like creature head silhouette with two round-tipped ears, two dark oval eyes and a tiny smile. Below it, one broad gold curved swap arrow sweeps left-to-right. Compact portrait-change symbol, no body or fur detail.",
+      "destination": "images/ui_icons/settings/changedisplaycreature.png"
+    },
+    {
+      "name": "Checkmark",
+      "filename": "checkmark.png",
+      "group": "symbols",
+      "design": "One very thick green checkmark with smoothly rounded ends and a dark-plum outline, slightly tilted up toward right. One broad light-green highlight. No badge, circle or background.",
+      "destination": "images/ui_icons/symbols/checkmark.png"
+    },
+    {
+      "name": "X",
+      "filename": "x.png",
+      "group": "symbols",
+      "design": "One very thick coral-red X made from two evenly sized diagonal rounded bars with dark-plum outline. One broad lighter-coral highlight. Balanced symmetrical shape, no badge or background.",
+      "destination": "images/ui_icons/symbols/x.png"
+    },
+    {
+      "name": "Warning",
+      "filename": "warning.png",
+      "group": "symbols",
+      "design": "One chunky warm-yellow triangular warning sign with broadly rounded corners and thick dark-plum outline. A single large dark-plum exclamation mark, exact symbol '!', centered inside. No extra border, letters, texture or base.",
+      "destination": "images/ui_icons/symbols/warning.png"
+    },
+    {
+      "name": "Four-point Star",
+      "filename": "fourpointstar.png",
+      "group": "symbols",
+      "design": "Exactly one bold symmetrical four-point sparkle symbol like '✦', with equal long points at top, bottom, left and right and smoothly concave sides. Gold fill, one ivory broad highlight, thick plum outline. No other stars, diamonds or glow.",
+      "destination": "images/ui_icons/symbols/fourpointstar.png"
+    },
+    {
+      "name": "Tutorial Arrow Up",
+      "filename": "tutorialarrowup.png",
+      "group": "symbols",
+      "design": "One very thick golden-yellow straight arrow pointing vertically UP. Broad triangular arrowhead, short wide shaft with flat base, softly rounded corners, dark-plum outline, single pale-ivory highlight. Balanced vertically centered, no hand or circle.",
+      "destination": "images/ui_icons/symbols/tutorialarrowup.png"
+    },
+    {
+      "name": "Tutorial Arrow Right",
+      "filename": "tutorialarrowright.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing horizontally RIGHT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowright.png"
+    },
+    {
+      "name": "Tutorial Arrow Down",
+      "filename": "tutorialarrowdown.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing vertically DOWN. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowdown.png"
+    },
+    {
+      "name": "Tutorial Arrow Left",
+      "filename": "tutorialarrowleft.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing horizontally LEFT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowleft.png"
+    },
+    {
+      "name": "Locked",
+      "filename": "locked.png",
+      "group": "symbols",
+      "design": "One chunky gold padlock, rounded rectangular amber-gold body and one thick silver U-shaped shackle fully CLOSED. A single large dark-plum keyhole on the front. Front view, no key, chain, text or ornament.",
+      "destination": "images/ui_icons/symbols/locked.png"
+    },
+    {
+      "name": "Unlocked",
+      "filename": "unlocked.png",
+      "group": "symbols",
+      "design": "Same chunky golden padlock body and dark keyhole, but silver U-shaped shackle is raised and tilted LEFT with a clearly visible large transparent gap between its right free end and body, visibly OPEN. Preserve body proportions, colors and outline.",
+      "reference": "Locked",
+      "destination": "images/ui_icons/symbols/unlocked.png"
+    }
+  ]
+}

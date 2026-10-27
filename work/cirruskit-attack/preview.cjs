@@ -1,0 +1,6 @@
+const fs=require('fs'),crypto=require('crypto'),{execFileSync}=require('child_process');
+// Reuse the existing lossless APNG exporter, retaining attack metadata timing.
+let source=fs.readFileSync('work/cirruskit-walk-rebuild/preview.cjs','utf8');source=source.slice(0,source.indexOf('let html='));source=source.replaceAll('cirruskit_move','cirruskit_attack').replace('actl.writeUInt32BE(meta.frames.length);','actl.writeUInt32BE(meta.frames.length);actl.writeUInt32BE(1,4);');fs.writeFileSync('work/cirruskit-attack/export-apng.cjs',source);execFileSync(process.execPath,['work/cirruskit-attack/export-apng.cjs']);
+const dir='images/cirruskit',meta=JSON.parse(fs.readFileSync(`${dir}/cirruskit_attack.json`)),plan=JSON.parse(fs.readFileSync('work/cirruskit-attack/frame-plan.json')),version=crypto.createHash('sha256').update(fs.readFileSync(`${dir}/cirruskit_attack.png`)).digest('hex').slice(0,12);
+let html=fs.readFileSync('work/cirruskit-attack/preview-template.html','utf8').replace('__VERSION__',version).replace('__DURATIONS__',JSON.stringify(meta.frames.map(f=>f.durationMs))).replace('__PHASES__',JSON.stringify(plan.frames.map(f=>({'wind-up':'Wind-up',pounce:'Pounce',landing:'Landing',recover:'Return to idle'})[f.phase])));
+fs.writeFileSync(`${dir}/cirruskit_attack_preview.html`,html);console.log({preview:'cirruskit_attack_preview.html',version});

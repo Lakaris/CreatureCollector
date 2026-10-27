@@ -17,6 +17,8 @@ import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/contex
 import { makeArenaBattle, makeBossUnit, addBossToBattle, bossOf } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import GearRewardGrid from "../../../ui/components/GearRewardGrid.js";
+import GearPreviewPopup from "../../../ui/components/GearPreviewPopup.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
@@ -406,7 +408,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   if(dBattleOutcome){
     const won=dBattleOutcome==="won";
     return React.createElement("div",{key:"sfv338",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
-      React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
+      React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?iconText("✅"):"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:4}},won?"Dungeon Cleared!":"Defeat!"),
       React.createElement("div",{style:{fontSize:14,color:"#888",marginBottom:20}},won?"Equipment rewards collected!":""),
       React.createElement("button",{onClick:()=>{stopDLoops();setDBattling(false);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDBattleSelected(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
@@ -434,7 +436,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         React.createElement("button",{onClick:cycleDSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},dSpeed+"x ⚡")
       ),
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
-        React.createElement("div",{style:{fontSize:13,fontWeight:700,color:dTimeLeft<=10?"#ef4444":"#534AB7"}},dTimeLeft+"s ⏱"),
+        React.createElement("div",{style:{fontSize:13,fontWeight:700,color:dTimeLeft<=10?"#ef4444":"#534AB7"}},iconText(dTimeLeft+"s ⏱")),
         React.createElement("div",{className:"battle-row",style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
         React.createElement("div",{className:"battle-side-panel"},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
         React.createElement("div",{className:"battle-grid",style:{width:DUNGEON_GRID_COLS*DUNGEON_TILE,height:DUNGEON_GRID_ROWS*DUNGEON_TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
@@ -707,7 +709,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}}," / "+DUNGEON_MAX_DEPLOYED+" deployed")
           ),
           React.createElement("div",{style:{display:"flex",gap:8}},
-            React.createElement("button",{onClick:()=>deployedCount>0&&setDPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},"🗑 Clear All"),
+            React.createElement("button",{onClick:()=>deployedCount>0&&setDPlanGrid({}),disabled:deployedCount===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:deployedCount>0?"#534AB7":"#ccc",border:"1.5px solid "+(deployedCount>0?"#534AB7":"#ccc"),borderRadius:12,cursor:deployedCount>0?"pointer":"default"}},iconText("🗑 Clear All")),
             React.createElement("button",{onClick:dAutoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
           )
         ),
@@ -765,26 +767,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"🎁 Dungeon Rewards"),
       React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},rewards.length+" items from "+boss.name)
     ),
-    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
-      rewards.map((item,i)=>{
-        const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
-        return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
-          React.createElement("div",{style:{fontSize:36,lineHeight:1}},gearIcon(item)),
-          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
-          React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
-          stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
-        );
-      })
-    ),
-    previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
-        React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
-      )
-    ),
+    React.createElement(GearRewardGrid,{rewards,onPick:setPreviewItem,style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}}),
+    previewItem&&React.createElement(GearPreviewPopup,{item:previewItem,onClose:()=>setPreviewItem(null),zIndex:150}),
     React.createElement("div",{style:{padding:"12px 16px 28px",flexShrink:0}},
       React.createElement("button",{onClick:collectRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
     )
@@ -813,7 +797,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             React.createElement("div",{style:{flex:1,minWidth:0}},
               React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"#111"}},item.name),
               item.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",marginTop:2}},Object.entries(item.stats).map(([s,v])=>formatStatBonus(s,v)).join(" · ")),
-              item.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.45,marginTop:6}},"✦ "+item.effect)
+              item.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.45,marginTop:6}},iconText("✦ "+item.effect))
             )
           ))
         );
@@ -873,20 +857,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{style:{fontSize:18,fontWeight:700}},"🏰 Dungeon"),
       boss&&React.createElement("button",{onClick:()=>{if(dungeonEnterActive)return;setShowRewards(true);},style:{marginLeft:"auto",padding:"5px 12px",fontSize:12,fontWeight:600,background:"#f0f0f0",border:"none",borderRadius:20,cursor:dungeonEnterActive?"not-allowed":"pointer",color:dungeonEnterActive?"#ccc":"#555"}},"Rewards")
     ),
-    previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:330,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        isExclusive(previewItem)&&React.createElement("div",{style:{textAlign:"center",marginBottom:8}},
-          React.createElement("span",{style:{fontSize:11,fontWeight:600,color:"#7c5cf6",background:"#f0effe",borderRadius:20,padding:"3px 12px",display:"inline-block"}},
-            restrictionIcon(previewItem)," "+exclusivityChip(previewItem,false)
-          )
-        ),
-        previewItem.stats&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8}},Object.entries(previewItem.stats).map(([s,v])=>formatStatBonus(s,v)).join(" · ")),
-        previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
-        React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
-      )
-    ),
+    previewItem&&React.createElement(GearPreviewPopup,{item:previewItem,onClose:()=>setPreviewItem(null),zIndex:330}),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"24px 24px 16px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:16}},
       boss
         ? React.createElement(React.Fragment,null,
@@ -916,7 +887,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           // (screen padding, nothing else there) has plenty of room.
           dungeonEnterActive&&React.createElement("div",{
             style:{position:"absolute",right:"100%",top:"50%",transform:"translate(0,-50%)",marginRight:10,fontSize:24,lineHeight:1,color:"#534AB7",animation:"pointerBounceX 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}
-          },"➡️"),
+          },iconText("➡️")),
           React.createElement("button",{
             onClick:()=>{
               if(!boss)return;
@@ -944,6 +915,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
       React.createElement("div",{style:{display:"flex",borderTop:"1px solid #e0e0e0"}},
         DUNGEON_BAR_ORDER.map(k=>DUNGEON_BOSSES.find(b=>b.key===k)).filter(Boolean).map(b=>React.createElement("button",{
           key:b.key,onClick:()=>{if(dungeonEnterActive)return;setSelected(b.key);},
+          // Icon only -- the name is still there for screen readers / hover.
+          title:b.type,"aria-label":b.type+" Dungeon",
           style:{
             flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,
             padding:"8px 2px",border:"none",
@@ -953,8 +926,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             opacity:dungeonEnterActive?0.5:1,
           }
         },
-          React.createElement("span",{style:{fontSize:20}},TYPE_EMOJI[b.type]||"👾"),
-          React.createElement("span",{style:{fontSize:8,fontWeight:700,color:selected===b.key?"#534AB7":"#888"}},b.type)
+          React.createElement("span",{style:{fontSize:22,lineHeight:1}},typeIcon(b.type))
         ))
       )
     )

@@ -4,7 +4,7 @@
 // unlike EquipmentDetail there is no upgrading, ascending, or equipping here.
 
 import React, { useState, useMemo } from "../../react.js";
-import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
+import { iconText, gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../data/equipment.js";
 import { GEAR_FILTER_STATS, STAT_LABELS, shortStatLabel } from "../../data/rarity.js";
@@ -26,14 +26,14 @@ function EquipmentDexEntry({ item, collected, onBack }) {
         exclusivityCaption(item)
       ),
       React.createElement("div", { style: { position: "absolute", top: 10, right: 12, fontSize: 10, fontWeight: 700, color: collected ? "#2e7d32" : "#aaa", background: collected ? "#e8f5e9" : "#f0f0f0", borderRadius: 4, padding: "2px 7px" } },
-        collected ? "✓ Collected" : "Not collected"
+        iconText(collected ? "✓ Collected" : "Not collected")
       ),
       React.createElement("div", { style: { textAlign: "center", paddingTop: 12 } },
         React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, gearIcon(item)),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 2 } }, item.name),
         React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 6 } }, "Base stats (Lv 1)"),
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: item.effect ? 6 : 0 } }, equipBonusStr(baseBonuses)),
-        item.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + item.effect)
+        item.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, iconText("✦ " + item.effect))
       )
     )
   );
@@ -149,7 +149,7 @@ function EquipmentDexScreen({ onBack }) {
               // Same invisible-when-uncollected badge trick as the Creature
               // Dex, so every card keeps identical height either way.
               React.createElement("div", { style: { display: "flex", gap: 4, justifyContent: "center", marginBottom: 4, flexWrap: "wrap", alignItems: "center" } },
-                React.createElement("span", { className: "lv-badge", style: { visibility: isCollected ? "visible" : "hidden" } }, "✓")
+                React.createElement("span", { className: "lv-badge", style: { visibility: isCollected ? "visible" : "hidden" } }, iconText("✓"))
               )
             );
           })

@@ -6,7 +6,7 @@
 // sense in the context of one creature).
 
 import React, { useState, useEffect, useRef, useLayoutEffect } from "../../react.js";
-import { gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX } from "../components/IconText.js";
+import { iconText, gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { GEAR_FILTER_STATS, STAT_LABELS, shortStatLabel } from "../../data/rarity.js";
@@ -138,7 +138,7 @@ function EquipmentScreen() {
   return React.createElement("div", null,
     ascendAllResult && React.createElement("div", { className: "modal-overlay", onClick: () => setAscendAllResult(null) },
       React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 20, padding: "24px 20px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.18)" } },
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 4 } }, "✦ Equipment Ascended"),
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 4 } }, iconText("✦ Equipment Ascended")),
         ascendAllResult.length === 0
           ? React.createElement("div", { style: { fontSize: 13, color: "#666", padding: "12px 0" } }, "Nothing was ready to ascend.")
           : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 12, maxHeight: "calc(50 * var(--vh))", overflowY: "auto", textAlign: "left" } },
@@ -172,7 +172,7 @@ function EquipmentScreen() {
             setAscendAllResult(results);
           },
           style: { fontSize: 12, fontWeight: 800, color: "#fff", background: "#f59e0b", border: "none", borderRadius: 9, cursor: "pointer", padding: "6px 12px", letterSpacing: ".03em" }
-        }, "✦ Ascend All"),
+        }, iconText("✦ Ascend All")),
         // Same tutorial lock as Collection's Dex button -- the Dex isn't part
         // of any guided flow, so it stays inert until the tutorial is done.
         React.createElement("button", { className: "btn btn-primary btn-sm", onClick: () => { if (tutorialRestricted) return; setShowDex(true); }, disabled: tutorialRestricted, style: { marginBottom: 0, padding: "4px 12px", border: "none", lineHeight: 1.2, opacity: tutorialRestricted ? 0.5 : 1, cursor: tutorialRestricted ? "not-allowed" : "pointer" } }, "Dex")
@@ -284,7 +284,7 @@ function EquipmentScreen() {
               onClick: () => { setSelected(item.id); if (tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID) setTutorialStep("upgradeItem"); },
               style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", minHeight: 170, boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
             },
-              showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
+              showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, iconText("⬇️")),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
                 React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "16px" } }, "Lv " + lvl),
                 // Icon only (the full "🔥 Fire" is in the title and the
@@ -309,7 +309,7 @@ function EquipmentScreen() {
               React.createElement("div", null,
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#000" } }, item.name),
                 React.createElement("div", { style: { fontSize: 11, color: "#666", minHeight: 27 } }, equipBonusStr(bonuses)),
-                React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 39, lineHeight: 1.3 } }, item.effect ? "✦ " + item.effect : "")
+                React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 39, lineHeight: 1.3 } }, item.effect ? iconText("✦ " + item.effect) : "")
               ),
               React.createElement("div", { style: { minHeight: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 } },
                 canAscendItem && React.createElement("span", { style: { fontSize: 9, fontWeight: 800, color: "#fff", background: "#f59e0b", borderRadius: 6, padding: "1px 6px", letterSpacing: ".04em", whiteSpace: "nowrap" } }, "ASCEND READY"),

@@ -195,7 +195,7 @@ function QuestsScreen({onBack}){
               transition:"background 0.15s",
             }
           },
-            React.createElement("span",{style:{fontSize:20}},locked?"🔒":t.emoji),
+            React.createElement("span",{style:{fontSize:20}},locked?iconText("🔒"):t.emoji),
             t.label,
             !locked&&tDone&&(t.id==="daily"||tBatchIdx<tBatches.length)&&React.createElement("span",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
           );
@@ -258,7 +258,7 @@ function QuestsScreen({onBack}){
                 React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:6}},
                   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
                     React.createElement("div",{style:{fontSize:13,fontWeight:600,color:done?"#166534":"#222",flex:1}},q.label),
-                    React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},claimed?"✓ Claimed":prog.cur+" / "+prog.max)
+                    React.createElement("div",{style:{fontSize:12,color:claimed?"#22c55e":"#888",flexShrink:0}},iconText(claimed?"✓ Claimed":prog.cur+" / "+prog.max))
                   ),
                   React.createElement("div",{style:{height:6,borderRadius:6,background:"#e8e8e8",overflow:"hidden"}},
                     React.createElement("div",{style:{height:"100%",width:(pct*100)+"%",background:done?"#22c55e":"#534AB7",borderRadius:6,transition:"width 0.3s"}})
@@ -273,7 +273,7 @@ function QuestsScreen({onBack}){
         )
       ),
       React.createElement("div",{style:{display:"flex",justifyContent:"center",padding:"16px 0 28px",flexShrink:0}},
-        React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},"✕")
+        React.createElement("button",{onClick:onBack,style:{width:52,height:52,borderRadius:"50%",border:"none",background:"#534AB7",color:"#fff",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(83,74,183,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}},iconText("✕"))
       )
       )
     )

@@ -1,0 +1,26 @@
+{
+  "nearHind": {
+    "left": 102,
+    "top": 355,
+    "width": 138,
+    "height": 119
+  },
+  "nearFront": {
+    "left": 248,
+    "top": 350,
+    "width": 127,
+    "height": 132
+  },
+  "farFront": {
+    "left": 353,
+    "top": 363,
+    "width": 122,
+    "height": 111
+  },
+  "farHind": {
+    "left": 214,
+    "top": 366,
+    "width": 72,
+    "height": 90
+  }
+}

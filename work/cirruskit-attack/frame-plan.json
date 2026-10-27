@@ -1,0 +1,232 @@
+{
+  "frames": [
+    {
+      "index": 0,
+      "durationMs": 16,
+      "expression": "normal",
+      "headDown": 0,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 1,
+      "durationMs": 16,
+      "expression": "normal",
+      "headDown": 2,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 2,
+      "durationMs": 16,
+      "expression": "focused",
+      "headDown": 5,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 3,
+      "durationMs": 16,
+      "expression": "focused",
+      "headDown": 9,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 4,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 14,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 5,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 19,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 6,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 22,
+      "lift": 0,
+      "reach": 0,
+      "phase": "wind-up"
+    },
+    {
+      "index": 7,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 17,
+      "lift": 8,
+      "reach": 1,
+      "phase": "pounce"
+    },
+    {
+      "index": 8,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 9,
+      "lift": 22,
+      "reach": 2,
+      "phase": "pounce"
+    },
+    {
+      "index": 9,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 32,
+      "reach": 4,
+      "phase": "pounce"
+    },
+    {
+      "index": 10,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 34,
+      "reach": 5,
+      "phase": "pounce"
+    },
+    {
+      "index": 11,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 32,
+      "reach": 5,
+      "phase": "pounce"
+    },
+    {
+      "index": 12,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 26,
+      "reach": 4,
+      "phase": "pounce"
+    },
+    {
+      "index": 13,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 18,
+      "reach": 3,
+      "phase": "pounce"
+    },
+    {
+      "index": 14,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 0,
+      "lift": 9,
+      "reach": 1,
+      "phase": "pounce"
+    },
+    {
+      "index": 15,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 8,
+      "lift": 0,
+      "reach": 0,
+      "phase": "landing"
+    },
+    {
+      "index": 16,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 16,
+      "lift": 0,
+      "reach": 0,
+      "phase": "landing"
+    },
+    {
+      "index": 17,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 20,
+      "lift": 0,
+      "reach": 0,
+      "phase": "landing"
+    },
+    {
+      "index": 18,
+      "durationMs": 16,
+      "expression": "attack",
+      "headDown": 17,
+      "lift": 0,
+      "reach": 0,
+      "phase": "landing"
+    },
+    {
+      "index": 19,
+      "durationMs": 16,
+      "expression": "focused",
+      "headDown": 13,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    },
+    {
+      "index": 20,
+      "durationMs": 16,
+      "expression": "focused",
+      "headDown": 9,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    },
+    {
+      "index": 21,
+      "durationMs": 16,
+      "expression": "focused",
+      "headDown": 5,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    },
+    {
+      "index": 22,
+      "durationMs": 16,
+      "expression": "normal",
+      "headDown": 2,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    },
+    {
+      "index": 23,
+      "durationMs": 16,
+      "expression": "normal",
+      "headDown": 1,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    },
+    {
+      "index": 24,
+      "durationMs": 16,
+      "expression": "normal",
+      "headDown": 0,
+      "lift": 0,
+      "reach": 0,
+      "phase": "recover"
+    }
+  ],
+  "columns": 5,
+  "rows": 5,
+  "totalDurationMs": 400
+}

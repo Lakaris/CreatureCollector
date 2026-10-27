@@ -1,0 +1,2 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs'),p=PNG.sync.read(fs.readFileSync('work/cirruskit-walk-chest-finish/layers/nearHind.png'));
+const rows=[];for(let y=379;y<=432;y++){let first=null,last=null,edge=null;for(let x=185;x<235;x++){let i=(y*512+x)*4;if(p.data[i+3]>128){edge=x;if(p.data[i]<70&&p.data[i+1]<55&&p.data[i+2]<70){first??=x;last=x;}}}rows.push({y,first,last,edge});}console.log(rows);

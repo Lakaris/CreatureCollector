@@ -1,0 +1,1238 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "items": [
+    {
+      "name": "Common Ascension Shard",
+      "filename": "commonascensionshard.png",
+      "group": "items",
+      "design": "A single thick broad upward-pointing crystal shard, pearl-white face and slate-gray facets, one chipped lower corner. One large double upward-chevron emblem in white with a slate border on the front. Generic magical ascension material for ALL creature types: no element, animal or leaf symbol.",
+      "destination": "images/item_icons/commonascensionshard.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Common Ascension Shard (name for metadata only).\nSubject: A single thick broad upward-pointing crystal shard, pearl-white face and slate-gray facets, one chipped lower corner. One large double upward-chevron emblem in white with a slate border on the front. Generic magical ascension material for ALL creature types: no element, animal or leaf symbol.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0c025ad2-955c-4afa-a9fe-3c2bd64de98f.png",
+      "status": "generated"
+    },
+    {
+      "name": "Mysterious Ore",
+      "filename": "mysteriousore.png",
+      "group": "items",
+      "design": "One chunky irregular charcoal-gray ore rock with three large facets and one wide violet crystal seam visible across its front. One small exposed purple crystal wedge on its upper edge, integrated into the rock. Compact mystery treasure ore, no question mark, no extra stones.",
+      "destination": "images/item_icons/mysteriousore.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Mysterious Ore (name for metadata only).\nSubject: One chunky irregular charcoal-gray ore rock with three large facets and one wide violet crystal seam visible across its front. One small exposed purple crystal wedge on its upper edge, integrated into the rock. Compact mystery treasure ore, no question mark, no extra stones.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1c1a36cc-97c5-457d-9be9-48069d5c29ba.png",
+      "status": "generated"
+    },
+    {
+      "name": "Battlepass",
+      "filename": "battlepass.png",
+      "group": "actions",
+      "design": "One chunky vertical royal-blue pennant badge with a forked bottom edge, broad gold border and a single large gold five-point star at its center. Small gold horizontal top bar. Simple premium reward-pass emblem, no lettering.",
+      "destination": "images/ui_icons/actions/battlepass.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Battlepass (name for metadata only).\nSubject: One chunky vertical royal-blue pennant badge with a forked bottom edge, broad gold border and a single large gold five-point star at its center. Small gold horizontal top bar. Simple premium reward-pass emblem, no lettering.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-50128537-9dcc-4182-8de7-77d821bc8080.png",
+      "status": "generated"
+    },
+    {
+      "name": "Random Equipment",
+      "filename": "randomequipment.png",
+      "group": "items",
+      "design": "One chunky silver-gray shoulder armor plate with a broad bronze-gold rim. A single LARGE bold dark question mark, exact symbol '?', centered on its broad pale front surface. Readable random-equipment reward symbol. No weapon, extra armor or text.",
+      "destination": "images/item_icons/randomequipment.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Random Equipment (name for metadata only).\nSubject: One chunky silver-gray shoulder armor plate with a broad bronze-gold rim. A single LARGE bold dark question mark, exact symbol '?', centered on its broad pale front surface. Readable random-equipment reward symbol. No weapon, extra armor or text.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-05b0d9d7-8b0d-4121-83cb-81231a8171db.png",
+      "status": "generated"
+    },
+    {
+      "name": "Settings",
+      "filename": "settings.png",
+      "group": "actions",
+      "design": "One front-facing chunky steel-blue cogwheel with six broad rounded teeth and one LARGE circular transparent hole. One pale blue highlight and slate-blue shadow. Simple sturdy settings gear, no screws.",
+      "destination": "images/ui_icons/actions/settings.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Settings (name for metadata only).\nSubject: One front-facing chunky steel-blue cogwheel with six broad rounded teeth and one LARGE circular transparent hole. One pale blue highlight and slate-blue shadow. Simple sturdy settings gear, no screws.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a93e2f23-3214-49bf-806b-f8f6925527b7.png",
+      "status": "generated"
+    },
+    {
+      "name": "Daily Calendar Rewards",
+      "filename": "dailycalendarrewards.png",
+      "group": "actions",
+      "design": "One square ivory calendar page with rounded lower corners, a thick red top header and TWO large dark binding loops. One large warm-gold five-point star centered on the blank page. No dates, grid, numbers or letters.",
+      "destination": "images/ui_icons/actions/dailycalendarrewards.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Daily Calendar Rewards (name for metadata only).\nSubject: One square ivory calendar page with rounded lower corners, a thick red top header and TWO large dark binding loops. One large warm-gold five-point star centered on the blank page. No dates, grid, numbers or letters.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d3244072-3075-44d7-91a4-498c1361f17f.png",
+      "status": "generated"
+    },
+    {
+      "name": "Epic Ascension Shard",
+      "filename": "epicascensionshard.png",
+      "group": "items",
+      "design": "Change only the gray and white crystal palette to saturated violet-magenta with deep-purple facets. Change the double upward-chevron emblem to pale warm gold with a dark-purple border. Preserve the same generic all-types shard and identical shape and scale.",
+      "reference": "Common Ascension Shard",
+      "destination": "images/item_icons/epicascensionshard.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Common Ascension Shard. Make a matching Epic Ascension Shard variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nChange only the gray and white crystal palette to saturated violet-magenta with deep-purple facets. Change the double upward-chevron emblem to pale warm gold with a dark-purple border. Preserve the same generic all-types shard and identical shape and scale.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-c872f085-3006-41c9-b3ec-cd88d647cb75.png",
+      "status": "generated"
+    },
+    {
+      "name": "Legendary Ascension Shard",
+      "filename": "legendaryascensionshard.png",
+      "group": "items",
+      "design": "Change only the gray and white crystal palette to rich golden yellow with deep-amber facets. Change the double upward-chevron emblem to warm ivory with an ochre border. Preserve the same generic all-types shard and identical shape and scale.",
+      "reference": "Common Ascension Shard",
+      "destination": "images/item_icons/legendaryascensionshard.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Common Ascension Shard. Make a matching Legendary Ascension Shard variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nChange only the gray and white crystal palette to rich golden yellow with deep-amber facets. Change the double upward-chevron emblem to warm ivory with an ochre border. Preserve the same generic all-types shard and identical shape and scale.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d59600b6-11d6-4380-9059-9ad918211343.png",
+      "status": "generated"
+    },
+    {
+      "name": "Deluxe Ore",
+      "filename": "deluxeore.png",
+      "group": "items",
+      "design": "Change the charcoal rock to deep navy-blue rock and the broad crystal seam and upper exposed crystal wedge to rich cyan-blue. Add a broad warm-gold edge on just the seam. Preserve the same ore shape, facets and proportions, no extra fragments.",
+      "reference": "Mysterious Ore",
+      "destination": "images/item_icons/deluxeore.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Mysterious Ore. Make a matching Deluxe Ore variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nChange the charcoal rock to deep navy-blue rock and the broad crystal seam and upper exposed crystal wedge to rich cyan-blue. Add a broad warm-gold edge on just the seam. Preserve the same ore shape, facets and proportions, no extra fragments.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d07fa45c-af5c-4c4d-a283-ccb0f3b6d0f7.png",
+      "status": "generated"
+    },
+    {
+      "name": "Prismatic Ore",
+      "filename": "prismaticore.png",
+      "group": "items",
+      "design": "Keep the same dark ore-rock silhouette. Change the broad crystal seam and exposed top crystal wedge to a single clear sequence of large rainbow facets: warm red, gold, green, cyan, violet. Charcoal-purple rock surrounds the rainbow. No glow or particles. Same proportions and scale.",
+      "reference": "Mysterious Ore",
+      "destination": "images/item_icons/prismaticore.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Mysterious Ore. Make a matching Prismatic Ore variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nKeep the same dark ore-rock silhouette. Change the broad crystal seam and exposed top crystal wedge to a single clear sequence of large rainbow facets: warm red, gold, green, cyan, violet. Charcoal-purple rock surrounds the rainbow. No glow or particles. Same proportions and scale.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-77a95086-f275-4a68-88f1-35288b6e13bd.png",
+      "status": "generated"
+    },
+    {
+      "name": "Descend",
+      "filename": "descend.png",
+      "group": "actions",
+      "design": "A small chunky stone cave doorway: three broad slate-blue arch stones around a dark-purple opening, containing THREE wide ivory stone steps descending inward. One broad golden downward arrow centered over the steps. Simple silhouette and big shapes, a labyrinth entrance rather than a castle.",
+      "destination": "images/ui_icons/actions/descend.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Descend (name for metadata only).\nSubject: A small chunky stone cave doorway: three broad slate-blue arch stones around a dark-purple opening, containing THREE wide ivory stone steps descending inward. One broad golden downward arrow centered over the steps. Simple silhouette and big shapes, a labyrinth entrance rather than a castle.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-45ff93b1-55f5-493f-b29b-cc3ae1643fe0.png",
+      "status": "generated"
+    },
+    {
+      "name": "New Player Welcome Gift",
+      "filename": "newplayerwelcomegift.png",
+      "group": "actions",
+      "design": "One chunky turquoise gift box with a broad warm-gold ribbon and two large rounded bow loops. A single small coral-red five-point star seal centered where ribbon crosses the front. No loose confetti or extra objects.",
+      "destination": "images/ui_icons/actions/newplayerwelcomegift.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: New Player Welcome Gift (name for metadata only).\nSubject: One chunky turquoise gift box with a broad warm-gold ribbon and two large rounded bow loops. A single small coral-red five-point star seal centered where ribbon crosses the front. No loose confetti or extra objects.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1af58674-b8a0-4681-997a-235c11050990.png",
+      "status": "generated"
+    },
+    {
+      "name": "Time",
+      "filename": "time.png",
+      "group": "actions",
+      "design": "One round ivory stopwatch with a thick bronze-gold rim and one short gold top button. Two thick dark hands form an L, no numbers and no tick marks. Large clean face, front view.",
+      "destination": "images/ui_icons/actions/time.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Time (name for metadata only).\nSubject: One round ivory stopwatch with a thick bronze-gold rim and one short gold top button. Two thick dark hands form an L, no numbers and no tick marks. Large clean face, front view.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9f8c0bc5-561c-4b81-a448-1927fbfc726d.png",
+      "status": "generated"
+    },
+    {
+      "name": "Clear Team",
+      "filename": "clearteam.png",
+      "group": "actions",
+      "design": "A simple compact 2-by-2 arrangement of FOUR chunky pale-blue square grid tiles with thick plum outlines, partly overlapped at the lower right by ONE large pink eraser with a cream bevel. Clearly a grid being cleared. No creatures, faces, dust or little fragments.",
+      "destination": "images/ui_icons/actions/clearteam.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Clear Team (name for metadata only).\nSubject: A simple compact 2-by-2 arrangement of FOUR chunky pale-blue square grid tiles with thick plum outlines, partly overlapped at the lower right by ONE large pink eraser with a cream bevel. Clearly a grid being cleared. No creatures, faces, dust or little fragments.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-97b0fc01-152a-4760-a189-a8a200978417.png",
+      "status": "generated"
+    },
+    {
+      "name": "Retreat",
+      "filename": "retreat.png",
+      "group": "actions",
+      "design": "One thick orange-gold counterclockwise restart arrow bent into an almost complete circle with one LARGE wedge arrowhead at the upper left pointing back-left. Wide transparent gap between arrowhead and tail, large transparent central hole. No secondary objects.",
+      "destination": "images/ui_icons/actions/retreat.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Retreat (name for metadata only).\nSubject: One thick orange-gold counterclockwise restart arrow bent into an almost complete circle with one LARGE wedge arrowhead at the upper left pointing back-left. Wide transparent gap between arrowhead and tail, large transparent central hole. No secondary objects.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-056d80d9-aa95-429e-9df8-b208676b4aa1.png",
+      "status": "generated"
+    },
+    {
+      "name": "Home",
+      "filename": "home.png",
+      "group": "menu",
+      "design": "One small cozy house with a broad coral-red triangular roof, cream walls and one large arched teal door. Front view, chunky squat proportions. No chimney, window, yard or scenery.",
+      "destination": "images/ui_icons/menu/home.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Home (name for metadata only).\nSubject: One small cozy house with a broad coral-red triangular roof, cream walls and one large arched teal door. Front view, chunky squat proportions. No chimney, window, yard or scenery.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2990f17b-61d0-4435-81be-d91e5eaf4b02.png",
+      "status": "generated"
+    },
+    {
+      "name": "Hatch",
+      "filename": "hatch.png",
+      "group": "menu",
+      "design": "One cream egg with a broad zigzag crack around the upper third and the top shell tipped slightly upward, revealing a simple golden interior. Two broad tan shell patches. Egg and lid together as one compact icon, no creature, shards or sparkles.",
+      "destination": "images/ui_icons/menu/hatch.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Hatch (name for metadata only).\nSubject: One cream egg with a broad zigzag crack around the upper third and the top shell tipped slightly upward, revealing a simple golden interior. Two broad tan shell patches. Egg and lid together as one compact icon, no creature, shards or sparkles.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1fa2bf7e-5333-4099-a375-27019f298892.png",
+      "status": "generated"
+    },
+    {
+      "name": "Collection",
+      "filename": "collection.png",
+      "group": "menu",
+      "design": "Two chunky overlapping collector cards, rear card teal and front card warm ivory with a broad purple frame. One large purple paw print on the front card. No labels, text, stat lines or tiny decorative marks.",
+      "destination": "images/ui_icons/menu/collection.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Collection (name for metadata only).\nSubject: Two chunky overlapping collector cards, rear card teal and front card warm ivory with a broad purple frame. One large purple paw print on the front card. No labels, text, stat lines or tiny decorative marks.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-e8dab1d8-0149-499d-bb49-20168c0bf414.png",
+      "status": "generated"
+    },
+    {
+      "name": "Play",
+      "filename": "play.png",
+      "group": "menu",
+      "design": "Two simple chunky crossed swords with broad ivory-silver blades, bronze-gold guards and short teal handles. Blades point up, obvious X silhouette. Only two weapons, no shield or background.",
+      "destination": "images/ui_icons/menu/play.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Play (name for metadata only).\nSubject: Two simple chunky crossed swords with broad ivory-silver blades, bronze-gold guards and short teal handles. Blades point up, obvious X silhouette. Only two weapons, no shield or background.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0b60a9a5-7273-4e4c-81a3-38a83665fb1e.png",
+      "status": "generated"
+    },
+    {
+      "name": "Farm",
+      "filename": "farm.png",
+      "group": "menu",
+      "design": "One compact cross-section mound of warm-brown soil with one large bright-green two-leaf sprout growing from it. Thick stem and broad leaves, one pale-green highlight. No roots, pebbles, fence or scenery.",
+      "destination": "images/ui_icons/menu/farm.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Farm (name for metadata only).\nSubject: One compact cross-section mound of warm-brown soil with one large bright-green two-leaf sprout growing from it. Thick stem and broad leaves, one pale-green highlight. No roots, pebbles, fence or scenery.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-681af9ff-9b75-4710-9c1c-3e4add9127e4.png",
+      "status": "generated"
+    },
+    {
+      "name": "Equipment",
+      "filename": "equipment.png",
+      "group": "menu",
+      "design": "One chunky silver-gray breastplate with a broad bronze-gold rim and two simple squared shoulder tabs. Front view, teal neck opening and one broad slate-blue shadow. No question mark, straps, rivets or heraldry.",
+      "destination": "images/ui_icons/menu/equipment.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Equipment (name for metadata only).\nSubject: One chunky silver-gray breastplate with a broad bronze-gold rim and two simple squared shoulder tabs. Front view, teal neck opening and one broad slate-blue shadow. No question mark, straps, rivets or heraldry.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-026c4ba9-1ad2-450b-b498-fcfe853c2085.png",
+      "status": "generated"
+    },
+    {
+      "name": "Store",
+      "filename": "store.png",
+      "group": "menu",
+      "design": "One compact wooden market stall with a red-and-cream striped canopy, two broad posts and a golden counter. Only THREE wide canopy stripes. A single large gold coin resting on the counter, no merchandise or text.",
+      "destination": "images/ui_icons/menu/store.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Store (name for metadata only).\nSubject: One compact wooden market stall with a red-and-cream striped canopy, two broad posts and a golden counter. Only THREE wide canopy stripes. A single large gold coin resting on the counter, no merchandise or text.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-80770abb-ef37-4711-ae38-4ebffaa40cc8.png",
+      "status": "generated"
+    },
+    {
+      "name": "Titles",
+      "filename": "titles.png",
+      "group": "flair",
+      "design": "One short thick ivory parchment name ribbon with broad gold edging, gently curled ends, and a single centered purple five-point star in place of writing. Wide compact banner silhouette, no letters or seals.",
+      "destination": "images/ui_icons/flair/titles.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Titles (name for metadata only).\nSubject: One short thick ivory parchment name ribbon with broad gold edging, gently curled ends, and a single centered purple five-point star in place of writing. Wide compact banner silhouette, no letters or seals.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-184f05ba-4e75-4bd6-92ba-e940e5006620.png",
+      "status": "generated"
+    },
+    {
+      "name": "Auras",
+      "filename": "auras.png",
+      "group": "flair",
+      "design": "One bold circular magical aura ring, thick violet outer edge and cyan inner edge with a LARGE fully transparent center. The top and sides have three large smooth flame-like protrusions integrated into the ring. Hard-edged flat cel colors, no blur, particles, extra symbols or glow.",
+      "destination": "images/ui_icons/flair/auras.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Auras (name for metadata only).\nSubject: One bold circular magical aura ring, thick violet outer edge and cyan inner edge with a LARGE fully transparent center. The top and sides have three large smooth flame-like protrusions integrated into the ring. Hard-edged flat cel colors, no blur, particles, extra symbols or glow.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-002f3fa0-6ef3-4257-9f43-3a408bc11f36.png",
+      "status": "generated"
+    },
+    {
+      "name": "Backgrounds",
+      "filename": "backgrounds.png",
+      "group": "flair",
+      "design": "One chunky rectangular golden picture frame, containing an extremely simple landscape of two broad green hills, flat pale-blue sky and one large golden sun. No clouds, trees, textures or extra scenery. Landscape is entirely inside frame, transparent outside.",
+      "destination": "images/ui_icons/flair/backgrounds.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Backgrounds (name for metadata only).\nSubject: One chunky rectangular golden picture frame, containing an extremely simple landscape of two broad green hills, flat pale-blue sky and one large golden sun. No clouds, trees, textures or extra scenery. Landscape is entirely inside frame, transparent outside.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-397ca6ad-ac24-413e-9ded-906254aef8f0.png",
+      "status": "generated"
+    },
+    {
+      "name": "Items",
+      "filename": "items.png",
+      "group": "flair",
+      "design": "One cute broad purple magician's top hat with a wide curved brim, a thick golden hatband and one large cyan four-point star on its front. Simple cosmetic accessory, no wand, sparkles or character.",
+      "destination": "images/ui_icons/flair/items.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Items (name for metadata only).\nSubject: One cute broad purple magician's top hat with a wide curved brim, a thick golden hatband and one large cyan four-point star on its front. Simple cosmetic accessory, no wand, sparkles or character.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bc4545a6-180f-4eb3-8f11-83f40c595857.png",
+      "status": "generated"
+    },
+    {
+      "name": "Common Rarity",
+      "filename": "common.png",
+      "group": "rarities",
+      "design": "One simple round silver-gray medal badge, thick slate border, one large warm-ivory five-point star in the center. Flat bottom, no ribbon tails, no letters or tiny details. Broad quiet neutral colors.",
+      "destination": "images/ui_icons/rarities/common.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Common Rarity (name for metadata only).\nSubject: One simple round silver-gray medal badge, thick slate border, one large warm-ivory five-point star in the center. Flat bottom, no ribbon tails, no letters or tiny details. Broad quiet neutral colors.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2263f5d8-33f9-463e-8c42-f30808f405c9.png",
+      "status": "generated"
+    },
+    {
+      "name": "Epic Rarity",
+      "filename": "epic.png",
+      "group": "rarities",
+      "design": "One chunky diamond-shaped violet medal badge, broad lavender rim and one large pale-gold five-point star in its center. Four rounded corners. Bold purple rarity emblem, no ribbon tails or tiny ornament.",
+      "destination": "images/ui_icons/rarities/epic.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Epic Rarity (name for metadata only).\nSubject: One chunky diamond-shaped violet medal badge, broad lavender rim and one large pale-gold five-point star in its center. Four rounded corners. Bold purple rarity emblem, no ribbon tails or tiny ornament.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-dfab667b-63e4-4de3-ab8b-b065a06cc81d.png",
+      "status": "generated"
+    },
+    {
+      "name": "Legendary Rarity",
+      "filename": "legendary.png",
+      "group": "rarities",
+      "design": "One broad golden crown with THREE large points, amber lower band and one large warm-ivory diamond inset centered on the band. Bold squat crown silhouette, no tiny gems or floating sparkles.",
+      "destination": "images/ui_icons/rarities/legendary.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Legendary Rarity (name for metadata only).\nSubject: One broad golden crown with THREE large points, amber lower band and one large warm-ivory diamond inset centered on the band. Bold squat crown silhouette, no tiny gems or floating sparkles.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-671ae391-4422-4f4e-bac2-8bb49c4a2d9b.png",
+      "status": "generated"
+    },
+    {
+      "name": "Sound",
+      "filename": "sound.png",
+      "group": "settings",
+      "design": "One chunky teal speaker with a broad flared cone facing right, plus TWO thick separated curved turquoise sound-wave arcs to its right. Simple audio-on symbol, no musical notes or additional objects.",
+      "destination": "images/ui_icons/settings/sound.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Sound (name for metadata only).\nSubject: One chunky teal speaker with a broad flared cone facing right, plus TWO thick separated curved turquoise sound-wave arcs to its right. Simple audio-on symbol, no musical notes or additional objects.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-096c755c-8d28-42b7-9e3a-07794cb2c6f4.png",
+      "status": "generated"
+    },
+    {
+      "name": "Notifications",
+      "filename": "notifications.png",
+      "group": "settings",
+      "design": "One chunky golden notification bell, rounded dome, flared rim, one round amber clapper and one short top loop. No red notification dot, numbers, ringing lines or additional ornaments.",
+      "destination": "images/ui_icons/settings/notifications.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Notifications (name for metadata only).\nSubject: One chunky golden notification bell, rounded dome, flared rim, one round amber clapper and one short top loop. No red notification dot, numbers, ringing lines or additional ornaments.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bf4b1fcd-0554-498a-af10-c82aba53646b.png",
+      "status": "generated"
+    },
+    {
+      "name": "Change Display Creature",
+      "filename": "changedisplaycreature.png",
+      "group": "settings",
+      "design": "One simple friendly teal cat-like creature head silhouette with two round-tipped ears, two dark oval eyes and a tiny smile. Below it, one broad gold curved swap arrow sweeps left-to-right. Compact portrait-change symbol, no body or fur detail.",
+      "destination": "images/ui_icons/settings/changedisplaycreature.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Change Display Creature (name for metadata only).\nSubject: One simple friendly teal cat-like creature head silhouette with two round-tipped ears, two dark oval eyes and a tiny smile. Below it, one broad gold curved swap arrow sweeps left-to-right. Compact portrait-change symbol, no body or fur detail.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d337dd26-11e5-42c2-918e-e72191969ff9.png",
+      "status": "generated"
+    },
+    {
+      "name": "Checkmark",
+      "filename": "checkmark.png",
+      "group": "symbols",
+      "design": "One very thick green checkmark with smoothly rounded ends and a dark-plum outline, slightly tilted up toward right. One broad light-green highlight. No badge, circle or background.",
+      "destination": "images/ui_icons/symbols/checkmark.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Checkmark (name for metadata only).\nSubject: One very thick green checkmark with smoothly rounded ends and a dark-plum outline, slightly tilted up toward right. One broad light-green highlight. No badge, circle or background.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a3404e98-4d77-43a6-8381-7671e008c34c.png",
+      "status": "generated"
+    },
+    {
+      "name": "X",
+      "filename": "x.png",
+      "group": "symbols",
+      "design": "One very thick coral-red X made from two evenly sized diagonal rounded bars with dark-plum outline. One broad lighter-coral highlight. Balanced symmetrical shape, no badge or background.",
+      "destination": "images/ui_icons/symbols/x.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: X (name for metadata only).\nSubject: One very thick coral-red X made from two evenly sized diagonal rounded bars with dark-plum outline. One broad lighter-coral highlight. Balanced symmetrical shape, no badge or background.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2a31b914-5068-4ade-979c-4bc37e102f54.png",
+      "status": "generated"
+    },
+    {
+      "name": "Warning",
+      "filename": "warning.png",
+      "group": "symbols",
+      "design": "One chunky warm-yellow triangular warning sign with broadly rounded corners and thick dark-plum outline. A single large dark-plum exclamation mark, exact symbol '!', centered inside. No extra border, letters, texture or base.",
+      "destination": "images/ui_icons/symbols/warning.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Warning (name for metadata only).\nSubject: One chunky warm-yellow triangular warning sign with broadly rounded corners and thick dark-plum outline. A single large dark-plum exclamation mark, exact symbol '!', centered inside. No extra border, letters, texture or base.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-56d5bfa3-04a6-41d3-a3a3-426840998857.png",
+      "status": "generated"
+    },
+    {
+      "name": "Four-point Star",
+      "filename": "fourpointstar.png",
+      "group": "symbols",
+      "design": "Exactly one bold symmetrical four-point sparkle symbol like '✦', with equal long points at top, bottom, left and right and smoothly concave sides. Gold fill, one ivory broad highlight, thick plum outline. No other stars, diamonds or glow.",
+      "destination": "images/ui_icons/symbols/fourpointstar.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Four-point Star (name for metadata only).\nSubject: Exactly one bold symmetrical four-point sparkle symbol like '✦', with equal long points at top, bottom, left and right and smoothly concave sides. Gold fill, one ivory broad highlight, thick plum outline. No other stars, diamonds or glow.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-c6259564-a18d-43ea-82f0-80de019f347b.png",
+      "status": "generated"
+    },
+    {
+      "name": "Tutorial Arrow Up",
+      "filename": "tutorialarrowup.png",
+      "group": "symbols",
+      "design": "One very thick golden-yellow straight arrow pointing vertically UP. Broad triangular arrowhead, short wide shaft with flat base, softly rounded corners, dark-plum outline, single pale-ivory highlight. Balanced vertically centered, no hand or circle.",
+      "destination": "images/ui_icons/symbols/tutorialarrowup.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Tutorial Arrow Up (name for metadata only).\nSubject: One very thick golden-yellow straight arrow pointing vertically UP. Broad triangular arrowhead, short wide shaft with flat base, softly rounded corners, dark-plum outline, single pale-ivory highlight. Balanced vertically centered, no hand or circle.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-69ce5a65-183d-416c-aea3-fb70d360874b.png",
+      "status": "generated"
+    },
+    {
+      "name": "Locked",
+      "filename": "locked.png",
+      "group": "symbols",
+      "design": "One chunky gold padlock, rounded rectangular amber-gold body and one thick silver U-shaped shackle fully CLOSED. A single large dark-plum keyhole on the front. Front view, no key, chain, text or ornament.",
+      "destination": "images/ui_icons/symbols/locked.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.\nAsset: Locked (name for metadata only).\nSubject: One chunky gold padlock, rounded rectangular amber-gold body and one thick silver U-shaped shackle fully CLOSED. A single large dark-plum keyhole on the front. Front view, no key, chain, text or ornament.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-8422e901-cdec-4cb6-b547-d2756c342ec7.png",
+      "status": "generated"
+    },
+    {
+      "name": "Tutorial Arrow Right",
+      "filename": "tutorialarrowright.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing horizontally RIGHT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowright.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Tutorial Arrow Up. Make a matching Tutorial Arrow Right variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nThe exact same single golden arrow design, but pointing horizontally RIGHT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7902d752-12a8-43f0-91fd-ce1ff98b8da6.png",
+      "status": "generated"
+    },
+    {
+      "name": "Tutorial Arrow Down",
+      "filename": "tutorialarrowdown.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing vertically DOWN. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowdown.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Tutorial Arrow Up. Make a matching Tutorial Arrow Down variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nThe exact same single golden arrow design, but pointing vertically DOWN. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-f2a0620e-8e23-470d-b642-5a83b95cf709.png",
+      "status": "generated"
+    },
+    {
+      "name": "Tutorial Arrow Left",
+      "filename": "tutorialarrowleft.png",
+      "group": "symbols",
+      "design": "The exact same single golden arrow design, but pointing horizontally LEFT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.",
+      "reference": "Tutorial Arrow Up",
+      "destination": "images/ui_icons/symbols/tutorialarrowleft.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Tutorial Arrow Up. Make a matching Tutorial Arrow Left variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nThe exact same single golden arrow design, but pointing horizontally LEFT. Preserve stroke thickness, palette, broad triangular head, short wide shaft, corners, centered proportions and transparent margins.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-072e8db3-ae56-41cd-83c1-6a22828564b9.png",
+      "status": "generated"
+    },
+    {
+      "name": "Unlocked",
+      "filename": "unlocked.png",
+      "group": "symbols",
+      "design": "Same chunky golden padlock body and dark keyhole, but silver U-shaped shackle is raised and tilted LEFT with a clearly visible large transparent gap between its right free end and body, visibly OPEN. Preserve body proportions, colors and outline.",
+      "reference": "Locked",
+      "destination": "images/ui_icons/symbols/unlocked.png",
+      "prompt": "Use case: precise-object-edit. The supplied image is the edit target: Locked. Make a matching Unlocked variant. Preserve visual style, thick contour, silhouette proportions, canvas placement, scale and transparent background except changes explicitly described below.\nSame chunky golden padlock body and dark keyhole, but silver U-shaped shackle is raised and tilted LEFT with a clearly visible large transparent gap between its right free end and body, visibly OPEN. Preserve body proportions, colors and outline.\nUse case: stylized-concept. Create exactly ONE polished inventory or interface icon for a cute creature-collecting game, matching the existing egg and equipment art: chunky rounded silhouette, VERY THICK smooth near-black plum-brown outline (10-13 pixels at final 256px), flat rich colors with only one broad cel-shaded shadow and one broad highlight. Square PNG, genuine fully transparent background and transparent holes. Designed for 256x256px and legibility at 64,32 and13px. Few large shapes, generous negative space, centered at about90% canvas with safe margins. Opaque object. No fine texture, tiny ornament, diffuse glow, cast shadow, loose sparkles, scenic backdrop, UI square tile or watermark. No letters, words or numbers unless an exact symbol is specifically required below. Keep the subject unmistakable and visually simple.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-50a1bc64-ef94-4f06-97d7-ebfc664f33fb.png",
+      "status": "generated"
+    }
+  ],
+  "exports": [
+    {
+      "filename": "commonascensionshard.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0c025ad2-955c-4afa-a9fe-3c2bd64de98f.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 43034,
+      "solidPixels": 21793,
+      "bounds": [
+        55,
+        10,
+        200,
+        244
+      ],
+      "footprint": [
+        146,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:29:18.3294197Z"
+    },
+    {
+      "filename": "mysteriousore.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1c1a36cc-97c5-457d-9be9-48069d5c29ba.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 25962,
+      "solidPixels": 38681,
+      "bounds": [
+        11,
+        16,
+        245,
+        240
+      ],
+      "footprint": [
+        235,
+        225
+      ],
+      "savedUtc": "2026-10-27T16:29:20.5036817Z"
+    },
+    {
+      "filename": "battlepass.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-50128537-9dcc-4182-8de7-77d821bc8080.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 26711,
+      "solidPixels": 37584,
+      "bounds": [
+        12,
+        11,
+        243,
+        245
+      ],
+      "footprint": [
+        232,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:29:22.6488113Z"
+    },
+    {
+      "filename": "randomequipment.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-05b0d9d7-8b0d-4121-83cb-81231a8171db.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 30732,
+      "solidPixels": 33926,
+      "bounds": [
+        11,
+        22,
+        245,
+        233
+      ],
+      "footprint": [
+        235,
+        212
+      ],
+      "savedUtc": "2026-10-27T16:29:25.0944329Z"
+    },
+    {
+      "filename": "settings.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a93e2f23-3214-49bf-806b-f8f6925527b7.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 31493,
+      "solidPixels": 32732,
+      "bounds": [
+        11,
+        11,
+        246,
+        245
+      ],
+      "footprint": [
+        236,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:29:27.1531303Z"
+    },
+    {
+      "filename": "dailycalendarrewards.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d3244072-3075-44d7-91a4-498c1361f17f.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 17154,
+      "solidPixels": 47253,
+      "bounds": [
+        11,
+        10,
+        243,
+        244
+      ],
+      "footprint": [
+        233,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:29:29.3479213Z"
+    },
+    {
+      "filename": "epicascensionshard.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-c872f085-3006-41c9-b3ec-cd88d647cb75.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 42780,
+      "solidPixels": 22036,
+      "bounds": [
+        54,
+        10,
+        200,
+        245
+      ],
+      "footprint": [
+        147,
+        236
+      ],
+      "savedUtc": "2026-10-27T16:33:09.1068248Z"
+    },
+    {
+      "filename": "legendaryascensionshard.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d59600b6-11d6-4380-9059-9ad918211343.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 43010,
+      "solidPixels": 21820,
+      "bounds": [
+        54,
+        11,
+        200,
+        244
+      ],
+      "footprint": [
+        147,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:33:10.7393969Z"
+    },
+    {
+      "filename": "deluxeore.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d07fa45c-af5c-4c4d-a283-ccb0f3b6d0f7.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 26093,
+      "solidPixels": 38478,
+      "bounds": [
+        10,
+        16,
+        244,
+        239
+      ],
+      "footprint": [
+        235,
+        224
+      ],
+      "savedUtc": "2026-10-27T16:33:12.6263571Z"
+    },
+    {
+      "filename": "prismaticore.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-77a95086-f275-4a68-88f1-35288b6e13bd.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 25885,
+      "solidPixels": 38689,
+      "bounds": [
+        10,
+        15,
+        245,
+        239
+      ],
+      "footprint": [
+        236,
+        225
+      ],
+      "savedUtc": "2026-10-27T16:33:14.4861478Z"
+    },
+    {
+      "filename": "descend.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-45ff93b1-55f5-493f-b29b-cc3ae1643fe0.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 22757,
+      "solidPixels": 41580,
+      "bounds": [
+        11,
+        17,
+        245,
+        238
+      ],
+      "footprint": [
+        235,
+        222
+      ],
+      "savedUtc": "2026-10-27T16:33:16.4577752Z"
+    },
+    {
+      "filename": "newplayerwelcomegift.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1af58674-b8a0-4681-997a-235c11050990.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 22506,
+      "solidPixels": 42009,
+      "bounds": [
+        12,
+        11,
+        245,
+        245
+      ],
+      "footprint": [
+        234,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:33:18.3869523Z"
+    },
+    {
+      "filename": "time.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9f8c0bc5-561c-4b81-a448-1927fbfc726d.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 31195,
+      "solidPixels": 33454,
+      "bounds": [
+        26,
+        11,
+        228,
+        244
+      ],
+      "footprint": [
+        203,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:36:45.5953174Z"
+    },
+    {
+      "filename": "clearteam.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-97b0fc01-152a-4760-a189-a8a200978417.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 24876,
+      "solidPixels": 39602,
+      "bounds": [
+        11,
+        20,
+        245,
+        234
+      ],
+      "footprint": [
+        235,
+        215
+      ],
+      "savedUtc": "2026-10-27T16:36:47.6070863Z"
+    },
+    {
+      "filename": "retreat.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-056d80d9-aa95-429e-9df8-b208676b4aa1.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 37171,
+      "solidPixels": 27050,
+      "bounds": [
+        20,
+        11,
+        236,
+        245
+      ],
+      "footprint": [
+        217,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:36:49.3660665Z"
+    },
+    {
+      "filename": "home.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2990f17b-61d0-4435-81be-d91e5eaf4b02.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 29159,
+      "solidPixels": 35505,
+      "bounds": [
+        10,
+        15,
+        244,
+        239
+      ],
+      "footprint": [
+        235,
+        225
+      ],
+      "savedUtc": "2026-10-27T16:36:51.2514315Z"
+    },
+    {
+      "filename": "hatch.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1fa2bf7e-5333-4099-a375-27019f298892.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 31450,
+      "solidPixels": 33224,
+      "bounds": [
+        36,
+        11,
+        219,
+        244
+      ],
+      "footprint": [
+        184,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:36:53.0757642Z"
+    },
+    {
+      "filename": "collection.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-e8dab1d8-0149-499d-bb49-20168c0bf414.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 22197,
+      "solidPixels": 42348,
+      "bounds": [
+        10,
+        12,
+        244,
+        243
+      ],
+      "footprint": [
+        235,
+        232
+      ],
+      "savedUtc": "2026-10-27T16:36:55.0983269Z"
+    },
+    {
+      "filename": "play.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0b60a9a5-7273-4e4c-81a3-38a83665fb1e.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 30141,
+      "solidPixels": 33761,
+      "bounds": [
+        11,
+        13,
+        245,
+        242
+      ],
+      "footprint": [
+        235,
+        230
+      ],
+      "savedUtc": "2026-10-27T16:40:13.1167332Z"
+    },
+    {
+      "filename": "farm.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-681af9ff-9b75-4710-9c1c-3e4add9127e4.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 33872,
+      "solidPixels": 30327,
+      "bounds": [
+        11,
+        22,
+        245,
+        233
+      ],
+      "footprint": [
+        235,
+        212
+      ],
+      "savedUtc": "2026-10-27T16:40:14.9135332Z"
+    },
+    {
+      "filename": "equipment.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-026c4ba9-1ad2-450b-b498-fcfe853c2085.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 36127,
+      "solidPixels": 28540,
+      "bounds": [
+        10,
+        32,
+        244,
+        223
+      ],
+      "footprint": [
+        235,
+        192
+      ],
+      "savedUtc": "2026-10-27T16:40:16.6934564Z"
+    },
+    {
+      "filename": "store.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-80770abb-ef37-4711-ae38-4ebffaa40cc8.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 25005,
+      "solidPixels": 38878,
+      "bounds": [
+        11,
+        14,
+        244,
+        241
+      ],
+      "footprint": [
+        234,
+        228
+      ],
+      "savedUtc": "2026-10-27T16:40:18.5782213Z"
+    },
+    {
+      "filename": "titles.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-184f05ba-4e75-4bd6-92ba-e940e5006620.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 44217,
+      "solidPixels": 20540,
+      "bounds": [
+        11,
+        67,
+        245,
+        188
+      ],
+      "footprint": [
+        235,
+        122
+      ],
+      "savedUtc": "2026-10-27T16:40:20.2402913Z"
+    },
+    {
+      "filename": "auras.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-002f3fa0-6ef3-4257-9f43-3a408bc11f36.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 45738,
+      "solidPixels": 18335,
+      "bounds": [
+        21,
+        11,
+        233,
+        244
+      ],
+      "footprint": [
+        213,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:40:21.8081691Z"
+    },
+    {
+      "filename": "backgrounds.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-397ca6ad-ac24-413e-9ded-906254aef8f0.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 23973,
+      "solidPixels": 40459,
+      "bounds": [
+        11,
+        29,
+        246,
+        225
+      ],
+      "footprint": [
+        236,
+        197
+      ],
+      "savedUtc": "2026-10-27T16:43:54.8994907Z"
+    },
+    {
+      "filename": "items.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bc4545a6-180f-4eb3-8f11-83f40c595857.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 31633,
+      "solidPixels": 32908,
+      "bounds": [
+        11,
+        27,
+        245,
+        228
+      ],
+      "footprint": [
+        235,
+        202
+      ],
+      "savedUtc": "2026-10-27T16:43:56.7113539Z"
+    },
+    {
+      "filename": "common.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2263f5d8-33f9-463e-8c42-f30808f405c9.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 23100,
+      "solidPixels": 41546,
+      "bounds": [
+        11,
+        13,
+        245,
+        242
+      ],
+      "footprint": [
+        235,
+        230
+      ],
+      "savedUtc": "2026-10-27T16:43:58.5674774Z"
+    },
+    {
+      "filename": "epic.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-dfab667b-63e4-4de3-ab8b-b065a06cc81d.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 32291,
+      "solidPixels": 32432,
+      "bounds": [
+        11,
+        12,
+        245,
+        244
+      ],
+      "footprint": [
+        235,
+        233
+      ],
+      "savedUtc": "2026-10-27T16:44:00.3479024Z"
+    },
+    {
+      "filename": "legendary.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-671ae391-4422-4f4e-bac2-8bb49c4a2d9b.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 36311,
+      "solidPixels": 28081,
+      "bounds": [
+        12,
+        28,
+        246,
+        227
+      ],
+      "footprint": [
+        235,
+        200
+      ],
+      "savedUtc": "2026-10-27T16:44:02.1388186Z"
+    },
+    {
+      "filename": "sound.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-096c755c-8d28-42b7-9e3a-07794cb2c6f4.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 40233,
+      "solidPixels": 24049,
+      "bounds": [
+        11,
+        43,
+        244,
+        213
+      ],
+      "footprint": [
+        234,
+        171
+      ],
+      "savedUtc": "2026-10-27T16:44:04.132133Z"
+    },
+    {
+      "filename": "notifications.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bf4b1fcd-0554-498a-af10-c82aba53646b.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 32812,
+      "solidPixels": 31784,
+      "bounds": [
+        15,
+        11,
+        238,
+        244
+      ],
+      "footprint": [
+        224,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:48:21.5798542Z"
+    },
+    {
+      "filename": "changedisplaycreature.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d337dd26-11e5-42c2-918e-e72191969ff9.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 28932,
+      "solidPixels": 35028,
+      "bounds": [
+        19,
+        10,
+        236,
+        244
+      ],
+      "footprint": [
+        218,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:48:23.7929887Z"
+    },
+    {
+      "filename": "checkmark.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a3404e98-4d77-43a6-8381-7671e008c34c.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 46204,
+      "solidPixels": 18563,
+      "bounds": [
+        11,
+        40,
+        245,
+        214
+      ],
+      "footprint": [
+        235,
+        175
+      ],
+      "savedUtc": "2026-10-27T16:48:25.5571877Z"
+    },
+    {
+      "filename": "x.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2a31b914-5068-4ade-979c-4bc37e102f54.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 25695,
+      "solidPixels": 38639,
+      "bounds": [
+        9,
+        14,
+        243,
+        242
+      ],
+      "footprint": [
+        235,
+        229
+      ],
+      "savedUtc": "2026-10-27T16:48:27.5142559Z"
+    },
+    {
+      "filename": "warning.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-56d5bfa3-04a6-41d3-a3a3-426840998857.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 32578,
+      "solidPixels": 32164,
+      "bounds": [
+        11,
+        26,
+        244,
+        230
+      ],
+      "footprint": [
+        234,
+        205
+      ],
+      "savedUtc": "2026-10-27T16:48:29.5424782Z"
+    },
+    {
+      "filename": "fourpointstar.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-c6259564-a18d-43ea-82f0-80de019f347b.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 48484,
+      "solidPixels": 16218,
+      "bounds": [
+        17,
+        11,
+        240,
+        244
+      ],
+      "footprint": [
+        224,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:48:31.4921729Z"
+    },
+    {
+      "filename": "tutorialarrowup.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-69ce5a65-183d-416c-aea3-fb70d360874b.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 38241,
+      "solidPixels": 26374,
+      "bounds": [
+        26,
+        11,
+        228,
+        244
+      ],
+      "footprint": [
+        203,
+        234
+      ],
+      "savedUtc": "2026-10-27T16:48:33.8702795Z"
+    },
+    {
+      "filename": "locked.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-8422e901-cdec-4cb6-b547-d2756c342ec7.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 28343,
+      "solidPixels": 36140,
+      "bounds": [
+        30,
+        11,
+        227,
+        245
+      ],
+      "footprint": [
+        198,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:48:36.1333121Z"
+    },
+    {
+      "filename": "tutorialarrowright.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7902d752-12a8-43f0-91fd-ce1ff98b8da6.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 39268,
+      "solidPixels": 25491,
+      "bounds": [
+        10,
+        30,
+        244,
+        224
+      ],
+      "footprint": [
+        235,
+        195
+      ],
+      "savedUtc": "2026-10-27T16:50:54.6995396Z"
+    },
+    {
+      "filename": "tutorialarrowdown.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-f2a0620e-8e23-470d-b642-5a83b95cf709.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 37596,
+      "solidPixels": 27014,
+      "bounds": [
+        24,
+        10,
+        232,
+        245
+      ],
+      "footprint": [
+        209,
+        236
+      ],
+      "savedUtc": "2026-10-27T16:50:57.1090446Z"
+    },
+    {
+      "filename": "tutorialarrowleft.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-072e8db3-ae56-41cd-83c1-6a22828564b9.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 39932,
+      "solidPixels": 24724,
+      "bounds": [
+        9,
+        33,
+        244,
+        222
+      ],
+      "footprint": [
+        236,
+        190
+      ],
+      "savedUtc": "2026-10-27T16:50:59.2656888Z"
+    },
+    {
+      "filename": "unlocked.png",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-50a1bc64-ef94-4f06-97d7-ebfc664f33fb.png",
+      "width": 256,
+      "height": 256,
+      "clearPixels": 31350,
+      "solidPixels": 32956,
+      "bounds": [
+        32,
+        11,
+        223,
+        245
+      ],
+      "footprint": [
+        192,
+        235
+      ],
+      "savedUtc": "2026-10-27T16:51:01.5360586Z"
+    }
+  ]
+}

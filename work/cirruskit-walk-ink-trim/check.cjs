@@ -1,0 +1,11 @@
+const fs=require('fs'),assert=require('assert'),sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+const root='work/cirruskit-walk-ink-trim',prior='work/cirruskit-walk-belly-separation',read=p=>PNG.sync.read(fs.readFileSync(p)),report=[];let unchanged=0,changed=0;
+for(let n=0;n<30;n++){const a=read(`${prior}/frames/frame-${n}.png`),b=read(`${root}/frames/frame-${n}.png`),bounds=[512,512,0,0];let count=0;
+ for(let k=0;k<262144;k++){const i=k*4,x=k%512,y=k>>9;if(a.data.subarray(i,i+4).equals(b.data.subarray(i,i+4))){unchanged++;continue;}
+ assert(n>0,'Frame 1 changed');assert(x>=340&&x<390&&y>=395&&y<425,`Change outside marked join: ${n+1} ${x},${y}`);assert.equal(a.data[i+3],b.data[i+3],'Silhouette changed');assert(b.data[i]>=a.data[i],'Added dark ink');
+ changed++;count++;bounds[0]=Math.min(bounds[0],x);bounds[1]=Math.min(bounds[1],y);bounds[2]=Math.max(bounds[2],x);bounds[3]=Math.max(bounds[3],y);
+ }report.push({frame:n+1,changedPixels:count,bounds:count?bounds:null});
+}
+assert(changed>0);assert.deepEqual(JSON.parse(fs.readFileSync(`${root}/poses.json`)),JSON.parse(fs.readFileSync(`${prior}/poses.json`)));
+const result={frames:30,frameOneUnchanged:true,silhouetteUnchanged:true,gaitUnchanged:true,unchangedPixels:unchanged,changedPixels:changed,perFrame:report};fs.writeFileSync(`${root}/trim-audit.json`,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+(async()=>{const c=[];for(let k=0;k<6;k++){const n=[1,2,4,8,21,29][k];for(let row=0;row<2;row++){const source=row?root:prior,left=k*240,top=row*224;const input=await sharp(`${source}/frames/frame-${n}.png`).extract({left:348,top:397,width:55,height:45}).resize(220,180,{kernel:'nearest'}).flatten({background:'#eeeeee'}).png().toBuffer();c.push({input,left,top:top+32});c.push({input:Buffer.from(`<svg width="240" height="32"><text x="4" y="23" font-size="17" font-family="Arial">${row?'After':'Before'} ${n+1}</text></svg>`),left,top});}}await sharp({create:{width:1440,height:448,channels:4,background:'white'}}).composite(c).png().toFile(`${root}/comparison.png`);})();

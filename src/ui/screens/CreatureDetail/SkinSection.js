@@ -165,7 +165,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
           React.createElement("button",{className:"btn",style:{flex:1,marginBottom:0,background:"#e0e0e0",color:"#333"},onClick:()=>setPreviewSkin(null)},"Close"),
           React.createElement("button",{className:"btn btn-primary",style:{flex:1,marginBottom:0},
             onClick:()=>{selectSkin(previewSkin.skin.id,def.id);setPreviewSkin(null);}
-          },activeSkinId===previewSkin.skin.id?"Equipped ✓":"Equip")
+          },activeSkinId===previewSkin.skin.id?iconText("Equipped ✓"):"Equip")
         )
       )
     ),
@@ -191,7 +191,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
       onMouseDown:startHold,onMouseUp:stopHold,onMouseLeave:stopHold,
       onTouchStart:e=>{e.preventDefault();startHold();},onTouchEnd:stopHold
     },
-      candyGuideStep==="candyFeed"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+      candyGuideStep==="candyFeed"&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-30,transform:"translate(-50%,0)",fontSize:22,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
       "Feed — 🍬 1  ("+currencies.candy+" left)"
     ),
     React.createElement("div",{className:"skin-grid"},
@@ -215,7 +215,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
           className:"skin-card"+(isActive?" active-skin":"")+(unlocked?"":" locked-skin"),
           onClick:()=>setPreviewSkin({skin,unlocked})
         },
-          React.createElement("div",{className:"skin-emoji"},unlocked?previewEmoji:"🔒"),
+          React.createElement("div",{className:"skin-emoji"},unlocked?previewEmoji:iconText("🔒")),
           React.createElement("div",{className:"skin-name"},skin.name),
           React.createElement("span",{className:"badge "+SKIN_TIER_CONFIG[skin.tier].color},SKIN_TIER_CONFIG[skin.tier].label),
           !unlocked&&React.createElement("div",{style:{fontSize:10,color:"#888",marginTop:3}},iconText("🔮 "+cost)),

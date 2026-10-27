@@ -32,7 +32,7 @@ export const INITIAL_CURRENCIES = {
   melonFire: 0, melonWater: 0, melonNature: 0, melonEarth: 0,
   melonWind: 0, melonElectric: 0, melonLight: 0, melonDark: 0, melonRainbow: 0,
   flairBanana: 0, mythicalFlairBanana: 0, ancientFlairBanana: 0, flairShard: 0,
-  mysteriousOre: 0, deluxeOre: 0, rainbowOre: 0, treasureShards: 0,
+  mysteriousOre: 0, deluxeOre: 0, prismaticOre: 0, treasureShards: 0,
   ancientFertilizer: 0,
 };
 
@@ -282,7 +282,12 @@ export function GameProvider({ children }) {
   const [profileTitle, setProfileTitle] = useState(() => initialSave?.profileTitle ?? null);
 
   // ── Currencies + collection ──────────────────────────────────────────────
-  const [currencies, setCurrencies] = useState(() => ({ ...INITIAL_CURRENCIES, ...(initialSave?.currencies || {}) }));
+  // rainbowOre was renamed prismaticOre without carrying the count over;
+  // drop the old key so it doesn't ride along in every save forever.
+  const [currencies, setCurrencies] = useState(() => {
+    const { rainbowOre: _retired, ...saved } = initialSave?.currencies || {};
+    return { ...INITIAL_CURRENCIES, ...saved };
+  });
   const [owned, setOwned] = useState(() => initialSave?.owned ?? {});
   const [unlockedSkins, setUnlockedSkins] = useState(() => initialSave?.unlockedSkins ?? []);
   const [skinShards, setSkinShards] = useState(() => initialSave?.skinShards ?? 0);

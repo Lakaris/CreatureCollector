@@ -206,7 +206,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px",flex:1,minHeight:0,display:"flex",flexDirection:"column",overflow:"hidden"}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#888",marginBottom:4}},
-          React.createElement("span",null,atCap?"⚠️ Storage full! Harvest now":"Time since last harvest: "+fmtTime(elapsedMs)),
+          React.createElement("span",null,atCap?iconText("⚠️ Storage full! Harvest now"):"Time since last harvest: "+fmtTime(elapsedMs)),
           React.createElement("span",null,Math.min(Math.round(elapsedHours/FIELD_CAP_HOURS*100),100)+"%")
         ),
         React.createElement("div",{style:{height:8,background:"#e0e0e0",borderRadius:4,overflow:"hidden",marginBottom:10}},
@@ -255,7 +255,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           "Harvest available in "+fmtTime(Math.max(0,farmFieldLastHarvest+3600000-now))
         ),
         React.createElement("div",{style:{display:"flex",gap:8,marginBottom:0,position:"relative",flexShrink:0}},
-          harvestTutorialLock&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-40,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+          harvestTutorialLock&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-40,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
           React.createElement("button",{
             onClick:harvest,
             disabled:!canHarvest||fertilizerUpgradeLock||fertilizerDoneLock,
@@ -281,13 +281,13 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         ),
         React.createElement("div",{style:{marginTop:10}}),
         farmFieldLevel>=maxLevel
-          ?React.createElement("div",{style:{textAlign:"center",fontSize:13,color:"#888",padding:"4px 0"}},"Field max level ✅")
+          ?React.createElement("div",{style:{textAlign:"center",fontSize:13,color:"#888",padding:"4px 0"}},iconText("Field max level ✅"))
           :React.createElement(React.Fragment,null,
             React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
               React.createElement("div",null)
             ),
             React.createElement("div",{style:{position:"relative"}},
-              (farmGuideStep==="upgradeField"||(fertilizerUpgradeLock&&!showFieldUpgrade))&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-32,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
+              (farmGuideStep==="upgradeField"||(fertilizerUpgradeLock&&!showFieldUpgrade))&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-32,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
               React.createElement("button",{
                 "data-guide-target":"upgradeField",
                 disabled:farmInteractionLocked&&!fertilizerUpgradeLock,
@@ -354,7 +354,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             // centered in the middle of the box, while progress/time/speed-up
             // move down to sit just above the bottom edge, instead of the
             // whole group being centered together.
-            !(unlocked&&crop&&!ready)&&React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?currencyIcon(cropDef.key,cropDef.emoji):"🌱"):"🔒"),
+            !(unlocked&&crop&&!ready)&&React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?currencyIcon(cropDef.key,cropDef.emoji):"🌱"):iconText("🔒")),
             unlocked&&!crop&&React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:6}},
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();setPicking(i);},
@@ -459,7 +459,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     ),
     showFieldUpgrade&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},"⬆️ Upgrade Field"),
+        React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},iconText("⬆️ Upgrade Field")),
         React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:16}},"Level "+farmFieldLevel+" → "+(farmFieldLevel+1)),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
           React.createElement("div",{className:"rates-row"},
@@ -483,7 +483,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             // above it) so it doesn't cover the "Cost: ..." line right
             // above the button row -- same convention as DungeonScreen's
             // Fight-button arrow, mirrored.
-            fertilizerUpgradeLock&&React.createElement("div",{style:{position:"absolute",left:"100%",top:"50%",transform:"translate(0,-50%)",marginLeft:8,fontSize:24,color:"#534AB7",animation:"pointerBounceXLeft 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬅️"),
+            fertilizerUpgradeLock&&React.createElement("div",{style:{position:"absolute",left:"100%",top:"50%",transform:"translate(0,-50%)",marginLeft:8,fontSize:24,color:"#534AB7",animation:"pointerBounceXLeft 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬅️")),
             React.createElement("button",{
               disabled:!canUpgrade,
               onClick:()=>{
@@ -499,7 +499,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     ),
     cancelling!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:36,marginBottom:8}},"⚠️"),
+        React.createElement("div",{style:{fontSize:36,marginBottom:8}},iconText("⚠️")),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:8}},"Cancel Growth?"),
         React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:16}},"All progress on this crop will be lost."),
         React.createElement("div",{style:{display:"flex",gap:8}},
@@ -533,7 +533,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     notify&&React.createElement("div",{style:{position:"absolute",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.75)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,pointerEvents:"none",whiteSpace:"nowrap",zIndex:20,animation:"toastFade 2s ease-in-out"}},notify),
     confirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:36,marginBottom:8}},"🔓"),
+        React.createElement("div",{style:{fontSize:36,marginBottom:8}},iconText("🔓")),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:16}},"Unlock Plot "+(farmPlots+1)+"?"),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
           React.createElement("button",{onClick:()=>setConfirm(false),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),

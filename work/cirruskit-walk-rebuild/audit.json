@@ -1,0 +1,69 @@
+{
+  "frames": 30,
+  "grid": [
+    6,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "frameDurationMs": 50,
+  "totalDurationMs": 1500,
+  "referenceFrames": 15,
+  "referenceFrameDurationMs": 100,
+  "referenceCycleDurationMatched": true,
+  "diagonalPairSynchronizationVerified": true,
+  "pairA": [
+    "nearFront",
+    "farHind"
+  ],
+  "pairB": [
+    "nearHind",
+    "farFront"
+  ],
+  "uniqueFrames": 30,
+  "noDuplicateFinalFrame": true,
+  "sourceColorChecks": {
+    "manePixels": 442920,
+    "facePixels": 1203570
+  },
+  "componentCounts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "smallComponents": [],
+  "loopSeamMeanDifferenceAt130px": 2.2054437869822485,
+  "maxOrdinaryMeanDifferenceAt130px": 5.920473372781065,
+  "gameAndPreviewTimingMatch": true,
+  "idleAndFlavorUnchanged": true,
+  "method": "New separate leg layers rotate at hip/shoulder pivots in synchronized diagonal pairs. Original face, mane and tail art retained. ImageGen supplied the hidden body backing plate."
+}

@@ -6,6 +6,7 @@ import { FRAME_MAP } from "../../data/profileCosmetics.js";
 import ProfilePopup from "../components/ProfilePopup.js";
 import ScreenHeader from "../components/ScreenHeader.js";
 import DisplayCreaturePicker from "./DisplayCreaturePicker.js";
+import { uiIcon } from "../components/IconText.js";
 
 function ToggleRow({ label, value, onChange }) {
   return React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 4px" } },
@@ -52,13 +53,13 @@ function SettingsScreen({ onBack }) {
           onClick: () => setPickingDisplay(true),
           style: { width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 4px", background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }
         },
-          React.createElement("div", { style: { fontSize: 15, color: "#333" } }, "🐾 Change display creature"),
+          React.createElement("div", { style: { fontSize: 15, color: "#333" } }, uiIcon("settings/changedisplaycreature"), " Change display creature"),
           React.createElement("div", { style: { fontSize: 18, color: "#bbb" } }, "›")
         )
       ),
       React.createElement("div", { className: "card" },
-        React.createElement(ToggleRow, { label: "🔊 Sound", value: sound, onChange: setSound }),
-        React.createElement(ToggleRow, { label: "🔔 Notifications", value: notifications, onChange: setNotifications })
+        React.createElement(ToggleRow, { label: React.createElement(React.Fragment, null, uiIcon("settings/sound"), " Sound"), value: sound, onChange: setSound }),
+        React.createElement(ToggleRow, { label: React.createElement(React.Fragment, null, uiIcon("settings/notifications"), " Notifications"), value: notifications, onChange: setNotifications })
       ),
       React.createElement("div", { style: { marginTop: 16, textAlign: "center", fontSize: 12, color: "#aaa" } }, "Creature Collector v1.0.0")
     ),

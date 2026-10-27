@@ -2,7 +2,7 @@
 // evolution stage is its own entry, grouped by family (see ALL_DEX_FORMS).
 
 import React, { useState, useMemo } from "../../react.js";
-import { typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
+import { iconText, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { ALL_DEX_FORMS, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
@@ -133,7 +133,7 @@ function DexScreen({onBack}){
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Effects"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           [...activeEffects].sort().map(l=>
-            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},l+" ✕")
+            React.createElement("button",{key:l,className:"filter-chip active",onClick:()=>toggleEffect(l)},iconText(l+" ✕"))
           ),
           React.createElement("button",{className:"filter-chip",onClick:()=>setEffectsOpen(true)},"＋ Select")
         )

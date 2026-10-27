@@ -34,7 +34,7 @@ function StoreScreen(){
   // Same idea for the Dungeon Starter Pack and dungeonsUnlocked.
   const visibleBundles=STORE_BUNDLES.filter(b=>(b.id!=="starter_pack"||plotsUnlocked)&&(b.id!=="dungeon_starter_pack"||dungeonsUnlocked));
   return React.createElement("div",{style:{background:"#f8f8ff",minHeight:"100%"}},
-    purchaseToast&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:320,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},"✅ "+purchaseToast),
+    purchaseToast&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:320,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},iconText("✅ "+purchaseToast)),
     confirmItem&&React.createElement("div",{onClick:()=>setConfirmItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
         React.createElement("div",{style:{fontSize:48,marginBottom:8}},iconText(confirmItem.emoji||"💎")),
@@ -73,7 +73,7 @@ function StoreScreen(){
             )
           ),
           owned
-            ? React.createElement("div",{style:{padding:"6px 14px",background:"#e8f5e9",color:"#2e7d32",borderRadius:10,fontSize:13,fontWeight:700,flexShrink:0}},"✓ Owned")
+            ? React.createElement("div",{style:{padding:"6px 14px",background:"#e8f5e9",color:"#2e7d32",borderRadius:10,fontSize:13,fontWeight:700,flexShrink:0}},iconText("✓ Owned"))
             : React.createElement("div",{style:{padding:"6px 14px",background:"linear-gradient(135deg,#534AB7,#7c4dff)",color:"#fff",borderRadius:10,fontSize:13,fontWeight:700,flexShrink:0}},b.price)
         );})
       )

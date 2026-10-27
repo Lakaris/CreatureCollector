@@ -1,0 +1,259 @@
+{
+  "frames": 25,
+  "grid": [
+    5,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "totalDurationMs": 400,
+  "frameDurationMs": 16,
+  "loop": false,
+  "firstAndLastMatchBaseExactly": true,
+  "sourceTextureChecks": {
+    "headAndFace": 1832300,
+    "maneColorsAndSwirls": 369500,
+    "tailAndPaws": 1411725
+  },
+  "maximumLiftPx": 34,
+  "noCanvasClipping": true,
+  "oneConnectedSilhouettePerFrame": true,
+  "gameAndPreviewTimingMatch": true,
+  "fitsBattleAttackWindow": true,
+  "existingIdleFlavorMoveAssetsUnchanged": true,
+  "generatedExpressionRegions": [
+    "left eye",
+    "right eye",
+    "mouth"
+  ],
+  "method": "Built-in image editor created the expression. Local face patches use that master; existing head/mane and body artwork move with rigid whole-pixel translations. No frame crossfades or full-character redraws.",
+  "perFrame": [
+    {
+      "frame": 1,
+      "phase": "wind-up",
+      "expression": "normal",
+      "headDownPx": 0,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 2,
+      "phase": "wind-up",
+      "expression": "normal",
+      "headDownPx": 2,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 3,
+      "phase": "wind-up",
+      "expression": "focused",
+      "headDownPx": 5,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 4,
+      "phase": "wind-up",
+      "expression": "focused",
+      "headDownPx": 9,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 5,
+      "phase": "wind-up",
+      "expression": "attack",
+      "headDownPx": 14,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 6,
+      "phase": "wind-up",
+      "expression": "attack",
+      "headDownPx": 19,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 7,
+      "phase": "wind-up",
+      "expression": "attack",
+      "headDownPx": 22,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 8,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 17,
+      "liftPx": 8,
+      "reachPx": 1,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 9,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 9,
+      "liftPx": 22,
+      "reachPx": 2,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 10,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 32,
+      "reachPx": 4,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 11,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 34,
+      "reachPx": 5,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 12,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 32,
+      "reachPx": 5,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 13,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 26,
+      "reachPx": 4,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 14,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 18,
+      "reachPx": 3,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 15,
+      "phase": "pounce",
+      "expression": "attack",
+      "headDownPx": 0,
+      "liftPx": 9,
+      "reachPx": 1,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 16,
+      "phase": "landing",
+      "expression": "attack",
+      "headDownPx": 8,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 17,
+      "phase": "landing",
+      "expression": "attack",
+      "headDownPx": 16,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 18,
+      "phase": "landing",
+      "expression": "attack",
+      "headDownPx": 20,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 19,
+      "phase": "landing",
+      "expression": "attack",
+      "headDownPx": 17,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 20,
+      "phase": "recover",
+      "expression": "focused",
+      "headDownPx": 13,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 21,
+      "phase": "recover",
+      "expression": "focused",
+      "headDownPx": 9,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 22,
+      "phase": "recover",
+      "expression": "focused",
+      "headDownPx": 5,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 23,
+      "phase": "recover",
+      "expression": "normal",
+      "headDownPx": 2,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 24,
+      "phase": "recover",
+      "expression": "normal",
+      "headDownPx": 1,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    },
+    {
+      "frame": 25,
+      "phase": "recover",
+      "expression": "normal",
+      "headDownPx": 0,
+      "liftPx": 0,
+      "reachPx": 0,
+      "connectedComponents": 1
+    }
+  ]
+}

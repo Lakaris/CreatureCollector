@@ -474,7 +474,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     const won = battleOutcome === "won";
     const reward = getDepthReward(wonDepthRef.current);
     return React.createElement("div", { key: "sfv421", className: "screen-fade", style: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#fff", zIndex: 210, padding: 24, textAlign: "center" } },
-      React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, won ? "✅" : "💀"),
+      React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, won ? iconText("✅") : "💀"),
       React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: won ? "#534AB7" : "#ef4444", marginBottom: won ? 20 : 4 } }, won ? "Floor " + wonDepthRef.current + " Complete" : "Defeat!"),
       won && React.createElement("div", { style: { marginBottom: 20, minHeight: 55, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 } },
         Object.keys(reward).length > 0 && React.createElement(React.Fragment, null,
@@ -518,7 +518,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         React.createElement("button", { onClick: cycleSpeed, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, battleSpeed + "x ⚡")
       ),
       React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", padding: "12px", overflow: "hidden", gap: 6 } },
-        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: timeLeft <= 10 ? "#ef4444" : "#534AB7" } }, timeLeft + "s ⏱"),
+        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: timeLeft <= 10 ? "#ef4444" : "#534AB7" } }, iconText(timeLeft + "s ⏱")),
         React.createElement("div", { className: "battle-row", style: { display: "flex", flexDirection: "row", alignItems: "flex-start", justifyContent: "center", gap: 10, width: "100%", maxWidth: "100%", overflowX: "auto", boxSizing: "border-box" } },
         React.createElement("div", { className: "battle-side-panel" }, React.createElement(DamageChart, { damageDealt: snap.damageDealt })),
         React.createElement("div", { className: "battle-grid", style: { width: ARENA_GRID_COLS*ARENA_TILE, height: ARENA_GRID_ROWS*ARENA_TILE, borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0 } },
@@ -797,7 +797,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: "#aaa" } }, " / " + ARENA_MAX_DEPLOYED + " deployed")
           ),
           React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("button", { onClick: () => deployedCount > 0 && setPlanGrid({}), disabled: deployedCount === 0, style: { padding: "8px 14px", fontSize: 14, fontWeight: 700, background: "#fff", color: deployedCount > 0 ? "#534AB7" : "#ccc", border: "1.5px solid " + (deployedCount > 0 ? "#534AB7" : "#ccc"), borderRadius: 12, cursor: deployedCount > 0 ? "pointer" : "default" } }, "🗑 Clear All"),
+            React.createElement("button", { onClick: () => deployedCount > 0 && setPlanGrid({}), disabled: deployedCount === 0, style: { padding: "8px 14px", fontSize: 14, fontWeight: 700, background: "#fff", color: deployedCount > 0 ? "#534AB7" : "#ccc", border: "1.5px solid " + (deployedCount > 0 ? "#534AB7" : "#ccc"), borderRadius: 12, cursor: deployedCount > 0 ? "pointer" : "default" } }, iconText("🗑 Clear All")),
             React.createElement("button", { onClick: autoDeploy, style: { padding: "8px 16px", fontSize: 14, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer" } }, "⚡ Auto Deploy")
           )
         ),

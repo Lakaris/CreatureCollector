@@ -3,7 +3,7 @@
 // element -- never the dungeon's unique per-boss kits.
 
 import React, { useState, useEffect } from "../../../react.js";
-import { gearIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
+import { iconText, gearIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_LABELS, formatStatBonus } from "../../../data/rarity.js";
@@ -17,6 +17,8 @@ import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
+import GearRewardGrid from "../../../ui/components/GearRewardGrid.js";
+import GearPreviewPopup from "../../../ui/components/GearPreviewPopup.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import { getAbilityTags } from "../../../core/abilityText.js";
@@ -448,36 +450,18 @@ function DailyBossScreen({onBack,onViewCreature}){
   // Victory rewards screen — beating the tier always drops a reward set
   if(rewards&&phase==="won")return React.createElement("div",{key:"sfv379",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
-      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"✅ Victory!"),
+      React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},iconText("✅ Victory!")),
       React.createElement("div",{style:{fontSize:13,color:"#888"}},"Rewards")
     ),
-    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
-      rewards.map((item,i)=>{
-        const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
-        return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
-          React.createElement("div",{style:{fontSize:36,lineHeight:1}},gearIcon(item)),
-          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
-          React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
-          stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
-        );
-      })
-    ),
-    previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
-        React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
-      )
-    ),
+    React.createElement(GearRewardGrid,{rewards,onPick:setPreviewItem,style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}}),
+    previewItem&&React.createElement(GearPreviewPopup,{item:previewItem,onClose:()=>setPreviewItem(null),zIndex:150}),
     React.createElement("div",{style:{padding:"12px 16px 28px",flexShrink:0}},
       React.createElement("button",{onClick:collectWinRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
     )
   );
   // Fallback victory screen (defensive — win always rolls rewards above)
   if(phase==="won")return React.createElement("div",{key:"sfv409",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
-    React.createElement("div",{style:{fontSize:64,marginBottom:12}},"✅"),
+    React.createElement("div",{style:{fontSize:64,marginBottom:12}},iconText("✅")),
     React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#534AB7",marginBottom:4}},"Victory!"),
     React.createElement("button",{onClick:continueAfterWin,style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
   );
@@ -486,26 +470,8 @@ function DailyBossScreen({onBack,onViewCreature}){
     React.createElement("div",{style:{padding:"16px 16px 0",flexShrink:0}},
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#111",marginBottom:4}},"Rewards")
     ),
-    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"0 16px 16px",display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,alignContent:"start"}},
-      rewards.map((item,i)=>{
-        const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
-        const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
-        return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
-          React.createElement("div",{style:{fontSize:36,lineHeight:1}},gearIcon(item)),
-          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
-          React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
-          stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
-        );
-      })
-    ),
-    previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
-        previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
-        React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
-      )
-    ),
+    React.createElement(GearRewardGrid,{rewards,onPick:setPreviewItem,style:{flex:1,overflowY:"auto",padding:"0 16px 16px"}}),
+    previewItem&&React.createElement(GearPreviewPopup,{item:previewItem,onClose:()=>setPreviewItem(null),zIndex:150}),
     React.createElement("div",{style:{padding:"12px 16px 28px",flexShrink:0}},
       React.createElement("button",{onClick:collectRewards,style:{width:"100%",padding:"14px 0",fontSize:16,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:14,cursor:"pointer"}},"Collect All")
     )
@@ -540,12 +506,12 @@ function DailyBossScreen({onBack,onViewCreature}){
             React.createElement("div",{id:"battle-boss-hp-pct",style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:"#fff",textShadow:"0 1px 2px rgba(0,0,0,0.5)",pointerEvents:"none"}},Math.ceil(snap.boss.hp/bossMaxHp*100)+"%")
           )
         ),
-        phase==="battling"&&React.createElement("button",{onClick:()=>setConfirmForfeitOpen(true),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏳 Forfeit"),
+        phase==="battling"&&React.createElement("button",{onClick:()=>setConfirmForfeitOpen(true),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},iconText("🏳 Forfeit")),
         React.createElement("button",{onClick:cycleSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},battleSpeed+"x ⚡")
       ),
       // battle grid
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
-        React.createElement("div",{style:{fontSize:13,fontWeight:700,color:bossTimeLeft<=10?"#ef4444":"#534AB7"}},bossTimeLeft+"s ⏱"),
+        React.createElement("div",{style:{fontSize:13,fontWeight:700,color:bossTimeLeft<=10?"#ef4444":"#534AB7"}},iconText(bossTimeLeft+"s ⏱")),
         // Named grid areas let the same three pieces move between the layouts
         // (see pickBattleLayout) without remounting the board.
         React.createElement("div",{style:{display:"grid",justifyContent:"center",alignItems:"start",gap:BATTLE_GAP,width:"100%",boxSizing:"border-box",
@@ -729,7 +695,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       ),
       confirmForfeitOpen&&React.createElement("div",{onClick:()=>setConfirmForfeitOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
         React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320,textAlign:"center"}},
-          React.createElement("div",{style:{fontSize:40,marginBottom:8}},"🏳"),
+          React.createElement("div",{style:{fontSize:40,marginBottom:8}},iconText("🏳")),
           React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:6}},"Forfeit this fight?"),
           React.createElement("div",{style:{fontSize:13,color:"#888",lineHeight:1.5,marginBottom:18}},"This counts as a loss and uses one of today's attempts."),
           React.createElement("div",{style:{display:"flex",gap:10}},
@@ -894,7 +860,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"#aaa"}}," / "+MAX_DEPLOYED+" deployed")
         ),
         React.createElement("div",{style:{display:"flex",gap:8}},
-          React.createElement("button",{onClick:()=>Object.keys(planGrid).length>0&&setPlanGrid({}),disabled:Object.keys(planGrid).length===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"1.5px solid "+(Object.keys(planGrid).length>0?"#534AB7":"#ccc"),borderRadius:12,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},"🗑 Clear All"),
+          React.createElement("button",{onClick:()=>Object.keys(planGrid).length>0&&setPlanGrid({}),disabled:Object.keys(planGrid).length===0,style:{padding:"8px 14px",fontSize:14,fontWeight:700,background:"#fff",color:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"1.5px solid "+(Object.keys(planGrid).length>0?"#534AB7":"#ccc"),borderRadius:12,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},iconText("🗑 Clear All")),
           React.createElement("button",{onClick:autoDeploy,style:{padding:"8px 16px",fontSize:14,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:12,cursor:"pointer"}},"⚡ Auto Deploy")
         )
       ),
@@ -974,7 +940,7 @@ function DailyBossScreen({onBack,onViewCreature}){
       React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",background:"#f0effe",borderRadius:20,padding:"3px 14px",marginBottom:4}},"Lv. "+level),
       completed
         ?React.createElement("div",{style:{background:"#e8f5e9",borderRadius:12,padding:"14px 24px",textAlign:"center"}},
-            React.createElement("div",{style:{fontSize:20,marginBottom:4}},"✅"),
+            React.createElement("div",{style:{fontSize:20,marginBottom:4}},iconText("✅")),
             React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"#2e7d32"}},"Completed today"),
             React.createElement("div",{style:{fontSize:12,color:"#666",marginTop:4}},"Come back tomorrow for a new boss")
           )
@@ -986,7 +952,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             const ss=String(s%60).padStart(2,"0");
             return React.createElement("div",{style:{width:"100%",maxWidth:300,textAlign:"center"}},
               rewardsCollectedToday&&React.createElement("div",{style:{marginBottom:12,textAlign:"center"}},
-                React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#16a34a",marginBottom:2}},"✅ Rewards Collected Today"),
+                React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#16a34a",marginBottom:2}},iconText("✅ Rewards Collected Today")),
                 React.createElement("div",{style:{fontSize:14,color:"#15803d"}},"Defeat the boss for more rewards")
               ),
               React.createElement("div",{style:{textAlign:"center",marginBottom:16}},

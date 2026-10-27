@@ -1,0 +1,46 @@
+[
+  {
+    "name": "waddlepop",
+    "changedPixels": 991,
+    "alphaUnchanged": true,
+    "markBounds": [
+      276,
+      330,
+      38,
+      40
+    ]
+  },
+  {
+    "name": "frostillery",
+    "changedPixels": 1180,
+    "alphaUnchanged": true,
+    "markBounds": [
+      286,
+      322,
+      42,
+      46
+    ]
+  },
+  {
+    "name": "bombardguin",
+    "changedPixels": 1266,
+    "alphaUnchanged": true,
+    "markBounds": [
+      298,
+      311,
+      43,
+      50
+    ]
+  },
+  {
+    "name": "cryogeddon",
+    "changedPixels": 1685,
+    "alphaUnchanged": true,
+    "markBounds": [
+      291,
+      311,
+      49,
+      56
+    ]
+  }
+]

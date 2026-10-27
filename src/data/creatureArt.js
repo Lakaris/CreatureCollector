@@ -75,10 +75,11 @@ export function artLoops(state, entry) {
 export const CREATURE_ART = {
   // 512px cells. Idle is a 6x5 grid breathing loop (30 frames at 64ms; 1.92s); flavor uses all 12 cells of a 4x3
   // grid with per-frame holds from cirruskit_flavor.json (2.432s).
-  // Move is a 6x4 walk-in-place loop (24 frames at 64ms; 1.536s).
+  // Move is a 6x5 paired walk loop (30 frames at 50ms; 1.5s).
   cirruskit: {
     idle: { src: "images/cirruskit/cirruskit_idle.png", frames: 30, columns: 6, durations: Array(30).fill(64) },
-    move: { src: "images/cirruskit/cirruskit_move.png", frames: 24, columns: 6, durations: Array(24).fill(64) },
+    move: { src: "images/cirruskit/cirruskit_move.png", frames: 30, columns: 6, durations: Array(30).fill(50) },
+    attack: { src: "images/cirruskit/cirruskit_attack.png", frames: 25, columns: 5, durations: Array(25).fill(16), loop: false },
     flavor: { src: "images/cirruskit/cirruskit_flavor.png", frames: 12, columns: 4, durations: [600, 80, 184, 208, 176, 192, 144, 144, 184, 80, 80, 360] },
   },
 

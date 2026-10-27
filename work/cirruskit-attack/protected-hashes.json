@@ -1,0 +1,20 @@
+{
+  "cirruskit_base.png": "5b5a758c40a2c2121533c788ac22fc2a485ef72ed40d329df8c1c20b2e4edad5",
+  "cirruskit_flavor.json": "150b1002b1412710eed049631db79d1dff8bf6da1705b5300680f2e35c9a2da5",
+  "cirruskit_flavor.png": "b1b5523fc5ccc2440d25d9de72789d250b05845a405caafa82e7e45101f2d61b",
+  "cirruskit_flavor_audit.json": "80da3f939e0a96cacbed58b337f29075187e631faa3de5567564c91607957a96",
+  "cirruskit_flavor_notes.txt": "dee48065b178ab4107fe8c5d3059073654e1b963ce788bd4f3af40160dca29e7",
+  "cirruskit_flavor_preview.html": "99aceca80c5a8205501c216f2e8f002236565cc987fe9b40adeef35335dcc4d6",
+  "cirruskit_flavor_preview.png": "d26a2d1edc7f9fa48886ce8bae8ed4cb761ea22a172accca25a8170e3c5b1dd8",
+  "cirruskit_idle.json": "a1685257f913d0e20fe8a9e9cf988727e71a70e26d8d1586b4022e73c3e4b015",
+  "cirruskit_idle.png": "d3faf0d1a8def06e307e39474e799d2fb3e319b265f39ed946f2d1b706d88b4d",
+  "cirruskit_idle_notes.txt": "cd65ac1ed2161acf997c4eff4fcd755a67eff90434bf41c604326fcc20e0e549",
+  "cirruskit_idle_preview.html": "caf724c3196712a6cc24d2502b749ef769f59db7c3f9bfdd7926331990584ed6",
+  "cirruskit_idle_preview.png": "1438fccf715f31fe7103bb3bc4afa1e96f9c20fd7d7551b530b99f828da5902b",
+  "cirruskit_move.json": "4aeecb1bc04e28e5e0166fcf5c52226a5485909d4ae7c186326e35d969803fa2",
+  "cirruskit_move.png": "f154bac1e53f75ffaca21a16ae481ac5d7cfffa4ed67f6893464b5357f1a300d",
+  "cirruskit_move_audit.json": "1c10744a46ec04f931b99d9672f1de56c17e0201c96db22c7da891187592faea",
+  "cirruskit_move_notes.txt": "1dfa25e43c1e22315963362a2376701332ffcbd3883bbcc5358fd8ebb8b1966c",
+  "cirruskit_move_preview.html": "f99b7b6d4e403d110ba096f200aa7f8c97a5fc7c3c29b33358b08c4e63ed5af3",
+  "cirruskit_move_preview.png": "b8bf6db372051bfb61a562781754fb459c362eddf67c11249cf35c9187735069"
+}

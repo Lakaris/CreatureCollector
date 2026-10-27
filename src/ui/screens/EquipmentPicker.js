@@ -7,7 +7,7 @@
 // tapping one opens a popup asking which of its equipped items to replace.
 
 import React, { useState } from "../../react.js";
-import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
+import { iconText, gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIPMENT_MAP, EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
@@ -81,7 +81,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
               React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#333" } }, existing.name + " (Lv " + lvl + ")", asc > 0 && React.createElement("span", { style: { display: "inline-flex", verticalAlign: "middle", marginLeft: 6 } }, React.createElement(GearAscStars, { asc, size: 11 }))),
                 React.createElement("div", { style: { fontSize: 11, color: "#666" } }, equipBonusStr(bonuses)),
-                React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 13 } }, existing.effect ? "✦ " + existing.effect : "")
+                React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 13 } }, existing.effect ? iconText("✦ " + existing.effect) : "")
               )
             );
           })

@@ -1,0 +1,11 @@
+{
+  "frames": 30,
+  "approvedRearPixelsUnchanged": 5068800,
+  "unchangedRegion": {
+    "x": 0,
+    "y": 0,
+    "width": 330,
+    "height": 512
+  },
+  "gaitPoseDataUnchanged": true
+}

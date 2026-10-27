@@ -74,7 +74,7 @@ function ItemInfo({ item, level, onClose }) {
       h("div", { style: { fontSize: 64, marginBottom: 4 } }, gearIcon(item)),
       h("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 6 } }, "Lv. " + level + " " + item.name),
       h("div", { style: { fontSize: 13, color: "#666", marginBottom: item.effect ? 6 : 0 } }, equipBonusStr(equipBonus(item.id, level))),
-      item.effect && h("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + item.effect)),
+      item.effect && h("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, iconText("✦ " + item.effect))),
   ]);
 }
 
@@ -318,7 +318,7 @@ function TrialsHome({ onBack, viewIdx, progIdx, maxIdx, stage, enemyLevel, enemi
     // than the screen still scrolls to its top instead of clipping it.
     h("div", { style: { flex: 1, overflowY: "auto", padding: "18px 16px", display: "flex", flexDirection: "column" } },
      h("div", { style: { margin: "auto 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: "100%" } },
-      status && h("div", { style: { fontSize: 13, fontWeight: 700, color: isLocked ? "#aaa" : isReplay ? "#16a34a" : "#ff9800" } }, status),
+      status && h("div", { style: { fontSize: 13, fontWeight: 700, color: isLocked ? "#aaa" : isReplay ? "#16a34a" : "#ff9800" } }, iconText(status)),
       h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, width: "100%", maxWidth: 380, opacity: isLocked ? 0.55 : 1 } },
         enemies.map((e, i) => {
           const def = CREATURE_MAP[e.id];
@@ -347,7 +347,7 @@ function TrialsHome({ onBack, viewIdx, progIdx, maxIdx, stage, enemyLevel, enemi
       h("button", {
         onClick: isLocked ? undefined : onFight,
         style: { width: "100%", padding: "13px", borderRadius: 14, border: "none", background: isLocked ? "#ccc" : "#534AB7", color: "#fff", fontWeight: 800, fontSize: 16, cursor: isLocked ? "default" : "pointer" },
-      }, isLocked ? "🔒 Beat the earlier levels first" : isReplay ? "⚔️ Fight again" : "⚔️ Fight")));
+      }, iconText(isLocked ? "🔒 Beat the earlier levels first" : isReplay ? "⚔️ Fight again" : "⚔️ Fight"))));
 }
 
 export default TrialsHome;

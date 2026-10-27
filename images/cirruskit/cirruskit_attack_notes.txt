@@ -1,0 +1,17 @@
+Cirruskit attack — narrowed eyes, open mouth, pounce in place
+
+25 transparent 512 x 512 frames, arranged in a 5 x 5 grid. Read left to right, top to bottom. Each frame lasts 16 ms, for a 400 ms one-shot animation. This fits the game's existing 400 ms attack-art window. The first and final frames are exact copies of cirruskit_base.png.
+
+Action: focus and crouch, open the mouth, launch into a small in-place pounce, land and recover to the base pose. The jump rises 34 pixels and reaches 5 pixels forward before returning to the starting position. The complete head and cloud mane move together using whole-pixel translations; the original artwork is not repeatedly resampled. The preview repeats with an 800 ms rest and provides normal, half and quarter speed, frame stepping, a slider and a dark background.
+
+The built-in image editor created a single attack-expression master. Only local patches around the eyes and mouth are used from that master. The body, tail, paws, face markings and cloud mane retain the existing source artwork. No full-frame regeneration, frame crossfades or optical-flow interpolation are used. Existing idle, flavor and move files are unchanged.
+
+Validation: all 25 frames inspected at full and game sizes. First/last base matches, all sheet cells, transparency at the canvas boundary, connected silhouettes, game/export/preview timing, and protected-file hashes passed. 1,832,300 head/face texture comparisons, 369,500 mane-color comparisons and 1,411,725 tail/paw comparisons passed. See cirruskit_attack_audit.json.
+
+Current rebuild: ../../work/cirruskit-attack/rebuild.cjs
+Generated master: ../../work/cirruskit-attack/inputs/attack-expression-generated.png
+Exact image-edit prompt: ../../work/cirruskit-attack/image-edit-prompt.txt
+Tool mode: built-in image_gen, transparent background. No CLI/API fallback.
+
+Final image-edit prompt:
+Use case: precise-object-edit. Edit target: the supplied transparent Cirruskit base sprite. Create an attack-expression version of this exact character, in the exact same standing pose, size, placement, and three-quarter viewing angle. Change ONLY its two eyes and mouth. Narrow both eyes into focused cat eyes with lowered upper lids; retain the dark plum eye outlines, existing pupils and highlights, and do not add eyebrows. Open the little mouth into a clear, cute attacking meow: a dark plum open mouth with a small pink tongue, connected naturally beneath the unchanged brown nose. Keep the same simple crisp cartoon linework and flat shaded colors. Preserve everything else: the silhouette, ears, forehead white swirl, cheek marks and whiskers, body shading, four white paws, cream cloud mane and every mane swirl, and blue-and-cream curled tail. Do not alter the pose or add movement effects, objects, shadows, text, or a background. Use true transparent background. This is a single clean master sprite for an animation, not a spritesheet. Match the reference framing exactly.

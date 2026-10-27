@@ -69,10 +69,27 @@ export function makeBoss(key,name,type){
 function makeVine(row,col){
   return {
     name:"Vine",emoji:"🌱",row,col,
+    creatureId:"__vine_minion",
+    unit:{isVineMinion:true},
     abilities:{
       basic:{name:"Lash",description:"Melee attacks the nearest enemy, moving toward it when out of reach",tags:["closest"]},
       special:{name:"Entangle",description:"Every few seconds, damages every enemy in the 8 surrounding tiles",tags:["nearby"]},
     },
+  };
+}
+
+/**
+ * One of the Dark Boss's Totems, at the tile it stands on. `creatureId` and
+ * `unit` tell DungeonScreen's dFight what to spawn: the "__dark_totem"
+ * creature (data/creatures.js -- its 0.5 Speed included), as a summon of the
+ * boss carrying its buff kind.
+ */
+function makeTotem(row,col,kind,abilityName,description,tags){
+  return {
+    name:"Bamboo Totem",emoji:"🎋",row,col,
+    creatureId:"__dark_totem",
+    unit:{totemKind:kind,_summonOf:"eboss"},
+    abilities:{basic:{name:abilityName,description,tags}},
   };
 }
 
@@ -121,12 +138,25 @@ export const DUNGEON_BOSSES=[
     special:{name:"Holy Radiance",description:"Deals damage to all enemies, then gains Power (attack buff) and Shield (absorbs damage until depleted, stackable)",tags:["shield"]},
     unique:{name:"Bulwark",description:"At 50% Health, gains a Shield equal to 30% of its max Health. While it has a Shield, slowly heals until the Shield breaks or its Health is full",tags:["shield","healovertime"]},
   }},
-  {...makeBoss("dark","Dark Boss","Dark"),abilities:{
-    basic:{name:"Shadow Row",description:"Cloaks the entire grid in shadow, dealing damage and inflicting Damage Over Time (stackable) on all enemies",tags:["damageovertime"]},
-    // Weak is a flat 30% Attack cut, not Attack Down's per-level ladder.
-    special:{name:"Cursed Veil",description:"Deals damage to all enemies and inflicts Weak (reduces attack) and Heal Immunity (blocks healing)",tags:["healimmunity"]},
-    unique:{name:"Dark Shroud",description:"Receives reduced damage for each debuffed enemy on the field"},
-  }},
+  // A dark panda shaman: it paints curses across the field with an ink brush,
+  // siphons the spirit out of its foes' blessings, and chants through four
+  // bamboo totems that feed it power. "Dark Boss" is a working name, to be
+  // replaced. Kit: battle/bosses/dark.js.
+  {...makeBoss("dark","Dark Boss","Dark"),attackType:"Ranged",spawnRow:2,abilities:{
+    basic:{name:"Ink Brush Sweep",description:"Deal damage to a Row of enemies and inflict Defense Down and Healing Down",tags:["row","defensedown","healdown"]},
+    special:{name:"Spirit Siphon",description:"Deal damage to all enemies and dispel all buffs on them. For each buff dispelled, this creature gains 1% Attack for the rest of battle",tags:["dispelbuff"]},
+    unique:{name:"Ancestor Totems",description:"Summon 4 Totems at the start of battle. For each Totem that's alive, this creature receives 15% less damage",tags:["summon"]},
+  },
+  // The Totems Ancestor Totems raises: two side by side above the boss and one at
+  // each edge of the grid, level with the top of its body (the boss stands at rows 2-3,
+  // columns 2-3 -- `spawnRow`). They are the boss's summons -- they fall with
+  // it -- and run darkTotemModule.
+  minions:[
+    makeTotem(0,2,"haste","Quickening Chant","Dark Boss gains Haste Up which can't be dispelled",["hasteup"]),
+    makeTotem(0,3,"speed","Swiftness Chant","Dark Boss gains Speed Up which can't be dispelled",["speedup"]),
+    makeTotem(2,0,"attack","Fury Chant","Dark Boss gains Attack Up which can't be dispelled",["attackup"]),
+    makeTotem(2,5,"defense","Bulwark Chant","Dark Boss gains Defense Up which can't be dispelled",["defenseup"]),
+  ]},
   {...makeBoss("wind","Wind Boss","Wind"),abilities:{
     basic:{name:"Gust Strike",description:"Melee attack that knocks the target back 1 tile",tags:["closest"]},
     special:{name:"Cyclone",description:"Deals damage to all enemies and pulls them 2 tiles closer"},

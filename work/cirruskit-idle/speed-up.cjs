@@ -1,0 +1,16 @@
+const fs=require('fs'),crypto=require('crypto');
+const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+fs.writeFileSync('work/cirruskit-idle/before-speed-hash.txt',hash('images/cirruskit/cirruskit_idle.png'));
+const assembler='work/cirruskit-idle/assemble-idle.cjs';
+let text=fs.readFileSync(assembler,'utf8');
+text=text.replace('frameMs=80','frameMs=64').replace('smooth=30x80-tail-outline-v2','smooth=30x${frameMs}-tail-outline-v2').replace('animation:idle 2.4s','animation:idle ${totalMs/1000}s').replace('30 frames · 80 ms per frame · 2.4-second loop','${count} frames · ${frameMs} ms per frame · ${totalMs/1000}-second loop');
+fs.writeFileSync(assembler,text);
+const config='src/data/creatureArt.js';
+text=fs.readFileSync(config,'utf8').replace('30 frames at 80ms; 2.4s','30 frames at 64ms; 1.92s').replace('durations: Array(30).fill(80)','durations: Array(30).fill(64)');
+fs.writeFileSync(config,text);
+const notes='images/cirruskit/cirruskit_idle_notes.txt';
+text=fs.readFileSync(notes,'utf8').replace('80ms per frame (12.5 frames/second), 2.4-second','64ms per frame (15.625 frames/second), 1.92-second').replace('80ms holds','64ms holds');
+fs.writeFileSync(notes,text);
+const checks='work/cirruskit-idle/check-smooth.cjs';
+text=fs.readFileSync(checks,'utf8').replace('t===80','t===64').replace('meta.totalDurationMs!==2400','meta.totalDurationMs!==1920').replace('80ms per frame / 2400ms loop','64ms per frame / 1920ms loop');
+fs.writeFileSync(checks,text);

@@ -4,6 +4,7 @@
 // unlike EquipmentDetail there is no upgrading, ascending, or equipping here.
 
 import React, { useState, useMemo } from "../../react.js";
+import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS } from "../../data/equipment.js";
 import { GEAR_FILTER_STATS, STAT_LABELS, shortStatLabel } from "../../data/rarity.js";
@@ -28,7 +29,7 @@ function EquipmentDexEntry({ item, collected, onBack }) {
         collected ? "✓ Collected" : "Not collected"
       ),
       React.createElement("div", { style: { textAlign: "center", paddingTop: 12 } },
-        React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, item.emoji),
+        React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, gearIcon(item)),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 2 } }, item.name),
         React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 6 } }, "Base stats (Lv 1)"),
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: item.effect ? 6 : 0 } }, equipBonusStr(baseBonuses)),
@@ -106,19 +107,19 @@ function EquipmentDexScreen({ onBack }) {
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Type"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), onClick: () => toggleElement(t) }, em + " " + t))
+          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), onClick: () => toggleElement(t) }, typeIcon(t), " " + t))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Role"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, ROLE_CONFIG[r].emoji + " " + r))
+          ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, roleIcon(r), " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Range"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1 } },
-          ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, ATTACK_TYPE_CONFIG[r].emoji + " " + r))
+          ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, rangeIcon(r), " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
@@ -136,14 +137,14 @@ function EquipmentDexScreen({ onBack }) {
             const isCollected = ownedIds.has(item.id);
             const rarCfg = EQUIP_RARITY_CONFIG[item.rarity];
             return React.createElement("div", { key: item.id, className: "creature-card", onClick: () => { setSelected(item); const c = document.querySelector(".app-content"); if (c) c.scrollTop = 0; }, style: { position: "relative", paddingTop: 30, background: rarCfg.bg, border: "1px solid " + rarCfg.color + "44" } },
-              item.element && React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, TYPE_EMOJI[item.element] || ""),
+              item.element && React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, typeIcon(item.element)),
               // Creature-exclusive gear shares the top-left corner with the
               // type icon; the two never co-occur (a species already implies
               // its element, so pinning both would be redundant).
               item.creatureId && React.createElement("span", { style: { position: "absolute", top: 5, left: 5, fontSize: 14, lineHeight: 1 } }, (CREATURE_MAP[item.creatureId] && CREATURE_MAP[item.creatureId].emoji) || "❓"),
-              item.attackType && React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[item.attackType].emoji),
-              item.role && React.createElement("span", { style: { position: "absolute", top: item.attackType ? 20 : 5, right: 5, fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[item.role].emoji),
-              React.createElement("div", { className: "creature-emoji" }, item.emoji),
+              item.attackType && React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 13, lineHeight: 1 } }, rangeIcon(item.attackType)),
+              item.role && React.createElement("span", { style: { position: "absolute", top: item.attackType ? 20 : 5, right: 5, fontSize: 13, lineHeight: 1 } }, roleIcon(item.role)),
+              React.createElement("div", { className: "creature-emoji" }, gearIcon(item)),
               React.createElement("div", { className: "creature-name" }, item.name),
               // Same invisible-when-uncollected badge trick as the Creature
               // Dex, so every card keeps identical height either way.

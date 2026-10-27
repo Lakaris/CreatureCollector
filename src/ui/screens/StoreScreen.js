@@ -37,14 +37,14 @@ function StoreScreen(){
     purchaseToast&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:320,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},"✅ "+purchaseToast),
     confirmItem&&React.createElement("div",{onClick:()=>setConfirmItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8}},confirmItem.emoji||"💎"),
+        React.createElement("div",{style:{fontSize:48,marginBottom:8}},iconText(confirmItem.emoji||"💎")),
         React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111",marginBottom:12}},
           confirmItem.name||(formatNum(confirmItem.gems)+" Gems"+(confirmItem.bonus>0?" +"+formatNum(confirmItem.bonus)+" bonus":""))
         ),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:4,marginBottom:16,textAlign:"left"}},
           confirmItem.items
             ? confirmItem.items.map((item,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:"#555"}},iconText(item)))
-            : React.createElement("div",{style:{fontSize:12,color:"#555"}},"💎 "+formatNum(confirmItem.gems)+(confirmItem.bonus>0?" + "+formatNum(confirmItem.bonus)+" bonus":""))
+            : React.createElement("div",{style:{fontSize:12,color:"#555"}},iconText("💎 "+formatNum(confirmItem.gems)+(confirmItem.bonus>0?" + "+formatNum(confirmItem.bonus)+" bonus":"")))
         ),
         React.createElement("div",{style:{fontSize:12,color:"#999",marginBottom:18}},
           confirmItem.oneTime?"One-time purchase — can't be bought again":"Simulated purchase — no real payment"
@@ -55,7 +55,7 @@ function StoreScreen(){
         )
       )
     ),
-    React.createElement(ScreenHeader,{title:"Store",right:React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})}),
+    React.createElement(ScreenHeader,{title:"Store",right:React.createElement(CurrencyChip,{currency:"gems",emoji:"💎",value:currencies.gems})}),
     React.createElement("div",{style:{padding:"0 16px 8px"}},
       React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}},"🎁 Bundles"),
       React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
@@ -79,11 +79,11 @@ function StoreScreen(){
       )
     ),
     React.createElement("div",{style:{padding:"12px 16px 24px"}},
-      React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}},"💎 Gem Packs"),
+      React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#534AB7",marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}},iconText("💎 Gem Packs")),
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}},
         STORE_GEM_PACKS.map(p=>React.createElement("div",{key:p.id,onClick:()=>setConfirmItem(p),style:{background:"#fff",borderRadius:16,padding:"14px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,boxShadow:"0 1px 6px rgba(0,0,0,0.07)",cursor:"pointer",position:"relative",border:"1.5px solid #e8e8e8"}},
           p.badge&&React.createElement("div",{style:{position:"absolute",top:-8,right:8,background:p.badge==="Best Value"?"#f59e0b":"#534AB7",color:"#fff",fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:8}},p.badge),
-          React.createElement("div",{style:{fontSize:32,lineHeight:1}},"💎"),
+          React.createElement("div",{style:{fontSize:32,lineHeight:1}},iconText("💎")),
           React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111"}},formatNum(p.gems)),
           p.bonus>0&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#22c55e"}},"+"+p.bonus+" bonus"),
           React.createElement("div",{style:{marginTop:4,padding:"5px 14px",background:"linear-gradient(135deg,#534AB7,#7c4dff)",color:"#fff",borderRadius:10,fontSize:12,fontWeight:700}},p.price)

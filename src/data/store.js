@@ -14,7 +14,7 @@ export const STORE_BUNDLES=[
   // Grants specialPurchased (see GameContext) -- the same flag Farm's Plot
   // 5/6 unlock already reads, so this is the one purchase path for it.
   {id:"starter_pack",name:"Starter Pack",emoji:"🌱",oneTime:true,
-   items:["🌾 Unlocks Plot 5","🌾 Unlocks Plot 6","🥚 20 Eggs","🌟 3 Legendary Eggs","🍬 50 Candy","🍌 20 Flair Bananas"],
+   items:["🌾 Unlocks Plot 5","🌾 Unlocks Plot 6","🥚 20 Eggs","🥚✨ 3 Legendary Eggs","🍬 50 Candy","🍌 20 Flair Bananas"],
    grants:{eggs:20,legendaryEggs:3,candy:50,flairBanana:20},
    price:"$9.99",badge:"One-time"},
   // Permanently doubles the daily free Dungeon Pass regen (10 -> 20 -- see
@@ -23,7 +23,7 @@ export const STORE_BUNDLES=[
   // amounts StoreScreen adds on purchase; the pass-cap bump itself is driven
   // directly by GameContext's dungeonStarterPackPurchased flag, not a currency.
   {id:"dungeon_starter_pack",name:"Dungeon Starter Pack",emoji:"🎫",oneTime:true,
-   items:["🎫 +10 Daily Dungeon Pass Cap (10 → 20, permanent)","🥚 20 Eggs","🌟 3 Legendary Eggs","🍬 50 Candy","🍌 20 Flair Bananas"],
+   items:["🎫 +10 Daily Dungeon Pass Cap (10 → 20, permanent)","🥚 20 Eggs","🥚✨ 3 Legendary Eggs","🍬 50 Candy","🍌 20 Flair Bananas"],
    grants:{eggs:20,legendaryEggs:3,candy:50,flairBanana:20},
    price:"$9.99",badge:"One-time"},
   {id:"starter",name:"Starter Bundle",emoji:"🎁",oneTime:true,
@@ -39,7 +39,7 @@ export const STORE_BUNDLES=[
    grants:{eggs:5,candy:10,flairBanana:1},
    price:"$7.99",badge:null},
   {id:"legendary",name:"Legendary Bundle",emoji:"🌟",
-   items:["🌟 1 Legendary Egg","🍖 500 Food","🍬 20 Candy"],
+   items:["🥚✨ 1 Legendary Egg","🍖 500 Food","🍬 20 Candy"],
    grants:{legendaryEggs:1,food:500,candy:20},
    price:"$14.99",badge:"Limited"},
 ];

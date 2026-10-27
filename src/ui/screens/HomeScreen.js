@@ -173,9 +173,9 @@ function HomeScreen(){
       // while a reward is waiting to be claimed (see dailyRewardWaiting).
       topBarButton("📅","Daily",dailyRewardWaiting({dailyDay,dailyLastClaimed,dailyClaimed}),()=>setShowDaily(true))
     ),right:React.createElement(React.Fragment,null,
-      React.createElement(CurrencyChip,{emoji:"⚔️",value:currencies.equipShards}),
-      React.createElement(CurrencyChip,{emoji:"🍖",value:currencies.food}),
-      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
+      React.createElement(CurrencyChip,{currency:"equipShards",emoji:"⚔️",value:currencies.equipShards}),
+      React.createElement(CurrencyChip,{currency:"food",emoji:"🍖",value:currencies.food}),
+      React.createElement(CurrencyChip,{currency:"gems",emoji:"💎",value:currencies.gems})
     )}),
     // The Home scene: the whole area between the header and the nav bar. The
     // featured creature's equipped background art is shown WHOLE at the top
@@ -193,7 +193,7 @@ function HomeScreen(){
     // Each anchored by its bottom edge at HOME_FEET_TOP (translate -100%).
     auraDef&&React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",fontSize:160,lineHeight:1,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},auraDef.emoji),
     React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))"}},
-      def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
+      def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120,showcase:true}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
     // The bottom panel: a soft lavender area starting exactly where the art
     // ends (never over it), holding the menu row -- Quests, Battle Pass,
     // Descend and the New Player Welcome Gift -- centred in it.

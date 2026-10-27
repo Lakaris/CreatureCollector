@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Gems",
+    "filename": "gems.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Gear Shards",
+    "filename": "gearshards.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Dungeon Pass",
+    "filename": "dungeonpass.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Fire Melon",
+    "filename": "firemelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Water Melon",
+    "filename": "watermelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Nature Melon",
+    "filename": "naturemelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Earth Melon",
+    "filename": "earthmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Wind Melon",
+    "filename": "windmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Electric Melon",
+    "filename": "electricmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Light Melon",
+    "filename": "lightmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Dark Melon",
+    "filename": "darkmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Rainbow Melon",
+    "filename": "rainbowmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Common Ascension Melon",
+    "filename": "commonascensionmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Food",
+    "filename": "food.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Candy",
+    "filename": "candy.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Skin Shards",
+    "filename": "skinshards.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Epic Ascension Melon",
+    "filename": "epicascensionmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Legendary Ascension Melon",
+    "filename": "legendaryascensionmelon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Ancient Fertilizer",
+    "filename": "ancientfertilizer.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Flair Shard",
+    "filename": "flairshard.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  }
+]

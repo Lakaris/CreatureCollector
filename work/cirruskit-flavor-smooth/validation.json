@@ -1,0 +1,27 @@
+{
+  "frameCount": 36,
+  "frameSize": [
+    512,
+    512
+  ],
+  "grid": [
+    6,
+    6
+  ],
+  "sheetSize": [
+    3072,
+    3072
+  ],
+  "totalDurationMs": 2432,
+  "movementFrameDurationMs": 64,
+  "originalNineKeyframesPreserved": true,
+  "baseEndpointsExact": true,
+  "unclipped": true,
+  "gameAndPreviewMatch": true,
+  "largestAdjacentChangeAt130px": {
+    "before": 47.17128965077229,
+    "after": 15.903047279268286,
+    "reductionPercent": 66.28659636612686
+  },
+  "detachedVisibleComponents": []
+}

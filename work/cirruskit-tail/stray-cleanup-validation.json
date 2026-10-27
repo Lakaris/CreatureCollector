@@ -1,0 +1,39 @@
+{
+  "changes": [
+    {
+      "frame": 3,
+      "removedPixels": 77,
+      "bounds": [
+        9,
+        339,
+        20,
+        355
+      ]
+    },
+    {
+      "frame": 5,
+      "removedPixels": 75,
+      "bounds": [
+        9,
+        355,
+        21,
+        370
+      ]
+    },
+    {
+      "frame": 7,
+      "removedPixels": 77,
+      "bounds": [
+        9,
+        339,
+        20,
+        355
+      ]
+    }
+  ],
+  "totalPixelsRemoved": 229,
+  "allOtherPixelsUnchanged": true,
+  "baseEndpointsUnchanged": true,
+  "frameCount": 9,
+  "timingsUnchanged": true
+}

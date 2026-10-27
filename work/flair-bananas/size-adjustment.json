@@ -1,0 +1,33 @@
+{
+  "filename": "ancientflairbanana.png",
+  "operation": "Uniform 96% resize and centering on a transparent 256 x 256 canvas",
+  "scale": 0.96,
+  "beforeBounds": [
+    29,
+    8,
+    231,
+    250
+  ],
+  "beforeFootprint": [
+    203,
+    243
+  ],
+  "afterBounds": [
+    31,
+    11,
+    225,
+    244
+  ],
+  "afterFootprint": [
+    195,
+    234
+  ],
+  "margins": [
+    31,
+    11,
+    30,
+    11
+  ],
+  "transparentPixels": 39461,
+  "solidPixels": 24574
+}

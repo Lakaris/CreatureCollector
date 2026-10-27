@@ -1,0 +1,12 @@
+{
+  "tool": "image_gen.imagegen",
+  "base": {
+    "prompt": "Use case: stylized-concept. Create ONE extremely simple five-point ascension star icon for a cute creature-collecting game. Square canvas with genuine transparent background. A classic upright five-point star, one point straight up, symmetric, broad plump arms, slightly rounded tips and corners, large solid center. Center at the exact middle of the square, full shape within safe equal margins, filling about 84% of width and height. One uniform thick near-black outline, about 8 pixels wide at final 128x128. Interior is a single completely flat solid neutral light gray (#B8B8B8). Outline is neutral near-black (#202020). Only these two colors plus transparent background, with normal antialiased edges. No shading, no gradients, no highlights, no texture, no inner lines, no bevels, no face, no text, no sparkle, no cast shadow, no background tile. This is the master base for precisely recolored tiers and hollow versions, so use a clean bold standard star silhouette readable at 13 pixels. Flat 2D game UI icon, not 3D. Output PNG.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17bd3-6c8e-76a1-a9e6-27b440e55840\\exec-c59033db-05d1-4eb7-916d-b0e277e29c83.png"
+  },
+  "hollowMaster": {
+    "prompt": "Edit this star master into its HOLLOW version. Preserve the exact same outer five-point star silhouette, position, size, rounded tips and near-black outer outline. Cut a smaller matching five-point star-shaped hole out of the center so the center becomes genuinely transparent. Leave a very broad solid light-gray star-shaped rim between the hole and existing near-black outer outline, wide enough to show its color at 13 pixels. Add a simple near-black inner border around the hole. Keep all lines bold, smooth, and simple. No shading, highlights, decorations, bevel, text or background. Only near-black outlines, flat light-gray rim, and true transparent hole and exterior. This image will be 128x128.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17bd3-6c8e-76a1-a9e6-27b440e55840\\exec-40121686-3bcc-49ee-b903-c9cdf91f15a8.png"
+  },
+  "export": "All final variants use the hollow master silhouette with deterministic palette recoloring; filled variants fill its center."
+}

@@ -1,0 +1,3 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+const dir='work/cirruskit-flavor-smooth/source';if(!fs.existsSync(`${dir}/sheet.png`)){fs.copyFileSync('images/cirruskit/cirruskit_flavor.png',`${dir}/sheet.png`);fs.copyFileSync('images/cirruskit/cirruskit_flavor.json',`${dir}/metadata.json`);}
+const sheet=PNG.sync.read(fs.readFileSync(`${dir}/sheet.png`));for(let n=0;n<9;n++){const p=new PNG({width:512,height:512});for(let y=0;y<512;y++){const at=((Math.floor(n/3)*512+y)*sheet.width+n%3*512)*4;sheet.data.copy(p.data,y*2048,at,at+2048);}fs.writeFileSync(`${dir}/frame-${n}.png`,PNG.sync.write(p));}

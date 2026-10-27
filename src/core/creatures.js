@@ -162,7 +162,8 @@ function activeSkinAppearance(def, ownedData, unlockedSkins) {
  * in the roster goes through it, art or not.
  *
  * Returns one of:
- *   {kind:"sprite", src, frames, fps, loop, blend, pixelated}  animated strip
+ *   {kind:"sprite", src, frames, columns, durations, totalMs, loop, blend, pixelated}
+ *                                                              animated sheet
  *   {kind:"image",  src, blend, pixelated}                     still image
  *   {kind:"emoji",  emoji}                                     the fallback
  *
@@ -182,11 +183,16 @@ export function getDisplayArt(def, ownedData, unlockedSkins, state = "idle") {
   const entry = art ? art[state] || art.idle : null;
   if (entry && entry.src) {
     const frames = entry.frames || 1;
+    const durations = entry.durations && entry.durations.length === frames
+      ? entry.durations
+      : Array(frames).fill(1000 / (entry.fps || DEFAULT_FPS));
     return {
       kind: frames > 1 ? "sprite" : "image",
       src: entry.src,
       frames,
-      fps: entry.fps || DEFAULT_FPS,
+      columns: entry.columns || frames,
+      durations,
+      totalMs: durations.reduce((a, b) => a + b, 0),
       loop: artLoops(state, entry),
       blend: entry.blend || null,
       pixelated: !!entry.pixelated,

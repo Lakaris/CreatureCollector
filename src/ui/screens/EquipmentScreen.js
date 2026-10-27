@@ -6,6 +6,7 @@
 // sense in the context of one creature).
 
 import React, { useState, useEffect, useRef, useLayoutEffect } from "../../react.js";
+import { gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { GEAR_FILTER_STATS, STAT_LABELS, shortStatLabel } from "../../data/rarity.js";
@@ -16,15 +17,17 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import EquipmentDetail from "../../ui/screens/EquipmentDetail.js";
 import EquipmentDexScreen from "../../ui/screens/EquipmentDexScreen.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
+import { GearAscStars } from "../../ui/components/AscStars.js";
 
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the
 // tutorial's guided walkthrough points at equipping/upgrading.
 const TUTORIAL_ITEM_ID="com_hp_atk";
 
-/** Star string for a given ascension count -- "✦"x10 once maxed, otherwise one "★" per ascension. */
-function ascStars(asc) {
-  return asc >= EQUIP_MAX_ASCENSION ? "✦".repeat(EQUIP_MAX_ASCENSION) : "★".repeat(asc);
-}
+const CARD_ICON_PX = GEAR_CARD_ICON_PX;
+// Compact grid: four tiles a row, each just the art, level, ascension stars,
+// favourite and restriction icon.
+const COMPACT_ICON_PX = 40;
+const COMPACT_KEY = "cc_equip_compact";
 
 function EquipmentScreen() {
   const { owned, equipmentLevels, equipmentAscensions, equipmentCopies, setEquipmentCopies, setEquipmentAscensions, equipFavorites, setEquipFavorites, tutorialRestricted, tutorialStep, setTutorialStep, setEquipmentDetailOpen } = useGame();
@@ -55,6 +58,13 @@ function EquipmentScreen() {
   const [filterElements, setFilterElements] = useState(new Set());
   const [filterRoles, setFilterRoles] = useState(new Set());
   const [filterRanges, setFilterRanges] = useState(new Set());
+  // Full cards vs the Compact grid (art, level, stars, favourite, restriction
+  // icon only). A per-device view preference, so it lives in localStorage
+  // rather than the save; wrapped because storage can be blocked.
+  const [compact, setCompact] = useState(() => { try { return localStorage.getItem(COMPACT_KEY) === "1"; } catch (e) { return false; } });
+  function chooseCompact(on) { setCompact(on); try { localStorage.setItem(COMPACT_KEY, on ? "1" : "0"); } catch (e) {} }
+  // The tutorial points at things on the full cards, so it always gets them.
+  const showCompact = compact && !tutorialRestricted;
 
   // The Type row has 8 chips and is the only filter row that can outgrow the
   // screen. The filter bar must never scroll sideways, so when the full
@@ -133,9 +143,9 @@ function EquipmentScreen() {
           ? React.createElement("div", { style: { fontSize: 13, color: "#666", padding: "12px 0" } }, "Nothing was ready to ascend.")
           : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 12, maxHeight: "calc(50 * var(--vh))", overflowY: "auto", textAlign: "left" } },
               ascendAllResult.map((r) => React.createElement("div", { key: r.id, style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 12px" } },
-                React.createElement("div", { style: { fontSize: 26, flexShrink: 0 } }, r.emoji),
+                React.createElement("div", { style: { fontSize: 26, flexShrink: 0 } }, gearIcon(r)),
                 React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 700, color: "#111" } }, r.name),
-                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#f59e0b", letterSpacing: 1, flexShrink: 0 } }, ascStars(r.asc))
+                React.createElement("div", { style: { flexShrink: 0, display: "flex" } }, React.createElement(GearAscStars, { asc: r.asc, size: 14 }))
               ))
             ),
         React.createElement("button", { onClick: () => setAscendAllResult(null), style: { marginTop: 20, width: "100%", padding: "10px 0", borderRadius: 12, border: "none", background: "#534AB7", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "OK")
@@ -155,7 +165,7 @@ function EquipmentScreen() {
               let copies = newCopies[item.id] || 0;
               while (asc < EQUIP_MAX_ASCENSION && copies >= EQUIP_ASC_COSTS[asc]) { copies -= EQUIP_ASC_COSTS[asc]; asc++; }
               newAsc[item.id] = asc; newCopies[item.id] = copies;
-              if (asc > startAsc) results.push({ id: item.id, name: item.name, emoji: item.emoji, asc });
+              if (asc > startAsc) results.push({ id: item.id, name: item.name, emoji: item.emoji, image: item.image, asc });
             });
             setEquipmentCopies(newCopies);
             setEquipmentAscensions(newAsc);
@@ -170,7 +180,17 @@ function EquipmentScreen() {
     }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 } },
       React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#666" } }, "All Gear"),
-      !tutorialRestricted && React.createElement("button", { onClick: () => setFiltersOpen((p) => !p), style: { fontSize: 11, color: "#534AB7", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" } }, filtersOpen ? "Hide Filters ▲" : "Filter ▼")
+      !tutorialRestricted && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+        // Full / Compact view switch.
+        React.createElement("div", { style: { display: "flex", border: "1px solid #d0ccf7", borderRadius: 8, overflow: "hidden" } },
+          [["Full", false], ["Compact", true]].map(([label, val]) => React.createElement("button", {
+            key: label,
+            onClick: () => chooseCompact(val),
+            style: { fontSize: 11, fontWeight: 600, padding: "3px 8px", border: "none", cursor: "pointer", background: compact === val ? "#534AB7" : "transparent", color: compact === val ? "#fff" : "#534AB7" },
+          }, label))
+        ),
+        React.createElement("button", { onClick: () => setFiltersOpen((p) => !p), style: { fontSize: 11, color: "#534AB7", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: "2px 4px" } }, filtersOpen ? "Hide Filters ▲" : "Filter ▼")
+      )
     ),
     !tutorialRestricted && filtersOpen && React.createElement("div", { style: { marginBottom: 4 } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
@@ -188,25 +208,25 @@ function EquipmentScreen() {
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Type"),
         React.createElement("div", { ref: typeRowRef, className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible", position: "relative" } },
-          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), title: t, onClick: () => toggleElement(t) }, typeEmojiOnly ? em : em + " " + t)),
+          Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" + (filterElements.has(t) ? " active" : ""), title: t, onClick: () => toggleElement(t) }, typeEmojiOnly ? typeIcon(t) : React.createElement(React.Fragment, null, typeIcon(t), " " + t))),
           // Invisible full-label copy used purely to measure whether the
           // labeled chips would fit -- keeps the emoji-only fallback reversible
           // when the window grows again.
           React.createElement("div", { ref: typeGhostRef, "aria-hidden": true, style: { position: "absolute", visibility: "hidden", pointerEvents: "none", display: "flex", gap: 6, whiteSpace: "nowrap", left: 0, top: 0, width: 0, overflow: "hidden" } },
-            Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" }, em + " " + t))
+            Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: t, className: "filter-chip" }, typeIcon(t), " " + t))
           )
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Role"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
-          ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, ROLE_CONFIG[r].emoji + " " + r))
+          ["Attacker", "Tank", "Support"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRoles.has(r) ? " active" : ""), onClick: () => toggleRole(r) }, roleIcon(r), " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
         React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: "#aaa", textTransform: "uppercase", letterSpacing: ".05em", whiteSpace: "nowrap" } }, "Range"),
         React.createElement("div", { className: "filter-row", style: { margin: 0, padding: 0, flex: 1, flexWrap: "wrap", overflowX: "visible" } },
-          ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, ATTACK_TYPE_CONFIG[r].emoji + " " + r))
+          ["Melee", "Ranged"].map((r) => React.createElement("button", { key: r, className: "filter-chip" + (filterRanges.has(r) ? " active" : ""), onClick: () => toggleRange(r) }, rangeIcon(r), " " + r))
         )
       ),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 10 } },
@@ -221,6 +241,33 @@ function EquipmentScreen() {
       ? React.createElement("div", { style: { textAlign: "center", padding: "40px 20px", color: "#666" } },
           React.createElement("i", { className: "ti ti-tool", style: { fontSize: 40, display: "block", marginBottom: 8, opacity: .3 } }),
           React.createElement("p", { style: { fontSize: 13 } }, "No gear yet")
+        )
+      : showCompact
+      ? React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginTop: 8 } },
+          items.map((item) => {
+            const lvl = equipmentLevels[item.id] || 1;
+            const asc = equipmentAscensions[item.id] || 0;
+            const rarCfg = EQUIP_RARITY_CONFIG[item.rarity];
+            const isEquipped = equippedAnywhere.has(item.id);
+            const fav = equipFavorites.has(item.id);
+            return React.createElement("div", {
+              key: item.id,
+              title: item.name,
+              onClick: () => setSelected(item.id),
+              style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 8, padding: "16px 4px 5px", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", boxSizing: "border-box", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none", minWidth: 0 }
+            },
+              // Corners: level top-left (gold once maxed), with the
+              // restriction icon under it; favourite top-right.
+              React.createElement("div", { style: { position: "absolute", top: 3, left: 4, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 } },
+                React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "11px", whiteSpace: "nowrap" } }, "Lv " + lvl),
+                isExclusive(item) && React.createElement("span", { title: exclusivityBadge(item), style: { fontSize: 11, lineHeight: 1 } }, restrictionIcon(item))
+              ),
+              React.createElement("div", { onClick: (e) => toggleFavorite(item.id, e), style: { position: "absolute", top: 2, right: 4, fontSize: 13, lineHeight: 1, cursor: "pointer", color: fav ? "#f59e0b" : "#ccc" } }, fav ? "★" : "☆"),
+              gearIcon(item, COMPACT_ICON_PX),
+              React.createElement("div", { style: { height: 8, display: "flex", justifyContent: "center", pointerEvents: "none" } },
+                asc > 0 && React.createElement(GearAscStars, { asc, size: 8 }))
+            );
+          })
         )
       : React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 } },
           items.map((item) => {
@@ -239,16 +286,22 @@ function EquipmentScreen() {
             },
               showItemPointer && React.createElement("div", { style: { position: "absolute", left: "50%", top: -34, transform: "translate(-50%,0)", fontSize: 26, color: "#534AB7", animation: "pointerBounce 1s ease-in-out infinite", zIndex: 6, pointerEvents: "none", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" } }, "⬇️"),
               React.createElement("div", { style: { position: "absolute", top: 6, left: 8, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 } },
-                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "16px" } }, lvl >= equipMaxLevel(item.id) ? "MAX" : "Lv " + lvl),
-                isExclusive(item) && React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: "#7F77DD", background: "#7F77DD1a", borderRadius: 6, padding: "2px 6px", lineHeight: "12px", whiteSpace: "nowrap" } },
-                  exclusivityBadge(item)
+                React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: lvl >= equipMaxLevel(item.id) ? "#f59e0b" : "#888", lineHeight: "16px" } }, "Lv " + lvl),
+                // Icon only (the full "🔥 Fire" is in the title and the
+                // detail view) -- the wide badge would collide with the art.
+                isExclusive(item) && React.createElement("span", { title: exclusivityBadge(item), style: { fontSize: 12, background: "#7F77DD1a", borderRadius: 6, padding: "2px 4px", lineHeight: "14px", whiteSpace: "nowrap" } },
+                  restrictionIcon(item)
                 )
               ),
-              React.createElement("div", { style: { position: "absolute", top: 6, right: 8, fontSize: 16, cursor: "pointer", color: equipFavorites.has(item.id) ? "#f59e0b" : "#ccc", lineHeight: 1 }, onClick: (e) => toggleFavorite(item.id, e) }, equipFavorites.has(item.id) ? "★" : "☆"),
-              asc > 0 && React.createElement("div", { style: { position: "absolute", top: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#f59e0b", lineHeight: "14px", pointerEvents: "none" } }, ascStars(asc)),
-              React.createElement("div", { style: { position: "relative", display: "inline-block", marginTop: 4 } },
-                React.createElement("span", { style: { fontSize: 22 } }, item.emoji)
+              React.createElement("div", { style: { position: "absolute", top: 6, right: 8, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 } },
+                React.createElement("div", { style: { fontSize: 16, cursor: "pointer", color: equipFavorites.has(item.id) ? "#f59e0b" : "#ccc", lineHeight: 1 }, onClick: (e) => toggleFavorite(item.id, e) }, equipFavorites.has(item.id) ? "★" : "☆")
               ),
+              gearIcon(item, CARD_ICON_PX),
+              // Ascension stars get their own row under the art. It's always
+              // there (empty at 0) so every card's text starts at the same
+              // height whether or not the item has ascended.
+              React.createElement("div", { style: { height: 10, display: "flex", justifyContent: "center", pointerEvents: "none" } },
+                asc > 0 && React.createElement(GearAscStars, { asc, size: 10 })),
               // Fixed-height rows (stats / effect / status) so every card is the
               // same size whether or not it has an effect -- the effect area
               // always reserves room for a 3-line description, and ascend +

@@ -319,7 +319,7 @@ function bonusBasicHit(u, target) {
   u._attackRiders = true;
   try {
     withApplier(u, () => withActiveAbility(u, "basic", () => {
-      // Outside the turn order, so a boss's Dark Shroud counts the party that
+      // Outside the turn order, so the boss formula is handed the party that
       // stands now (see unitDamage).
       const party = battleRosterOf(state).filter((o) => o.hp > 0 && isEnemyOf(target, o));
       const dmg = basicUnitDamage(u, target, party);

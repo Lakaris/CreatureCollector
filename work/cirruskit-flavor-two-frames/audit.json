@@ -1,0 +1,34 @@
+{
+  "frames": 11,
+  "updatedFrameNumbers": [
+    2,
+    10
+  ],
+  "originalNineFramesPixelIdentical": true,
+  "allOtherSheetCellsPixelIdentical": true,
+  "originalToNewFrameNumbers": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    11
+  ],
+  "totalDurationMs": 2432,
+  "baseEndpointsExact": true,
+  "reverseTransitionPoseMatches": true,
+  "unusedGridCellTransparent": true,
+  "gameAndPreviewTimingMatch": true,
+  "transitionPixelChecks": {
+    "unchangedTailAndFeet": 126904,
+    "exactTranslatedUpperHeadPixels": 40975,
+    "exactTranslatedManeCreamAndSwirlPixels": 14764
+  },
+  "headAndManeTranslationPx": 28,
+  "localEdgeCleanup": "Shoulder backing and outline junctions only; ImageGen supplied a local cleanup reference. Source RGB retained for all mane cream and tan swirls.",
+  "visualInspection": "Compared enlarged shoulder, mane, and foot regions on light and dark backgrounds. No full-frame redraw, morphing, or crossfade.",
+  "sheetSha256": "ad8e67bff2f9710e8eacd75880f9465f3cdb4aac3aaed22d9e98c5a72c728173"
+}

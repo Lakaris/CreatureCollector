@@ -1,0 +1,13 @@
+Cirruskit flavor animation — extra halfway return pose
+
+12 frames, 512 x 512 pixels each, arranged in a full 4 x 3 grid. Total duration: 2432 ms.
+
+Added one frame between the previous frames 10 and 11. The new frame is frame 11; the original standing endpoint is now frame 12. The head and complete cloud mane sit 14 pixels below the base, exactly halfway between the prior lowered pose at 28 pixels and standing at 0 pixels. The colors and all three mane swirl designs retain the base pixels. The tail and feet stay fixed.
+
+The new pose holds for 80 ms. The final standing hold was shortened from 440 ms to 360 ms, keeping the total animation length unchanged. Every earlier drawing is pixel-identical to the previous version. The other durations and the idle animation are unchanged.
+
+A small exposed shoulder-outline repair uses a built-in ImageGen cleanup reference. The exact prompt is saved at ../../work/cirruskit-return-halfway/image-edit-prompt.txt. No full-frame redraw, morphing or crossfade was used.
+
+Validation: all eleven previous drawings unchanged; halfway position and mane colors checked against the base; 14,764 cream/swirl pixels and 40,975 upper-head pixels match their source exactly after translation; tail and feet unchanged; game configuration, JSON and animated preview agree. Enlarged shoulder and mane details and the final three-frame return sequence were inspected.
+
+The preview supports play/pause, previous/next frame, a frame slider and dark-background inspection.

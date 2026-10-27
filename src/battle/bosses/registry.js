@@ -17,7 +17,7 @@ import earth from "./earth.js";
 import electric from "./electric.js";
 import water from "./water.js";
 import light from "./light.js";
-import dark from "./dark.js";
+import dark, { darkTotemModule } from "./dark.js";
 import wind from "./wind.js";
 import daily from "./daily.js";
 import { makeBossContext } from "./context.js";
@@ -115,9 +115,11 @@ export function asCreatureModule(kit) {
   };
 }
 
-/** Every boss kit as a creature module, keyed by its creatureId. */
-export const BOSS_CREATURE_MODULES = Object.fromEntries(
-  Object.entries(BOSS_MODULES).map(([key, kit]) => ["__boss_" + key, asCreatureModule(kit)])
-);
+/** Every boss kit as a creature module, keyed by its creatureId -- plus the
+ * creatures a boss brings with it (the Dark Boss's Totems). */
+export const BOSS_CREATURE_MODULES = {
+  ...Object.fromEntries(Object.entries(BOSS_MODULES).map(([key, kit]) => ["__boss_" + key, asCreatureModule(kit)])),
+  __dark_totem: darkTotemModule,
+};
 
 export default BOSS_MODULES;

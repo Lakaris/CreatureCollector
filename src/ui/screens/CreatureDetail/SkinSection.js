@@ -6,6 +6,7 @@ import { SKIN_TIER_CONFIG, SKIN_FAIL_SHARDS } from "../../../data/rarity.js";
 import { getChain, getSkinsForCreature } from "../../../core/creatures.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { rollSkinForCreature } from "../../../core/gacha.js";
+import { iconText } from "../../components/IconText.js";
 
 function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep}){
   const { currencies, setCurrencies, setOwned, unlockedSkins, setUnlockedSkins, skinShards, setSkinShards } = useGame();
@@ -124,7 +125,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
           React.createElement("span",{className:"badge "+cfg.color},cfg.label),
           React.createElement("div",{style:{display:"flex",gap:24}},
             React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},cfg.rate+"%"),
-            React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#555"}},"🔮 "+cfg.shardValue)
+            React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#555"}},iconText("🔮 "+cfg.shardValue))
           )
         )
       ),
@@ -132,7 +133,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
         React.createElement("span",{style:{fontSize:12,color:"#888"}},"No skin"),
         React.createElement("div",{style:{display:"flex",gap:24}},
           React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#000"}},(100-Object.values(SKIN_TIER_CONFIG).reduce((s,c)=>s+c.rate,0))+"%"),
-          React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#555"}},"🔮 "+SKIN_FAIL_SHARDS)
+          React.createElement("span",{style:{fontSize:13,fontWeight:500,color:"#555"}},iconText("🔮 "+SKIN_FAIL_SHARDS))
         )
       )
     ),
@@ -148,7 +149,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
         ),
         !previewSkin.unlocked&&React.createElement(React.Fragment,null,
           React.createElement("div",{style:{fontSize:12,color:"#666",textAlign:"center",marginBottom:14}},
-            "🔮 "+skinShards+" / "+SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost+" Shards"
+            iconText("🔮 "+skinShards+" / "+SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost+" Shards")
           ),
           React.createElement("div",{style:{display:"flex",gap:8}},
             React.createElement("button",{className:"btn",style:{flex:1,marginBottom:0,background:"#e0e0e0",color:"#333"},onClick:()=>setPreviewSkin(null)},"Cancel"),
@@ -157,7 +158,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
               style:{flex:1,marginBottom:0,opacity:skinShards>=SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost?1:0.45},
               disabled:skinShards<SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost,
               onClick:()=>skinShards>=SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost&&setConfirmSkin(previewSkin.skin)
-            },"Purchase — 🔮 "+SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost)
+            },iconText("Purchase — 🔮 "+SKIN_TIER_CONFIG[previewSkin.skin.tier].shardCost))
           )
         ),
         previewSkin.unlocked&&React.createElement("div",{style:{display:"flex",gap:8}},
@@ -173,7 +174,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
       React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
         React.createElement("div",{style:{fontSize:18,fontWeight:600,color:"#000",marginBottom:6,textAlign:"center"}},"Purchase skin?"),
         React.createElement("p",{style:{fontSize:13,color:"#666",textAlign:"center",marginBottom:4}},confirmSkin.name),
-        React.createElement("p",{style:{fontSize:13,color:"#444",textAlign:"center",marginBottom:18}},"This will cost 🔮 "+SKIN_TIER_CONFIG[confirmSkin.tier].shardCost+" Skin Shards."),
+        React.createElement("p",{style:{fontSize:13,color:"#444",textAlign:"center",marginBottom:18}},iconText("This will cost 🔮 "+SKIN_TIER_CONFIG[confirmSkin.tier].shardCost+" Skin Shards.")),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{className:"btn",style:{flex:1,marginBottom:0,background:"#e0e0e0",color:"#333"},onClick:()=>setConfirmSkin(null)},"Cancel"),
           React.createElement("button",{className:"btn btn-primary",style:{flex:1,marginBottom:0},onClick:()=>doUnlockWithShards(confirmSkin)},"Confirm")
@@ -181,7 +182,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
       )
     ),
 
-    React.createElement("div",{style:{fontSize:12,color:"#666",marginBottom:10}},"🔮 "+skinShards+" Shards"),
+    React.createElement("div",{style:{fontSize:12,color:"#666",marginBottom:10}},iconText("🔮 "+skinShards+" Shards")),
     React.createElement("button",{
       className:"btn btn-primary",
       disabled:currencies.candy<1,
@@ -217,7 +218,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
           React.createElement("div",{className:"skin-emoji"},unlocked?previewEmoji:"🔒"),
           React.createElement("div",{className:"skin-name"},skin.name),
           React.createElement("span",{className:"badge "+SKIN_TIER_CONFIG[skin.tier].color},SKIN_TIER_CONFIG[skin.tier].label),
-          !unlocked&&React.createElement("div",{style:{fontSize:10,color:"#888",marginTop:3}},"🔮 "+cost),
+          !unlocked&&React.createElement("div",{style:{fontSize:10,color:"#888",marginTop:3}},iconText("🔮 "+cost)),
           isActive&&stageRow(cid=>skin.appearances[cid]?.emoji,cid=>selectSkin(skin.id,cid),cid=>cid===activeStage)
         );
       })
@@ -234,7 +235,7 @@ function SkinSection({ownedData,def,onCandyUsed,candyGuideStep,setCandyGuideStep
         React.createElement("div",{style:{marginBottom:newSkinPopup.duplicate?8:16}},
           React.createElement("span",{className:"badge "+SKIN_TIER_CONFIG[newSkinPopup.skin.tier].color},SKIN_TIER_CONFIG[newSkinPopup.skin.tier].label)
         ),
-        newSkinPopup.duplicate&&React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},"+"+newSkinPopup.shardValue+" 🔮 Skin Shards"),
+        newSkinPopup.duplicate&&React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:16}},iconText("+"+newSkinPopup.shardValue+" 🔮 Skin Shards")),
         React.createElement("button",{className:"btn btn-primary",style:{width:"100%",marginBottom:0},onClick:()=>setNewSkinPopup(null)},"OK")
       )
     ),

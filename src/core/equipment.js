@@ -89,17 +89,27 @@ export function exclusivityBadge(item) {
   return [axis.emoji(v), axis.label(v)].filter(Boolean).join(" ");
 }
 
+/** Which restriction the item carries, as {field, value} -- e.g. {field:
+ * "element", value: "Fire"} -- or null for universal gear. For screens that
+ * draw the restriction's icon themselves (restrictionIcon in IconText.js). */
+export function exclusivityAxis(item) {
+  if (!item) return null;
+  const axis = EXCLUSIVITY_AXES.find((a) => item[a.field]);
+  return axis ? { field: axis.field, value: item[axis.field] } : null;
+}
+
 /**
  * The long form, with the axis's emoji and noun: "🔥 Fire type exclusive",
  * "⚔️ Attacker role exclusive", "🐶 Emberpup exclusive". Empty string for
- * universal gear.
+ * universal gear. `withEmoji` false drops the leading emoji, for screens that
+ * draw the icon as a picture in front of it.
  */
-export function exclusivityChip(item) {
+export function exclusivityChip(item, withEmoji = true) {
   if (!item) return "";
   const axis = EXCLUSIVITY_AXES.find((a) => item[a.field]);
   if (!axis) return "";
   const v = item[axis.field];
-  return [axis.emoji(v), axis.label(v), axis.noun, "exclusive"].filter(Boolean).join(" ");
+  return [withEmoji && axis.emoji(v), axis.label(v), axis.noun, "exclusive"].filter(Boolean).join(" ");
 }
 
 /** Gear Shard cost to take an item from `level` to the next.

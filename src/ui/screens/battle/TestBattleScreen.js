@@ -10,6 +10,7 @@
 // whole screen is a debug tool and may be removed or toggled off later.
 
 import React, { useState, useRef, useEffect } from "../../../react.js";
+import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -610,9 +611,9 @@ function TestBattleScreen({ onBack }) {
       React.createElement("input", { placeholder: "Search creatures…", value: search, onChange: (e) => setSearch(e.target.value), style: { width: "100%", maxWidth: COLS * TILE, padding: "7px 10px", borderRadius: 8, border: "1px solid #ccc", fontSize: 13, boxSizing: "border-box" } }),
       // Roster filters: type / role / range / rarity chips + owned toggle.
       React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center", maxWidth: 480 } },
-        Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: "t" + t, title: t, className: "filter-chip" + (fType.has(t) ? " active" : ""), onClick: () => toggleIn(setFType)(t) }, em)),
-        Object.keys(ROLE_CONFIG).map((r) => React.createElement("button", { key: "r" + r, className: "filter-chip" + (fRole.has(r) ? " active" : ""), onClick: () => toggleIn(setFRole)(r) }, ROLE_CONFIG[r].emoji + " " + r)),
-        ["Melee", "Ranged"].map((r) => React.createElement("button", { key: "g" + r, className: "filter-chip" + (fRange.has(r) ? " active" : ""), onClick: () => toggleIn(setFRange)(r) }, ATTACK_TYPE_CONFIG[r].emoji + " " + r)),
+        Object.entries(TYPE_EMOJI).map(([t, em]) => React.createElement("button", { key: "t" + t, title: t, className: "filter-chip" + (fType.has(t) ? " active" : ""), onClick: () => toggleIn(setFType)(t) }, typeIcon(t))),
+        Object.keys(ROLE_CONFIG).map((r) => React.createElement("button", { key: "r" + r, className: "filter-chip" + (fRole.has(r) ? " active" : ""), onClick: () => toggleIn(setFRole)(r) }, roleIcon(r), " " + r)),
+        ["Melee", "Ranged"].map((r) => React.createElement("button", { key: "g" + r, className: "filter-chip" + (fRange.has(r) ? " active" : ""), onClick: () => toggleIn(setFRange)(r) }, rangeIcon(r), " " + r)),
         [...new Set(CREATURES.map((c) => c.rarity))].map((r) => React.createElement("button", { key: "y" + r, className: "filter-chip" + (fRarity.has(r) ? " active" : ""), onClick: () => toggleIn(setFRarity)(r) }, r[0].toUpperCase() + r.slice(1))),
         React.createElement("button", { className: "filter-chip" + (fOwned ? " active" : ""), onClick: () => setFOwned((p) => !p) }, "★ Owned")
       ),
@@ -634,7 +635,7 @@ function TestBattleScreen({ onBack }) {
           style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, width: 64, padding: "6px 2px", borderRadius: 10, cursor: "grab", userSelect: "none", background: selectedId === c.id ? "#EEEDFE" : "#fff", border: "2px solid " + (selectedId === c.id ? "#534AB7" : "#eee") }
         },
           React.createElement(CreatureIcon, { def: c, size: 24 }),
-          React.createElement("div", { style: { fontSize: 9, fontWeight: 600, color: "#333", textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", pointerEvents: "none" } }, (TYPE_EMOJI[c.type] || "") + " " + c.name)
+          React.createElement("div", { style: { fontSize: 9, fontWeight: 600, color: "#333", textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", pointerEvents: "none" } }, typeIcon(c.type), " " + c.name)
         ))
       )
     ),
@@ -726,7 +727,7 @@ function TestBattleScreen({ onBack }) {
                   title: it ? it.name : "Empty slot",
                   style: { width: 54, height: 54, borderRadius: 10, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1, cursor: "pointer", background: it ? (rarCfg ? rarCfg.bg : "#f5f5f5") : "#f5f5f5", border: "2.5px solid " + (equipSlotSel === i ? "#534AB7" : it && rarCfg ? rarCfg.color + "66" : "#e0e0e0"), boxSizing: "border-box", userSelect: "none" }
                 },
-                  React.createElement("div", { style: { fontSize: 20, lineHeight: 1 } }, it ? it.emoji : "＋"),
+                  React.createElement("div", { style: { fontSize: 20, lineHeight: 1 } }, it ? gearIcon(it) : "＋"),
                   React.createElement("div", { style: { fontSize: 7, fontWeight: 700, color: "#888" } }, it ? "tap ×" : "Slot " + (i + 1))
                 ),
                 // Per-slot level: 0 = the save's real level for this item.
@@ -763,7 +764,7 @@ function TestBattleScreen({ onBack }) {
                 },
                 style: { display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 8, cursor: "pointer", background: rarCfg ? rarCfg.bg : "#f5f5f5", border: "1px solid " + (rarCfg ? rarCfg.color + "44" : "#eee"), userSelect: "none" }
               },
-                React.createElement("div", { style: { fontSize: 18, flexShrink: 0 } }, it.emoji),
+                React.createElement("div", { style: { fontSize: 18, flexShrink: 0 } }, gearIcon(it)),
                 React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                   React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, it.name + "  ·  Lv " + lvl),
                   React.createElement("div", { style: { fontSize: 10, color: "#666" } }, equipBonusStr(bonuses)),

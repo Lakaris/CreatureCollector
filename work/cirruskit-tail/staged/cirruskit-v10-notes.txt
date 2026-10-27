@@ -1,0 +1,3 @@
+V10 corrects only the cream-colored ribbons of the moving tail. One shared correction maps the tail's cream fill and darker cream shading to tail-only samples from the approved base; the mane palette is not used.
+
+No image regeneration. Mane and tail blues unchanged. Alpha, timing and frame dimensions unchanged. The first and last frames are pixel-identical to the approved base. All changed pixels are confined to the tail cream selection, with no changes touching its crop boundary. Actual output measurements are in cirruskit-v10-tail-audit.json.

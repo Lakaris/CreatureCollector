@@ -103,7 +103,7 @@ export function battleRoster() {
 }
 
 /** The player-side creatures alive when this tick began -- the list the boss
- * damage formula reads (the Dark boss's Dark Shroud counts their debuffs).
+ * damage formula can be handed (playerDamageToBoss's `aliveP`).
  * Fixed for the whole tick, so a creature defeated mid-tick still counts. */
 let tickPlayers = [];
 export function setTickPlayers(units) {

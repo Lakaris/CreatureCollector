@@ -1,0 +1,76 @@
+{
+  "image": "cirruskit_idle.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 4,
+  "rows": 2,
+  "loop": true,
+  "totalDurationMs": 2400,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 4,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 5,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 6,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 7,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    }
+  ],
+  "notes": "Read left to right, top row then bottom row. First and last frames are exact copies of cirruskit_base.png."
+}

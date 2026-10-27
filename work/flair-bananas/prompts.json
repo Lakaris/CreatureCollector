@@ -1,0 +1,29 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "output_directory": "images/equipment_icons",
+  "items": [
+    {
+      "name": "Flair Banana",
+      "filename": "flairbanana.png",
+      "prompt": "Use case: stylized-concept. Create ONE inventory item icon: a half-peeled Flair Banana for a cute creature collecting game. Square canvas, genuine transparent background. A single plump curved banana with its upper half exposed, smooth ivory-cream fruit rising upward with a gentle curve, three broad golden-yellow peel flaps folded down around the midpoint, a short joined lower peel and small brown end. Immediately recognizable half-peeled banana silhouette, chunky and charming. Match the game's equipment icons: extremely thick dark near-black plum-brown outlines, rounded shapes, broad flat color fills, minimal clean cel shading with only one broad highlight and one shadow per material. Yellow peel, cream fruit, muted amber shadow, brown tip, dark outline. No face, eyes, limbs, accessories, spots, texture, thin lines or decorative objects. Final deliverable will be 256x256 pixels and displayed at 13x13 to 64x64, so prioritize a bold silhouette and large simple shapes. Center the entire banana and all peel tips in the square, occupy about 85% of height and width, with a safe transparent margin on all sides. Outer outline equivalent to 10-13 pixels at 256px. All fruit and peel opaque, all surrounding space and gaps fully transparent. No text, letters, labels, watermark, ground, background tile, cast shadow, glow, sparkles or gradients. Flat illustrated game icon, not 3D or photorealistic.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1f884b45-fbfd-4d0f-bed8-4e2ddc16cffa.png"
+    },
+    {
+      "name": "Ancient Flair Banana",
+      "filename": "ancientflairbanana.png",
+      "prompt": "Use case: precise-object-edit. Edit the supplied half-peeled banana inventory icon into a matching Ancient Flair Banana variant. The supplied image is the edit target. Preserve the exact banana silhouette, curved exposed fruit, three broad hanging peel flaps, pose, scale, framing, extremely thick dark plum-brown outlines, simple flat cel-shaded game illustration style, and genuinely transparent background. Change only the palette and the single large marking described here. Recolor the yellow outer peel to rich warm amber-orange with russet-orange shadows and broad pale-gold highlights. Keep the exposed fruit a warm ivory cream. Add one single broad pale-gold chevron marking centered on the large front folded peel flap, simple and bold, with no tiny engraving. Keep the end tip brown. This is an ancient rarity food item with a warm gold-and-orange identity, still obviously an edible banana, not a metal object. Preserve very simple large shapes and broad color areas because the final PNG will be 256x256 and displayed at 13x13 to 64x64 pixels. Keep the whole object and all peel tips comfortably inside the square canvas. The object must be fully opaque and all surrounding space and gaps genuinely transparent. No text, faces, eyes, accessories, texture, flecks, fine patterns, additional objects, floating decoration, cast shadows or background.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bfeb8e35-c1da-4fdf-814d-315297839dff.png"
+    },
+    {
+      "name": "Mythical Flair Banana",
+      "filename": "mythicalflairbanana.png",
+      "prompt": "Use case: precise-object-edit. Edit the supplied half-peeled banana inventory icon into a matching Mythical Flair Banana variant. The supplied image is the edit target. Preserve the exact banana silhouette, curved exposed fruit, three broad hanging peel flaps, pose, scale, framing, extremely thick dark plum-brown outlines, simple flat cel-shaded game illustration style, and genuinely transparent background. Change only the palette and the single large marking described here. Recolor the yellow outer peel to rich violet-purple with plum shadows and broad lavender highlights. Keep the exposed fruit ivory cream with a very faint lavender shadow. Add one single large solid pale-cyan four-point star marking centered on the large front folded peel flap. The star is part of the peel's color design, not a floating sparkle, and has no halo. Keep the end tip dark plum. This is a mythical rarity food item with a violet-and-cyan identity, still obviously a banana. Preserve very simple large shapes and broad color areas because the final PNG will be 256x256 and displayed at 13x13 to 64x64 pixels. Keep the whole object and all peel tips comfortably inside the square canvas. The object must be fully opaque and all surrounding space and gaps genuinely transparent. No text, faces, eyes, accessories, texture, flecks, fine patterns, additional objects, floating decoration, cast shadows or background.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7a9aac41-8d25-42a3-8ac1-861cc954fc07.png"
+    }
+  ]
+}

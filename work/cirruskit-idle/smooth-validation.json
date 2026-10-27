@@ -1,0 +1,19 @@
+{
+  "frames": 30,
+  "uniqueFrames": 30,
+  "sheet": [
+    3072,
+    2560
+  ],
+  "timing": "64ms per frame / 1920ms loop",
+  "gameConfigMatches": true,
+  "firstFrameExact": true,
+  "duplicateEnding": false,
+  "feetFixed": true,
+  "canvasUnclipped": true,
+  "gameSizeAdjacentMeanPixelDifference": {
+    "min": 0.9809579997679478,
+    "max": 1.556660633484268,
+    "loopSeam": 1.2948410488456972
+  }
+}

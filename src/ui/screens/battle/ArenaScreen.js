@@ -1,7 +1,7 @@
 // Arena: symmetric minion-vs-minion stages, no boss unit.
 
 import React, { useState, useEffect } from "../../../react.js";
-import { iconText } from "../../components/IconText.js";
+import { iconText, currencyIcon, gearIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -24,6 +24,9 @@ import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
 import { DEV_MODE } from "../../../config.js";
+import { TRIALS_ID, TRIALS_TAB, trialsGearFor, trialsItemLevel } from "../../../core/trials.js";
+import { EQUIPMENT_MAP, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
+import TrialsHome, { TrialsEnemyHeader, TrialsEnemyBody } from "./TrialsHome.js";
 
 const ARENA_UNLOCK_COUNT=6;
 const ARENA_MAX_LEVEL=50;
@@ -38,15 +41,30 @@ const ARENA_STAGE_REWARDS={1:{eggs:5},2:{flairBanana:3},3:{mysteriousOre:3},4:{c
 // The "all" tab's own label is already "Arena", so appending " Arena" again
 // would read "Arena Arena" -- every other tab's label is just the type name
 // (e.g. "Fire") and still needs the suffix.
-function arenaTitle(tabDef){return tabDef.id==="all"?tabDef.label:tabDef.label+" Arena";}
+function arenaTitle(tabDef){return tabDef.id==="all"||tabDef.id===TRIALS_ID?tabDef.label:tabDef.label+" Arena";}
+
+// Trials mode (mode="trials"): the same screen run as ONE track, on its own
+// save state -- the Arena fields the screen reads are swapped for the Trials
+// ones here, so everything below works unchanged. Arena quests count every key
+// of arenaLevels/arenaProgress, so Trials never writes to those.
+function trialsAware(g,mode){
+  if(mode!==TRIALS_ID)return g;
+  return {...g,
+    arenaLevels:g.trialsLevels,setArenaLevels:g.setTrialsLevels,
+    arenaProgress:g.trialsProgress,setArenaProgress:g.setTrialsProgress,
+    arenaPlanGrid:g.trialsPlanGrid,setArenaPlanGrid:g.setTrialsPlanGrid,
+    arenaDeepLink:null,setArenaDeepLink:()=>{},
+  };
+}
 
 // Shared empty grid so a tab with no deployment yields a stable identity
 // instead of a fresh {} every render.
 const EMPTY_GRID={};
 
-function ArenaScreen({onBack,onFight,onViewCreature}){
-  const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards, arenaPlanGrid: planGrids, setArenaPlanGrid: setPlanGrids, arenaDeepLink, setArenaDeepLink } = useGame();
-  const [arenaTab,setArenaTab]=useState("all");
+function ArenaScreen({onBack,onFight,onViewCreature,mode}){
+  const isTrials=mode===TRIALS_ID;
+  const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards, arenaPlanGrid: planGrids, setArenaPlanGrid: setPlanGrids, arenaDeepLink, setArenaDeepLink } = trialsAware(useGame(),mode);
+  const [arenaTab,setArenaTab]=useState(isTrials?TRIALS_ID:"all");
   // planGrids is arena tab id -> {"r,c": creatureId}; planGrid/setPlanGrid are
   // the current tab's slice, so the rest of the screen keeps working with a
   // plain flat grid and each arena remembers its own team. Per-tab matters
@@ -104,6 +122,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const arenaUnitDomRefs=React.useRef(new Map());
   const savedPlanGridRef=React.useRef({});
   const wonStageRef=React.useRef(1);
+  const wonReplayRef=React.useRef(false);
   const [planning,setPlanning]=useState(false);
   const [dragId,setDragId]=useState(null);
   const [dragCell,setDragCell]=useState(null);
@@ -142,9 +161,22 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   const creatureListRef=React.useRef(null);
   const dragScroll=React.useRef({armed:false,on:false,x:0,y:0,sl:0,intentScroll:false});
   const HOLD_DELAY=350,HOLD_MS=700;
-  const tabDef=ARENA_TABS.find(t=>t.id===arenaTab);
-  const level=arenaLevels?.[arenaTab]||1;
-  const stage=arenaProgress?.[arenaTab]||1;
+  const tabDef=isTrials?TRIALS_TAB:ARENA_TABS.find(t=>t.id===arenaTab);
+  // Progress: the furthest stage reached. Trials can also VIEW (and replay)
+  // another stage -- `trialsView`, a stage number 1-500 counted level-major --
+  // so the level/stage the rest of the screen fights is the viewed one.
+  const progLevel=arenaLevels?.[arenaTab]||1;
+  const progStage=arenaProgress?.[arenaTab]||1;
+  const progIdx=(progLevel-1)*ARENA_STAGES_PER_LEVEL+progStage;
+  const { trialsClears, setTrialsClears }=useGame();
+  const [trialsView,setTrialsView]=useState(null);
+  const viewIdx=isTrials?(trialsView??progIdx):progIdx;
+  const level=isTrials?Math.ceil(viewIdx/ARENA_STAGES_PER_LEVEL):progLevel;
+  const stage=isTrials?((viewIdx-1)%ARENA_STAGES_PER_LEVEL)+1:progStage;
+  // A stage already beaten: it can be fought again, but pays nothing and
+  // moves nothing. One past the furthest reached is locked.
+  const isReplay=isTrials&&viewIdx<progIdx;
+  const isLockedStage=isTrials&&viewIdx>progIdx;
   const isBoss=stage===10;
   const arenaRequiredType=ARENA_TAB_TYPE[arenaTab]||null;
   const ownedList=Object.values(owned||{}).sort((a,b)=>(b.level||1)-(a.level||1)).filter(o=>o&&CREATURE_MAP[o.id]&&(!arenaRequiredType||CREATURE_MAP[o.id].type===arenaRequiredType));
@@ -317,6 +349,16 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
    * victory-pose linger as the overlay delay) and the dev cheat button. */
   function winStage(overlayDelayMs=600){
     stopArenaLoops();
+    // Trials remembers the team that beat each stage -- the LAST one, replays
+    // included -- with each creature's level at the time.
+    if(isTrials){
+      const team={...savedPlanGridRef.current};
+      const levels=Object.fromEntries(Object.values(team).map(id=>[id,owned?.[id]?.level||1]));
+      setTrialsClears(p=>({...p,[viewIdx]:{team,levels,at:Date.now()}}));
+    }
+    wonReplayRef.current=isReplay;
+    if(isReplay){onFight&&onFight();setTimeout(()=>setBattleOutcome("won"),overlayDelayMs);return;}
+    if(isTrials)setTrialsView(null);
     if(isBoss){setArenaLevels(p=>({...p,[arenaTab]:Math.min(ARENA_MAX_LEVEL,(p[arenaTab]||1)+1)}));setArenaProgress(p=>({...p,[arenaTab]:1}));}
     else setArenaProgress(p=>({...p,[arenaTab]:(p[arenaTab]||1)+1}));
     wonStageRef.current=stage;
@@ -366,9 +408,16 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     let n2=0;
     if(arenaLevel<=2) n2=stageNum>=9?1:0;
     else n2=stageNum>=8?3:stageNum>=5?2:stageNum>=3?1:0;
+    // A seeded pick that lands on a creature already in the lineup steps on to
+    // the next one in its pool, so a stage only repeats a creature when its
+    // pool has run out (a type arena with fewer first forms than slots).
     const enemies=[];
-    for(let i=0;i<n2&&secondEvos.length;i++) enemies.push(secondEvos[Math.abs(seed+i*19)%secondEvos.length]);
-    for(let i=enemies.length;i<6;i++) enemies.push(firstEvos[Math.abs(seed+i*13)%firstEvos.length]);
+    const pick=(pool,idx)=>{
+      for(let s=0;s<pool.length;s++){const c=pool[(idx+s)%pool.length];if(!enemies.includes(c)){enemies.push(c);return;}}
+      enemies.push(pool[idx%pool.length]);
+    };
+    for(let i=0;i<n2&&secondEvos.length;i++) pick(secondEvos,Math.abs(seed+i*19)%secondEvos.length);
+    for(let i=enemies.length;i<6;i++) pick(firstEvos,Math.abs(seed+i*13)%firstEvos.length);
     return enemies;
   }
   function getStageEnemies(tabId,stageNum,arenaLevel){
@@ -376,6 +425,11 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return enemies.length?enemies.map(c=>c.emoji):["❓"];
   }
   function getEnemyLayout(tabId,stageNum,arenaLevel){
+    // Trials enemies wear equipment, picked per enemy slot (core/trials.js);
+    // makeArenaBattle turns `__equipped` into stats and gear effects.
+    const dressed=(creature,slot)=>tabId!==TRIALS_ID?creature:{...creature,
+      __equipped:trialsGearFor(creature,arenaLevel||1,stageNum,slot),
+      __equipLevel:trialsItemLevel(arenaEnemyLevel(arenaLevel||1,stageNum))};
     const enemies=getEnemiesForStage(tabId,stageNum,arenaLevel||1);
     if(!enemies.length)return{};
     const baseSeed=tabId.split("").reduce((a,c)=>a+c.charCodeAt(0),0)*31+stageNum*17;
@@ -386,7 +440,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     function seedCol(n){return((baseSeed*1664525+n*1013904223)>>>0)%COLS;}
     function place(creature,rows,idx){
       const startCol=seedCol(idx*7+rows[0]*3);
-      for(const row of rows)for(let dc=0;dc<COLS;dc++){const col=(startCol+dc)%COLS,key=row+","+col;if(!used.has(key)){grid[key]=creature;used.add(key);return;}}
+      for(const row of rows)for(let dc=0;dc<COLS;dc++){const col=(startCol+dc)%COLS,key=row+","+col;if(!used.has(key)){grid[key]=dressed(creature,idx);used.add(key);return;}}
     }
     ranged.forEach((c,i)=>place(c,i%2===0?[0,1]:[1,0],i));
     melee.forEach((c,i)=>place(c,i%2===0?[2,1]:[1,2],i+10));
@@ -398,7 +452,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
     return React.createElement("div",{key:"sfv377",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#fff",zIndex:210,padding:24,textAlign:"center"}},
       React.createElement("div",{style:{fontSize:64,marginBottom:12}},won?"✅":"💀"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:won?"#534AB7":"#ef4444",marginBottom:20}},won?(isBoss?"Boss Defeated!":"Victory!"):"Defeat!"),
-      won&&(()=>{const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
+      won&&wonReplayRef.current&&React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:20}},"Cleared again — replays give no rewards"),
+      won&&!wonReplayRef.current&&(()=>{const REWARD_DISPLAY={eggs:["🥚","Egg","Eggs"],flairBanana:["🍌","Flair Banana","Flair Bananas"],mysteriousOre:["🪨","Mysterious Ore","Mysterious Ore"],candy:["🍬","Candy","Candy"],mythicalFlairBanana:["🍌✨","Mythical Flair Banana","Mythical Flair Bananas"],deluxeOre:["💎","Deluxe Ore","Deluxe Ore"],ancientFlairBanana:["🍌🏺","Ancient Flair Banana","Ancient Flair Bananas"],legendaryEggs:["🥚✨","Legendary Egg","Legendary Eggs"]};const r=ARENA_STAGE_REWARDS[wonStageRef.current]||{eggs:1};return React.createElement("div",{style:{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:14,padding:"12px 24px",marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#7c3aed",textTransform:"uppercase",letterSpacing:1}},"Reward"),Object.entries(r).map(([k,v])=>{const d=REWARD_DISPLAY[k]||["🎁",k,k];return React.createElement("div",{key:k,style:{fontSize:16,fontWeight:700,color:"#534AB7"}},d[0]+" "+v+" "+(v===1?d[1]:d[2]));}));})(),
       React.createElement("button",{onClick:()=>{setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setBattleSelectedUid(null);},style:{padding:"12px 36px",background:"#534AB7",color:"#fff",border:"none",borderRadius:12,fontWeight:700,fontSize:15,cursor:"pointer"}},"Continue")
     );
   }
@@ -539,7 +594,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
               const onHoldStart=isPlayerZone&&creatureId
                 ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);})
                 :enemyDef
-                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyMinimized(false);setArenaEnemyInfo(enemyDef.id);expandArenaPanel("enemy");},180);})
+                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyMinimized(false);setArenaEnemyInfo(enemyDef);expandArenaPanel("enemy");},180);})
                   :undefined;
               const onHoldEnd=isPlayerZone&&creatureId
                 ?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!arenaTouchDrag.dragRef.current.active){setPlanGrid(p=>{const n={...p};delete n[key];return n;});}})
@@ -568,7 +623,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                   boxSizing:"border-box",userSelect:"none",
                   ...(rangePreview.cellStyle(key)||{}),
                 }
-              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[d.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},d.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def:d,size:planTile,contain:true}));})());
+              },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},typeIcon(d.type)),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},rangeIcon(d.attackType === "Ranged" ? "Ranged" : "Melee")),React.createElement(CreatureIcon,{def:d,size:planTile,contain:true}));})());
             })).flat()
           )
         ),
@@ -576,15 +631,32 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
         React.createElement("div",{ref:arenaRightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
           // enemy panel
           arenaEnemyInfo&&(()=>{
-            const def=CREATURE_MAP[arenaEnemyInfo];
+            const def=CREATURE_MAP[arenaEnemyInfo.id];
+            // Trials enemies wear equipment: listed under the header.
+            const gear=(arenaEnemyInfo.__equipped||[]).map(id=>EQUIPMENT_MAP[id]).filter(Boolean);
             if(!def)return null;
+            const enemyMinBtn=React.createElement("button",{onClick:()=>setArenaEnemyMinimized(p=>{const next=!p;if(!next)expandArenaPanel("enemy");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},arenaEnemyMinimized?"＋":"－");
+            // Trials: the same header, gear and ability cards as the Trials screen's
+            // creature popup (TrialsHome.js), sized for this narrower column.
+            if(isTrials)return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
+              enemyMinBtn,
+              React.createElement(TrialsEnemyHeader,{enemy:arenaEnemyInfo,enemyLevel:arenaEnemyLevel(level,stage),compact:true}),
+              !arenaEnemyMinimized&&React.createElement("div",{style:{marginTop:12}},React.createElement(TrialsEnemyBody,{enemy:arenaEnemyInfo,onTag:setArenaAbilityTagPopup,compact:true}))
+            );
             return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-              React.createElement("button",{onClick:()=>setArenaEnemyMinimized(p=>{const next=!p;if(!next)expandArenaPanel("enemy");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},arenaEnemyMinimized?"＋":"－"),
+              enemyMinBtn,
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:arenaEnemyMinimized?0:12}},
                 React.createElement("div",null,
                   React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
                   React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+" · Lv."+arenaEnemyLevel(level,stage)+" · Enemy")
                 )
+              ),
+              !arenaEnemyMinimized&&gear.length>0&&React.createElement("div",{style:{marginBottom:10}},
+                React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}},"Equipment · Lv."+(arenaEnemyInfo.__equipLevel||1)),
+                gear.map(e=>React.createElement("div",{key:e.id,style:{marginBottom:4}},
+                  React.createElement("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:11,fontWeight:700,color:EQUIP_RARITY_CONFIG[e.rarity]?.color||"#333"}},React.createElement("span",null,gearIcon(e)),e.name),
+                  e.effect&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:1}},e.effect)
+                ))
               ),
               !arenaEnemyMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
                 if(!abl)return null;
@@ -654,7 +726,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
           )
         ),
         ownedList.length===0
-          ?React.createElement("div",{style:{fontSize:12,color:"#999",padding:"10px 2px"}},"No "+arenaRequiredType+"-type creatures to deploy.")
+          ?React.createElement("div",{style:{fontSize:12,color:"#999",padding:"10px 2px"}},arenaRequiredType?"No "+arenaRequiredType+"-type creatures to deploy.":"No creatures to deploy.")
           :React.createElement("div",{
           ref:creatureListRef,
           onMouseDown:onListMouseDown,
@@ -693,8 +765,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
               ),
               React.createElement("div",{style:{opacity:isPlaced?0.4:1,display:"flex",flexDirection:"column",alignItems:"center",gap:1}},
                 React.createElement("div",{style:{position:"relative",lineHeight:1}},
-                  React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},TYPE_EMOJI[def.type]||""),
-                  React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},def.attackType==="Ranged"?"🏹":"⚔️"),
+                  React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},typeIcon(def.type)),
+                  React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},rangeIcon(def.attackType === "Ranged" ? "Ranged" : "Melee")),
                   React.createElement(CreatureIcon,{def,size:24,style:{marginTop:6}})
                 ),
                 React.createElement("div",{style:{fontSize:8,color:"#333",fontWeight:600,textAlign:"center",lineHeight:1.2,maxWidth:48,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},def.name),
@@ -709,10 +781,29 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
   }
 
 
+  // Trials' own home screen (TrialsHome.js): one stage at a time, with its
+  // enemies up front. Planning and the battle above are shared with the Arena.
+  if(isTrials){
+    const grid=getEnemyLayout(arenaTab,stage,level);
+    const cellOrder=k=>{const [r,c]=k.split(",").map(Number);return r*100+c;};
+    const enemies=Object.keys(grid).sort((a,b)=>cellOrder(a)-cellOrder(b)).map(k=>grid[k]);
+    const maxIdx=ARENA_MAX_LEVEL*ARENA_STAGES_PER_LEVEL;
+    return React.createElement(TrialsHome,{
+      onBack,viewIdx,progIdx,maxIdx,stage,
+      enemyLevel:arenaEnemyLevel(level,stage),enemies,
+      reward:isReplay?null:ARENA_STAGE_REWARDS_DISPLAY[stage-1],
+      clear:trialsClears?.[viewIdx]||null,
+      isReplay,isLocked:isLockedStage,
+      onPrev:()=>setTrialsView(Math.max(1,viewIdx-1)),
+      onNext:()=>setTrialsView(Math.min(maxIdx,viewIdx+1)),
+      onToCurrent:()=>setTrialsView(null),
+      onFight:()=>{if(!isLockedStage)setPlanning(true);},
+    });
+  }
   return React.createElement("div",{key:"sfv682",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f5f5f5"}},
     rewardPopup!==null&&(()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[rewardPopup];return React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
-        React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},iconText(rd.emoji)),
+        React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},currencyIcon(rd.key,rd.emoji)),
         React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},rd.label),
         React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:4}},REWARD_DESC[rd.key]||""),
         React.createElement("button",{onClick:()=>setRewardPopup(null),style:{marginTop:20,padding:"10px 28px",borderRadius:12,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
@@ -727,7 +818,8 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
       React.createElement("div",{style:{background:"#534AB7",color:"#fff",borderRadius:20,padding:"3px 14px",fontSize:13,fontWeight:700,flexShrink:0}},"Rank "+level)
     ),
     React.createElement("div",{style:{display:"flex",flex:1,overflow:"hidden"}},
-      React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,justifyContent:"space-evenly"}},
+      // The type tabs. Trials is a single track, so it has none.
+      !isTrials&&React.createElement("div",{style:{display:"flex",flexDirection:"column",width:72,borderRight:"1px solid #e0e0e0",background:"#fff",flexShrink:0,justifyContent:"space-evenly"}},
         ARENA_TABS.map(t=>{
           const reqType=ARENA_TAB_TYPE[t.id];
           const isLocked=reqType&&(arenaTypeCounts[reqType]||0)<ARENA_UNLOCK_COUNT;
@@ -777,7 +869,7 @@ function ArenaScreen({onBack,onFight,onViewCreature}){
                 )
               ),
               (()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[i];return React.createElement("div",{onClick:!isPast?(e=>{e.stopPropagation();setRewardPopup(i);}):undefined,style:{flexShrink:0,textAlign:"center",cursor:isPast?"default":"pointer",opacity:isPast?0.35:1}},
-                React.createElement("div",{style:{fontSize:24,lineHeight:1}},iconText(rd.emoji)),
+                React.createElement("div",{style:{fontSize:24,lineHeight:1}},currencyIcon(rd.key,rd.emoji)),
                 React.createElement("div",{style:{fontSize:12,fontWeight:800,color:"#555",marginTop:2}},rd.qty)
               );})()
             );

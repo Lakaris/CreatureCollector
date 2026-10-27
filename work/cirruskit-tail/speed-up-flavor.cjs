@@ -1,0 +1,13 @@
+const fs=require('fs'),assert=require('assert'),crypto=require('crypto');
+const metaPath='images/cirruskit/cirruskit_flavor.json',configPath='src/data/creatureArt.js';
+const meta=JSON.parse(fs.readFileSync(metaPath,'utf8')),previous=meta.frames.map(f=>f.durationMs),next=previous.map(t=>Math.round(t/1.25));
+assert.deepEqual(previous,[850,230,260,220,240,180,180,230,650]);
+let config=fs.readFileSync(configPath,'utf8');
+const oldLine='flavor: { src: "images/cirruskit/cirruskit_flavor.png", frames: 9, columns: 3, durations: [850, 230, 260, 220, 240, 180, 180, 230, 650] }';
+assert(config.includes(oldLine),'Expected current flavor configuration');
+meta.frames.forEach((frame,i)=>frame.durationMs=next[i]);meta.totalDurationMs=next.reduce((sum,t)=>sum+t,0);
+config=config.replace(oldLine,`flavor: { src: "images/cirruskit/cirruskit_flavor.png", frames: 9, columns: 3, durations: [${next.join(', ')}] }`).replace('cirruskit_flavor.json (3.04s)','cirruskit_flavor.json (2.432s)');
+const sheetHash=crypto.createHash('sha256').update(fs.readFileSync('images/cirruskit/cirruskit_flavor.png')).digest('hex');
+fs.writeFileSync('work/cirruskit-tail/before-flavor-speed.json',JSON.stringify({previous,next,sheetHash},null,2));
+fs.writeFileSync(metaPath,JSON.stringify(meta,null,2)+'\n');fs.writeFileSync(configPath,config);
+console.log(JSON.stringify({durations:next,totalMs:meta.totalDurationMs,speedIncreasePercent:25}));

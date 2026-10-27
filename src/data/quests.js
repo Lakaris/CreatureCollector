@@ -171,7 +171,7 @@ export const QUEST_DEFS={
   ],
 };
 
-export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",melonRainbow:"🍈 Rainbow Melon",ascensionMelon:"🍈 Legendary Ascension Melon",ascensionMelonCommon:"🍈⚪ Common Ascension Melon",ascensionMelonEpic:"🍈🟣 Epic Ascension Melon",legendaryEgg:"🌟 Legendary Egg",legendaryEggs:"🌟 Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
+export const REWARD_LABELS={gems:"💎 Gems",food:"🍖 Food",candy:"🍬 Candy",equipShards:"⚔️ Gear Shards",dungeonPass:"🎫 Dungeon Passes",egg:"🥚 Egg",eggs:"🥚 Egg",battlepassPoints:"🎫 Pass Points",flairBanana:"🍌 Flair Banana",mythicalFlairBanana:"🍌✨ Mythical Flair Banana",ancientFlairBanana:"🍌⭐ Ancient Flair Banana",melonRainbow:"🌈 Rainbow Melon",ascensionMelon:"🍈 Legendary Ascension Melon",ascensionMelonCommon:"🍈⚪ Common Ascension Melon",ascensionMelonEpic:"🍈🟣 Epic Ascension Melon",legendaryEgg:"🥚✨ Legendary Egg",legendaryEggs:"🥚✨ Legendary Egg",ancientFertilizer:"🪴 Ancient Fertilizer",plots:"🌾 Plots",dungeons:"🏰 Dungeons",dailyBoss:"👹 Daily Boss",arena:"🏟️ Arena",treasure:"💰 Treasure",com_hp_atk2:"🧤 Leather Vambrace",com_hp_def2:"🪵 Wooden Buckler",com_hp_def:"🪨 Stone Brace",com_atk_def2:"📌 Bronze Spikes",com_atk_def:"🥊 Iron Knuckles",gearBundle:"🛡️ 5 Common Equipment"};
 export const REWARD_DESC={
   gems:"A powerful currency with many uses",
   food:"Used to level up Creatures.",
@@ -229,7 +229,7 @@ export const DAILY_REWARDS=[
   {day:7,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:8,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:9,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
-  {day:10,label:"1 Rainbow Melon",emoji:"🍈",reward:{melonRainbow:1}},
+  {day:10,label:"1 Rainbow Melon",emoji:"🌈",reward:{melonRainbow:1}},
   {day:11,label:"1 Egg",emoji:"🥚",reward:{eggs:1}},
   {day:12,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:13,label:"5 Candy",emoji:"🍬",reward:{candy:5}},
@@ -249,7 +249,7 @@ export const DAILY_REWARDS=[
   {day:27,label:"Food",emoji:"🍖",reward:{food:"FIELD_12H"}},
   {day:28,label:"5 Dungeon Passes",emoji:"🎫",reward:{dungeonPass:5}},
   {day:29,label:"Gear Shards",emoji:"⚔️",reward:{equipShards:"FIELD_12H"}},
-  {day:30,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+  {day:30,label:"1 Legendary Egg",emoji:"🥚✨",reward:{legendaryEggs:1}},
 ];
 
 /** Resolves any "FIELD_<N>H" sentinel (food against FIELD_RATES, equipShards
@@ -298,15 +298,15 @@ export const BATTLEPASS_REWARDS_PAID=[
 
 export const NEW_PLAYER_GIFT_REWARDS=[
   {day:1,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
-  {day:2,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+  {day:2,label:"1 Legendary Egg",emoji:"🥚✨",reward:{legendaryEggs:1}},
   {day:3,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
   {day:4,label:"1 Legendary Ascension Melon",emoji:"🍈",reward:{ascensionMelon:1}},
   {day:5,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
-  {day:6,label:"1 Legendary Egg",emoji:"🌟",reward:{legendaryEggs:1}},
+  {day:6,label:"1 Legendary Egg",emoji:"🥚✨",reward:{legendaryEggs:1}},
   {day:7,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
-  {day:8,label:"1 Rainbow Melon",emoji:"🍈",reward:{melonRainbow:1}},
+  {day:8,label:"1 Rainbow Melon",emoji:"🌈",reward:{melonRainbow:1}},
   {day:9,label:"5 Eggs",emoji:"🥚",reward:{eggs:5}},
-  {day:10,label:"3 Legendary Eggs",emoji:"🌟",reward:{legendaryEggs:3}},
+  {day:10,label:"3 Legendary Eggs",emoji:"🥚✨",reward:{legendaryEggs:3}},
 ];
 
 export const BATTLEPASS_MISSIONS=[

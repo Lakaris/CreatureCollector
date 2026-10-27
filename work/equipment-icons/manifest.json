@@ -1,0 +1,1903 @@
+{
+  "style": "Use case: stylized-concept. Create exactly ONE equipment inventory icon for a cute creature-collecting game. A square PNG with genuine transparent background. Match this collection's Anchor Charm: very thick near-black plum-brown outer contour, chunky rounded proportions, broad clean color areas, simple hard-edged cel shading, one broad highlight and one shadow, no surface texture. Design for final 256x256 pixels and tiny 13x13 to 64x64 display. Bold unmistakable silhouette and generous negative spaces, 3-5 main colors maximum. Center whole item on a square canvas, filling 85-90% of its area with safe margins. Outline equivalent to 10-13px at 256px. No text, numbers, labels, runic writing, watermark, background, tile, vignette, ground, cast shadow, glow haze, loose sparkles, decorative clutter, or tiny details. No character or body wearing it. Show an isolated item. Color and shape must communicate the item, with at most one large distinctive emblem. Background and any holes are fully transparent; the object itself is opaque. Render as flat illustrated game art, not photorealistic or 3D.",
+  "items": [
+    {
+      "id": "com_hp_atk",
+      "name": "Iron Band",
+      "ordinal": 1,
+      "filename": "ironband.png",
+      "design": "Wide slate iron cuff, raised diamond boss and two large rivets.",
+      "status": "saved"
+    },
+    {
+      "id": "com_hp_atk2",
+      "name": "Leather Vambrace",
+      "ordinal": 2,
+      "filename": "leathervambrace.png",
+      "design": "Tapered chestnut forearm guard, broad cream strap, one square bronze buckle.",
+      "status": "saved"
+    },
+    {
+      "id": "com_hp_atk3",
+      "name": "Boarhide Wrap",
+      "ordinal": 3,
+      "filename": "boarhidewrap.png",
+      "design": "Brown hide cuff, ochre belt, two prominent ivory tusks, three broad fur tufts.",
+      "status": "saved"
+    },
+    {
+      "id": "com_hp_def",
+      "name": "Stone Brace",
+      "ordinal": 4,
+      "filename": "stonebrace.png",
+      "design": "Three chunky gray stone cuff segments, central moss-green stone stripe.",
+      "status": "saved"
+    },
+    {
+      "id": "com_hp_def2",
+      "name": "Wooden Buckler",
+      "ordinal": 5,
+      "filename": "woodenbuckler.png",
+      "design": "Small round honey-brown wooden shield, broad iron rim and single round steel boss, just two plank seams.",
+      "status": "saved"
+    },
+    {
+      "id": "com_hp_def3",
+      "name": "Bone Guard",
+      "ordinal": 6,
+      "filename": "boneguard.png",
+      "design": "Ivory bone forearm shield with a broad central ridge, two large rounded side lobes and brown leather backing.",
+      "status": "saved"
+    },
+    {
+      "id": "com_atk_def",
+      "name": "Iron Knuckles",
+      "ordinal": 7,
+      "filename": "ironknuckles.png",
+      "design": "Chunky blue-gray metal knuckle guard with four large rounded finger openings and an angular lower grip.",
+      "status": "saved"
+    },
+    {
+      "id": "com_atk_def2",
+      "name": "Bronze Spikes",
+      "ordinal": 8,
+      "filename": "bronzespikes.png",
+      "design": "A short broad bronze armor strip bearing three big rounded pyramidal spikes, warm copper and golden faces.",
+      "status": "saved"
+    },
+    {
+      "id": "com_atk_def3",
+      "name": "Rawhide Wraps",
+      "ordinal": 9,
+      "filename": "rawhidewraps.png",
+      "design": "Compact crossed rolls of tan leather hand wraps with just three broad overlapping bands and short ends.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_hp_atk",
+      "name": "Silver Armlet",
+      "ordinal": 10,
+      "filename": "silverarmlet.png",
+      "design": "Polished silver open arm cuff with two broad crescent tips enclosing one large blue oval stone.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_hp_atk2",
+      "name": "Falcon Bracer",
+      "ordinal": 11,
+      "filename": "falconbracer.png",
+      "design": "Slate-blue forearm guard whose front forms a bold cream falcon wing with only three long feather plates.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_hp_def",
+      "name": "Guardian Crest",
+      "ordinal": 12,
+      "filename": "guardiancrest.png",
+      "design": "Broad blue shield medallion with ivory border and one large gold four-point guardian star.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_hp_def2",
+      "name": "Tortoise Shell",
+      "ordinal": 13,
+      "filename": "tortoiseshell.png",
+      "design": "Domed olive-green tortoise shell, cream rim, one central hexagonal plate and four broad side segments.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_atk_def",
+      "name": "War Gauntlet",
+      "ordinal": 14,
+      "filename": "wargauntlet.png",
+      "design": "Steel-blue clenched gauntlet with three chunky finger plates, crimson cuff and large square knuckle plate.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_atk_def2",
+      "name": "Wolf Fang Claw",
+      "ordinal": 15,
+      "filename": "wolffangclaw.png",
+      "design": "Brown leather claw grip holding three long ivory wolf fangs with cool-gray tips.",
+      "status": "saved"
+    },
+    {
+      "id": "sig_hp",
+      "name": "Life Sigil",
+      "ordinal": 16,
+      "filename": "lifesigil.png",
+      "design": "Simple rounded copper medallion with one raised coral-red heart, ivory heart highlight and short attachment loop.",
+      "status": "saved"
+    },
+    {
+      "id": "sig_atk",
+      "name": "Fury Sigil",
+      "ordinal": 17,
+      "filename": "furysigil.png",
+      "design": "Simple triangular bronze medallion bearing a single large red-orange angular flame.",
+      "status": "saved"
+    },
+    {
+      "id": "sig_def",
+      "name": "Iron Sigil",
+      "ordinal": 18,
+      "filename": "ironsigil.png",
+      "design": "Simple square slate iron medallion bearing one raised pale-blue shield shape.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_fire_atk",
+      "name": "Kindled Charm",
+      "ordinal": 19,
+      "filename": "kindledcharm.png",
+      "design": "A little orange ember flame enclosed in a stout dark-bronze teardrop pendant rim with top ring.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_water_hp",
+      "name": "Dewdrop Charm",
+      "ordinal": 20,
+      "filename": "dewdropcharm.png",
+      "design": "Large aqua water-drop pendant in a simple silver cap, one broad pale-blue highlight.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_water_hp_def",
+      "name": "Coral Band",
+      "ordinal": 21,
+      "filename": "coralband.png",
+      "design": "A chunky salmon-pink coral bracelet with three rounded branch tips on its front and a cream inner rim.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_nat_def_atk",
+      "name": "Thorn Ring",
+      "ordinal": 22,
+      "filename": "thornring.png",
+      "design": "Dark green thick vine ring with two large curved thorns and one small pale-green leaf.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_ear_def",
+      "name": "Pebble Talisman",
+      "ordinal": 23,
+      "filename": "pebbletalisman.png",
+      "design": "One smooth warm-gray oval stone bound by a single broad dark-brown leather loop, tiny moss patch.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_ear_hp_def",
+      "name": "Clay Bangle",
+      "ordinal": 24,
+      "filename": "claybangle.png",
+      "design": "Thick terracotta bracelet with one broad ivory zigzag band across its front.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_wind_atk",
+      "name": "Breeze Feather",
+      "ordinal": 25,
+      "filename": "breezefeather.png",
+      "design": "One broad curved mint-green feather with cream shaft and only three sweeping feather lobes.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_wind_hp_atk",
+      "name": "Zephyr Knot",
+      "ordinal": 26,
+      "filename": "zephyrknot.png",
+      "design": "A plump teal cord tied in a simple symmetrical wind knot with two wide loops and two short ends.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_elec_def",
+      "name": "Capacitor Charm",
+      "ordinal": 27,
+      "filename": "capacitorcharm.png",
+      "design": "A compact golden cylinder pendant with dark slate caps and one bold cyan lightning-bolt inlay.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_elec_atk_def",
+      "name": "Copper Coil",
+      "ordinal": 28,
+      "filename": "coppercoil.png",
+      "design": "Three chunky copper loops forming a compact electrical coil around a short dark iron spindle.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_light_hp",
+      "name": "Sunbeam Locket",
+      "ordinal": 29,
+      "filename": "sunbeamlocket.png",
+      "design": "Round gold locket with four broad sun rays and a warm cream central disc.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_light_hp_def",
+      "name": "Glow Band",
+      "ordinal": 30,
+      "filename": "glowband.png",
+      "design": "Thick golden wrist band with a large luminous pale-yellow oval inset, solid colors without aura.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_dark_atk",
+      "name": "Duskfang Charm",
+      "ordinal": 31,
+      "filename": "duskfangcharm.png",
+      "design": "One violet-gray curved fang pendant with a dark plum cap and mauve crescent inset.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_dark_hp_atk",
+      "name": "Umbral Thread",
+      "ordinal": 32,
+      "filename": "umbralthread.png",
+      "design": "A compact loop of thick dark-purple cord with one bold lavender knot and two short trailing ends.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_atk_edge",
+      "name": "Duelist's Edge",
+      "ordinal": 33,
+      "filename": "duelistsedge.png",
+      "design": "Short elegant silver dueling blade tilted diagonally, deep-red grip and a single large gold curved handguard.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_atk_hunter",
+      "name": "Hunter's Mark",
+      "ordinal": 34,
+      "filename": "huntersmark.png",
+      "design": "A green arrowhead badge with a large cream circular target emblem, no letters or small markings.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_tank_plate",
+      "name": "Squire's Plate",
+      "ordinal": 35,
+      "filename": "squiresplate.png",
+      "design": "Small broad steel breastplate with squared shoulders and one simple burgundy central stripe.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_tank_grit",
+      "name": "Grit Band",
+      "ordinal": 36,
+      "filename": "gritband.png",
+      "design": "Rough charcoal wrist cuff with a broad ochre central plate and one large pale scratch slash.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_sup_charm",
+      "name": "Mender's Charm",
+      "ordinal": 37,
+      "filename": "menderscharm.png",
+      "design": "Rounded mint healing pendant with one large cream plus-shaped inlay, broad gold rim and loop.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_sup_bell",
+      "name": "Chorus Bell",
+      "ordinal": 38,
+      "filename": "chorusbell.png",
+      "design": "One plump golden bell, lavender bow handle, dark open mouth and single large round clapper.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_rng_melee_grip",
+      "name": "Brawler's Grip",
+      "ordinal": 39,
+      "filename": "brawlersgrip.png",
+      "design": "A curled tan hand-wrap grip with a broad red knuckle pad and three thick wrap folds.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_rng_melee_greaves",
+      "name": "Charger's Greaves",
+      "ordinal": 40,
+      "filename": "chargersgreaves.png",
+      "design": "One chunky forward-leaning steel shin guard with a golden toe point and a broad crimson speed stripe.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_rng_ranged_scope",
+      "name": "Keen Scope",
+      "ordinal": 41,
+      "filename": "keenscope.png",
+      "design": "Compact brass sighting telescope with one large turquoise front lens and a short dark eyepiece.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_rng_ranged_quiver",
+      "name": "Light Quiver",
+      "ordinal": 42,
+      "filename": "lightquiver.png",
+      "design": "Small cream-and-tan quiver holding two thick arrows with broad pale-blue fletching.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_atk_focus",
+      "name": "Focus Band",
+      "ordinal": 43,
+      "filename": "focusband.png",
+      "design": "Wide purple cloth headband tied at one side, one large round ivory inset at its center.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_atk_leech",
+      "name": "Leech Ring",
+      "ordinal": 44,
+      "filename": "leechring.png",
+      "design": "A thick dark-red curled leech-shaped ring enclosing a round hole, one large cream tooth-like tip.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_def_cloak",
+      "name": "Traveler's Cloak",
+      "ordinal": 45,
+      "filename": "travelerscloak.png",
+      "design": "Short folded forest-green hooded travel cape with a single golden round clasp and two broad folds.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_coin",
+      "name": "Lucky Coin",
+      "ordinal": 46,
+      "filename": "luckycoin.png",
+      "design": "Thick golden coin viewed slightly tilted, one large raised four-leaf green clover.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_def_sentry",
+      "name": "Sentry Emblem",
+      "ordinal": 47,
+      "filename": "sentryemblem.png",
+      "design": "A blue-gray shield badge with a single large gold open-eye emblem and cream center.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_def_anchor",
+      "name": "Anchor Charm",
+      "ordinal": 48,
+      "filename": "anchorcharm.png",
+      "design": "Reuse the existing completed anchorcharm.png without regeneration.",
+      "status": "existing"
+    },
+    {
+      "id": "rar_gen_atk_def_haste",
+      "name": "Runner's Band",
+      "ordinal": 49,
+      "filename": "runnersband.png",
+      "design": "Bright teal wrist band bearing one big cream swept-back wing shape, single short tied tail.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_atk_def_tar",
+      "name": "Tar Droplet",
+      "ordinal": 50,
+      "filename": "tardroplet.png",
+      "design": "One plump black-purple tar droplet with a broad lavender reflected patch and rounded heavy base.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_def_amber",
+      "name": "Amber Bead",
+      "ordinal": 51,
+      "filename": "amberbead.png",
+      "design": "Large golden-orange amber bead with a dark cord hole and a single simple dark leaf silhouette inside.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_atk_wax",
+      "name": "Wax Cell",
+      "ordinal": 52,
+      "filename": "waxcell.png",
+      "design": "One thick golden hexagonal honeycomb cup with warm amber center and broad cream wax rim.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_atk_crit_chirp",
+      "name": "Cricket Chirp",
+      "ordinal": 53,
+      "filename": "cricketchirp.png",
+      "design": "Small olive-green cricket-shaped whistle charm, bold curved body and two oversized folded hind-leg shapes, no fine antennae.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_molt",
+      "name": "Molted Skin",
+      "ordinal": 54,
+      "filename": "moltedskin.png",
+      "design": "A pale tan curled strip of shed reptile skin with a large diamond plate pattern limited to three shapes.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_atk_cdmg_hydra",
+      "name": "Hydra Tooth",
+      "ordinal": 55,
+      "filename": "hydratooth.png",
+      "design": "One stout ivory tooth with two smaller forked tooth tips at its root, jade-green base cap.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_def_barrier",
+      "name": "Crest of Conquest",
+      "ordinal": 56,
+      "filename": "crestofconquest.png",
+      "design": "Crimson shield crest with thick gold trim and a single large gold crown silhouette.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_hp_atk",
+      "name": "Warlord's Seal",
+      "ordinal": 57,
+      "filename": "warlordsseal.png",
+      "design": "Heavy dark-red wax seal on a gold backing, bold horned helmet emblem at its center.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_hp_def",
+      "name": "Citadel Core",
+      "ordinal": 58,
+      "filename": "citadelcore.png",
+      "design": "A compact blue-gray fortress-shaped core with two squared towers around a large pale-cyan central gem.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_atk_def",
+      "name": "Infernal Glove",
+      "ordinal": 59,
+      "filename": "infernalglove.png",
+      "design": "A thick charcoal armored glove with orange-red knuckle plates shaped as three broad flame tips.",
+      "status": "saved"
+    },
+    {
+      "id": "cre_hp",
+      "name": "Life Crest",
+      "ordinal": 60,
+      "filename": "lifecrest.png",
+      "design": "Larger gold heart-shaped crest, red central heart and two broad ivory leaf wings.",
+      "status": "saved"
+    },
+    {
+      "id": "cre_atk",
+      "name": "Fury Crest",
+      "ordinal": 61,
+      "filename": "furycrest.png",
+      "design": "Gold flame-shaped crest with a large scarlet flame center and two short pointed side wings.",
+      "status": "saved"
+    },
+    {
+      "id": "cre_def",
+      "name": "Iron Crest",
+      "ordinal": 62,
+      "filename": "ironcrest.png",
+      "design": "Silver shield-shaped crest, deep-blue center and one broad pale-steel vertical ridge.",
+      "status": "saved"
+    },
+    {
+      "id": "res_fire",
+      "name": "Cinder Ward",
+      "ordinal": 63,
+      "filename": "cinderward.png",
+      "design": "A rounded charcoal shield charm enclosing one large bright-orange ember and a broad copper rim.",
+      "status": "saved"
+    },
+    {
+      "id": "res_water",
+      "name": "Tide Guard",
+      "ordinal": 64,
+      "filename": "tideguard.png",
+      "design": "Small deep-blue shield with a single large curling aqua wave and cream crest.",
+      "status": "saved"
+    },
+    {
+      "id": "res_nature",
+      "name": "Bark Shield",
+      "ordinal": 65,
+      "filename": "barkshield.png",
+      "design": "A broad leaf-shaped brown bark shield with one thick central grain groove and moss-green outer edging.",
+      "status": "saved"
+    },
+    {
+      "id": "res_earth",
+      "name": "Stone Bulwark",
+      "ordinal": 66,
+      "filename": "stonebulwark.png",
+      "design": "Chunky squat gray tower shield made from three large stone blocks, one ivory central face.",
+      "status": "saved"
+    },
+    {
+      "id": "res_wind",
+      "name": "Gale Barrier",
+      "ordinal": 67,
+      "filename": "galebarrier.png",
+      "design": "A pale-mint round shield whose solid rim curves into one broad wind spiral.",
+      "status": "saved"
+    },
+    {
+      "id": "res_dark",
+      "name": "Shadow Veil",
+      "ordinal": 68,
+      "filename": "shadowveil.png",
+      "design": "A folded purple-black gauze hood or veil, one broad lavender edge and one clean eye-shaped opening, no face.",
+      "status": "saved"
+    },
+    {
+      "id": "res_light",
+      "name": "Radiant Aegis",
+      "ordinal": 69,
+      "filename": "radiantaegis.png",
+      "design": "Ivory round shield with stout gold rim and one large pale-yellow four-point star.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_fire_hp_atk",
+      "name": "Scorchmantle",
+      "ordinal": 70,
+      "filename": "scorchmantle.png",
+      "design": "Short charcoal shoulder cape with a broad orange flame-shaped hem and a single ember clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_water_hp_def",
+      "name": "Tideweave Wrap",
+      "ordinal": 71,
+      "filename": "tideweavewrap.png",
+      "design": "Rolled blue fabric wrap with two broad aqua wave bands and one cream end fold.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_water_atk_def",
+      "name": "Brineplate",
+      "ordinal": 72,
+      "filename": "brineplate.png",
+      "design": "Broad sea-blue chest armor with an ivory scallop-shaped central plate and chunky teal edges.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_nat_hp_def",
+      "name": "Thornback Vest",
+      "ordinal": 73,
+      "filename": "thornbackvest.png",
+      "design": "Forest-green armored vest with two large wooden thorn shoulder points and tan central panels.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_ear_hp_def",
+      "name": "Bedrock Slab",
+      "ordinal": 74,
+      "filename": "bedrockslab.png",
+      "design": "A squat broad rectangular dark-gray stone slab with one large diagonal fracture and sandy exposed edge.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_ear_atk_def",
+      "name": "Quake Brand",
+      "ordinal": 75,
+      "filename": "quakebrand.png",
+      "design": "A rough ochre stone pendant bearing one broad black zigzag fault, dark-brown top binding.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_elec_def_atk",
+      "name": "Capacitor Plate",
+      "ordinal": 76,
+      "filename": "capacitorplate.png",
+      "design": "A steel breastplate with a large golden battery-shaped center and one cyan lightning inlay.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_elec_hp_def",
+      "name": "Stormshell Mantle",
+      "ordinal": 77,
+      "filename": "stormshellmantle.png",
+      "design": "Compact deep-blue shoulder mantle made from three overlapping curved shell plates, one gold lightning clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_light_hp_def",
+      "name": "Radiant Shroud",
+      "ordinal": 78,
+      "filename": "radiantshroud.png",
+      "design": "Ivory hooded mantle with broad warm-gold edges and a simple diamond sun clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_dark_hp_atk",
+      "name": "Voidthread Cloak",
+      "ordinal": 79,
+      "filename": "voidthreadcloak.png",
+      "design": "A short dark-plum cloak with a deep-violet interior and one large crescent cutout clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_wind_atk_def",
+      "name": "Galeforce Band",
+      "ordinal": 80,
+      "filename": "galeforceband.png",
+      "design": "A thick mint-silver cuff with two large swept wing fins and a dark-teal center band.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_wind_hp_atk",
+      "name": "Slipstream Blade",
+      "ordinal": 81,
+      "filename": "slipstreamblade.png",
+      "design": "Curved pale-cyan short blade with a broad wind-swoosh silhouette, teal hilt and cream edge.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_wind_hp_def",
+      "name": "Featherweight Wrap",
+      "ordinal": 82,
+      "filename": "featherweightwrap.png",
+      "design": "A small cream cloth wrap with one broad pale-mint feather attached and two short folded tails.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_wind_def_atk",
+      "name": "Cyclone Guard",
+      "ordinal": 83,
+      "filename": "cycloneguard.png",
+      "design": "A round teal buckler shaped around one bold three-arm wind swirl and a silver outer rim.",
+      "status": "saved"
+    },
+    {
+      "id": "typ_wind_hp_atk2",
+      "name": "Jetstream Sigil",
+      "ordinal": 84,
+      "filename": "jetstreamsigil.png",
+      "design": "A blue diamond medallion with a large white upward swept arrow and two short wing tips.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_nat_hp",
+      "name": "Sprout Locket",
+      "ordinal": 85,
+      "filename": "sproutlocket.png",
+      "design": "Golden oval locket containing a simple bright-green two-leaf sprout on cream backing.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_fire_atk",
+      "name": "Flarebrand Ring",
+      "ordinal": 86,
+      "filename": "flarebrandring.png",
+      "design": "A thick bronze ring topped by one bold red-orange flame-shaped stone.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_water_hp",
+      "name": "Springwell Ring",
+      "ordinal": 87,
+      "filename": "springwellring.png",
+      "design": "A wide silver ring holding a large aqua water-drop stone with one cream ripple at its base.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_nat_hp_def",
+      "name": "Verdant Weave",
+      "ordinal": 88,
+      "filename": "verdantweave.png",
+      "design": "A compact folded green cloth sash woven from three broad leaf-shaped panels, cream binding.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_ear_def",
+      "name": "Basalt Ward",
+      "ordinal": 89,
+      "filename": "basaltward.png",
+      "design": "A dark basalt hexagonal shield charm with a single broad orange seam and muted gray edges.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_wind_atk_def",
+      "name": "Tailwind Talon",
+      "ordinal": 90,
+      "filename": "tailwindtalon.png",
+      "design": "One swept ivory bird talon capped in teal with a broad mint feather fin at its base.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_elec_atk",
+      "name": "Voltaic Fang",
+      "ordinal": 91,
+      "filename": "voltaicfang.png",
+      "design": "One bright-yellow fang shaped like a lightning bolt, dark-blue base cap and cream edge.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_light_hp",
+      "name": "Dawnlight Halo",
+      "ordinal": 92,
+      "filename": "dawnlighthalo.png",
+      "design": "A thick warm-gold halo ring with four short rounded ivory rays, slightly tilted with a clear hole.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_dark_hp_atk",
+      "name": "Gloomreaper Chain",
+      "ordinal": 93,
+      "filename": "gloomreaperchain.png",
+      "design": "Three heavy dark-violet chain links holding one ivory crescent fang, no long thin chain.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_role_atk_slayer",
+      "name": "Slayer's Band",
+      "ordinal": 94,
+      "filename": "slayersband.png",
+      "design": "A wide dark-red cuff with one large ivory fang-shaped front plate and a gold outer edge.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_role_tank_bastion",
+      "name": "Bastion Plate",
+      "ordinal": 95,
+      "filename": "bastionplate.png",
+      "design": "Massive compact slate-blue breastplate with thick rectangular shoulder ledges and a central gold shield boss.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_role_sup_cantor",
+      "name": "Cantor's Beads",
+      "ordinal": 96,
+      "filename": "cantorsbeads.png",
+      "design": "A loop of five large lavender and cream prayer beads, a single small golden bell at the bottom.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_rng_melee_vanguard",
+      "name": "Vanguard Gauntlet",
+      "ordinal": 97,
+      "filename": "vanguardgauntlet.png",
+      "design": "One stout silver armored fist with a large royal-blue knuckle shield and gold cuff.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_rng_melee_vanguard_def",
+      "name": "Vanguard Pauldron",
+      "ordinal": 98,
+      "filename": "vanguardpauldron.png",
+      "design": "One broad layered steel shoulder plate with a large blue central panel and bold gold rim.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_rng_ranged_lens",
+      "name": "Longshot Lens",
+      "ordinal": 99,
+      "filename": "longshotlens.png",
+      "design": "A large cyan convex lens in a dark-brass mount with a short conical sight body.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_atk_vamp",
+      "name": "Vampiric Band",
+      "ordinal": 100,
+      "filename": "vampiricband.png",
+      "design": "A dark burgundy ring with two large ivory fangs gripping one red oval gem.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_oath",
+      "name": "Duelist's Oath",
+      "ordinal": 101,
+      "filename": "duelistsoath.png",
+      "design": "A gold ring-shaped medal with one silver upright sword laid across a deep-red shield center.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_idol",
+      "name": "Guardian Idol",
+      "ordinal": 102,
+      "filename": "guardianidol.png",
+      "design": "A squat ivory stone guardian figurine holding one broad blue shield, faceless simple helmet.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_def_bulwark",
+      "name": "Bulwark Sigil",
+      "ordinal": 103,
+      "filename": "bulwarksigil.png",
+      "design": "A thick square bronze medallion with one large blue tower-shield emblem.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_def_sentinel",
+      "name": "Sentinel Idol",
+      "ordinal": 104,
+      "filename": "sentinelidol.png",
+      "design": "A compact gray stone watchtower idol with two squared crown notches and one broad golden eye inset.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_atk_silk",
+      "name": "Spider Silk Spool",
+      "ordinal": 105,
+      "filename": "spidersilkspool.png",
+      "design": "A short dark wood spool wrapped in a plump ivory silk coil, one loose thick loop.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_def_cocoon",
+      "name": "Cocoon Wrap",
+      "ordinal": 106,
+      "filename": "cocoonwrap.png",
+      "design": "A soft cream oval cocoon wrap with three broad diagonal silk bands and pale mint shadow.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_atk_honey",
+      "name": "Honeycomb Flask",
+      "ordinal": 107,
+      "filename": "honeycombflask.png",
+      "design": "A squat amber flask shaped like one hexagonal honey cell, cream wax collar and cork.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_crit_fork",
+      "name": "Tuning Fork",
+      "ordinal": 108,
+      "filename": "tuningfork.png",
+      "design": "A thick silver U-shaped tuning fork, short plum handle and broad rounded prongs.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_def_lacquer",
+      "name": "Pearl Lacquer",
+      "ordinal": 109,
+      "filename": "pearllacquer.png",
+      "design": "A small open cream shell-shaped pot filled with pale-pink pearly lacquer, one large pearl-like dome.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_cdmg_snare",
+      "name": "Hunter's Snare",
+      "ordinal": 110,
+      "filename": "hunterssnare.png",
+      "design": "A stout brown leather snare loop with one large wooden toggle and compact coil at its base, no fine wires.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_crit_antler",
+      "name": "Beacon Antler",
+      "ordinal": 111,
+      "filename": "beaconantler.png",
+      "design": "A single ivory antler with three broad branch tips and a large warm-gold bead at its base.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_def_rampage",
+      "name": "Warlord's Trophy",
+      "ordinal": 112,
+      "filename": "warlordstrophy.png",
+      "design": "A compact bronze beast-horn trophy with two stout ivory horns and a crimson central shield.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_def_hp_last",
+      "name": "Last Stand Crown",
+      "ordinal": 113,
+      "filename": "laststandcrown.png",
+      "design": "A thick battered steel crown with three broad points, gold center plate and a single red stone.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_atk_heal",
+      "name": "Lifebinder Pendant",
+      "ordinal": 114,
+      "filename": "lifebinderpendant.png",
+      "design": "A large coral heart gem embraced by two broad ivory hands or leaf shapes in a gold pendant frame.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_crit_cicada",
+      "name": "Cicada Husk",
+      "ordinal": 115,
+      "filename": "cicadahusk.png",
+      "design": "A small empty golden-brown cicada shell, plump segmented body, two broad folded wing plates, no thin legs.",
+      "status": "saved"
+    },
+    {
+      "id": "rel_hp",
+      "name": "Life Relic",
+      "ordinal": 116,
+      "filename": "liferelic.png",
+      "design": "A large red heart jewel in a stout ivory-gold shrine frame with two broad leaf wings and one top loop.",
+      "status": "saved"
+    },
+    {
+      "id": "rel_atk",
+      "name": "Fury Relic",
+      "ordinal": 117,
+      "filename": "furyrelic.png",
+      "design": "A large scarlet angular flame gem in a dark bronze frame with two chunky gold horn-like tips.",
+      "status": "saved"
+    },
+    {
+      "id": "rel_def",
+      "name": "Iron Relic",
+      "ordinal": 118,
+      "filename": "ironrelic.png",
+      "design": "A heavy silver and navy tower-shield relic, thick gold border and large diamond steel center.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_hp_atk",
+      "name": "Divine Colossus",
+      "ordinal": 119,
+      "filename": "divinecolossus.png",
+      "design": "A squat golden stone armor idol with ivory shoulders and a single large pale-blue heart crystal, no fine facial features.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_hp_def",
+      "name": "Eternal Fortress",
+      "ordinal": 120,
+      "filename": "eternalfortress.png",
+      "design": "A compact ivory-and-gold fortress shield with three broad battlements and a blue central gemstone.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_atk_def",
+      "name": "Dragon's Claw",
+      "ordinal": 121,
+      "filename": "dragonsclaw.png",
+      "design": "A dark-red claw gauntlet holding three oversized ivory dragon talons and one gold wrist band.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_hp_berserk",
+      "name": "Berserk Core",
+      "ordinal": 122,
+      "filename": "berserkcore.png",
+      "design": "A jagged crimson crystal heart core clasped by two thick charcoal metal jaws.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_def_double",
+      "name": "Twin Fang",
+      "ordinal": 123,
+      "filename": "twinfang.png",
+      "design": "Two broad curved ivory fangs crossed at the roots in one red leather clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_atk_shock",
+      "name": "Shockwave Gauntlet",
+      "ordinal": 124,
+      "filename": "shockwavegauntlet.png",
+      "design": "A chunky blue steel gauntlet with an oversized circular golden knuckle emitter and one cyan inset.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_def_pierce",
+      "name": "Arrowsplit",
+      "ordinal": 125,
+      "filename": "arrowsplit.png",
+      "design": "One thick ivory arrowhead splitting into two broad forked points, short ochre shaft and teal tail fin.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_def_atk_counter",
+      "name": "Thornback Plate",
+      "ordinal": 126,
+      "filename": "thornbackplate.png",
+      "design": "A dark-green breastplate with three large ivory thorn spikes across the upper rim and tan central armor plate.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_def_immune",
+      "name": "Last Breath Core",
+      "ordinal": 127,
+      "filename": "lastbreathcore.png",
+      "design": "A smoky-gray heart-shaped core with one large pale-cyan teardrop inset, held in an ivory crescent frame.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_def_crit",
+      "name": "Shattercrit Ring",
+      "ordinal": 128,
+      "filename": "shattercritring.png",
+      "design": "A dark steel ring holding a large red angular crystal with one broad clean split through its center.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_def_revive",
+      "name": "Phoenix Core",
+      "ordinal": 129,
+      "filename": "phoenixcore.png",
+      "design": "A bold orange-red heart ember framed by two broad gold phoenix wings with three feather tips each.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_hp_lifesteal",
+      "name": "Bloodthirster",
+      "ordinal": 130,
+      "filename": "bloodthirster.png",
+      "design": "A stout dark-crimson curved blade with an ivory fang-shaped edge and a gold crossguard, no blood or gore.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_wyrmblood",
+      "name": "Wyrmblood Chalice",
+      "ordinal": 131,
+      "filename": "wyrmbloodchalice.png",
+      "design": "A squat dark-red chalice with two short dragon-horn handles, gold rim and ruby-red liquid.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_ambrosia",
+      "name": "Ambrosia Chalice",
+      "ordinal": 132,
+      "filename": "ambrosiachalice.png",
+      "design": "A cream-and-gold rounded chalice holding warm golden nectar, large leaf-shaped base.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_atk_magpie",
+      "name": "Magpie Brooch",
+      "ordinal": 133,
+      "filename": "magpiebrooch.png",
+      "design": "A simple black-and-ivory magpie wing brooch clasping one large sky-blue gem in gold setting.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_crit_echo",
+      "name": "Echo Conch",
+      "ordinal": 134,
+      "filename": "echoconch.png",
+      "design": "One chunky pale-peach spiral conch shell, ivory lip and a deep-teal open mouth, only two broad spiral bands.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_atk_cdmg_mantis",
+      "name": "Mantis Scythe",
+      "ordinal": 135,
+      "filename": "mantisscythe.png",
+      "design": "A compact curved mint-green scythe blade with three broad triangular inner teeth and a short dark-green grip.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_hp_atk_bleed",
+      "name": "Sanguine Fang",
+      "ordinal": 136,
+      "filename": "sanguinefang.png",
+      "design": "A single large crimson fang pendant with an ivory edge and a dark gold cap.",
+      "status": "saved"
+    },
+    {
+      "id": "eff_def_atk_buffstk",
+      "name": "Warbuff Plate",
+      "ordinal": 137,
+      "filename": "warbuffplate.png",
+      "design": "A broad red-and-gold breastplate with a single large raised horn emblem and dark gray shoulder edges.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_water_hp_def",
+      "name": "Seafoam Cloak",
+      "ordinal": 138,
+      "filename": "seafoamcloak.png",
+      "design": "A short aqua cape with a cream scalloped foam hem and a broad blue hood.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_water_hp_atk",
+      "name": "Tidal Grip",
+      "ordinal": 139,
+      "filename": "tidalgrip.png",
+      "design": "A chunky teal gauntlet whose knuckle plate forms one large curling aqua wave.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_earth_hp_def",
+      "name": "Petrified Core",
+      "ordinal": 140,
+      "filename": "petrifiedcore.png",
+      "design": "A heavy gray-brown oval fossil core with one broad cream spiral and rough three-point stone rim.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_earth_atk_def",
+      "name": "Tremor Edge",
+      "ordinal": 141,
+      "filename": "tremoredge.png",
+      "design": "A short massive gray stone cleaver with one big ochre fracture stripe and dark-brown grip.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_elec_atk_def",
+      "name": "Chain Conductor",
+      "ordinal": 142,
+      "filename": "chainconductor.png",
+      "design": "Three stout golden chain links joining a large cyan lightning-shaped crystal to a dark steel cap.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_dark_hp_atk",
+      "name": "Voidheart",
+      "ordinal": 143,
+      "filename": "voidheart.png",
+      "design": "A deep-purple heart-shaped gemstone with one large lavender crescent highlight and thick dark metal claws.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_dark_hp_def",
+      "name": "Shadow Shroud",
+      "ordinal": 144,
+      "filename": "shadowshroud.png",
+      "design": "A black-plum hooded shroud with two broad violet folds and a single ivory crescent clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_wind_hp_atk",
+      "name": "Gust Anklets",
+      "ordinal": 145,
+      "filename": "gustanklets.png",
+      "design": "A paired set of compact silver ankle cuffs, each with one broad mint wind wing, joined as a tight overlapping icon.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_wind_atk_def",
+      "name": "Tempest Blade",
+      "ordinal": 146,
+      "filename": "tempestblade.png",
+      "design": "A stout curved blue sword with a large pale-cyan lightning-shaped edge and gold grip.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_wind_hp_def",
+      "name": "Cyclone Ring",
+      "ordinal": 147,
+      "filename": "cyclonering.png",
+      "design": "A thick silver ring topped with one bold teal spiral shaped like a compact cyclone.",
+      "status": "saved"
+    },
+    {
+      "id": "dng_wind_atk_def2",
+      "name": "Sirocco Plate",
+      "ordinal": 148,
+      "filename": "siroccoplate.png",
+      "design": "Warm sandstone-colored chest armor with a broad crimson wind-curve motif and bronze edging.",
+      "status": "saved"
+    },
+    {
+      "id": "role_atk_rampage",
+      "name": "Rampage Shard",
+      "ordinal": 149,
+      "filename": "rampageshard.png",
+      "design": "A chunky jagged red-orange crystal shard with three prominent points and one charcoal base band.",
+      "status": "saved"
+    },
+    {
+      "id": "role_atk_lifesteal",
+      "name": "Hungering Edge",
+      "ordinal": 150,
+      "filename": "hungeringedge.png",
+      "design": "A broad dark-purple curved short blade whose inner edge forms two ivory fang teeth, burgundy grip.",
+      "status": "saved"
+    },
+    {
+      "id": "role_tank_fortress",
+      "name": "Ironwall Core",
+      "ordinal": 151,
+      "filename": "ironwallcore.png",
+      "design": "A heavy dark-steel cube core with broad silver bevels and one large blue shield plate.",
+      "status": "saved"
+    },
+    {
+      "id": "role_tank_taunt",
+      "name": "Warlord's Insignia",
+      "ordinal": 152,
+      "filename": "warlordsinsignia.png",
+      "design": "A crimson medal with two stout gold horns and a large centered gold spearhead emblem.",
+      "status": "saved"
+    },
+    {
+      "id": "role_tank_barrier",
+      "name": "Eternal Bulwark",
+      "ordinal": 153,
+      "filename": "eternalbulwark.png",
+      "design": "A wide ivory tower shield with heavy gold edging, two broad battlement corners and a large blue diamond boss.",
+      "status": "saved"
+    },
+    {
+      "id": "role_tank_counter",
+      "name": "Rebuke Gauntlet",
+      "ordinal": 154,
+      "filename": "rebukegauntlet.png",
+      "design": "A silver clenched gauntlet with an oversized gold palm-back plate and three blunt blue knuckle studs.",
+      "status": "saved"
+    },
+    {
+      "id": "role_tank_guardian",
+      "name": "Guardian's Oath",
+      "ordinal": 155,
+      "filename": "guardiansoath.png",
+      "design": "A gold-and-ivory shield-shaped pendant crossed by a broad blue ribbon, one red central jewel.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_bond",
+      "name": "Twin Soul Crest",
+      "ordinal": 156,
+      "filename": "twinsoulcrest.png",
+      "design": "A rounded two-part crest with one coral-red and one cyan teardrop forming a joined heart, gold rim.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_amplify",
+      "name": "Amplifier Prism",
+      "ordinal": 157,
+      "filename": "amplifierprism.png",
+      "design": "A large triangular lavender prism in a stout golden frame, one broad white light facet.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_haste",
+      "name": "Swiftgrace Band",
+      "ordinal": 158,
+      "filename": "swiftgraceband.png",
+      "design": "A slender-looking but bold cream-gold cuff with a large mint wing centerpiece and open inner hole.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_barrier",
+      "name": "Sanctum Seal",
+      "ordinal": 159,
+      "filename": "sanctumseal.png",
+      "design": "A round ivory seal framed in warm gold, one large pale-blue four-point sanctuary star.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_revive",
+      "name": "Soul Lantern",
+      "ordinal": 160,
+      "filename": "soullantern.png",
+      "design": "A squat dark-violet lantern containing one large pale-cyan flame, thick handle and three broad frame bars.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_cleanse",
+      "name": "Purifier's Chalice",
+      "ordinal": 161,
+      "filename": "purifierschalice.png",
+      "design": "A silver chalice with a large ivory water-drop center and pale-blue liquid, thick golden rim.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_aura",
+      "name": "Blessing Mantle",
+      "ordinal": 162,
+      "filename": "blessingmantle.png",
+      "design": "A short ivory shoulder mantle with gold scalloped hem and one large rose-pink heart clasp.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_overload",
+      "name": "Overdrive Sigil",
+      "ordinal": 163,
+      "filename": "overdrivesigil.png",
+      "design": "A dark-blue diamond medallion with a big golden double lightning-bolt motif and cyan center.",
+      "status": "saved"
+    },
+    {
+      "id": "role_sup_inspire",
+      "name": "Warcry Pendant",
+      "ordinal": 164,
+      "filename": "warcrypendant.png",
+      "design": "A compact bronze battle-horn pendant with a broad crimson mouth and sturdy gold attachment loop.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_fire_ember",
+      "name": "Ember Chip",
+      "ordinal": 165,
+      "filename": "emberchip.png",
+      "design": "One irregular charcoal chip with a single large bright-orange ember face and three broad dark edges.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_fire_ashen",
+      "name": "Ashen Locket",
+      "ordinal": 166,
+      "filename": "ashenlocket.png",
+      "design": "A soot-gray oval locket with a broad bronze rim and one cream ash-leaf emblem.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_fire_kiln",
+      "name": "Kiln Heart",
+      "ordinal": 167,
+      "filename": "kilnheart.png",
+      "design": "A warm terracotta heart-shaped kiln charm, one large dark opening holding a solid orange flame.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_fire_flashpoint",
+      "name": "Flashpoint Ring",
+      "ordinal": 168,
+      "filename": "flashpointring.png",
+      "design": "A thick dark bronze ring topped by one angular golden spark-shaped gem with red center.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_fire_everflame",
+      "name": "Everflame Crown",
+      "ordinal": 169,
+      "filename": "everflamecrown.png",
+      "design": "A compact gold crown with three large orange flame-shaped points and a simple crimson band.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_fire_inferno",
+      "name": "Inferno Heart",
+      "ordinal": 170,
+      "filename": "infernoheart.png",
+      "design": "A bold red-orange flaming heart with three broad flame tips, dark-charcoal outer frame.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_fire_wildfire",
+      "name": "Wildfire Brand",
+      "ordinal": 171,
+      "filename": "wildfirebrand.png",
+      "design": "A squat charred wooden pendant with one large red-orange flame inlay and a thick tan binding.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_water_frost",
+      "name": "Frost Pearl",
+      "ordinal": 172,
+      "filename": "frostpearl.png",
+      "design": "A large pale icy-blue pearl with a broad white crescent highlight in a simple silver shell cup.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_water_rime",
+      "name": "Rime Shard",
+      "ordinal": 173,
+      "filename": "rimeshard.png",
+      "design": "One thick pale-cyan ice shard with three angular planes and a deep-blue base.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_water_undertow",
+      "name": "Undertow Anchor",
+      "ordinal": 174,
+      "filename": "undertowanchor.png",
+      "design": "A squat dark-teal anchor with very broad hooked arms, aqua wave-shaped stock and stout silver top ring.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_water_tidecaller",
+      "name": "Tidecaller Shell",
+      "ordinal": 175,
+      "filename": "tidecallershell.png",
+      "design": "A broad aqua scallop shell with five large ribs, cream lip and one small gold loop.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_water_zero",
+      "name": "Absolute Zero",
+      "ordinal": 176,
+      "filename": "absolutezero.png",
+      "design": "A compact six-point ice crystal with a large dark-blue hexagonal center and thick white-cyan arms.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_water_maelstrom",
+      "name": "Maelstrom Core",
+      "ordinal": 177,
+      "filename": "maelstromcore.png",
+      "design": "A round deep-blue orb core whose face contains one big aqua whirlpool spiral, chunky silver rim.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_water_leviathan",
+      "name": "Leviathan Scale",
+      "ordinal": 178,
+      "filename": "leviathanscale.png",
+      "design": "One large shield-shaped turquoise dragon scale with thick navy edge and a broad pale-blue center ridge.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_nat_nettle",
+      "name": "Nettle Pin",
+      "ordinal": 179,
+      "filename": "nettlepin.png",
+      "design": "A short bronze pin with one bright-green serrated leaf head, only three large leaf teeth per side.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_nat_strangler",
+      "name": "Strangler Vine",
+      "ordinal": 180,
+      "filename": "stranglervine.png",
+      "design": "A thick dark-green vine curling into a tight loop around a tan wooden toggle, two large pointed leaves.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_nat_rootbound",
+      "name": "Rootbound Idol",
+      "ordinal": 181,
+      "filename": "rootboundidol.png",
+      "design": "A squat brown wooden idol wrapped by three thick roots, one large fresh-green leaf at its top.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_nat_worldtree",
+      "name": "Worldtree Seed",
+      "ordinal": 182,
+      "filename": "worldtreeseed.png",
+      "design": "A large golden-brown seed split by one bold seam, two broad emerald leaves emerging above it.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_nat_pollen",
+      "name": "Pollen Pouch",
+      "ordinal": 183,
+      "filename": "pollenpouch.png",
+      "design": "A small golden cloth pouch with a broad green leaf flap, cream tie and three large pollen beads at its mouth.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_nat_toxin",
+      "name": "Toxin Gland",
+      "ordinal": 184,
+      "filename": "toxingland.png",
+      "design": "A plump lime-green organic teardrop sac held by a dark-purple collar, one broad pale-yellow highlight, no gore.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_ear_sandstone",
+      "name": "Sandstone Charm",
+      "ordinal": 185,
+      "filename": "sandstonecharm.png",
+      "design": "A warm sandy triangular stone pendant with one broad terracotta stripe and stout brown binding.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_ear_monolith",
+      "name": "Monolith Shard",
+      "ordinal": 186,
+      "filename": "monolithshard.png",
+      "design": "A tall but compact charcoal stone crystal shard with three broad flat planes and one pale-gray exposed face.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_ear_geode",
+      "name": "Geode Heart",
+      "ordinal": 187,
+      "filename": "geodeheart.png",
+      "design": "A heart-shaped rough gray geode with a large purple crystal cavity of only three broad facets.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_ear_keystone",
+      "name": "Titan's Keystone",
+      "ordinal": 188,
+      "filename": "titanskeystone.png",
+      "design": "A heavy trapezoidal golden sandstone keystone with one large gray diamond boss and thick beveled edges.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_ear_seismic",
+      "name": "Seismic Heart",
+      "ordinal": 189,
+      "filename": "seismicheart.png",
+      "design": "A dark-gray stone heart with one large orange zigzag fracture and broad ochre bevels.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_elec_static",
+      "name": "Static Pin",
+      "ordinal": 190,
+      "filename": "staticpin.png",
+      "design": "A short cobalt pin topped by a bold lemon-yellow lightning bolt.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_elec_tesla",
+      "name": "Tesla Coil",
+      "ordinal": 191,
+      "filename": "teslacoil.png",
+      "design": "A compact stout bronze coil tower with two thick copper loops, dark base and a large silver sphere.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_elec_overcharge",
+      "name": "Overcharge Cell",
+      "ordinal": 192,
+      "filename": "overchargecell.png",
+      "design": "A chunky yellow battery cell with blue-gray endcaps and one big cyan lightning bolt.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_elec_rod",
+      "name": "Lightning Rod",
+      "ordinal": 193,
+      "filename": "lightningrod.png",
+      "design": "A short thick gold rod with a broad forked lightning-shaped head and dark-blue collar.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_elec_railgun",
+      "name": "Railgun Coil",
+      "ordinal": 194,
+      "filename": "railguncoil.png",
+      "design": "A compact dark-blue cylindrical coil with three thick copper bands and a broad cyan aperture.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_dark_hex",
+      "name": "Hex Nail",
+      "ordinal": 195,
+      "filename": "hexnail.png",
+      "design": "One thick black-violet bent iron nail with a large diamond head and a lavender central inset.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_dark_grave",
+      "name": "Grave Lily",
+      "ordinal": 196,
+      "filename": "gravelily.png",
+      "design": "One broad ivory lily flower with three thick petals, plum center and a short dark-green stem.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_dark_souljar",
+      "name": "Soul Jar",
+      "ordinal": 197,
+      "filename": "souljar.png",
+      "design": "A squat purple glass jar with a large pale-cyan spirit-flame shape inside and a thick ivory stopper.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_dark_curse",
+      "name": "Curse Tablet",
+      "ordinal": 198,
+      "filename": "cursetablet.png",
+      "design": "A broken dark-purple stone tablet with a single large pale-lavender eye symbol, no writing.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_dark_reaper",
+      "name": "Reaper's Lantern",
+      "ordinal": 199,
+      "filename": "reaperslantern.png",
+      "design": "A stout blackened lantern with a wide violet crescent roof and one large mint ghost-flame inside.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_dark_eclipse",
+      "name": "Eclipse Mirror",
+      "ordinal": 200,
+      "filename": "eclipsemirror.png",
+      "design": "A round dark-violet mirror in a thick gold frame, one large ivory crescent reflected across its face.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_light_prism",
+      "name": "Prism Shard",
+      "ordinal": 201,
+      "filename": "prismshard.png",
+      "design": "One stout triangular crystal with three broad cyan, lavender and pale-yellow faces, dark outline.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_typ_light_halo",
+      "name": "Halo Pin",
+      "ordinal": 202,
+      "filename": "halopin.png",
+      "design": "A short gold pin topped by a thick ivory-gold halo ring, one broad cream highlight.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_light_sanctuary",
+      "name": "Sanctuary Lamp",
+      "ordinal": 203,
+      "filename": "sanctuarylamp.png",
+      "design": "A small squat ivory oil lamp with gold rim, curled handle and one solid warm-yellow flame.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_light_solar",
+      "name": "Solar Lens",
+      "ordinal": 204,
+      "filename": "solarlens.png",
+      "design": "A large round golden lens with a pale-yellow center in a thick dark-bronze mount, four short broad rays.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_typ_light_dawnchime",
+      "name": "Dawn Chime",
+      "ordinal": 205,
+      "filename": "dawnchime.png",
+      "design": "A compact gold hanging chime with one broad sunrise disc and two short thick ivory bell bars.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_light_aegis",
+      "name": "Aegis Feather",
+      "ordinal": 206,
+      "filename": "aegisfeather.png",
+      "design": "A broad ivory feather shaped like a small shield, golden central shaft and three large lobes per side.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_typ_light_sunforge",
+      "name": "Sunforge Crown",
+      "ordinal": 207,
+      "filename": "sunforgecrown.png",
+      "design": "A stout dark-gold crown with three broad squared sunray points, ivory central sun disc and orange inset.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_atk_whetstone",
+      "name": "Whetstone",
+      "ordinal": 208,
+      "filename": "whetstone.png",
+      "design": "A thick tilted gray sharpening stone with warm cream worn face and a simple dark-brown leather base.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_role_atk_ambush",
+      "name": "Ambush Fang",
+      "ordinal": 209,
+      "filename": "ambushfang.png",
+      "design": "A large curved ivory fang partly wrapped in one broad dark-green leaf and a brown binding.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_role_atk_finisher",
+      "name": "Finisher's Coin",
+      "ordinal": 210,
+      "filename": "finisherscoin.png",
+      "design": "A thick bronze coin with one bold ivory dagger-shaped emblem on a dark-red central field.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_role_atk_glass",
+      "name": "Glass Blade",
+      "ordinal": 211,
+      "filename": "glassblade.png",
+      "design": "A short broad translucent-looking pale-cyan crystal blade, opaque solid facets, navy handle and cream edge.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_role_atk_bloodrush",
+      "name": "Bloodrush Crown",
+      "ordinal": 212,
+      "filename": "bloodrushcrown.png",
+      "design": "A dark-red crown with three tall broad ivory fang points and a single ruby front stone.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_role_atk_warpath",
+      "name": "Warpath Greaves",
+      "ordinal": 213,
+      "filename": "warpathgreaves.png",
+      "design": "One chunky crimson shin guard with thick gold knee plate and dark-steel toe cap.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_def_atk_bramble",
+      "name": "Bramble Cuff",
+      "ordinal": 214,
+      "filename": "bramblecuff.png",
+      "design": "A stout brown vine cuff with two large green thorns and one broad fresh leaf on its front.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_def_quartz",
+      "name": "Quartz Chip",
+      "ordinal": 215,
+      "filename": "quartzchip.png",
+      "design": "A chunky pale-pink quartz chip with just three large planes and a white flat highlight.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_def_hp_burrow",
+      "name": "Burrow Band",
+      "ordinal": 216,
+      "filename": "burrowband.png",
+      "design": "A thick earthen-brown bracelet with a single large ivory digging-claw front plate and olive edges.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_atk_dynamo",
+      "name": "Dynamo Band",
+      "ordinal": 217,
+      "filename": "dynamoband.png",
+      "design": "A wide cobalt wrist cuff with a large gold circular generator boss and one cyan bolt inset.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_def_hp_grounding",
+      "name": "Grounding Rod",
+      "ordinal": 218,
+      "filename": "groundingrod.png",
+      "design": "A short thick copper spike with a broad dark-gray ring collar and a chunky flat gold cap.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_hp_atk_ion",
+      "name": "Ion Thread",
+      "ordinal": 219,
+      "filename": "ionthread.png",
+      "design": "A compact bright-cyan cord loop with a single large golden knot and two broad angular tails, no aura.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_def_carapace",
+      "name": "Beetle Carapace",
+      "ordinal": 220,
+      "filename": "beetlecarapace.png",
+      "design": "A domed cobalt-and-teal beetle shell shield with one large center seam and two broad wing plates.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_def_faultline",
+      "name": "Fault Line Gauntlet",
+      "ordinal": 221,
+      "filename": "faultlinegauntlet.png",
+      "design": "A bulky gray stone fist with one bold orange zigzag fault across its back and dark brown cuff.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_hp_shale",
+      "name": "Shale Anklet",
+      "ordinal": 222,
+      "filename": "shaleanklet.png",
+      "design": "A small low cuff of three broad slate-gray stone plates held by a thick tan strap.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_crit_hollow",
+      "name": "Hollow Mask",
+      "ordinal": 223,
+      "filename": "hollowmask.png",
+      "design": "A simple ivory oval mask with two large dark eye holes and a clean pointed lower edge, no ornate decoration.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_atk_adrenal",
+      "name": "Adrenal Gland",
+      "ordinal": 224,
+      "filename": "adrenalgland.png",
+      "design": "A rounded coral-red organic gland charm with one broad cream lobe and a dark burgundy base, no gore.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_gen_hp_atk_hourglass",
+      "name": "Thief's Hourglass",
+      "ordinal": 225,
+      "filename": "thiefshourglass.png",
+      "design": "A squat hourglass with thick dark-purple caps, gold supports and one simple pale-gold sand shape.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_gen_atk_cdmg_nightshade",
+      "name": "Nightshade Bead",
+      "ordinal": 226,
+      "filename": "nightshadebead.png",
+      "design": "A large dark-purple berry bead with a lavender crescent highlight, three broad olive leaves and a top hole.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_rng_melee_whirlwind",
+      "name": "Whirlwind Axe",
+      "ordinal": 227,
+      "filename": "whirlwindaxe.png",
+      "design": "A compact double-curved pale-cyan axe head forming a broad wind swirl around a short teal handle.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_rng_ranged_hawkeye",
+      "name": "Hawkeye Lens",
+      "ordinal": 228,
+      "filename": "hawkeyelens.png",
+      "design": "A large golden oval lens in a bold silver falcon-eye-shaped frame, cyan glass center.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_rng_ranged_volley",
+      "name": "Volley Quiver",
+      "ordinal": 229,
+      "filename": "volleyquiver.png",
+      "design": "A stout dark-blue quiver holding three broad cream-and-gold arrow heads and simple crimson fletching.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_hp_def_pangolin",
+      "name": "Pangolin Plate",
+      "ordinal": 230,
+      "filename": "pangolinplate.png",
+      "design": "A broad warm-brown armor plate made of five large overlapping bronze-edged scales, no tiny scale pattern.",
+      "status": "saved"
+    },
+    {
+      "id": "rar_gen_atk_sloth",
+      "name": "Sloth Claw",
+      "ordinal": 231,
+      "filename": "slothclaw.png",
+      "design": "A compact brown leather grip holding three broad strongly curved ivory sloth claws.",
+      "status": "saved"
+    },
+    {
+      "id": "epi_gen_atk_hp_snail",
+      "name": "Snail Shell",
+      "ordinal": 232,
+      "filename": "snailshell.png",
+      "design": "One rounded warm-ochre spiral snail shell, cream lip and a single large darker spiral band, no snail body.",
+      "status": "saved"
+    },
+    {
+      "id": "leg_gen_atk_hp_puppeteer",
+      "name": "Puppeteer's Strings",
+      "ordinal": 233,
+      "filename": "puppeteersstrings.png",
+      "design": "A small thick wooden cross control with three short bold ivory cords attached to a simple gold ring, compact silhouette.",
+      "status": "saved"
+    }
+  ],
+  "generated": [
+    {
+      "name": "Iron Band",
+      "filename": "ironband.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE equipment inventory icon for a cute creature-collecting game. A square PNG with genuine transparent background. Match this collection's Anchor Charm: very thick near-black plum-brown outer contour, chunky rounded proportions, broad clean color areas, simple hard-edged cel shading, one broad highlight and one shadow, no surface texture. Design for final 256x256 pixels and tiny 13x13 to 64x64 display. Bold unmistakable silhouette and generous negative spaces, 3-5 main colors maximum. Center whole item on a square canvas, filling 85-90% of its area with safe margins. Outline equivalent to 10-13px at 256px. No text, numbers, labels, runic writing, watermark, background, tile, vignette, ground, cast shadow, glow haze, loose sparkles, decorative clutter, or tiny details. No character or body wearing it. Show an isolated item. Color and shape must communicate the item, with at most one large distinctive emblem. Background and any holes are fully transparent; the object itself is opaque. Render as flat illustrated game art, not photorealistic or 3D.\nItem name (metadata only, no text in image): Iron Band.\nSubject design: A broad dark iron wrist cuff in three-quarter view, blue-gray metal, one chunky raised diamond-shaped steel boss and two broad rivets. A visibly open cuff interior.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ba94cb9e-ef52-42fe-ba9b-b6667020973b.png",
+      "hint": "Generated images are saved to C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616 as C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ba94cb9e-ef52-42fe-ba9b-b6667020973b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "status": "generated"
+    },
+    {
+      "name": "Leather Vambrace",
+      "filename": "leathervambrace.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE equipment inventory icon for a cute creature-collecting game. A square PNG with genuine transparent background. Match this collection's Anchor Charm: very thick near-black plum-brown outer contour, chunky rounded proportions, broad clean color areas, simple hard-edged cel shading, one broad highlight and one shadow, no surface texture. Design for final 256x256 pixels and tiny 13x13 to 64x64 display. Bold unmistakable silhouette and generous negative spaces, 3-5 main colors maximum. Center whole item on a square canvas, filling 85-90% of its area with safe margins. Outline equivalent to 10-13px at 256px. No text, numbers, labels, runic writing, watermark, background, tile, vignette, ground, cast shadow, glow haze, loose sparkles, decorative clutter, or tiny details. No character or body wearing it. Show an isolated item. Color and shape must communicate the item, with at most one large distinctive emblem. Background and any holes are fully transparent; the object itself is opaque. Render as flat illustrated game art, not photorealistic or 3D.\nItem name (metadata only, no text in image): Leather Vambrace.\nSubject design: A tapered warm chestnut leather forearm guard, diagonal three-quarter view, one broad cream strap and a single square bronze buckle. One large folded edge, no stitching.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a7f929a5-da88-4352-8787-14f6f88e0898.png",
+      "hint": "Generated images are saved to C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616 as C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a7f929a5-da88-4352-8787-14f6f88e0898.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "status": "generated"
+    },
+    {
+      "name": "Boarhide Wrap",
+      "filename": "boarhidewrap.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE equipment inventory icon for a cute creature-collecting game. A square PNG with genuine transparent background. Match this collection's Anchor Charm: very thick near-black plum-brown outer contour, chunky rounded proportions, broad clean color areas, simple hard-edged cel shading, one broad highlight and one shadow, no surface texture. Design for final 256x256 pixels and tiny 13x13 to 64x64 display. Bold unmistakable silhouette and generous negative spaces, 3-5 main colors maximum. Center whole item on a square canvas, filling 85-90% of its area with safe margins. Outline equivalent to 10-13px at 256px. No text, numbers, labels, runic writing, watermark, background, tile, vignette, ground, cast shadow, glow haze, loose sparkles, decorative clutter, or tiny details. No character or body wearing it. Show an isolated item. Color and shape must communicate the item, with at most one large distinctive emblem. Background and any holes are fully transparent; the object itself is opaque. Render as flat illustrated game art, not photorealistic or 3D.\nItem name (metadata only, no text in image): Boarhide Wrap.\nSubject design: A sturdy brown fur wrist wrap with a broad ochre belt and two short curved ivory tusks forming the front clasp. Three large fur points only.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-dc91927b-3b06-4c44-a19b-7e84df24683b.png",
+      "hint": "Generated images are saved to C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616 as C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-dc91927b-3b06-4c44-a19b-7e84df24683b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "status": "generated"
+    },
+    {
+      "name": "Stone Brace",
+      "filename": "stonebrace.png",
+      "prompt": "Use case: stylized-concept. Create exactly ONE equipment inventory icon for a cute creature-collecting game. A square PNG with genuine transparent background. Match this collection's Anchor Charm: very thick near-black plum-brown outer contour, chunky rounded proportions, broad clean color areas, simple hard-edged cel shading, one broad highlight and one shadow, no surface texture. Design for final 256x256 pixels and tiny 13x13 to 64x64 display. Bold unmistakable silhouette and generous negative spaces, 3-5 main colors maximum. Center whole item on a square canvas, filling 85-90% of its area with safe margins. Outline equivalent to 10-13px at 256px. No text, numbers, labels, runic writing, watermark, background, tile, vignette, ground, cast shadow, glow haze, loose sparkles, decorative clutter, or tiny details. No character or body wearing it. Show an isolated item. Color and shape must communicate the item, with at most one large distinctive emblem. Background and any holes are fully transparent; the object itself is opaque. Render as flat illustrated game art, not photorealistic or 3D.\nItem name (metadata only, no text in image): Stone Brace.\nSubject design: A bulky gray stone cuff made of three large blocky fitted slabs, one moss-green central inset stripe. Clearly a bracelet with a large open interior.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-6453e71d-d84c-4415-a073-9eb43ec3ec97.png",
+      "hint": "Generated images are saved to C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616 as C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-6453e71d-d84c-4415-a073-9eb43ec3ec97.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "status": "generated"
+    }
+  ]
+}

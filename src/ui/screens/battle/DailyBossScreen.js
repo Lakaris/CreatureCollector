@@ -3,6 +3,7 @@
 // element -- never the dungeon's unique per-boss kits.
 
 import React, { useState, useEffect } from "../../../react.js";
+import { gearIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_LABELS, formatStatBonus } from "../../../data/rarity.js";
@@ -23,7 +24,7 @@ import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/Ability
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
-import { isAppNarrow } from "../../../ui/uiScale.js";
+import { isAppNarrow, appWidth } from "../../../ui/uiScale.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
 
@@ -127,15 +128,14 @@ function DailyBossScreen({onBack,onViewCreature}){
   }
   const ghs=React.useRef({timer:null,fired:false});
   const [confirmForfeitOpen,setConfirmForfeitOpen]=useState(false);
-  const [bossPopupOpen,setBossPopupOpen]=useState(false);
+  // On narrow screens the boss's side panel starts hidden (see
+  // .daily-boss-panel in components.css) and holding the boss reveals it --
+  // the same side panel a held creature gets, not a popup. On wide screens
+  // the panel is always there. Both read the breakpoint from uiScale, in
+  // design pixels: a raw window.innerWidth check here would drift from the
+  // stylesheet as the UI scale changes.
+  const [bossPanelOpen,setBossPanelOpen]=useState(false);
   const bhs=React.useRef({timer:null,fired:false});
-  // The boss popup only makes sense once the persistent boss panel is hidden
-  // (see .daily-boss-panel in components.css) -- on wide screens there's
-  // already room for that panel, so the popup stays off. Both read the
-  // breakpoint from uiScale, in design pixels: a raw window.innerWidth check
-  // here would drift from the stylesheet as the UI scale changes, and the two
-  // disagreeing means either a hidden panel with no popup to replace it, or a
-  // popup competing with a panel that is already on screen.
   const [isNarrowScreen,setIsNarrowScreen]=useState(()=>typeof window!=="undefined"&&isAppNarrow());
   useEffect(()=>{
     function onResize(){setIsNarrowScreen(isAppNarrow());}
@@ -143,7 +143,8 @@ function DailyBossScreen({onBack,onViewCreature}){
     window.addEventListener("orientationchange",onResize);
     return ()=>{window.removeEventListener("resize",onResize);window.removeEventListener("orientationchange",onResize);};
   },[]);
-  useEffect(()=>{if(!isNarrowScreen)setBossPopupOpen(false);},[isNarrowScreen]);
+  useEffect(()=>{if(!isNarrowScreen)setBossPanelOpen(false);},[isNarrowScreen]);
+  function showBossPanel(){setBossPanelOpen(true);setBossMinimized(false);expandDailyPanel("boss");}
   function beginHold(creatureId,onComplete){
     endHold();
     hs.current.fired=false;
@@ -184,6 +185,33 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [bSnap,setBSnap]=useState(null);
   const [atkEffects,setAtkEffects]=useState([]);
   const [battleSelected,setBattleSelected]=useState(null); // {type:"unit",uid} | {type:"boss"} | null
+  // Battle layout, picked by the room actually available (design pixels) rather
+  // than the app-wide narrow breakpoint, so the info card sits BESIDE the grid
+  // whenever it fits:
+  //   "sides" -- damage chart | grid | info card (three columns fit)
+  //   "right" -- grid | info card over damage chart (one side column fits)
+  //   "below" -- grid, then damage chart and info card side by side under it
+  const BATTLE_SIDE_W=150,BATTLE_GAP=10,BATTLE_PAD=12;
+  function pickBattleLayout(){
+    const avail=appWidth()-2*BATTLE_PAD,grid=GRID_COLS*TILE;
+    return avail>=grid+2*(BATTLE_SIDE_W+BATTLE_GAP)?"sides":avail>=grid+BATTLE_SIDE_W+BATTLE_GAP?"right":"below";
+  }
+  const [battleLayout,setBattleLayout]=useState(()=>typeof window!=="undefined"?pickBattleLayout():"sides");
+  useEffect(()=>{
+    function onResize(){setBattleLayout(pickBattleLayout());}
+    window.addEventListener("resize",onResize);
+    window.addEventListener("orientationchange",onResize);
+    return ()=>{window.removeEventListener("resize",onResize);window.removeEventListener("orientationchange",onResize);};
+  },[]);
+  // Press-and-hold on a battling unit or the boss opens its info card, the
+  // same as a tap: a moving target is easy to miss with a quick tap, and a
+  // hold is what the planning phase taught.
+  const selHold=React.useRef(null);
+  function holdToSelect(sel){
+    const clear=()=>{if(selHold.current){clearTimeout(selHold.current);selHold.current=null;}};
+    const start=()=>{clear();selHold.current=setTimeout(()=>{selHold.current=null;setBattleSelected(sel);},180);};
+    return {onMouseDown:start,onMouseUp:clear,onMouseLeave:clear,onTouchStart:start,onTouchEnd:clear,onTouchCancel:clear};
+  }
   const [bossTimeLeft,setBossTimeLeft]=useState(60);
   const easeInOut=aEase;
   // Player units come from the shared builder, so Daily Boss fights now respect
@@ -428,7 +456,7 @@ function DailyBossScreen({onBack,onViewCreature}){
         const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
         const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
         return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
-          React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
+          React.createElement("div",{style:{fontSize:36,lineHeight:1}},gearIcon(item)),
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
           React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
           stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
@@ -437,7 +465,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     ),
     previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},previewItem.emoji),
+        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
         previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
         React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
@@ -463,7 +491,7 @@ function DailyBossScreen({onBack,onViewCreature}){
         const rarCfg=EQUIP_RARITY_CONFIG[item.rarity]||EQUIP_RARITY_CONFIG.common;
         const stats=Object.entries(item.stats||{}).map(([s,v])=>formatStatBonus(s,v)).join(" · ");
         return React.createElement("div",{key:i,onClick:()=>setPreviewItem(item),style:{background:rarCfg.bg,border:"1.5px solid "+rarCfg.color+"66",borderRadius:14,padding:"14px 12px",display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}},
-          React.createElement("div",{style:{fontSize:36,lineHeight:1}},item.emoji),
+          React.createElement("div",{style:{fontSize:36,lineHeight:1}},gearIcon(item)),
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111",textAlign:"center",lineHeight:1.3}},item.name),
           React.createElement("div",{style:{fontSize:10,fontWeight:700,color:rarCfg.color,background:"rgba(255,255,255,0.55)",borderRadius:6,padding:"2px 8px",textTransform:"capitalize"}},rarCfg.label),
           stats&&React.createElement("div",{style:{fontSize:10,color:"#444",textAlign:"center"}},stats)
@@ -472,7 +500,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     ),
     previewItem&&React.createElement("div",{onClick:()=>setPreviewItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320}},
-        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},previewItem.emoji),
+        React.createElement("div",{style:{fontSize:48,marginBottom:8,textAlign:"center"}},gearIcon(previewItem)),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:4,textAlign:"center"}},previewItem.name),
         previewItem.effect&&React.createElement("div",{style:{fontSize:12,color:"#555",lineHeight:1.5,padding:"10px 12px",background:"#f7f7ff",borderRadius:10,border:"1px solid #e0deff",marginBottom:12}},"✦ "+previewItem.effect),
         React.createElement("button",{onClick:()=>setPreviewItem(null),style:{width:"100%",padding:"11px 0",fontSize:14,fontWeight:700,background:"#f0f0f0",color:"#555",border:"none",borderRadius:12,cursor:"pointer"}},"Close")
@@ -518,13 +546,19 @@ function DailyBossScreen({onBack,onViewCreature}){
       // battle grid
       React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",alignItems:"center",padding:"12px",overflow:"hidden",gap:6}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:bossTimeLeft<=10?"#ef4444":"#534AB7"}},bossTimeLeft+"s ⏱"),
-        React.createElement("div",{className:"battle-row",style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
-        React.createElement("div",{className:"battle-side-panel"},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
-        React.createElement("div",{className:"battle-grid",style:{width:GRID_COLS*TILE,height:GRID_ROWS*TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+        // Named grid areas let the same three pieces move between the layouts
+        // (see pickBattleLayout) without remounting the board.
+        React.createElement("div",{style:{display:"grid",justifyContent:"center",alignItems:"start",gap:BATTLE_GAP,width:"100%",boxSizing:"border-box",
+          ...(battleLayout==="sides"?{gridTemplateColumns:BATTLE_SIDE_W+"px auto "+BATTLE_SIDE_W+"px",gridTemplateAreas:'"chart board info"'}
+            :battleLayout==="right"?{gridTemplateColumns:"auto "+BATTLE_SIDE_W+"px",gridTemplateRows:"auto 1fr",gridTemplateAreas:'"board info" "board chart"'}
+            :{gridTemplateColumns:BATTLE_SIDE_W+"px "+BATTLE_SIDE_W+"px",gridTemplateAreas:'"board board" "chart info"'})}},
+        React.createElement("div",{style:{gridArea:"chart"}},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
+        React.createElement("div",{style:{gridArea:"board",justifySelf:"center",width:GRID_COLS*TILE,height:GRID_ROWS*TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
           // boss overlay — position managed by RAF
           React.createElement("div",{
             ref:el=>{bossDomRef.current=el;if(el){el.style.left=(snap.boss.col*TILE)+"px";el.style.top=(snap.boss.row*TILE)+"px";}},
             onClick:()=>setBattleSelected({type:"boss"}),
+            ...holdToSelect({type:"boss"}),
             style:{position:"absolute",width:2*TILE,height:2*TILE,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",pointerEvents:"auto",cursor:"pointer",zIndex:10}
           },
             React.createElement("div",{style:{position:"relative",lineHeight:1}},
@@ -648,6 +682,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 }else{unitDomRefs.current.delete(u.uid);}
               },
               onClick:u.hp>0?()=>setBattleSelected({type:"unit",uid:u.uid}):undefined,
+              ...(u.hp>0?holdToSelect({type:"unit",uid:u.uid}):{}),
               style:{
                 position:"absolute",
                 width:TILE,height:TILE,
@@ -673,7 +708,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             )
           )
         ),
-        React.createElement("div",{className:"battle-side-panel"},selectedUnit?React.createElement(UnitInfoPanel,{
+        React.createElement("div",{style:{gridArea:"info"}},selectedUnit?React.createElement(UnitInfoPanel,{
           def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
@@ -724,9 +759,9 @@ function DailyBossScreen({onBack,onViewCreature}){
     React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
       React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative"}},
       React.createElement("div",{
-        onMouseDown:isNarrowScreen?()=>{bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;setBossPopupOpen(true);},180);}:undefined,
+        onMouseDown:isNarrowScreen?()=>{bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;showBossPanel();},180);}:undefined,
         onMouseUp:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
-        onTouchStart:isNarrowScreen?(e)=>{e.preventDefault();bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;setBossPopupOpen(true);},180);}:undefined,
+        onTouchStart:isNarrowScreen?(e)=>{e.preventDefault();bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;showBossPanel();},180);}:undefined,
         onTouchEnd:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
         style:{position:"absolute",left:2*planTile,top:1*planTile,width:2*planTile,height:2*planTile,display:"flex",alignItems:"center",justifyContent:"center",fontSize:Math.round(planTile*1.13),lineHeight:1,pointerEvents:isNarrowScreen?"auto":"none",cursor:isNarrowScreen?"pointer":"default",zIndex:10,userSelect:"none"}
       },TYPE_EMOJI[boss.type]||"👾"),
@@ -772,7 +807,7 @@ function DailyBossScreen({onBack,onViewCreature}){
                 ...(rangePreview.cellStyle(key)||{}),
               }
             },
-            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},TYPE_EMOJI[def.type]||""),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},def.attackType==="Ranged"?"🏹":"⚔️"),React.createElement(CreatureIcon,{def,size:planTile,contain:true})):"");
+            def?React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},typeIcon(def.type)),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},rangeIcon(def.attackType === "Ranged" ? "Ranged" : "Melee")),React.createElement(CreatureIcon,{def,size:planTile,contain:true})):"");
           })
         ).flat()
       )
@@ -784,7 +819,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           const abilityLabels=DAILY_ABILITY_LABELS;
           const bossStats=getBossStats(boss,level);
           const dailyAbilities=dailyAbilitiesFor(boss.type);
-          return React.createElement("div",{className:"daily-boss-panel",style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
+          return React.createElement("div",{className:"daily-boss-panel"+(bossPanelOpen?" open":""),style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
             React.createElement("button",{onClick:()=>setBossMinimized(p=>{const next=!p;if(!next)expandDailyPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},bossMinimized?"＋":"－"),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:bossMinimized?0:4}},
               React.createElement("div",{style:{fontSize:28,lineHeight:1}},TYPE_EMOJI[boss.type]||"👾"),
@@ -911,8 +946,8 @@ function DailyBossScreen({onBack,onViewCreature}){
             ),
             React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:1,opacity:isPlaced?0.35:1}},
               React.createElement("div",{style:{position:"relative",lineHeight:1}},
-                React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},TYPE_EMOJI[def.type]||""),
-              React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},def.attackType==="Ranged"?"🏹":"⚔️"),
+                React.createElement("div",{style:{position:"absolute",top:-2,left:-6,fontSize:10,lineHeight:1}},typeIcon(def.type)),
+              React.createElement("div",{style:{position:"absolute",top:-2,right:-6,fontSize:10,lineHeight:1}},rangeIcon(def.attackType === "Ranged" ? "Ranged" : "Melee")),
                 React.createElement(CreatureIcon,{def,size:24,style:{marginTop:6}})
               ),
               React.createElement("div",{style:{fontSize:8,color:"#333",fontWeight:600,textAlign:"center",lineHeight:1.2,maxWidth:48,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},def.name),
@@ -924,34 +959,6 @@ function DailyBossScreen({onBack,onViewCreature}){
     )
   ),
   touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
-  bossPopupOpen&&isNarrowScreen&&(()=>{
-    const abilityLabels=DAILY_ABILITY_LABELS;
-    const dailyAbilities=dailyAbilitiesFor(boss.type);
-    return React.createElement("div",{onClick:()=>setBossPopupOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"18px",width:"100%",maxWidth:320,boxShadow:"0 8px 32px rgba(0,0,0,0.2)",position:"relative"}},
-        React.createElement("button",{onClick:()=>setBossPopupOpen(false),style:{position:"absolute",top:10,right:10,width:22,height:22,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},"×"),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:12}},
-          React.createElement("div",{style:{fontSize:32,lineHeight:1}},TYPE_EMOJI[boss.type]||"👾"),
-          React.createElement("div",null,
-            React.createElement("div",{style:{fontSize:16,fontWeight:800,color:"#111"}},boss.name),
-            React.createElement("div",{style:{fontSize:12,color:"#666",fontWeight:600}},boss.type+" · Lv."+level)
-          )
-        ),
-        Object.entries(dailyAbilities).map(([k,abl])=>
-          React.createElement("div",{key:k,style:{marginBottom:10}},
-            React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-              React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-              abl.tags&&abl.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                React.createElement(AbilityTagPills,{tags:abl.tags,onOpen:setDailyAbilityTagPopup,compact:true})
-              )
-            ),
-            React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-            React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.description)
-          )
-        )
-      )
-    );
-  })(),
   );
   // Main screen
   return React.createElement("div",{key:"sfv894",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},

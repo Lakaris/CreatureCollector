@@ -2,6 +2,7 @@
 // evolution stage is its own entry, grouped by family (see ALL_DEX_FORMS).
 
 import React, { useState, useMemo } from "../../react.js";
+import { typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { ALL_DEX_FORMS, ALL_TYPES } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
@@ -98,7 +99,7 @@ function DexScreen({onBack}){
           // Emoji only -- the eight type names together overran the row on
           // narrow screens. The name stays in the tooltip and the aria-label.
           ALL_TYPES.map(t=>
-            React.createElement("button",{key:t,className:"filter-chip type-chip"+(activeTypes.has(t)?" active":""),onClick:()=>toggleType(t),title:t,"aria-label":t},TYPE_EMOJI[t])
+            React.createElement("button",{key:t,className:"filter-chip type-chip"+(activeTypes.has(t)?" active":""),onClick:()=>toggleType(t),title:t,"aria-label":t},typeIcon(t))
           )
         )
       ),
@@ -106,7 +107,7 @@ function DexScreen({onBack}){
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Role"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.keys(ROLE_CONFIG).map(r=>
-            React.createElement("button",{key:r,className:"filter-chip"+(activeRoles.has(r)?" active":""),onClick:()=>toggleRole(r)},ROLE_CONFIG[r].emoji+" "+r)
+            React.createElement("button",{key:r,className:"filter-chip"+(activeRoles.has(r)?" active":""),onClick:()=>toggleRole(r)},roleIcon(r), " " + r)
           )
         )
       ),
@@ -114,7 +115,7 @@ function DexScreen({onBack}){
         React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Range"),
         React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
           Object.keys(ATTACK_TYPE_CONFIG).map(a=>
-            React.createElement("button",{key:a,className:"filter-chip"+(activeAttackTypes.has(a)?" active":""),onClick:()=>toggleAttackType(a)},ATTACK_TYPE_CONFIG[a].emoji+" "+a)
+            React.createElement("button",{key:a,className:"filter-chip"+(activeAttackTypes.has(a)?" active":""),onClick:()=>toggleAttackType(a)},rangeIcon(a), " " + a)
           )
         )
       ),
@@ -162,9 +163,9 @@ function DexScreen({onBack}){
               art.kind!=="emoji"&&React.createElement(CreatureIcon,{key:"art",def,still:true,size:72,style:{position:"absolute",top:0,left:0,width:"100%",height:"calc(100% - "+NAME_BAR_H+"px)",...collectedFx}}),
               // Badge column, top-left: Type, then Role, then Range.
               React.createElement("div",{style:{position:"absolute",top:5,left:5,display:"flex",flexDirection:"column",gap:4,alignItems:"center",pointerEvents:"none"}},
-                React.createElement("span",{style:{fontSize:14,lineHeight:1}},(TYPE_EMOJI[def.type]||def.type)),
-                def.role&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ROLE_CONFIG[def.role].emoji),
-                def.attackType&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},ATTACK_TYPE_CONFIG[def.attackType].emoji)
+                React.createElement("span",{style:{fontSize:14,lineHeight:1}},typeIcon(def.type)),
+                def.role&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},roleIcon(def.role)),
+                def.attackType&&React.createElement("span",{style:{fontSize:13,lineHeight:1}},rangeIcon(def.attackType))
               ),
               art.kind!=="emoji"
                 ?React.createElement("div",{style:{height:72}})

@@ -1,0 +1,82 @@
+{
+  "sourceAnchors": [
+    [
+      226.4902556452057,
+      201.67009912613344,
+      160.55004219253675
+    ],
+    [
+      240.3041212934172,
+      218.85647071155748,
+      178.9396873493971
+    ]
+  ],
+  "baseTargetAnchors": [
+    [
+      237.5453056768559,
+      216.7849344978166,
+      177.4896288209607
+    ],
+    [
+      251.25356787255228,
+      237.89191282221483,
+      204.00320831950438
+    ]
+  ],
+  "checks": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 2,
+      "changedPixels": 12599,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 3,
+      "changedPixels": 12265,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 4,
+      "changedPixels": 12896,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 5,
+      "changedPixels": 12772,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 6,
+      "changedPixels": 12896,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 7,
+      "changedPixels": 12265,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 8,
+      "changedPixels": 12599,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    },
+    {
+      "frame": 9,
+      "changedPixels": 0,
+      "alphaUnchanged": true,
+      "changesTouchMaskBoundary": 0
+    }
+  ]
+}

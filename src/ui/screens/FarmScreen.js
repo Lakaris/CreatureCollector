@@ -1,6 +1,7 @@
 // Farm: idle field generation plus plantable crop plots.
 
 import React, { useState, useMemo, useEffect } from "../../react.js";
+import { iconText, currencyIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { MELON_TYPES } from "../../data/types.js";
 import { PLOT_GROW_MS, PLOT_CROPS, FIELD_RATES, FIELD_SHARD_RATES, FIELD_CAP_HOURS, FIELD_MIN_HOURS, getPlotYield } from "../../data/farm.js";
@@ -220,14 +221,14 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           ?React.createElement("div",{style:{marginBottom:10}},
             accumulated>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({emoji:"🍖",label:"Food",desc:REWARD_DESC.food||""});}},"🍖"),
+                React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({key:"food",emoji:"🍖",label:"Food",desc:REWARD_DESC.food||""});}},currencyIcon("food","🍖")),
                 React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Food")
               ),
               React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+formatNum(accumulated))
             ),
             accumulatedShards>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({emoji:"🔧",label:"Gear Shards",desc:REWARD_DESC.equipShards||""});}},"🔧"),
+                React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({key:"equipShards",emoji:"🔧",label:"Gear Shards",desc:REWARD_DESC.equipShards||""});}},currencyIcon("equipShards","🔧")),
                 React.createElement("span",{style:{fontSize:13,fontWeight:600}},"Gear Shards")
               ),
               React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},"+"+formatNum(accumulatedShards))
@@ -238,7 +239,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               const label=m?m.label:"Candy";
               return React.createElement("div",{key:k,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
                 React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                  React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({emoji,label,desc:REWARD_DESC[k]||""});}},emoji),
+                  React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({key:k,emoji,label,desc:REWARD_DESC[k]||""});}},currencyIcon(k,emoji)),
                   React.createElement("span",{style:{fontSize:13,fontWeight:600}},label)
                 ),
                 React.createElement("span",{style:{fontSize:16,fontWeight:800,color:"#333"}},v)
@@ -276,7 +277,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             },
             style:{padding:"12px 10px",border:"none",borderRadius:10,fontWeight:700,fontSize:13,
               cursor:farmInteractionLocked?"not-allowed":"pointer",background:farmInteractionLocked?"#ccc":"#534AB7",color:"#fff",whiteSpace:"nowrap"}
-          },"⚡ "+Math.ceil(500*Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs)/(FIELD_CAP_HOURS*3600000))+" 💎")
+          },iconText("⚡ "+Math.ceil(500*Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs)/(FIELD_CAP_HOURS*3600000))+" 💎"))
         ),
         React.createElement("div",{style:{marginTop:10}}),
         farmFieldLevel>=maxLevel
@@ -296,7 +297,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
                   display:"flex",flexDirection:"column",alignItems:"center",gap:1},
               },
                 React.createElement("span",null,"Upgrade Field"),
-                React.createElement("span",{style:{fontSize:11,fontWeight:600,opacity:0.85,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?undefined:"#ffcdd2"}},"🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost)
+                React.createElement("span",{style:{fontSize:11,fontWeight:600,opacity:0.85,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?undefined:"#ffcdd2"}},iconText("🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost))
               )
             )
           )
@@ -353,7 +354,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             // centered in the middle of the box, while progress/time/speed-up
             // move down to sit just above the bottom edge, instead of the
             // whole group being centered together.
-            !(unlocked&&crop&&!ready)&&React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?cropDef.emoji:"🌱"):"🔒"),
+            !(unlocked&&crop&&!ready)&&React.createElement("div",{style:{fontSize:36,marginBottom:8}},unlocked?(cropDef?currencyIcon(cropDef.key,cropDef.emoji):"🌱"):"🔒"),
             unlocked&&!crop&&React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:6}},
               React.createElement("button",{
                 onClick:e=>{e.stopPropagation();setPicking(i);},
@@ -362,7 +363,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             ),
             unlocked&&crop&&!ready&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",padding:12,boxSizing:"border-box"}},
               React.createElement("div",{style:{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}},
-                React.createElement("div",{style:{fontSize:36,marginBottom:8,cursor:"pointer"},onClick:e=>{e.stopPropagation();setDescPopup({emoji:cropDef.emoji,label:cropDef.label,desc:REWARD_DESC[cropDef.key]||""});}},cropDef.emoji),
+                React.createElement("div",{style:{fontSize:36,marginBottom:8,cursor:"pointer"},onClick:e=>{e.stopPropagation();setDescPopup({key:cropDef.key,emoji:cropDef.emoji,label:cropDef.label,desc:REWARD_DESC[cropDef.key]||""});}},currencyIcon(cropDef.key,cropDef.emoji)),
                 React.createElement("div",{style:{fontSize:11,color:"#1565c0",fontWeight:600}},cropDef.label+" × "+formatNum(effectiveYield))
               ),
               React.createElement("div",{style:{width:"100%",flexShrink:0}},
@@ -383,7 +384,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
                     }});
                   },
                   style:{padding:"4px 10px",background:"#7b1fa2",color:"#fff",border:"none",borderRadius:7,fontWeight:700,cursor:"pointer",fontSize:11}
-                },"⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎")
+                },iconText("⚡ "+Math.ceil(500*msLeft/PLOT_GROW_MS)+" 💎"))
               )
             ),
             unlocked&&crop&&ready&&React.createElement(React.Fragment,null,
@@ -411,7 +412,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     ),
     descPopup&&React.createElement("div",{onClick:()=>setDescPopup(null),style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}},
       React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:260,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:40,marginBottom:8}},descPopup.emoji),
+        React.createElement("div",{style:{fontSize:40,marginBottom:8}},currencyIcon(descPopup.key,descPopup.emoji)),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:8,color:"#111"}},descPopup.label),
         React.createElement("div",{style:{fontSize:13,color:"#666",lineHeight:1.5}},descPopup.desc),
         React.createElement("button",{onClick:()=>setDescPopup(null),style:{marginTop:16,padding:"10px 28px",borderRadius:10,border:"none",background:"#534AB7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}},"OK")
@@ -421,7 +422,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:270,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},"⚡"),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Speed Up?"),
-        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},"This will use 💎 "+speedUpConfirm.cost+" Gems."),
+        React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},iconText("This will use 💎 "+speedUpConfirm.cost+" Gems.")),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{onClick:()=>setSpeedUpConfirm(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),
           React.createElement("button",{onClick:()=>{const cb=speedUpConfirm.onConfirm;setSpeedUpConfirm(null);cb();},style:{flex:1,padding:"10px 0",background:"#534AB7",color:"#fff",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Confirm")
@@ -439,19 +440,19 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       }},
         React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#555",marginBottom:6,paddingBottom:4,borderBottom:"0.5px solid rgba(0,0,0,0.08)"}},"Drops per hour"),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(rate))," 🍖 Food"),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(rate))," ",currencyIcon("food","🍖")," Food"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
         ),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(shardRate))," 🔧 Gear Shards"),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,formatNum(shardRate))," ",currencyIcon("equipShards","🔧")," Gear Shards"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"100%")
         ),
         React.createElement("div",{className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,"2")," 🍬 Candy"),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,"2")," ",currencyIcon("candy","🍬")," Candy"),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},"0.5%")
         ),
         ...MELON_TYPES.map(m=>React.createElement("div",{key:m.key,className:"rates-row"},
-          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,m.fieldAmount)," "+m.emoji+" "+m.label),
+          React.createElement("span",{style:{fontSize:12}},React.createElement("b",null,m.fieldAmount)," ",currencyIcon(m.key,m.emoji)," "+m.label),
           React.createElement("span",{style:{fontSize:12,fontWeight:600}},parseFloat((m.fieldRate*100).toFixed(2))+"%")
         ))
       )
@@ -470,7 +471,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"#2e7d32"}},formatNum(shardRate)+" → "+(FIELD_SHARD_RATES[farmFieldLevel+1]?formatNum(FIELD_SHARD_RATES[farmFieldLevel+1]):"?")+"/hr")
           )
         ),
-        React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},"Cost: 🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost+" Ancient Fertilizer"),
+        React.createElement("div",{style:{fontSize:13,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?"#333":"#e53935",marginBottom:4,fontWeight:600}},iconText("Cost: 🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost+" Ancient Fertilizer")),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
           React.createElement("button",{
             disabled:fertilizerUpgradeLock,
@@ -521,7 +522,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
             },
             style:{display:"flex",flexDirection:"column",alignItems:"center",padding:"7px 4px",background:"#f5f5f5",border:"2px solid #e0e0e0",borderRadius:10,cursor:"pointer",gap:2}
           },
-            React.createElement("span",{style:{fontSize:20}},crop.emoji),
+            React.createElement("span",{style:{fontSize:20}},currencyIcon(crop.key,crop.emoji)),
             React.createElement("span",{style:{fontSize:10,fontWeight:700,textAlign:"center",lineHeight:1.2}},crop.label),
             React.createElement("span",{style:{fontSize:9,color:"#888"}},"x"+formatNum(getPlotYield(crop,plotUpgrades[picking]||0,farmFieldLevel)))
           ))

@@ -1,0 +1,29 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "output_directory": "images/item_icons",
+  "items": [
+    {
+      "name": "Creature Egg",
+      "filename": "creatureegg.png",
+      "prompt": "Use case: stylized-concept. Generate exactly ONE Creature Egg inventory icon for a cute creature-collecting game; this egg hatches into a playable creature. The ordinary, common egg should look modest and average. One intact upright chicken-egg-shaped shell, smoothly rounded narrow top and broad rounded lower half, frontal view, centered and vertically balanced. Shell is warm ivory cream, with only THREE broad simple rounded muted tan patches, clearly separated and easy to see; no speckles or tiny dots. One broad pale highlight at upper left and one broad soft-tan cel-shadow down the lower right. Cute chunky proportions. Very thick smooth near-black plum-brown contour (equivalent to 10-13 pixels in a final 256px icon). Match a flat illustrated fantasy equipment icon set with clean broad color areas, minimal hard-edged cel shading, and simple rounded shapes. No gradients, texture, realism, or 3D rendering. The whole intact egg is opaque. Genuine transparent background, no background color or tile, no ground or cast shadow. Entire egg fully inside square canvas with generous safe margins: centered egg approximately 90% of canvas height, about 70% of width. Final export is 256x256 and will be displayed from 13x13 to 64x64, so use a strong unmistakable egg silhouette and very few large details. No cracks, hatching animal, eyes, face, wings, nest, pedestal, ribbon, jewels, floating sparkles, aura, text, letters or watermark. Return one standalone ordinary Creature Egg.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2f089524-5505-40ea-a68d-3e70c4193acb.png"
+    },
+    {
+      "name": "Legendary Egg",
+      "filename": "legendaryegg.png",
+      "prompt": "Use case: precise-object-edit. Turn the provided ordinary Creature Egg icon into a matching Legendary Egg. The input is the edit target. Keep EXACTLY the same intact upright egg silhouette, proportions, thick dark plum-brown outline, scale, position, safe margins and transparent background. Change only the shell's colors and surface pattern: make the shell a rich luminous golden yellow with one broad pale-gold highlight at upper left and one broad deep-amber cel shadow along the lower right. Remove all three tan patches. Replace them with ONE large simple pale-gold four-point star-shaped marking centered prominently on the front, with a thick warm-ochre border for contrast, plus ONE broad smooth darker-gold band curving across the bottom quarter of the shell. The star is a flat marking on the egg, not a separate gem or floating object. The egg should be a little more special and legendary than the reference while remaining an extremely simple, cute inventory icon. Main identity is GOLD. Broad flat colors, minimal clean cel shading, no texture or tiny detail. No cracks, creature, face, crown, wings, nest, pedestal, accessories, floating stars, glow haze, ground shadow, text or watermark. Entire shell opaque, outside completely transparent. Square final artwork for a 256x256 PNG, readable from 13x13 to 64x64. Return exactly one Legendary Egg, preserve the reference footprint.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-f39347dc-f67f-42c1-b88f-a9911a478cd2.png"
+    },
+    {
+      "name": "Legendary Egg — Three Stars",
+      "filename": "legendaryeggmultistars.png",
+      "prompt": "Use case: precise-object-edit. Create an alternate version of the provided Legendary Egg inventory icon. Change ONLY the star marking pattern: replace the single large central four-point star with THREE large, simple, clearly separated four-point stars in the same pale-gold fill and thick warm-ochre borders. Arrange the three star markings in a balanced triangular grouping on the front of the egg: one at upper center, two below it left and right on the broader middle of the egg. Use just three broad bold stars, all similar in size, no small scattered sparkles or dots. Leave generous golden shell space between them. These are flat markings ON the shell, not floating objects. Preserve the exact golden shell colors, single broad pale-gold highlight, simple deep-amber lower band, minimal cel shading, thick dark plum-brown outer outline, intact upright egg silhouette, dimensions, position, framing and margins. Keep genuinely transparent background and opaque egg. No added cracks, accessories, glow, texture, text, numbers or additional decoration. Maintain the very simple bold fantasy game item style, square canvas, final 256x256 PNG that also reads at 13x13 to64x64. Return exactly one Legendary Egg with three stars.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-aae93f53-77f0-462c-8944-9d0a4d3cd46f.png"
+    }
+  ]
+}

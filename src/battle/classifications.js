@@ -46,7 +46,7 @@ export const CLASSIFICATIONS = {
     shieldIsPool: true,
     // Takes the attacker's damage unmitigated -- bosses have never had a
     // Defense stat in the fight -- through the boss formula in battle/damage.js
-    // (playerDamageToBoss), which also carries the Dark boss's Dark Shroud.
+    // (playerDamageToBoss).
     unmitigatedDamage: true,
     // Shrugs off the effects creatures' Basic hits carry on-hit -- Lava
     // Spit's Expose, Frost Nip's Frostbite, Tusk Slam's chill and Healing

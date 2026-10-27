@@ -1,6 +1,7 @@
 // Egg hatching: banners, pulls, pity, and reveal animations.
 
 import React, { useState, useEffect } from "../../react.js";
+import { typeIcon, iconText } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG } from "../../data/rarity.js";
@@ -123,7 +124,7 @@ function GachaScreen({onHatch}){
     React.createElement(ScreenHeader,{title:"Hatch",right:React.createElement(React.Fragment,null,
       React.createElement(CurrencyChip,{emoji:"🥚",value:currencies.eggs}),
       React.createElement(CurrencyChip,{emoji:"🥚✨",value:currencies.legendaryEggs||0}),
-      React.createElement(CurrencyChip,{emoji:"💎",value:currencies.gems})
+      React.createElement(CurrencyChip,{currency:"gems",emoji:"💎",value:currencies.gems})
     )}),
     // Title (and, only for the Storm banner, its blurb) live above the
     // colored box now rather than inside it -- banner-switch arrows flank
@@ -139,7 +140,16 @@ function GachaScreen({onHatch}){
       React.createElement("button",{onClick:()=>{setBannerIdx(i=>(i-1+BANNERS.length)%BANNERS.length);setShowInfo(false);},
         style:{background:"none",border:"1px solid #ddd",borderRadius:10,padding:"8px 16px",cursor:"pointer",fontSize:26,color:"#555",lineHeight:1,flexShrink:0}},"‹"),
       React.createElement("div",{style:{flex:1,textAlign:"center"}},
-        React.createElement("div",{className:"gacha-title",style:{color:banner.titleColor,marginBottom:0}},banner.name),
+        // The (i) for pity + rates sits right after the name, inline, so it
+        // reads as "about this banner" rather than floating in a corner.
+        React.createElement("div",{className:"gacha-title",style:{color:banner.titleColor,marginBottom:0}},
+          banner.name,
+          React.createElement("button",{
+            onClick:()=>setShowInfo(true),
+            "aria-label":"Banner info",
+            style:{background:"none",border:"none",cursor:"pointer",color:banner.titleColor,padding:"0 0 0 6px",lineHeight:1,opacity:.7,verticalAlign:"middle"}
+          },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}}))
+        ),
         // Always rendered (blank when there's no blurb) so this block is the
         // same height for every banner -- otherwise the box below, which
         // fills whatever space is left, would be shorter on the one banner
@@ -153,13 +163,12 @@ function GachaScreen({onHatch}){
     // is left between the header above and the banner-nav/hatch buttons
     // below, instead of the page overflowing on tall screens or leaving a
     // big empty gap on short ones.
-    React.createElement("div",{className:"gacha-banner",style:{position:"relative",background:banner.color,borderColor:banner.border,flex:1,minHeight:0,display:"flex",flexDirection:"column",justifyContent:"center",overflow:"hidden"}},
-      React.createElement("button",{
-        onClick:()=>setShowInfo(true),
-        style:{position:"absolute",top:10,right:10,background:"none",border:"none",cursor:"pointer",color:banner.titleColor,padding:2,lineHeight:1,opacity:.7}
-      },React.createElement("i",{className:"ti ti-info-circle",style:{fontSize:18}})),
-      React.createElement("span",{className:"egg-tap",style:{flexShrink:0},onClick:()=>canAfford(1)&&doHatch(1)},
-        banner.featured?CREATURE_MAP[banner.featured].emoji:"🥚")
+    // No coloured box any more -- the egg stands on the page by itself, sized
+    // to the screen height. It's display only: hatching goes through the
+    // buttons below (and their cost confirm), never a tap on the egg.
+    React.createElement("div",{style:{position:"relative",flex:1,minHeight:0,display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",overflow:"hidden",marginBottom:14}},
+      React.createElement("span",{style:{flexShrink:0,display:"block",textAlign:"center",lineHeight:1,userSelect:"none",fontSize:"min(190px, calc(var(--vh) * 24))"}},
+        banner.featured?CREATURE_MAP[banner.featured].emoji:iconText(eggIcon))
     ),
     // Pity + rates are opt-in detail, bundled into one popup behind the (i)
     // button instead of a bar that's always on the page or an inline
@@ -213,18 +222,23 @@ function GachaScreen({onHatch}){
         )
       );
     })(),
+    // Fixed height: the 💎 emoji in the Standard/Storm cost labels is taller
+    // than the egg picture on the Legendary banner's, which made these
+    // buttons -- and so the flex:1 banner box above -- a different size per
+    // banner. Buttons centre their content, so a set height keeps all three
+    // banners identical whatever the label holds.
     React.createElement("div",{style:{flexShrink:0,paddingTop:10}},
-      React.createElement("button",{className:"btn btn-primary",style:{marginBottom:8},onClick:()=>canAfford(1)&&setPendingHatch(1),disabled:!canAfford(1)},"Hatch ×1  —  "+costLabel(1)),
-      React.createElement("button",{className:"btn",style:{background:"#3C3489",color:"#fff",borderColor:"#3C3489",marginBottom:12},onClick:()=>canAfford(10)&&setPendingHatch(10),disabled:!canAfford(10)},"Hatch ×10  —  "+costLabel(10))
+      React.createElement("button",{className:"btn btn-primary",style:{marginBottom:8,height:40,padding:"0 10px"},onClick:()=>canAfford(1)&&setPendingHatch(1),disabled:!canAfford(1)},iconText("Hatch ×1  —  "+costLabel(1))),
+      React.createElement("button",{className:"btn",style:{background:"#3C3489",color:"#fff",borderColor:"#3C3489",marginBottom:12,height:40,padding:"0 10px"},onClick:()=>canAfford(10)&&setPendingHatch(10),disabled:!canAfford(10)},iconText("Hatch ×10  —  "+costLabel(10)))
     ),
     pendingHatch&&React.createElement("div",{className:"modal-overlay",onClick:()=>setPendingHatch(null)},
       React.createElement("div",{className:"modal-box",onClick:e=>e.stopPropagation()},
-        React.createElement("div",{style:{fontSize:40,marginBottom:8}},banner.featured?CREATURE_MAP[banner.featured].emoji:"🥚"),
+        React.createElement("div",{style:{fontSize:40,marginBottom:8}},banner.featured?CREATURE_MAP[banner.featured].emoji:iconText(eggIcon)),
         React.createElement("div",{style:{fontSize:16,fontWeight:600,color:"#000",marginBottom:6}},
           "Hatch ×"+pendingHatch+"?"),
         React.createElement("p",{style:{fontSize:13,color:"#666",marginBottom:4}},banner.name),
         React.createElement("p",{style:{fontSize:13,color:"#444",marginBottom:18}},
-          "This will cost "+costLabel(pendingHatch)+"."),
+          iconText("This will cost "+costLabel(pendingHatch)+".")),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{className:"btn",style:{flex:1,marginBottom:0,background:"#e0e0e0",color:"#333"},onClick:()=>setPendingHatch(null)},"Cancel"),
           React.createElement("button",{className:"btn btn-primary",style:{flex:1,marginBottom:0},onClick:()=>{const c=pendingHatch;setPendingHatch(null);doHatch(c);}},
@@ -239,15 +253,15 @@ function GachaScreen({onHatch}){
       const shardPct=Math.min(100,Math.round((shards/c.shardsToAscend)*100));
       return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",zIndex:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}},
         React.createElement("div",{style:{alignSelf:"flex-end",marginBottom:8,display:"flex",gap:6}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+formatNum(currencies[eggKey]||0)),
-          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+formatNum(currencies.gems))
+          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},iconText(eggIcon+" "+formatNum(currencies[eggKey]||0))),
+          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},iconText("💎 "+formatNum(currencies.gems)))
         ),
         React.createElement("div",{style:{textAlign:"center",flex:1,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",overflowY:"auto"}},
           React.createElement("span",{style:{fontSize:96,display:"block",marginBottom:12,animation:"revealPop .4s cubic-bezier(.34,1.56,.64,1)"}},c.emoji),
           isNew&&React.createElement("span",{style:{display:"inline-block",fontSize:11,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"2px 10px",marginBottom:8,letterSpacing:".04em"}},"NEW"),
           React.createElement("span",{className:"badge "+RARITY_CONFIG[c.rarity].color,style:{display:"inline-block",marginBottom:10}},RARITY_CONFIG[c.rarity].label),
           React.createElement("div",{style:{fontSize:26,fontWeight:600,marginBottom:4,color:"#000"}},c.name),
-          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:isNew?16:20}},(TYPE_EMOJI[c.type]||"")+" "+c.type),
+          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:isNew?16:20}},typeIcon(c.type), " " + c.type),
           !isNew&&React.createElement("div",{style:{width:220,marginBottom:16}},
             React.createElement("div",{style:{height:6,background:"#e0e0e0",borderRadius:3,overflow:"hidden",marginBottom:5}},
               React.createElement("div",{style:{height:"100%",width:shardPct+"%",background:shards>=c.shardsToAscend?"#378ADD":"#EF9F27",borderRadius:3,transition:"width .3s"}})
@@ -276,10 +290,10 @@ function GachaScreen({onHatch}){
           })(),
           React.createElement("button",{
             className:"btn btn-primary",
-            style:{marginBottom:0,fontSize:16,padding:14,opacity:canAfford(1)?1:0.45},
+            style:{marginBottom:0,fontSize:16,padding:"0 14px",height:50,opacity:canAfford(1)?1:0.45},
             disabled:!canAfford(1),
             onClick:()=>{if(canAfford(1))doHatch(1);}
-          },"Hatch Again — "+costLabel(1)),
+          },iconText("Hatch Again — "+costLabel(1))),
           React.createElement("button",{className:"btn",style:{marginBottom:0,fontSize:15,padding:12,background:"#e0e0e0",color:"#333"},onClick:()=>setResult(null)},isNew?"Nice!":"Got it")
         )
       );
@@ -288,8 +302,8 @@ function GachaScreen({onHatch}){
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}},
         React.createElement("div",{style:{fontSize:16,fontWeight:500,color:"#000"}},"Hatch Results"),
         React.createElement("div",{style:{display:"flex",gap:6}},
-          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},eggIcon+" "+formatNum(currencies[eggKey]||0)),
-          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},"💎 "+formatNum(currencies.gems))
+          React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},iconText(eggIcon+" "+formatNum(currencies[eggKey]||0))),
+          !isLegBanner&&React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#444",background:"#e8e8e8",borderRadius:20,padding:"4px 12px"}},iconText("💎 "+formatNum(currencies.gems)))
         )
       ),
       React.createElement("div",{className:"reveal-summary-grid"},
@@ -326,10 +340,10 @@ function GachaScreen({onHatch}){
           :React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
             React.createElement("button",{
               className:"btn btn-primary",
-              style:{marginBottom:0,fontSize:16,padding:14,opacity:canAfford(10)?1:0.45},
+              style:{marginBottom:0,fontSize:16,padding:"0 14px",height:50,opacity:canAfford(10)?1:0.45},
               disabled:!canAfford(10),
               onClick:()=>{if(canAfford(10))doHatch(10);}
-            },"Hatch Again x10 — "+costLabel(10)),
+            },iconText("Hatch Again x10 — "+costLabel(10))),
             React.createElement("button",{className:"btn",style:{marginBottom:0,fontSize:15,padding:12,background:"#e0e0e0",color:"#333"},onClick:()=>{setMultiResults(null);setDetailItem(null);}},"Collect All")
           )
       )
@@ -343,7 +357,7 @@ function GachaScreen({onHatch}){
           isNew&&React.createElement("span",{style:{display:"inline-block",fontSize:11,fontWeight:700,background:"#534AB7",color:"#fff",borderRadius:6,padding:"2px 10px",marginBottom:8,letterSpacing:".04em"}},"NEW"),
           React.createElement("span",{className:"badge "+RARITY_CONFIG[c.rarity].color,style:{display:"inline-block",marginBottom:10}},RARITY_CONFIG[c.rarity].label),
           React.createElement("div",{style:{fontSize:22,fontWeight:600,marginBottom:4,color:"#000"}},c.name),
-          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:16}},(TYPE_EMOJI[c.type]||"")+" "+c.type),
+          React.createElement("div",{style:{fontSize:14,color:"#666",marginBottom:16}},typeIcon(c.type), " " + c.type),
           !isNew&&React.createElement("div",{style:{width:"100%",marginBottom:16}},
             React.createElement("div",{style:{height:6,background:"#e0e0e0",borderRadius:3,overflow:"hidden",marginBottom:5}},
               React.createElement("div",{style:{height:"100%",width:shardPct+"%",background:shards>=c.shardsToAscend?"#378ADD":"#EF9F27",borderRadius:3,transition:"width .3s"}})

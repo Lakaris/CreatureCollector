@@ -7,6 +7,7 @@
 // tapping one opens a popup asking which of its equipped items to replace.
 
 import React, { useState } from "../../react.js";
+import { gearIcon, typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIPMENT_MAP, EQUIP_RARITY_CONFIG } from "../../data/equipment.js";
@@ -14,7 +15,7 @@ import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js
 import { getDisplayArt } from "../../core/creatures.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import { equipBonus, equipBonusStr, isExclusive, itemFitsCreature, exclusivityLabels } from "../../core/equipment.js";
-import AscStars, { ascStarTier } from "../../ui/components/AscStars.js";
+import { CreatureAscStars, GearAscStars } from "../../ui/components/AscStars.js";
 import ScreenHeader from "../../ui/components/ScreenHeader.js";
 
 /** Height of the bottom ascension bar -- matches CollectionScreen's ASC_BAR_H. */
@@ -76,9 +77,9 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
               onClick: () => { const cid = replaceCreatureId; setReplaceCreatureId(null); equipOnto(cid, slotIdx); },
               style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 10, background: "#f7f7fb", border: "1px solid #eee", cursor: "pointer", minHeight: 62, boxSizing: "border-box" }
             },
-              React.createElement("span", { style: { fontSize: 22, flexShrink: 0 } }, existing.emoji),
+              React.createElement("span", { style: { fontSize: 22, flexShrink: 0 } }, gearIcon(existing)),
               React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#333" } }, existing.name + (asc > 0 ? " (Lv " + lvl + ", ✦" + asc + ")" : " (Lv " + lvl + ")")),
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: "#333" } }, existing.name + " (Lv " + lvl + ")", asc > 0 && React.createElement("span", { style: { display: "inline-flex", verticalAlign: "middle", marginLeft: 6 } }, React.createElement(GearAscStars, { asc, size: 11 }))),
                 React.createElement("div", { style: { fontSize: 11, color: "#666" } }, equipBonusStr(bonuses)),
                 React.createElement("div", { style: { fontSize: 10, color: "#7F77DD", fontWeight: 600, marginTop: 2, minHeight: 13 } }, existing.effect ? "✦ " + existing.effect : "")
               )
@@ -90,7 +91,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
     ),
     React.createElement(ScreenHeader, { title: "Choose a Creature", onBack }),
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 12, color: "#666" } },
-      React.createElement("span", { style: { fontSize: 20 } }, item.emoji),
+      React.createElement("span", { style: { fontSize: 20 } }, gearIcon(item)),
       React.createElement("span", null, "Equipping " + item.name + exclusivityLabels(item).map((l) => " · " + l + " only").join(""))
     ),
     entries.length === 0
@@ -107,7 +108,6 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
             const hasOpenSlot = (o.equipped || [null, null, null, null]).some((s) => !s);
             const art = getDisplayArt(d, o, unlockedSkins);
             const rarCfg = EQUIP_RARITY_CONFIG[d.rarity];
-            const asc = ascStarTier(o.ascensions);
             return React.createElement("div", {
               key: o.id,
               className: "creature-card",
@@ -117,9 +117,9 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
               art.kind !== "emoji" && React.createElement(CreatureIcon, { key: "art", def: d, ownedData: o, unlockedSkins, still: true, size: 72, style: { position: "absolute", top: 0, left: 0, width: "100%", height: "calc(100% - " + ASC_BAR_H + "px)" } }),
               // Badge column, top-left: Type, then Role, then Range.
               React.createElement("div", { style: { position: "absolute", top: 5, left: 5, display: "flex", flexDirection: "column", gap: 4, alignItems: "center", pointerEvents: "none" } },
-                React.createElement("span", { style: { fontSize: 14, lineHeight: 1 } }, TYPE_EMOJI[d.type] || d.type),
-                d.role && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, ROLE_CONFIG[d.role].emoji),
-                d.attackType && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, ATTACK_TYPE_CONFIG[d.attackType].emoji)
+                React.createElement("span", { style: { fontSize: 14, lineHeight: 1 } }, typeIcon(d.type)),
+                d.role && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, roleIcon(d.role)),
+                d.attackType && React.createElement("span", { style: { fontSize: 13, lineHeight: 1 } }, rangeIcon(d.attackType))
               ),
               React.createElement("span", { style: { position: "absolute", top: 5, right: 5, fontSize: 12, fontWeight: 700, color: "#666", lineHeight: 1, pointerEvents: "none", textShadow: "0 0 3px #fff, 0 0 3px #fff" } }, "Lv " + o.level),
               // Picker-only: this creature's four slots are taken, so tapping it
@@ -128,7 +128,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
               // art without changing the card's shape.
               !hasOpenSlot && React.createElement("div", { style: { position: "absolute", left: 2, right: 2, bottom: ASC_BAR_H + 2, fontSize: 8, fontWeight: 800, color: "#d97706", textAlign: "center", lineHeight: 1.15, pointerEvents: "none", textShadow: "0 0 3px #fff, 0 0 3px #fff" } }, "Slots full · tap to replace"),
               React.createElement("div", { style: { position: "absolute", left: 0, right: 0, bottom: 0, height: ASC_BAR_H, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.92)", borderTop: "0.5px solid rgba(0,0,0,0.08)", borderRadius: "0 0 9px 9px", overflow: "hidden", containerType: "inline-size" } },
-                React.createElement(AscStars, { n: asc.count, max: 5, doubled: asc.doubled, colors: asc.colors, slotted: true, style: { fontSize: "min(16px,17.5cqw)", gap: 1, ...asc.style } })
+                React.createElement(CreatureAscStars, { asc: o.ascensions, size: "min(16px,17.5cqw)" })
               ),
               art.kind !== "emoji"
                 ? React.createElement("div", { style: { height: 72 } })

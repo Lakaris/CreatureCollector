@@ -1,0 +1,24 @@
+{
+  "frames": 12,
+  "addedFrameNumber": 11,
+  "insertedBetweenPreviousFrames": [
+    10,
+    11
+  ],
+  "previousElevenDrawingsPixelIdentical": true,
+  "newFinalStandingFrameNumber": 12,
+  "baseEndpointExact": true,
+  "addedFrameHoldMs": 80,
+  "finalStandingHoldMs": 360,
+  "totalDurationMs": 2432,
+  "halfwayHeadAndManeOffsetFromBasePx": 14,
+  "previousFrameHeadAndManeOffsetFromBasePx": 28,
+  "sourcePixelsVerified": {
+    "maneCreamAndSwirls": 14764,
+    "upperHead": 40975,
+    "tailAndFeet": 126904
+  },
+  "gameAndPreviewTimingMatch": true,
+  "noMorphingOrFrameCrossfade": true,
+  "localRepair": "Only the exposed shoulder outline uses the built-in image editor cleanup reference; the mane colors and swirls retain original pixels."
+}

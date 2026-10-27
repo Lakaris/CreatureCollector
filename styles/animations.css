@@ -40,7 +40,6 @@
    background to frames*100% wide, so walking background-position-x from 0% to
    100% steps cell by cell at any icon size -- this one keyframe serves every
    creature, frame count, and render size. Pair it with steps(n,jump-none). */
-@keyframes spritePlay{from{background-position-x:0%}to{background-position-x:100%}}
 
 /* ── Soft mount transitions ──────────────────────────────────────────────
    Screens and overlays fade in instead of popping into place. Opacity only

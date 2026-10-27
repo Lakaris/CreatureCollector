@@ -738,7 +738,7 @@ export function countDebuffs(u) {
 function stealableBuffs(from) {
   const out = [];
   for (const m of from.statMods || []) {
-    if (m.pct > 0) out.push({ take: (to) => {
+    if (m.pct > 0 && !m.undispellable) out.push({ take: (to) => {
       from.statMods.splice(from.statMods.indexOf(m), 1);
       applyStatMod(to, { kind: m.kind, pct: m.pct, src: "stolen:" + m.kind, ticks: m.ticks, holdDuration: true });
     } });
@@ -932,7 +932,7 @@ function sameEffect(a, kind, pct, exact = false) {
  * `src` is the applier's uid; anything falsy is treated as one shared
  * anonymous source.
  */
-export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false, exact = false }) {
+export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = false, environmental = false, exact = false, undispellable = false }) {
   if (!pct) return;
   if (pct < 0 && resistsDebuff(u, { environmental })) return;
   if (pct < 0 && kind === "haste" && isImmune(u, "hastedown")) return;
@@ -955,6 +955,9 @@ export function applyStatMod(u, { kind, pct, src, ticks = 6, holdDuration = fals
   const stacks = debuff ? debuffStacks(u, 1) : buffStacks(u, 1);
   const had = !!u.statMods && u.statMods.some((m) => sameEffect(m, kind, pct, exact));
   let added = pushStatMod(u, kind, pct, src, ticks, exact);
+  // A buff its text says "can't be dispelled" (the Dark Boss's Totems): kept by
+  // dispels and buff steals (see clearPositiveStatMods, stealableBuffs).
+  if (undispellable) { const m = u.statMods.find((x) => sameEffect(x, kind, pct, exact) && x.src === src); if (m) m.undispellable = true; }
   for (let i = 1; i < stacks; i++) added = pushStatMod(u, kind, pct, (src ?? "anon") + ":extra" + i, ticks, exact) || added;
   if (debuff) debuffLanded(u, added && !had);
   if (debuff && !environmental) mirrorDebuff(u, (m) => applyStatMod(m, { kind, pct, src: u.uid + ":mirror", ticks: baseTicks, holdDuration, exact }));
@@ -1059,7 +1062,7 @@ export function clearNegativeStatMods(u) {
 
 /** Strip every positive stat mod (buff dispel); debuffs are untouched. */
 export function clearPositiveStatMods(u) {
-  if (u.statMods) u.statMods = u.statMods.filter((m) => m.pct < 0);
+  if (u.statMods) u.statMods = u.statMods.filter((m) => m.pct < 0 || m.undispellable);
 }
 
 /**

@@ -149,7 +149,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
     // bottom-anchored and never stretched; the creature stands
     // PORTRAIT_FEET_BOTTOM up, the same spot on the art as elsewhere.
     React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
-      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
+      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
     ),
     React.createElement("div",{style:{flex:flairTab==="feed"?"1 0 auto":1,minHeight:0,overflow:flairTab==="feed"?"visible":"hidden",display:"flex",flexDirection:"column"}},
       // Feed tab: the equipped-flair row fills the space under the portrait,
@@ -219,7 +219,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
                           ),
                           React.createElement("div",{style:{fontSize:17,fontWeight:700,color:"#6f6f6f",marginBottom:2}},(item&&item.name)||"Duplicate"),
                           React.createElement("div",{style:{fontSize:12,color:"#8a8a8a",fontWeight:600,marginBottom:10}},"Already unlocked"),
-                          React.createElement("div",{style:{fontSize:13,color:"#7986cb",fontWeight:700}},"+"+r0.shards+" 🔷 Flair Shards")
+                          React.createElement("div",{style:{fontSize:13,color:"#7986cb",fontWeight:700}},iconText("+"+r0.shards+" 🔷 Flair Shards"))
                         );
                       })()
                   )
@@ -267,7 +267,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
                           ),
                           React.createElement(AutoFitText,{size:11,minSize:7,style:{fontWeight:600,lineHeight:1.2,color:r.won?"#555":"#7986cb"}},
                             r.won?(r.won.buff?"+"+r.won.buff.pct+"% "+BUFF_STAT_LABEL[r.won.buff.stat]:"")
-                                 :("+"+r.shards+" 🔷")
+                                 :iconText("+"+r.shards+" 🔷")
                           )
                         );
                       }

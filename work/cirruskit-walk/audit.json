@@ -1,0 +1,126 @@
+{
+  "frames": 24,
+  "frameSize": [
+    512,
+    512
+  ],
+  "grid": [
+    6,
+    4
+  ],
+  "frameDurationMs": 64,
+  "totalDurationMs": 1536,
+  "loop": true,
+  "firstFrameExactBase": true,
+  "uniqueFrames": 23,
+  "noRepeatedFinalFrame": true,
+  "noCanvasClipping": true,
+  "sourcePixelChecks": {
+    "exactManeColorsAndSwirlsAcrossFrames": 354336,
+    "exactFacePixelsAcrossFrames": 962856
+  },
+  "connectedComponentSizes": [
+    [
+      152763
+    ],
+    [
+      152495
+    ],
+    [
+      152042
+    ],
+    [
+      151676
+    ],
+    [
+      152243
+    ],
+    [
+      153128
+    ],
+    [
+      153381
+    ],
+    [
+      153302
+    ],
+    [
+      152818
+    ],
+    [
+      152756
+    ],
+    [
+      152659
+    ],
+    [
+      152711
+    ],
+    [
+      152763
+    ],
+    [
+      152640
+    ],
+    [
+      152406
+    ],
+    [
+      152200
+    ],
+    [
+      152729
+    ],
+    [
+      153524
+    ],
+    [
+      153759
+    ],
+    [
+      153459
+    ],
+    [
+      152504
+    ],
+    [
+      152138
+    ],
+    [
+      152149
+    ],
+    [
+      152565
+    ]
+  ],
+  "adjacentFrameMeanDifferenceAt130px": [
+    3.289388560157791,
+    6.368915187376726,
+    2.7190138067061143,
+    4.870138067061144,
+    4.898994082840237,
+    1.0351479289940828,
+    0.5876923076923077,
+    4.0926627218934915,
+    1.8344773175542406,
+    5.080591715976332,
+    5.64138067061144,
+    2.9681065088757395,
+    3.1592110453648914,
+    6.2057988165680475,
+    2.6564694280078895,
+    4.785877712031558,
+    4.770039447731755,
+    0.9671203155818541,
+    1.1052465483234715,
+    5.04258382642998,
+    2.3240631163708088,
+    5.36861932938856,
+    6.3145562130177515,
+    3.1834516765285996
+  ],
+  "lastToFirstWithinNormalChangeRange": true,
+  "gameAndPreviewMatch": true,
+  "existingIdleAndFlavorUnchanged": true,
+  "method": "Original source artwork with anchored leg motion, rigid head/mane bob and isolated tail sway. Built-in image editing supplied a stepping pose guide. No crossfade or optical-flow interpolation."
+}

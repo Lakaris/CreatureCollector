@@ -1,0 +1,300 @@
+{
+  "image": "cirruskit_flavor.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 6,
+  "rows": 6,
+  "loop": false,
+  "totalDurationMs": 2432,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 160
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 5,
+      "x": 2560,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 9,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 10,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 11,
+      "x": 2560,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 13,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 14,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 15,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 16,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 17,
+      "x": 2560,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 18,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 19,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 20,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 21,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 22,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 23,
+      "x": 2560,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 24,
+      "x": 0,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 25,
+      "x": 512,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 26,
+      "x": 1024,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 27,
+      "x": 1536,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 28,
+      "x": 2048,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 29,
+      "x": 2560,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 30,
+      "x": 0,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 31,
+      "x": 512,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 32,
+      "x": 1024,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 33,
+      "x": 1536,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 34,
+      "x": 2048,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 64
+    },
+    {
+      "index": 35,
+      "x": 2560,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 96
+    }
+  ],
+  "notes": "Read left to right, top to bottom. 36 frames; 64 ms movement holds, 160 ms starting hold and 96 ms ending hold. First and last frames exactly match cirruskit_base.png. All nine previous key poses are preserved. A repaired intermediate pose and motion-aligned in-betweens smooth the crouch and paw tap. Play once, then return to idle."
+}

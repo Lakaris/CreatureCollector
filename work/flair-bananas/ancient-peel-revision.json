@@ -1,0 +1,11 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "filename": "ancientflairbanana.png",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "prompt": "Use case: precise-object-edit. Edit this existing Ancient Flair Banana inventory icon. CHANGE ONLY THE PEEL COLORS. The banana must look dramatically different from a regular yellow banana at very small size. Recolor all amber-orange and yellow areas of the banana peel to a saturated deep copper-red / brick-crimson base, dark burgundy-red shadows, and restrained muted rose-copper highlights. The overall peel must read RED, not yellow, gold, or orange. Preserve the one existing broad gold chevron marking on the front flap, in pale warm gold for strong contrast against the red peel. Do not add any other ornament or detail. Keep the exposed ivory banana flesh EXACTLY as in the reference: identical cream color, shading, curved shape, contours, position, and scale. Keep the brown bottom tip, exact three folded peel-flap shapes, same silhouette, framing, and very thick dark plum-brown outlines. Preserve the simple flat cel-shaded illustration style and broad uncomplicated shapes. No added objects, no accessories, no texture, no text, no floating sparkles or glow. Maintain a genuinely transparent background and transparent gaps; banana itself opaque. Square composition, all edges within canvas. The final icon is 256x256, displayed down to13x13, so strong red-versus-yellow color separation is essential. Return one revised Ancient Flair Banana only.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-3880a7b3-b7d6-41e6-b68a-b0b3d1e7afe2.png"
+}

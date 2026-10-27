@@ -247,6 +247,17 @@ export function isBossUnit(u) {
  *     tag: the 8 surrounding tiles). Several Bells nearby don't add up --
  *     the strongest applies.
  */
+/**
+ * A creature passive that changes how much damage ITS OWN carrier takes
+ * registers `fn(target, {effectDamage})` here, returning a multiplier (1 for
+ * none). Read for every hit by defenderDamageMultiplier -- ability damage and
+ * effect damage alike. Registered at load by the module, like onDamageBonus.
+ */
+const damageTakenSources = [];
+export function onDamageTaken(fn) {
+  damageTakenSources.push(fn);
+}
+
 export function defenderDamageMultiplier(target, { effectDamage = false, redirected = false } = {}) {
   let mult = 1;
   const gear = target.gear;
@@ -283,6 +294,12 @@ export function defenderDamageMultiplier(target, { effectDamage = false, redirec
     if (gear.tauntedDmgReductionPct && attacker && attacker !== target && (attacker.tauntTicks || 0) > 0) cut(gear.tauntedDmgReductionPct);
     // Glass Blade: the price of its damage -- everything it takes.
     if (gear.dmgTakenPct) mult *= 1 + gear.dmgTakenPct / 100;
+  }
+  // Creature passives that cut what THIS creature takes (the Dark Boss's
+  // Totems), registered by their modules -- see onDamageTaken below.
+  for (const fn of damageTakenSources) {
+    const f = fn(target, { effectDamage });
+    if (f !== 1) mult *= f;
   }
   // Tesla Coil: standing inside the active Aura of an enemy that wears it.
   const tesla = teslaAuraPct(target);

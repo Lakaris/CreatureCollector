@@ -20,9 +20,100 @@
 //   style          extra styles, merged last
 //   contain        keep an emoji's ink inside the size box (see below). Image
 //                  art already fits its box, so this only affects emoji.
+//   showcase       the creature is on display (creature page portrait, Home):
+//                  now and then it plays its `flavor` art over idle, and
+//                  tapping it plays a random one of its other animations
+//                  (flavor, move, attack, defeat, victory -- whichever it has
+//                  art for). See data/creatureArt.js.
 
-import React from "../../react.js";
-import { getDisplayArt } from "../../core/creatures.js";
+import React, { useState, useEffect } from "../../react.js";
+import { getDisplayArt, hasArtState } from "../../core/creatures.js";
+import { ART_STATES, FLAVOR_STILL_MS, FLAVOR_FIRST_MS, FLAVOR_GAP_MS } from "../../data/creatureArt.js";
+
+const randBetween = ([min, max]) => min + Math.random() * (max - min);
+
+/** How long a showcase play of `art` lasts before returning to idle: one pass
+ * of a strip, FLAVOR_STILL_MS for a still. Looping strips (move) would be over
+ * in a blink after one pass, so they run two passes, at least FLAVOR_STILL_MS. */
+function playMs(art) {
+  if (art.kind !== "sprite") return FLAVOR_STILL_MS;
+  return art.loop ? Math.max(art.totalMs * 2, FLAVOR_STILL_MS) : art.totalMs;
+}
+
+// Background position (in %) of cell `i` of a `cols`-wide sheet. Percentage
+// background-position is relative to (box - image) size, not to the image, so
+// 0%..100% across (cols-1) steps lands exactly on each column -- likewise for
+// rows -- at any rendered size.
+function cellPos(i, cols, rows) {
+  const x = cols > 1 ? ((i % cols) / (cols - 1)) * 100 : 0;
+  const y = rows > 1 ? (Math.floor(i / cols) / (rows - 1)) * 100 : 0;
+  return x + "% " + y + "%";
+}
+
+// One @keyframes per distinct sheet, generated on first use: a keyframe at
+// each frame's start time holding its cell, played with step-end so every
+// frame holds for exactly its own duration (sheets can time frames unevenly).
+const sheetKeyframes = new Map();
+function sheetAnimation(art) {
+  const sig = art.src + "|" + art.columns + "|" + art.durations.join(",");
+  let name = sheetKeyframes.get(sig);
+  if (!name) {
+    name = "sheet" + sheetKeyframes.size;
+    sheetKeyframes.set(sig, name);
+    const rows = Math.ceil(art.frames / art.columns);
+    let t = 0;
+    const steps = art.durations.map((d, i) => {
+      const at = (t / art.totalMs) * 100;
+      t += d;
+      return at.toFixed(4) + "%{background-position:" + cellPos(i, art.columns, rows) + "}";
+    });
+    steps.push("100%{background-position:" + cellPos(art.frames - 1, art.columns, rows) + "}");
+    const el = document.createElement("style");
+    el.textContent = "@keyframes " + name + "{" + steps.join("") + "}";
+    document.head.appendChild(el);
+  }
+  return name + " " + (art.totalMs / 1000).toFixed(3) + "s step-end " + (art.loop ? "infinite" : "1 forwards");
+}
+
+/**
+ * Drives showcase animations: flavor on a random timer, and any non-idle state
+ * on tap. Returns the state playing now (null = resting) and a play count that
+ * keys the rendered element, so each play remounts it and the strip starts
+ * again from its first frame.
+ */
+function useShowcase(enabled, def, ownedData, unlockedSkins) {
+  const states = enabled && def ? ART_STATES.filter((s) => s !== "idle" && hasArtState(def, ownedData, unlockedSkins, s)) : [];
+  const hasFlavor = states.includes("flavor");
+  const [plays, setPlays] = useState(0);
+  const [playing, setPlaying] = useState(null);
+  const sig = (def && def.id) + ":" + states.join();
+
+  const start = (s) => {
+    setPlays((n) => n + 1);
+    setPlaying(s);
+  };
+
+  useEffect(() => {
+    if (!states.length) {
+      if (playing) setPlaying(null);
+      return;
+    }
+    let t;
+    if (playing) t = setTimeout(() => setPlaying(null), playMs(getDisplayArt(def, ownedData, unlockedSkins, playing)));
+    else if (hasFlavor) t = setTimeout(() => start("flavor"), randBetween(plays === 0 ? FLAVOR_FIRST_MS : FLAVOR_GAP_MS));
+    return () => clearTimeout(t);
+  }, [sig, playing, plays]);
+
+  // Tap: a random state, never the one already playing when there's a choice.
+  const tap = states.length
+    ? () => {
+        const pool = states.length > 1 ? states.filter((s) => s !== playing) : states;
+        start(pool[Math.floor(Math.random() * pool.length)]);
+      }
+    : null;
+
+  return { playing: states.length ? playing : null, plays, tap };
+}
 
 // An emoji drawn at font-size = size does NOT fit in a size-tall box. The
 // emoji font reports a taller box than the line (ascent 50 + descent 12
@@ -37,9 +128,14 @@ import { getDisplayArt } from "../../core/creatures.js";
 // they err small, which clips nothing.
 const EMOJI_FIT = 0.82;
 
-function CreatureIcon({ def, size, style, className, state, still, ownedData, unlockedSkins, contain }) {
+function CreatureIcon({ def, size, style, className, state, still, ownedData, unlockedSkins, contain, showcase }) {
+  const sc = useShowcase(showcase && !still && (!state || state === "idle"), def, ownedData, unlockedSkins);
   if (!def) return null;
-  const art = getDisplayArt(def, ownedData, unlockedSkins, state);
+  const art = getDisplayArt(def, ownedData, unlockedSkins, sc.playing || state);
+  // A fresh key per showcase play (and back to idle) remounts the element, so
+  // a strip always starts on its first frame instead of resuming mid-animation.
+  const key = sc.playing ? sc.playing + sc.plays : "base";
+  const onClick = sc.tap || undefined;
 
   if (art.kind === "emoji") {
     const box = contain
@@ -54,49 +150,54 @@ function CreatureIcon({ def, size, style, className, state, still, ownedData, un
     display: "block",
     ...(art.blend ? { mixBlendMode: art.blend } : null),
     ...(art.pixelated ? { imageRendering: "pixelated" } : null),
+    ...(onClick ? { cursor: "pointer", WebkitTapHighlightColor: "transparent" } : null),
   };
 
   if (art.kind === "image") {
     return React.createElement("img", {
+      key,
       src: art.src,
       alt: "",
       decoding: "async",
+      draggable: false,
+      onClick,
       className,
       style: { ...base, objectFit: "contain", ...style },
     });
   }
 
-  // Sprite strip: `frames` equal cells laid out horizontally. Sizing the
-  // background to frames*100% and stepping background-position-x from 0% to
-  // 100% lands exactly on each cell, because percentage background-position is
-  // relative to (container - image) width rather than to the image. That makes
-  // the whole thing size-independent -- one keyframe (spritePlay, in
-  // styles/animations.css) drives every creature at every icon size.
+  // Sprite sheet: `frames` equal square cells, `columns` to a row. The sheet is
+  // sized to columns*100% x rows*100% of a square cell box and stepped through
+  // with a generated keyframe (see sheetAnimation), so it's size-independent.
   //
-  // jump-none is what makes the last cell reachable: plain steps(n) would stop
-  // one cell short, since it never emits the 100% endpoint.
-  return React.createElement("div", {
-    className,
-    style: {
-      ...base,
-      backgroundImage: 'url("' + art.src + '")',
-      backgroundSize: art.frames * 100 + "% 100%",
-      backgroundRepeat: "no-repeat",
-      // `still` holds the first frame as a poster instead of animating.
-      ...(still
-        ? { backgroundPositionX: "0%" }
-        : {
-            animation:
-              "spritePlay " +
-              (art.frames / art.fps).toFixed(3) +
-              "s steps(" +
-              art.frames +
-              ",jump-none) " +
-              (art.loop ? "infinite" : "1 forwards"),
-          }),
-      ...style,
+  // Callers may stretch the box to a non-square shape (Collection cards), which
+  // would stretch the cells too -- so the sheet draws in a square inner box,
+  // the largest that fits (like an img's object-fit: contain), centred, or
+  // bottom-aligned when the caller asks for objectPosition "... bottom".
+  const rows = Math.ceil(art.frames / art.columns);
+  const { objectPosition, ...outerStyle } = style || {};
+  const bottom = /bottom/.test(objectPosition || "");
+  return React.createElement(
+    "div",
+    {
+      key,
+      onClick,
+      className,
+      style: { ...base, containerType: "size", display: "flex", justifyContent: "center", alignItems: bottom ? "flex-end" : "center", ...outerStyle },
     },
-  });
+    React.createElement("div", {
+      style: {
+        width: "min(100cqw, 100cqh)",
+        height: "min(100cqw, 100cqh)",
+        flexShrink: 0,
+        backgroundImage: 'url("' + art.src + '")',
+        backgroundSize: art.columns * 100 + "% " + rows * 100 + "%",
+        backgroundRepeat: "no-repeat",
+        // `still` holds the first frame as a poster instead of animating.
+        ...(still ? { backgroundPosition: "0% 0%" } : { animation: sheetAnimation(art) }),
+      },
+    })
+  );
 }
 
 export default CreatureIcon;

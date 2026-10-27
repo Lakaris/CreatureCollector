@@ -4,6 +4,7 @@
 // own Gear tab already treats equipment.
 
 import React from "../../react.js";
+import { gearIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../data/equipment.js";
@@ -12,6 +13,7 @@ import ScreenHeader from "../../ui/components/ScreenHeader.js";
 import Notify from "../../ui/components/Notify.js";
 import EquipmentPicker from "../../ui/screens/EquipmentPicker.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
+import { GearAscStars } from "../../ui/components/AscStars.js";
 import { formatNum } from "../../core/format.js";
 
 function EquipmentDetail({ itemId, onBack }) {
@@ -58,7 +60,6 @@ function EquipmentDetail({ itemId, onBack }) {
   const canAffordUpgrade = upgradeCost !== null && (currencies.equipShards || 0) >= upgradeCost;
   const ascCost = asc < EQUIP_MAX_ASCENSION ? EQUIP_ASC_COSTS[asc] : null;
   const canAffordAsc = ascCost !== null && copies >= ascCost;
-  const starStr = "★".repeat(asc);
 
   const equippedBy = Object.values(owned || {}).filter((p) => (p.equipped || []).includes(pi.id));
 
@@ -135,10 +136,10 @@ function EquipmentDetail({ itemId, onBack }) {
         );
       })(),
       React.createElement("div", { style: { textAlign: "center", marginBottom: 16, paddingTop: 12, flexShrink: 0 } },
-        React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, pi.emoji),
+        React.createElement("div", { style: { fontSize: 64, marginBottom: 4 } }, gearIcon(pi)),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 2 } }, pi.name),
-        asc > 0 && React.createElement("div", { style: { fontSize: 14, color: "#f59e0b", letterSpacing: 2, marginBottom: 4 } }, starStr),
-        React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: lvl >= maxLvl ? "#d97706" : "#444", marginBottom: 6 } }, lvl >= maxLvl ? "MAX" : "Lv " + lvl + " / " + maxLvl),
+        asc > 0 && React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 4 } }, React.createElement(GearAscStars, { asc, size: 16 })),
+        React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: lvl >= maxLvl ? "#d97706" : "#444", marginBottom: 6 } }, "Lv " + lvl),
         React.createElement("div", { style: { fontSize: 13, color: "#666", marginBottom: pi.effect ? 6 : 0 } }, equipBonusStr(bonuses)),
         pi.effect && React.createElement("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, "✦ " + pi.effect)
       ),

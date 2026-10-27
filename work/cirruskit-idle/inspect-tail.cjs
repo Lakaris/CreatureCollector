@@ -1,0 +1,1 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');(async()=>{for(const n of [0,7,22])await sharp(`work/cirruskit-idle/frame-${n}.png`).extract({left:0,top:50,width:250,height:350}).resize(500,700,{kernel:'nearest'}).flatten({background:'#f5f2f8'}).png().toFile(`work/cirruskit-idle/tail-${n}-check.png`);})();

@@ -1,0 +1,15 @@
+const fs=require('fs'),assert=require('assert'),crypto=require('crypto');
+const {PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+const dir='images/cirruskit',file=`${dir}/cirruskit_flavor.png`,backup='work/cirruskit-tail/before-stray-cleanup';
+const source=fs.readFileSync(file),sheet=PNG.sync.read(source),before=Buffer.from(sheet.data),meta=JSON.parse(fs.readFileSync(`${dir}/cirruskit_flavor.json`));
+fs.mkdirSync(backup,{recursive:true});if(!fs.existsSync(`${backup}/cirruskit_flavor.png`))fs.writeFileSync(`${backup}/cirruskit_flavor.png`,source);
+// The three isolated export fragments are wholly outside the creature's silhouette.
+// Restrict cleanup to their inspected bounds; preserve every other source pixel.
+const regions=new Map([[2,[9,339,20,355]],[4,[9,355,21,370]],[6,[9,339,20,355]]]);
+const changes=[];
+for(const [index,[left,top,right,bottom]]of regions){const f=meta.frames[index];let removed=0;for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const i=((f.y+y)*sheet.width+f.x+x)*4;if(sheet.data[i+3]){assert(sheet.data[i]*sheet.data[i+3]/255<100&&sheet.data[i+1]*sheet.data[i+3]/255<100&&sheet.data[i+2]*sheet.data[i+3]/255<100,'Unexpected colored art in cleanup bounds');removed++;sheet.data.fill(0,i,i+4);}}changes.push({frame:index+1,removedPixels:removed,bounds:[left,top,right,bottom]});}
+let changed=0;for(let y=0;y<sheet.height;y++)for(let x=0;x<sheet.width;x++){const i=(y*sheet.width+x)*4;if(sheet.data.subarray(i,i+4).equals(before.subarray(i,i+4)))continue;const index=Math.floor(y/512)*3+Math.floor(x/512),region=regions.get(index);assert(region&&x%512>=region[0]&&x%512<=region[2]&&y%512>=region[1]&&y%512<=region[3]);assert.equal(sheet.data[i+3],0);changed++;}
+for(const f of meta.frames){const p=new PNG({width:512,height:512});for(let y=0;y<512;y++){const from=((f.y+y)*sheet.width+f.x)*4;sheet.data.copy(p.data,y*2048,from,from+2048);}if(f.index===0||f.index===8)assert(p.data.equals(PNG.sync.read(fs.readFileSync(`${dir}/cirruskit_base.png`)).data));if(regions.has(f.index)){const framePath=`work/cirruskit-tail/frames/frame-${f.index}.png`;if(fs.existsSync(framePath)&&!fs.existsSync(`${backup}/frame-${f.index}.png`))fs.copyFileSync(framePath,`${backup}/frame-${f.index}.png`);fs.writeFileSync(framePath,PNG.sync.write(p));}}
+fs.writeFileSync(file,PNG.sync.write(sheet));const report={changes,totalPixelsRemoved:changed,allOtherPixelsUnchanged:true,baseEndpointsUnchanged:true,frameCount:meta.frames.length,timingsUnchanged:true};fs.writeFileSync('work/cirruskit-tail/stray-cleanup-validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+const scriptPath='work/cirruskit-tail/preview-flavor.cjs';let script=fs.readFileSync(scriptPath,'utf8');const digest=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0,12);script=script.replace(/cirruskit_flavor\.png(?:\?v=[a-f0-9]+)?'\)/,`cirruskit_flavor.png?v=${digest}')`);fs.writeFileSync(scriptPath,script);
+

@@ -1,0 +1,84 @@
+{
+  "image": "cirruskit-idle-v10-spritesheet.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 3,
+  "rows": 3,
+  "loop": true,
+  "totalDurationMs": 3040,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 850
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 230
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 260
+    },
+    {
+      "index": 3,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 220
+    },
+    {
+      "index": 4,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 240
+    },
+    {
+      "index": 5,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 180
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 180
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 230
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 650
+    }
+  ],
+  "notes": "Read left to right, top row to bottom row. First and last frames are exact copies of cirruskit-critters-512-v3.png."
+}

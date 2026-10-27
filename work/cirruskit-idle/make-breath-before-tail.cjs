@@ -1,0 +1,7 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');const p=PNG.sync.read(fs.readFileSync('C:/Users/Annie/Documents/Codex/2026-10-26/can-you-create-a-512-512/outputs/cirruskit-critters-512-v3.png'));
+const smooth=(a,b,t)=>{let x=Math.max(0,Math.min(1,(t-a)/(b-a)));return x*x*(3-2*x);};const amounts=[0,.19,.61,1,.87,.50,.16,0];
+function offset(x,y,t){let body=smooth(155,245,x),foot=1-smooth(350,425,y);return [t*(x-335)*.008*Math.exp(-Math.pow((y-325)/90,2))*body*foot,-t*4*body*foot];}
+function sample(x,y){let ix=Math.floor(x),iy=Math.floor(y),dx=x-ix,dy=y-iy,out=[0,0,0,0];for(let [ox,oy,w]of [[0,0,(1-dx)*(1-dy)],[1,0,dx*(1-dy)],[0,1,(1-dx)*dy],[1,1,dx*dy]]){let xx=ix+ox,yy=iy+oy;if(xx<0||yy<0||xx>=512||yy>=512)continue;let i=(yy*512+xx)*4,a=p.data[i+3]/255;out[3]+=w*a;for(let k=0;k<3;k++)out[k]+=w*a*p.data[i+k];}return out[3]?out.slice(0,3).map(v=>Math.round(v/out[3])).concat(Math.round(out[3]*255)):[0,0,0,0];}
+for(let n=0;n<8;n++){let q=new PNG({width:512,height:512});if(n===0||n===7)p.data.copy(q.data);else for(let y=0;y<512;y++)for(let x=0;x<512;x++){let sx=x,sy=y;for(let z=0;z<4;z++){let [dx,dy]=offset(sx,sy,amounts[n]);sx=x-dx;sy=y-dy;}let c=sample(sx,sy),i=(y*512+x)*4;for(let k=0;k<4;k++)q.data[i+k]=c[k];}fs.writeFileSync(`work/cirruskit-idle/frame-${n}.png`,PNG.sync.write(q));}
+console.log('Eight base-derived frames created. Maximum head movement 4px; feet remain planted.');
+

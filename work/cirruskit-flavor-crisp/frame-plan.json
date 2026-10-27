@@ -1,0 +1,247 @@
+{
+  "frames": [
+    {
+      "pose": "standing",
+      "durationMs": 160
+    },
+    {
+      "pose": "quick-crouch",
+      "durationMs": 48
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 2,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 3,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 4,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 5,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 2,
+      "pawY": -2,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 5,
+      "pawY": -7,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 9,
+      "pawY": -12,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 5,
+      "pawX": 11,
+      "pawY": -14,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 4,
+      "pawX": 5,
+      "pawY": -7,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 3,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 3,
+      "pawX": 2,
+      "pawY": -3,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 4,
+      "pawX": 6,
+      "pawY": -7,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 5,
+      "pawX": 8,
+      "pawY": -10,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 6,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 5,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 4,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 3,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 2,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 1,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "crouched",
+      "tailX": 0,
+      "pawX": 0,
+      "pawY": 0,
+      "durationMs": 64
+    },
+    {
+      "pose": "rise",
+      "durationMs": 80
+    },
+    {
+      "pose": "standing",
+      "durationMs": 96
+    }
+  ],
+  "totalDurationMs": 2432,
+  "columns": 6,
+  "rows": 6
+}

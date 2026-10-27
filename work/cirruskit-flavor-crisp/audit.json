@@ -1,0 +1,33 @@
+{
+  "frames": 36,
+  "sheetSize": [
+    3072,
+    3072
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "totalDurationMs": 2432,
+  "crouchTransitionPoseMs": 48,
+  "blendedFrames": 0,
+  "warpedFrames": 0,
+  "resampledMovingLayers": 0,
+  "baseEndpointsExact": true,
+  "underbellyChangedPixels": 0,
+  "maneOpaquePixelsChanged": 0,
+  "faceChangedPixels": 0,
+  "tailColorOrEdgeChanges": 0,
+  "pawColorOrEdgeChanges": 0,
+  "pixelComparisons": {
+    "underbelly": 288000,
+    "mane": 440480,
+    "face": 1092000,
+    "tail": 1472772,
+    "paw": 101108
+  },
+  "visibleStrayComponents": 0,
+  "visibleCanvasClipping": 0,
+  "gameMetadataAndApngTimingMatch": true,
+  "previewPlaybackAndFrameControlsChecked": true
+}

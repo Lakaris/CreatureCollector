@@ -4,10 +4,13 @@
 
 import React from "../../react.js";
 import { formatNum } from "../../core/format.js";
+import { iconText, currencyIcon } from "./IconText.js";
 
-export function CurrencyChip({ emoji, value }) {
+// `currency` (a currencies key) picks the icon by key -- needed when the
+// emoji is shared with something else, like Gear Shards' ⚔️.
+export function CurrencyChip({ currency, emoji, value }) {
   return React.createElement("div", { className: "chip" },
-    emoji,
+    currency ? currencyIcon(currency, emoji) : iconText(emoji),
     React.createElement("span", null, formatNum(value))
   );
 }

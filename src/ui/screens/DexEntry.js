@@ -1,6 +1,7 @@
 // Read-only dex page for one evolution chain.
 
 import React, { useState } from "../../react.js";
+import { typeIcon, roleIcon, rangeIcon } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { RARITY_CONFIG, SKIN_TIER_CONFIG } from "../../data/rarity.js";
@@ -94,11 +95,11 @@ function DexEntry({def,onBack,onNavigate,navList}){
         // out to about this size too), with the card growing to fit.
         React.createElement(CreatureIcon,{def,still:true,size:130,style:{margin:"0 auto 10px"}}),
         React.createElement("div",{style:{fontSize:20,fontWeight:600,color:"#000",marginBottom:3}},def.name),
-        React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:8}},TYPE_EMOJI[def.type]||def.type," ",def.type),
+        React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:8}},typeIcon(def.type)," ",def.type),
         React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",justifyContent:"center"}},
           React.createElement("span",{className:"badge "+RARITY_CONFIG[def.rarity].color},RARITY_CONFIG[def.rarity].label),
-          def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},ROLE_CONFIG[def.role].emoji+" "+def.role),
-          def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
+          def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},roleIcon(def.role), " " + def.role),
+          def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},rangeIcon(def.attackType), " " + def.attackType)
         )
       ),
       // minHeight reserves room for the longest description in the roster
@@ -171,9 +172,11 @@ function DexEntry({def,onBack,onNavigate,navList}){
                   : React.createElement("span",{style:{fontSize:9,fontWeight:700,color:ac.color,opacity:0.5,userSelect:"none"}},"No img")
               )
             ),
-            React.createElement("div",{style:{flex:1,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
+            // The pills always sit on their own line beneath the name (see
+            // CreatureDetail).
+            React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"flex-start",gap:4}},
               React.createElement("span",{className:"ability-name"},abl.name),
-              React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
+              React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,justifyContent:"flex-end"}},
                 // Specials without a charge cost (e.g. Overload Sting, gated
                 // purely by Restrained stacks) show no energy pill.
                 k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{

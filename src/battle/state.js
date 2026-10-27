@@ -133,8 +133,15 @@ export function makeArenaBattle(
   };
   const enemyUnits = Object.entries(enemyGrid).map(([key, edef], i) => {
     const [row, col] = key.split(",").map(Number);
+    // Trials enemies wear equipment (`__equipped`, every item at `__equipLevel`
+    // -- see core/trials.js): their stats go through the same pipeline as an
+    // owned creature's, gear included, and the gear's battle effects ride on
+    // `gear` below exactly as a player's do.
+    const equipped = enemyLevel && edef?.__equipped?.length ? edef.__equipped : null;
     const lvlStats = enemyLevel
-      ? calcStats(edef, { level: enemyLevel, ascensions: 0 })
+      ? equipped
+        ? computeCombatStats(edef, { id: edef.id, level: enemyLevel, ascensions: 0, equipped }, Object.fromEntries(equipped.map((id) => [id, edef.__equipLevel || 1])), {})
+        : calcStats(edef, { level: enemyLevel, ascensions: 0 })
       : null;
     // Labyrinth Boss creatures (every 10th floor): 2x2 body, +25% to every
     // stat -- HP/ATK/DEF plus Speed and Haste -- on top of the floor's
@@ -182,6 +189,7 @@ export function makeArenaBattle(
       abilCharge: 0,
       abilChargeMax: getSpecialChargeAt(edef, ENEMY_ABILITY_LEVEL),
       abilityLevels: { basic: ENEMY_ABILITY_LEVEL, special: ENEMY_ABILITY_LEVEL, unique: ENEMY_ABILITY_LEVEL },
+      ...(equipped ? gearBattleBonus(equipped) : {}),
     };
   });
 
@@ -228,7 +236,7 @@ export function makeBossUnit(bossDef, level, row, col, { kitKey = bossDef.key, n
     spd: 1,
     abilitySpeed: 1,
     crit: s.crit, critDmg: s.critDmg,
-    isRanged: false,
+    isRanged: bossDef.attackType === "Ranged",
     // The kit's own clocks: Basic, movement, Special. The Special opens on 10.
     atkCd: 0, moveCd: 0, specialCd: 10,
     // No charge bar: a boss's Special runs off its kit's own cooldown.

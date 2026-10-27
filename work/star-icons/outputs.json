@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Hollow Grey Star",
+    "filename": "hollowgreystar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 0
+  },
+  {
+    "name": "Hollow Bronze Star",
+    "filename": "hollowbronzestar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 0
+  },
+  {
+    "name": "Hollow Silver Star",
+    "filename": "hollowsilverstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 0
+  },
+  {
+    "name": "Hollow Platinum Star",
+    "filename": "hollowplatinumstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 0
+  },
+  {
+    "name": "Hollow Gold Star",
+    "filename": "hollowgoldstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 0
+  },
+  {
+    "name": "Grey Star",
+    "filename": "greystar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 255
+  },
+  {
+    "name": "Bronze Star",
+    "filename": "bronzestar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 255
+  },
+  {
+    "name": "Silver Star",
+    "filename": "silverstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 255
+  },
+  {
+    "name": "Platinum Star",
+    "filename": "platinumstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 255
+  },
+  {
+    "name": "Gold Star",
+    "filename": "goldstar.png",
+    "width": 128,
+    "height": 128,
+    "centerAlpha": 255
+  }
+]

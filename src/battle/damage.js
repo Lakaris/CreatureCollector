@@ -239,10 +239,7 @@ export function mitigatedDamage(atk, def) {
  * Used for player-vs-minion and minion-vs-player alike.
  */
 /**
- * `party` (optional): the defender's foes to count for a boss's Dark Shroud
- * (see playerDamageToBoss). Left out, it is the party at the start of the tick;
- * a hit landed outside the acting creature's own turn -- a Counter, a
- * Bloodrush bonus hit -- passes the party standing right now, as it always has.
+ * `party` (optional): passed through to playerDamageToBoss for a boss defender.
  */
 export function unitDamage(attacker, defender, party) {
   // A creature classed to take damage unmitigated (the boss -- see
@@ -269,21 +266,11 @@ function sureCritAgainst(attacker, target) {
  * Player damage against a boss. Bosses have no DEF stat, so this is unmitigated
  * apart from the attacker's own Weaken debuff.
  *
- * The dark boss's Dark Shroud is applied here rather than in dark.js because it
- * modifies incoming damage rather than anything the boss does on its turn: the
- * more debuffs the party is carrying, the less it hurts the boss (floor 30%).
- *
  * Crit comes in through attackRoll, not from a second roll here.
  */
 export function playerDamageToBoss(attacker, boss, aliveP = tickStartPlayers()) {
   const roll = sureCritAgainst(attacker, boss) ? withGuaranteedCrit(attacker, () => attackRoll(attacker, boss)) : attackRoll(attacker, boss);
   let dmg = Math.max(1, Math.round(roll * weakenMultiplier(attacker) * statModMultiplier(attacker, "atk") * auraAtkMultiplier(attacker)));
-  if (boss._bossKey === "dark") {
-    const debuffed = aliveP.filter(
-      (p) => (p.dotTicks || 0) > 0 || (p.weakTicks || 0) > 0 || (p.healImmuneTicks || 0) > 0
-    ).length;
-    dmg = Math.max(1, Math.round(dmg * Math.max(0.3, 1 - debuffed * 0.1)));
-  }
   return dmg;
 }
 

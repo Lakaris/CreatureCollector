@@ -420,6 +420,20 @@ function App() {
       React.createElement(CreatureOverlayHost)
     );
 
+  // Trials runs the Arena screen as a single track whose enemies wear
+  // equipment. Its fights don't count as Arena fights.
+  if (tab === "play" && gameMode === "trials")
+    return React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(ArenaScreen, {
+        mode: "trials",
+        onBack: () => setGameMode(null),
+        onViewCreature: viewCreature,
+      }),
+      React.createElement(CreatureOverlayHost)
+    );
+
   if (tab === "play" && gameMode === "labyrinth")
     return React.createElement(
       React.Fragment,
@@ -563,6 +577,36 @@ function App() {
                 },
                 "⬇️"
               )
+          ),
+          // Trials: the Arena's format, one track, enemies in equipment
+          // (ArenaScreen in "trials" mode). Opens alongside the Arena.
+          React.createElement(
+            "div",
+            {
+              onClick: () => {
+                if (dungeonPointActive) return;
+                if (!arenaUnlocked) { setPlayLockedMsg("Unlocks via progression quest"); return; }
+                if (!newFeaturePillsSeen.trials) setNewFeaturePillsSeen((prev) => ({ ...prev, trials: true }));
+                setGameMode("trials");
+              },
+              style: arenaUnlocked
+                ? { ...CARD_BASE, opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
+                : { ...CARD_BASE, background: "#f5f5f5" },
+            },
+            React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: arenaUnlocked ? 1 : 0.5 } }, arenaUnlocked ? "⚔️" : "🔒"),
+            React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "div",
+                { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 2 } },
+                React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: arenaUnlocked ? "#111" : "#999" } }, "Trials"),
+                arenaUnlocked && !newFeaturePillsSeen.trials && React.createElement("div", { style: NEW_PILL }, "NEW")
+              ),
+              arenaUnlocked
+                ? React.createElement("div", { style: { fontSize: 12, color: "#888" } }, "Face equipped enemy teams")
+                : React.createElement("div", { style: { fontSize: 12, color: "#aaa" } }, "Unlocks via progression quest")
+            )
           ),
           React.createElement(DailyBossCard, { locked: !dailyBossUnlocked, onLockedTap: () => setPlayLockedMsg("Unlocks via progression quest"), disabled: dungeonPointActive }),
           React.createElement(

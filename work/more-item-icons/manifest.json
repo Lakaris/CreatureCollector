@@ -1,0 +1,131 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "style": "Create exactly ONE inventory icon for a cute creature-collecting game, matching its existing equipment and egg art. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outer contour (10-13px at final 256px), broad flat colors, minimal clean cel shading with one broad highlight and one shadow, no fine texture. Design for 256x256 pixels and tiny 13x13 to64x64 display: strong silhouette, generous negative spaces, only 3-5 main colors except the rainbow melon. Center the entire item at about90% canvas size with safe transparent margins. Object opaque, background and holes fully transparent. No text, numbers, labels, runes, watermarks, UI tile, vignette, ground, cast shadow, glow haze, loose sparkles, clutter, character, realistic rendering or tiny details.",
+  "items": [
+    {
+      "name": "Gems",
+      "filename": "gems.png",
+      "kind": "new",
+      "design": "One large chunky cut cyan-blue diamond gemstone, broad pentagonal crown and pointed lower tip, just four large geometric facets, pale-cyan highlight and deep-blue lower facet. A clean premium currency gem, no extra fragments or decorations."
+    },
+    {
+      "name": "Gear Shards",
+      "filename": "gearshards.png",
+      "kind": "new",
+      "design": "Two overlapping chunky broken steel gear fragments. The larger fragment is a broken half-cog with three wide square gear teeth and one large round opening; a smaller angular plate fragment tucks behind it. Light slate steel faces, dark charcoal side faces, one warm bronze edge. Obviously broken metal equipment material, no tiny rivets or scratches."
+    },
+    {
+      "name": "Dungeon Pass",
+      "filename": "dungeonpass.png",
+      "kind": "new",
+      "design": "One thick brick-red rectangular admission ticket tilted slightly diagonally, deeply notched short ends, broad warm-gold border and a single large dark-plum arched dungeon doorway emblem in the center. Two large gold stone blocks above the arch suggest a fortress gate. No printed text, numbers, perforations or small marks."
+    },
+    {
+      "name": "Fire Melon",
+      "filename": "firemelon.png",
+      "kind": "melon_base",
+      "design": "One plump round whole fantasy melon, slightly wider than a circle, with a short thick dark-green stem and one broad simple green leaf at top left. Frontal view. Warm red-orange rind, two broad darker-red curved vertical rind stripes near the left and right sides, and a single large cream-yellow stylized flame marking centered on the front. The flame is a flat rind marking, not actual fire. Very simple clean silhouette and few large shapes. Keep the middle of the fruit free of other patterns."
+    },
+    {
+      "name": "Water Melon",
+      "filename": "watermelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with aqua-blue, two broad deep-blue side stripes, and one large pale-cyan water droplet marking on the front. Remove the flame entirely."
+    },
+    {
+      "name": "Nature Melon",
+      "filename": "naturemelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with bright grassy green, two broad forest-green side stripes, and one large pale-lime leaf marking on the front, with at most one broad central vein. Remove the flame entirely."
+    },
+    {
+      "name": "Earth Melon",
+      "filename": "earthmelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with warm sandy tan, two broad earthy-brown side stripes, and one large angular slate-brown stone diamond marking with one broad pale facet on the front. Remove the flame entirely."
+    },
+    {
+      "name": "Wind Melon",
+      "filename": "windmelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with pale mint-aqua, two broad turquoise side stripes, and one large deep-teal curved wind swoosh marking on the front. The swoosh has a single large open curl and a short broad tail. Remove the flame entirely."
+    },
+    {
+      "name": "Electric Melon",
+      "filename": "electricmelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with bright lemon-yellow, two broad warm-amber side stripes, and one large saturated cobalt-blue lightning bolt marking on the front. Remove the flame entirely."
+    },
+    {
+      "name": "Light Melon",
+      "filename": "lightmelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with warm pearl-ivory, two broad pale-gold side stripes, and one large solid golden four-point star marking with a dark-ochre border on the front. No floating sparkle or glow. Remove the flame entirely."
+    },
+    {
+      "name": "Dark Melon",
+      "filename": "darkmelon.png",
+      "kind": "melon",
+      "design": "Replace the rind with deep indigo-plum, two broad medium-violet side stripes, and one large pale-lavender crescent moon marking on the front. Remove the flame entirely."
+    },
+    {
+      "name": "Rainbow Melon",
+      "filename": "rainbowmelon.png",
+      "kind": "melon",
+      "design": "Replace the entire rind pattern with SIX wide smooth vertical curved color panels, red, orange, yellow, green, blue and violet, following the round fruit surface. Each panel is a flat broad area, no gradient. Remove the flame and all central emblems completely; the rainbow rind alone is the distinctive feature."
+    },
+    {
+      "name": "Common Ascension Melon",
+      "filename": "commonascensionmelon.png",
+      "kind": "ascension_base",
+      "design": "Replace the rind with pearl-gray, two broad slate-silver side stripes, and one large simple white double upward-chevron marking edged in medium slate on the front. The double chevron is two stacked broad upward-pointing V shapes, clearly an evolution symbol, not letters. Remove the flame entirely. Keep this common rarity fruit understated."
+    },
+    {
+      "name": "Food",
+      "filename": "food.png",
+      "kind": "new",
+      "design": "One plump roasted drumstick tilted diagonally, rounded warm chestnut-brown meat with a broad caramel highlight and darker lower shadow, and one short thick ivory bone with a chunky two-lobed end. Simple friendly cartoon food with no bite, garnish, steam, plate, fine texture or cut marks."
+    },
+    {
+      "name": "Candy",
+      "filename": "candy.png",
+      "kind": "new",
+      "design": "One oversized wrapped candy, bright pink rounded central sweet with a single broad cream diagonal band, and two chunky turquoise twisted-wrapper ends left and right, each with only one broad fold. Compact silhouette, no tiny creases, printed marks or loose sweets."
+    },
+    {
+      "name": "Skin Shards",
+      "filename": "skinshards.png",
+      "kind": "new",
+      "design": "One chunky hot-pink cosmetic skin fragment, shaped like a broad irregular shield-like shard with two large notches along one side. Rich magenta shadow, a broad lavender facet, and one large pale-cyan diamond-shaped inset marking at its center. A small dark-purple shard tucked behind its bottom corner. Large simple geometric shapes, no texture, no skin anatomy."
+    },
+    {
+      "name": "Epic Ascension Melon",
+      "filename": "epicascensionmelon.png",
+      "kind": "ascension",
+      "design": "Change the pearl-gray rind to saturated violet-magenta with two broad deep-purple side stripes and bright lilac highlights. Change the double upward-chevron marking to pale warm gold with a dark-plum border. Keep it one bold evolution emblem, no other decoration."
+    },
+    {
+      "name": "Legendary Ascension Melon",
+      "filename": "legendaryascensionmelon.png",
+      "kind": "ascension",
+      "design": "Change the pearl-gray rind to rich warm golden yellow with two broad deep-amber side stripes and pale-gold highlights. Change the double upward-chevron marking to warm ivory with a thick ochre-gold border. Keep it one bold evolution emblem, no other decoration."
+    },
+    {
+      "name": "Ancient Fertilizer",
+      "filename": "ancientfertilizer.png",
+      "kind": "new",
+      "design": "One squat ochre-brown fertilizer sack with a wide rolled cream top lip and a single smooth dark-brown mound of soil visible inside. On the front is one large simple jade-green two-leaf sprout emblem with a warm-gold border. Soft chunky pouch shape, one broad fold, no scattered soil, lettering, strings, tiny stitching or decorative relics."
+    },
+    {
+      "name": "Flair Shard",
+      "filename": "flairshard.png",
+      "kind": "new",
+      "design": "One thick violet-and-gold broken star fragment: a broad four-point star silhouette with its lower-right tip clearly chipped away in one large angular notch. Violet face, deep-plum side face, broad gold edging, and one large pale-lavender central highlight. A magical cosmetic fragment, visibly star-shaped and different from a regular diamond gem. No glow, sparkle particles or extra shards."
+    }
+  ]
+}

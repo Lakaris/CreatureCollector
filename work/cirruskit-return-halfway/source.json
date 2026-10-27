@@ -1,0 +1,100 @@
+{
+  "image": "cirruskit_flavor.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 4,
+  "rows": 3,
+  "loop": false,
+  "totalDurationMs": 2432,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 600
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 80
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 184
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 208
+    },
+    {
+      "index": 4,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 176
+    },
+    {
+      "index": 5,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 192
+    },
+    {
+      "index": 6,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 144
+    },
+    {
+      "index": 7,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 144
+    },
+    {
+      "index": 8,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 184
+    },
+    {
+      "index": 9,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 80
+    },
+    {
+      "index": 10,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 440
+    }
+  ],
+  "notes": "Eleven frames: the nine-frame version with one added head-down pose between original frames 1 and 2, and the same intermediate pose in reverse between original frames 8 and 9. The original nine frames are unchanged. Added poses hold for 80ms; the opening and closing holds are shortened by 80ms each to preserve the 2432ms total. Read left to right, top to bottom. The twelfth grid cell is unused and transparent."
+}

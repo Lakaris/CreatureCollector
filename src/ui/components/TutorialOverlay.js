@@ -2,6 +2,7 @@
 // GameContext's `tutorialSeen` flag. Rest of the screen stays plain white --
 // graphics to accompany each line/creature will land here later.
 import React, { useState, useRef, useEffect } from "../../react.js";
+import { typeIcon, roleIcon, rangeIcon, iconText } from "./IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { makeOwnedCreature, getChain, MAX_ABILITY_LEVEL } from "../../core/creatures.js";
@@ -431,13 +432,13 @@ function TutorialOverlay() {
                   React.createElement(
                     "span",
                     { key: "role", style: { fontSize: 11, fontWeight: 600, color: ROLE_CONFIG[fd.role].color, background: ROLE_CONFIG[fd.role].bg, borderRadius: 8, padding: "2px 7px" } },
-                    ROLE_CONFIG[fd.role].emoji + " " + fd.role
+                    roleIcon(fd.role), " " + fd.role
                   ),
                 fd.attackType &&
                   React.createElement(
                     "span",
                     { key: "range", style: { fontSize: 11, fontWeight: 600, color: ATTACK_TYPE_CONFIG[fd.attackType].color, background: ATTACK_TYPE_CONFIG[fd.attackType].bg, borderRadius: 8, padding: "2px 7px" } },
-                    ATTACK_TYPE_CONFIG[fd.attackType].emoji + " " + fd.attackType
+                    rangeIcon(fd.attackType), " " + fd.attackType
                   )
               );
             })()
@@ -471,13 +472,13 @@ function TutorialOverlay() {
                       animation: selectedEgg === id ? "eggShake 0.4s ease-in-out infinite" : "none",
                     },
                   },
-                  "🥚"
+                  iconText("🥚")
                 )
               ),
               React.createElement(
                 "div",
                 { style: { fontSize: 12, fontWeight: 600, color: "#888" } },
-                (TYPE_EMOJI[CREATURE_MAP[id].type] || "") + " " + CREATURE_MAP[id].type
+                typeIcon(CREATURE_MAP[id].type), " " + CREATURE_MAP[id].type
               )
             )
           )
@@ -524,7 +525,7 @@ function TutorialOverlay() {
         React.createElement(
           "div",
           { style: { fontSize: 13, fontWeight: 600, color: "#888", marginTop: -8 } },
-          (TYPE_EMOJI[pickedDef.type] || "") + " " + pickedDef.type
+          typeIcon(pickedDef.type), " " + pickedDef.type
         )
       ),
     phase === "reveal" &&
@@ -653,7 +654,7 @@ function TutorialOverlay() {
       pickedDef &&
       (() => {
         const playerZoneStartRow = TUTORIAL_PLAYER_ZONE_START_ROW;
-        const attackIcon = (def) => (def.attackType === "Ranged" ? "🏹" : "⚔️");
+        const attackIcon = (def) => (rangeIcon(def.attackType === "Ranged" ? "Ranged" : "Melee"));
         const deployed = !!playerCell;
         return React.createElement(
           "div",
@@ -751,7 +752,7 @@ function TutorialOverlay() {
                               cursor: isPlayerCell ? "grab" : undefined,
                             },
                           },
-                          React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 9, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""),
+                          React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 9, lineHeight: 1, pointerEvents: "none" } }, typeIcon(d.type)),
                           React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 9, lineHeight: 1, pointerEvents: "none" } }, attackIcon(d)),
                           React.createElement(CreatureIcon, { def: d, size: TUTORIAL_TILE })
                         )
@@ -872,7 +873,7 @@ function TutorialOverlay() {
                   React.createElement(
                     "div",
                     { style: { position: "relative", lineHeight: 1 } },
-                    React.createElement("div", { style: { position: "absolute", top: -2, left: -6, fontSize: 10, lineHeight: 1 } }, TYPE_EMOJI[pickedDef.type] || ""),
+                    React.createElement("div", { style: { position: "absolute", top: -2, left: -6, fontSize: 10, lineHeight: 1 } }, typeIcon(pickedDef.type)),
                     React.createElement("div", { style: { position: "absolute", top: -2, right: -6, fontSize: 10, lineHeight: 1 } }, attackIcon(pickedDef)),
                     React.createElement(CreatureIcon, { def: pickedDef, size: 24, style: { marginTop: 6 } })
                   ),

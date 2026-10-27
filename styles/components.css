@@ -87,12 +87,14 @@
 :root[data-app-narrow="1"] .battle-grid{order:1;}
 :root[data-app-narrow="1"] .battle-side-panel{order:2;}
 
-/* Daily Boss planning phase: the boss's persistent info card doesn't fit next
-   to the grid when the app is narrow, so it's hidden there -- press-and-hold
-   the boss on the grid opens the same info as a popup instead (see
-   bossPopupOpen in DailyBossScreen.js, which reads the same breakpoint through
-   isAppNarrow so the two can never disagree). */
+/* Daily Boss planning phase: the boss's info card doesn't fit next to the grid
+   at all times when the app is narrow, so it starts hidden there --
+   press-and-hold the boss on the grid shows it in the side panel, the same
+   place a held creature's card goes (see bossPanelOpen in DailyBossScreen.js,
+   which reads the same breakpoint through isAppNarrow so the two can never
+   disagree). */
 :root[data-app-narrow="1"] .daily-boss-panel{display:none;}
+:root[data-app-narrow="1"] .daily-boss-panel.open{display:block;}
 
 /* Filters */
 .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
@@ -105,7 +107,13 @@
    big enough to read. Selection still shows through the active background.
    The uniform min-width keeps all eight on one line at 375px -- the row
    scrolls with a hidden scrollbar, so anything past the edge is invisible. */
-.filter-chip.type-chip{padding:3px 4px;min-width:30px;font-size:14px;line-height:1.25;text-align:center}
+.filter-chip.type-chip{padding:4px 4px;min-width:30px;text-align:center}
+/* Trait icons in filter chips draw at a fixed 16px rather than scaling with
+   the 11px label. The negative margin keeps the taller picture from growing the
+   chip, so icon-only type chips and labelled chips ("[icon] Attacker") are all
+   the same height as a plain text chip. !important because the icons carry an
+   inline em size (see IconText.js). */
+.filter-chip img{width:16px !important;height:16px !important;margin:-3px 0;vertical-align:middle !important}
 
 /* Abilities */
 .xp-row{background:#fff;border:0.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:8px 12px;margin-bottom:12px}
@@ -149,7 +157,6 @@
 /* Labels + progress */
 .section-label{font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 .lv-badge{background:#EAF3DE;color:#173404;font-size:11px;padding:2px 7px;border-radius:12px;font-weight:500}
-.asc-stars{color:#EF9F27;font-size:11px;font-weight:600;letter-spacing:1px}
 .shard-bar-bg{height:5px;background:#eee;border-radius:3px;overflow:hidden;flex:1}
 .shard-bar-fill{height:100%;background:#EF9F27;border-radius:3px;transition:width .3s}
 .notify{background:#EAF3DE;color:#173404;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:10px;text-align:center}

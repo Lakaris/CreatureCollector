@@ -1,6 +1,7 @@
 // Creature detail screen: stats, levelling, evolution, equipment, and the skin/flair tabs.
 
 import React, { useState, useEffect, useRef } from "../../../react.js";
+import { iconText, currencyIcon, gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX as CARD_ICON_PX } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
@@ -13,7 +14,7 @@ import { equipUpgradeCost, equipBonus, equipBonusStr, itemAffectsStat, equipMaxL
 import { formatAbilityStep, extractHeal, getAbilityTags, formatStarlitAbilityLevel, isStarlitAbilityLine, getAbilityStatBonus, usesPlainAbilityLevels, formatPlainAbilityLevel } from "../../../core/abilityText.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { getMelonLabel, getMelonAvailable, deductMelon, getAscensionMelon } from "../../../core/melons.js";
-import AscStars, { ascStarTier } from "../../../ui/components/AscStars.js";
+import { CreatureAscStars, GearAscStars } from "../../../ui/components/AscStars.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import StatStrip from "../../../ui/components/StatStrip.js";
 import PipRow from "../../../ui/components/PipRow.js";
@@ -489,7 +490,6 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       const canAffordUpgrade=upgradeCost!==null&&(currencies.equipShards||0)>=upgradeCost;
       const ascCost=asc<EQUIP_MAX_ASCENSION?EQUIP_ASC_COSTS[asc]:null;
       const canAffordAsc=ascCost!==null&&copies>=ascCost;
-      const starStr="★".repeat(asc);
       // Matches EquipmentDetail.js's own page exactly (white ScreenHeader bar,
       // no-scroll flex layout, identical card styling/colors) -- this is the
       // same item, just reached by holding a gear tile from inside a
@@ -503,10 +503,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             exclusivityCaption(pi)
           ),
           React.createElement("div",{style:{textAlign:"center",marginBottom:16,paddingTop:12,flexShrink:0}},
-            React.createElement("div",{style:{fontSize:64,marginBottom:4}},pi.emoji),
+            React.createElement("div",{style:{fontSize:64,marginBottom:4}},gearIcon(pi)),
             React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#000",marginBottom:2}},pi.name),
-            asc>0&&React.createElement("div",{style:{fontSize:14,color:"#f59e0b",letterSpacing:2,marginBottom:4}},starStr),
-            React.createElement("div",{style:{fontSize:16,fontWeight:700,color:lvl>=maxLvl?"#d97706":"#444",marginBottom:6}},lvl>=maxLvl?"MAX":"Lv "+lvl+" / "+maxLvl),
+            asc>0&&React.createElement("div",{style:{display:"flex",justifyContent:"center",marginBottom:4}},React.createElement(GearAscStars,{asc,size:16})),
+            React.createElement("div",{style:{fontSize:16,fontWeight:700,color:lvl>=maxLvl?"#d97706":"#444",marginBottom:6}},"Lv "+lvl),
             React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:pi.effect?6:0}},equipBonusStr(bonuses)),
             pi.effect&&React.createElement("div",{style:{fontSize:12,color:"#7F77DD",fontWeight:600}},"✦ "+pi.effect)
           ),
@@ -544,7 +544,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       notify&&React.createElement(Notify,{msg:notify}),
       equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
         React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-          React.createElement("div",{style:{fontSize:32,marginBottom:8}},EQUIPMENT_MAP[equipConflict.itemId]?.emoji),
+          React.createElement("div",{style:{fontSize:32,marginBottom:8}},gearIcon(EQUIPMENT_MAP[equipConflict.itemId])),
           React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
           React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},(EQUIPMENT_MAP[equipConflict.itemId]?.name||"This item")+" is already equipped on "+equipConflict.otherPetName+". Unequip it from there and equip it here?"),
           React.createElement("div",{style:{display:"flex",gap:8}},
@@ -561,9 +561,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#000"}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
             React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#666",marginBottom:6}},"Lv "+ownedData.level),
             React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap"}},
-              def.type&&React.createElement("span",{style:{fontSize:11,fontWeight:600,background:"#f0f0f0",color:"#444",borderRadius:8,padding:"2px 7px"}},(TYPE_EMOJI[def.type]||"")+" "+def.type),
-              def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},ROLE_CONFIG[def.role].emoji+" "+def.role),
-              def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},ATTACK_TYPE_CONFIG[def.attackType].emoji+" "+def.attackType)
+              def.type&&React.createElement("span",{style:{fontSize:11,fontWeight:600,background:"#f0f0f0",color:"#444",borderRadius:8,padding:"2px 7px"}},typeIcon(def.type), " " + def.type),
+              def.role&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ROLE_CONFIG[def.role].color,background:ROLE_CONFIG[def.role].bg,borderRadius:8,padding:"2px 7px"}},roleIcon(def.role), " " + def.role),
+              def.attackType&&React.createElement("span",{style:{fontSize:11,fontWeight:600,color:ATTACK_TYPE_CONFIG[def.attackType].color,background:ATTACK_TYPE_CONFIG[def.attackType].bg,borderRadius:8,padding:"2px 7px"}},rangeIcon(def.attackType), " " + def.attackType)
             )
           )
         ),
@@ -590,9 +590,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               style:{flex:1,height:128,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:isPickingThis?"#e0f7fa":rarCfg?rarCfg.bg:"#f5f5f5",border:"2px solid "+(isPickingThis?"#00acc1":rarCfg?rarCfg.color:"#e0e0e0"),borderRadius:10,padding:"8px 6px",cursor:pickerTutorialLock?"not-allowed":"pointer",textAlign:"center",userSelect:"none",boxSizing:"border-box",opacity:pickerTutorialLock&&!isPickingThis?0.5:1}},
               item
                 ? React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}},
-                    React.createElement("div",{style:{position:"absolute",top:0,left:2,fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=equipMaxLevel(item.id)?"MAX":"Lv "+lvl),
+                    React.createElement("div",{style:{position:"absolute",top:0,left:2,fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},"Lv "+lvl),
                     React.createElement("div",{style:{position:"relative",display:"inline-block",marginTop:8}},
-                      React.createElement("div",{style:{fontSize:24}},item.emoji),
+                      React.createElement("div",{style:{fontSize:24}},gearIcon(item)),
                       holdEquip===slotKey&&React.createElement("svg",{width:36,height:36,style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}},
                         React.createElement("circle",{cx:18,cy:18,r:16,fill:"none",stroke:"#534AB7",strokeWidth:3,strokeDasharray:100,strokeDashoffset:100,strokeLinecap:"round",
                           style:{animation:"holdRing 0.5s linear forwards",transformOrigin:"18px 18px",transform:"rotate(-90deg)"}})
@@ -662,7 +662,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Type"),
             React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
               Object.entries(TYPE_EMOJI).map(([t,em])=>
-                React.createElement("button",{key:t,className:"filter-chip"+(equipFilterElements.has(t)?" active":""),onClick:()=>toggleEquipElement(t)},em+" "+t)
+                React.createElement("button",{key:t,className:"filter-chip"+(equipFilterElements.has(t)?" active":""),onClick:()=>toggleEquipElement(t)}, typeIcon(t), " " + t)
               )
             )
           ),
@@ -670,7 +670,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("span",{style:{fontSize:10,fontWeight:600,color:"#aaa",textTransform:"uppercase",letterSpacing:".05em",whiteSpace:"nowrap"}},"Role"),
             React.createElement("div",{className:"filter-row",style:{margin:0,padding:0,flex:1}},
               ["Attacker","Tank","Support"].map(r=>
-                React.createElement("button",{key:r,className:"filter-chip"+(equipFilterRoles.has(r)?" active":""),onClick:()=>toggleEquipRole(r)},ROLE_CONFIG[r].emoji+" "+r)
+                React.createElement("button",{key:r,className:"filter-chip"+(equipFilterRoles.has(r)?" active":""),onClick:()=>toggleEquipRole(r)},roleIcon(r), " " + r)
               )
             )
           ),
@@ -760,20 +760,30 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               style:{position:"relative",background:isEquippedHere?"#ede9ff":highlight?"#f0eeff":(rarCfg?rarCfg.bg:"#fff"),borderRadius:10,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",gap:4,opacity:tutorialBlocked?0.35:disabled?0.4:1,cursor:(equipSlotPicker!==null&&!disabled&&!tutorialBlocked)?"pointer":"default",width:"calc(50% - 4px)",minHeight:170,boxSizing:"border-box",textAlign:"center",border:"1.5px solid "+(isEquippedHere?"#534AB7":highlight?"#d0ccf7":(rarCfg?rarCfg.color+"44":"#eee")),userSelect:"none"}},
               showItemPointer&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-34,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},"⬇️"),
               React.createElement("div",{style:{position:"absolute",top:6,left:8,textAlign:"left"}},
-                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},lvl>=equipMaxLevel(item.id)?"MAX":"Lv "+lvl),
-                isExclusive(item)&&React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"#7F77DD",marginTop:2,whiteSpace:"nowrap"}},
-                  exclusivityCaption(item)
+                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:lvl>=equipMaxLevel(item.id)?"#f59e0b":"#888",lineHeight:"16px"}},"Lv "+lvl),
+                // Icon only, as on the Equipment page -- "Fire exclusive" in
+                // full would run into the 44px art. The caption stays as the
+                // hover title and in the detail popup.
+                isExclusive(item)&&React.createElement("span",{title:exclusivityCaption(item),style:{display:"inline-block",fontSize:12,background:"#7F77DD1a",borderRadius:6,padding:"2px 4px",lineHeight:"14px",marginTop:3,whiteSpace:"nowrap"}},
+                  restrictionIcon(item)
                 )
               ),
               !tutorialBlocked&&React.createElement("div",{style:{position:"absolute",top:6,right:8,fontSize:16,cursor:"pointer",color:equipFavorites.has(item.id)?"#f59e0b":"#ccc",lineHeight:1},onClick:e=>toggleEquipFavorite(item.id,e)},equipFavorites.has(item.id)?"★":"☆"),
-              asc>0&&React.createElement("div",{style:{position:"absolute",top:4,left:0,right:0,textAlign:"center",fontSize:10,fontWeight:700,color:"#f59e0b",lineHeight:"14px",pointerEvents:"none"}},asc>=EQUIP_MAX_ASCENSION?"✦".repeat(10):(asc<=5?"★".repeat(asc):"★".repeat(5)+"★".repeat(asc-5))),
-              React.createElement("div",{style:{position:"relative",display:"inline-block",marginTop:4}},
-                React.createElement("span",{style:{fontSize:22}},item.emoji),
-                holdEquip===cardKey&&React.createElement("svg",{width:36,height:36,style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}},
-                  React.createElement("circle",{cx:18,cy:18,r:16,fill:"none",stroke:"#534AB7",strokeWidth:3,strokeDasharray:100,strokeDashoffset:100,strokeLinecap:"round",
+              // Art at the Equipment page's size (CARD_ICON_PX), with the
+              // hold-to-equip ring drawn around it. The ring's viewBox stays
+              // 36x36 (r 16, dash 100 = one lap) and just scales up.
+              React.createElement("div",{style:{position:"relative"}},
+                gearIcon(item,CARD_ICON_PX),
+                holdEquip===cardKey&&React.createElement("svg",{width:CARD_ICON_PX+16,height:CARD_ICON_PX+16,viewBox:"0 0 36 36",style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}},
+                  React.createElement("circle",{cx:18,cy:18,r:16,fill:"none",stroke:"#534AB7",strokeWidth:2,strokeDasharray:100,strokeDashoffset:100,strokeLinecap:"round",
                     style:{animation:"holdRing 0.5s linear forwards",transformOrigin:"18px 18px",transform:"rotate(-90deg)"}})
                 )
               ),
+              // Ascension stars in their own row under the art, as on the
+              // Equipment page -- always there (empty at 0) so every card's
+              // text starts at the same height.
+              React.createElement("div",{style:{height:10,display:"flex",justifyContent:"center",pointerEvents:"none"}},
+                asc>0&&React.createElement(GearAscStars,{asc,size:10})),
               // Fixed-height rows (stats / effect / status) so every card is the
               // same size whether or not it has an effect -- the effect area
               // always reserves room for a 3-line description, and ascend +
@@ -783,7 +793,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                 React.createElement("div",{style:{fontSize:11,color:"#666",minHeight:27}},equipBonusStr(bonuses)),
                 React.createElement("div",{style:{fontSize:10,color:"#7F77DD",fontWeight:600,marginTop:2,minHeight:39,lineHeight:1.3}},item.effect?"✦ "+item.effect:"")
               ),
-              React.createElement("div",{style:{minHeight:18,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},
+              React.createElement("div",{style:{minHeight:20,display:"flex",alignItems:"center",justifyContent:"center",gap:4}},
                 canAscendItem&&React.createElement("span",{style:{fontSize:9,fontWeight:800,color:"#fff",background:"#f59e0b",borderRadius:6,padding:"1px 6px",letterSpacing:".04em",whiteSpace:"nowrap"}},"ASCEND READY"),
                 equippedByPet&&React.createElement("span",{style:{fontSize:9,color:"#e65100",fontWeight:600,lineHeight:1.2,display:"flex",alignItems:"center",gap:3}},
                   React.createElement("span",{style:{fontSize:12}},equippedByDef?.emoji||"❓"),
@@ -831,9 +841,9 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           React.createElement("span",{style:{fontSize:12,lineHeight:1}},RARITY_GEM[def.rarity]),
           React.createElement("span",{style:{fontSize:11,fontWeight:700,color:rar.color,letterSpacing:".03em"}},rar.label),
           React.createElement("span",{style:{width:1,height:14,background:"#ddd",margin:"0 2px"}}),
-          icon("type",def.type,TYPE_EMOJI[def.type]||def.type),
-          def.role&&icon("role",def.role,ROLE_CONFIG[def.role].emoji),
-          def.attackType&&icon("range",def.attackType,ATTACK_TYPE_CONFIG[def.attackType].emoji)
+          icon("type",def.type,typeIcon(def.type)),
+          def.role&&icon("role",def.role,roleIcon(def.role)),
+          def.attackType&&icon("range",def.attackType,rangeIcon(def.attackType))
         );
       })(),
       React.createElement("button",{
@@ -846,7 +856,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:32,marginBottom:8}},EQUIPMENT_MAP[equipConflict.itemId]?.emoji),
+        React.createElement("div",{style:{fontSize:32,marginBottom:8}},gearIcon(EQUIPMENT_MAP[equipConflict.itemId])),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},
           (EQUIPMENT_MAP[equipConflict.itemId]?.name||"This item")+" is already equipped on "+equipConflict.otherPetName+". Unequip it from there and equip it here?"
@@ -859,15 +869,15 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     ),
     confirmMelon&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}},
       React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
-        React.createElement("div",{style:{fontSize:32,marginBottom:8}},ascMelon.emoji),
+        React.createElement("div",{style:{fontSize:32,marginBottom:8}},currencyIcon(ascMelon.key,ascMelon.emoji)),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Use "+ascMelon.label+"s?"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:4}},
           "You have "+ownedData.shards+" shards."
         ),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},
-          confirmMelon.shardsUsed>0
+          iconText(confirmMelon.shardsUsed>0
             ?"This will use 🔶 "+confirmMelon.shardsUsed+" shards + "+ascMelon.emoji+" "+confirmMelon.melonsUsed+" melon"+(confirmMelon.melonsUsed>1?"s":"")+"."
-            :ascMelon.emoji+" "+confirmMelon.melonsUsed+" melon"+(confirmMelon.melonsUsed>1?"s":"")+" will be used."
+            :ascMelon.emoji+" "+confirmMelon.melonsUsed+" melon"+(confirmMelon.melonsUsed>1?"s":"")+" will be used.")
         ),
         React.createElement("div",{style:{display:"flex",gap:8}},
           React.createElement("button",{onClick:()=>setConfirmMelon(null),style:{flex:1,padding:"10px 0",background:"#eee",color:"#333",border:"none",borderRadius:8,fontWeight:600,cursor:"pointer",fontSize:13}},"Cancel"),
@@ -892,7 +902,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         // spot of the art as on the Flair stage -- leaving the room above for
         // effects.
         React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,borderRadius:0,...backdrop}},
-          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
+          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
         ),
         // Top-right: level, with the ascension stars tucked under it. Same
         // banded row the Collection cards draw (colour = band of ten, ringed
@@ -902,11 +912,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         // scenery.
         React.createElement("div",{style:{position:"absolute",top:0,right:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3}},
           React.createElement("span",{style:{fontSize:17,fontWeight:700,...(backdrop?{color:"#fff",textShadow:"0 1px 3px rgba(0,0,0,0.7)"}:{color:"#666"})}},"Lv "+ownedData.level),
-          (()=>{
-            const asc=ascStarTier(ownedData.ascensions);
-            if(!asc.count)return null;
-            return React.createElement(AscStars,{n:asc.count,max:5,doubled:asc.doubled,colors:asc.colors,slotted:true,style:{fontSize:11,gap:1,...asc.style}});
-          })()
+          React.createElement(CreatureAscStars,{asc:ownedData.ascensions,size:11})
         )
       ),
       React.createElement(StatStrip,{values:statsWithEquip,onClick:setStatInfoPopup,isHighlighted:s=>lastLeveledStat===s})
@@ -966,7 +972,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             item
               ? React.createElement("div",null,
                   React.createElement("div",{style:{position:"relative",display:"inline-block"}},
-                    React.createElement("div",{style:{fontSize:22}},item.emoji),
+                    React.createElement("div",{style:{fontSize:22}},gearIcon(item)),
                     holdEquip===cSlotKey&&React.createElement("svg",{width:36,height:36,style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}},
                       React.createElement("circle",{cx:18,cy:18,r:16,fill:"none",stroke:"#534AB7",strokeWidth:3,strokeDasharray:100,strokeDashoffset:100,strokeLinecap:"round",
                         style:{animation:"holdRing 0.5s linear forwards",transformOrigin:"18px 18px",transform:"rotate(-90deg)"}})
@@ -1046,7 +1052,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
             React.createElement("div",{className:"shard-bar-fill",style:{width:Math.round(shardsProgress*100)+"%",background:ownedData.shards>=rootDef.shardsToAscend?"#378ADD":"#EF9F27"}})
           ),
           ownedData.shards>=rootDef.shardsToAscend&&React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"#378ADD",whiteSpace:"nowrap"}},"Ready!"),
-          React.createElement("span",{style:{fontSize:12,color:"#2e7d32",fontWeight:600,whiteSpace:"nowrap"}},ascMelon.emoji+" "+(currencies[ascMelon.key]||0))
+          React.createElement("span",{style:{fontSize:12,color:"#2e7d32",fontWeight:600,whiteSpace:"nowrap"}},iconText(ascMelon.emoji+" "+(currencies[ascMelon.key]||0)))
         ),
         canEvolve&&React.createElement("div",{style:{fontSize:11,background:"#FAECE7",color:"#4A1B0C",borderRadius:6,padding:"4px 8px",marginBottom:8}},
           "✨ Ready to evolve into "+CREATURE_MAP[def.evolutionId].name+"!"
@@ -1062,7 +1068,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           const label=melonsUsed>0
             ?action+" — 🔶 "+shardsUsed+(melonsUsed>0?" + "+ascMelon.emoji+" "+melonsUsed:"")
             :action+" — 🔶 "+needed+" Shards";
-          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend||ascendButtonLock,style:{marginBottom:0,opacity:ascendButtonLock?0.5:undefined}},label);
+          return React.createElement("button",{className:"btn btn-primary",onClick:doAscend,disabled:!canAscend||ascendButtonLock,style:{marginBottom:0,opacity:ascendButtonLock?0.5:undefined}},iconText(label));
         })()
       )
     ),
@@ -1106,9 +1112,11 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
               )
             ),
             React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:4}},
-              React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}},
+              // The pills always sit on their own line beneath the name, so a
+              // long name and a full set of pills never crowd each other.
+              React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:4}},
                 React.createElement("span",{className:"ability-name"},abl.name),
-                React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}},
+                React.createElement("div",{style:{display:"flex",flexDirection:"row-reverse",alignItems:"center",gap:5,justifyContent:"flex-end"}},
                   // Specials without a charge cost (e.g. Overload Sting, gated
                   // purely by Restrained stacks) show no energy pill.
                   k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{

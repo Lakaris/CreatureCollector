@@ -153,6 +153,7 @@ export const ABILITY_TAG_DEFS = {
   // tiles; Storm Lance and Inferno Breath run the column). Anything that DOES
   // reach the arena's edge has to say so in its own text -- Tremor Edge does.
   line: { label: "Line", description: "Hits every tile in a straight line in the direction of the attack, as far as the ability reaches." },
+  row: { label: "Row", description: "Affects every creature on one side in one horizontal row of the grid." },
   horizontalrow: { label: "Horizontal Row", description: "Hits every tile in the targeted creature's row." },
   speedup: { label: "Speed Up", description: "Increases the creature's Speed.", stacking: [25, 50, 75, 100, 125] },
   taunt: { label: "Taunt", description: "Enemies target the creature who inflicted the debuff onto them." },
@@ -564,6 +565,13 @@ const PRICKLET_PHRASES = {
   basic: null,
 };
 
+// Daubling (mud wasp) line: Mud Pellet is a plain hit on the generic phrase,
+// its max tier's Attack Down arriving as a rider. Clay Rampart and Sealing
+// Shell carry their Shield size in the text, so they are written out per tier.
+const DAUBLING_PHRASES = {
+  basic: null,
+};
+
 // Gillet (axolotl) line: Water Jet is a plain hit on the generic phrase. Swell
 // carries two numbers ("Heal 20 HP; 14 dmg") so it rides the dual-badge
 // healDamage shape. Its max tier folds the knockback in beside the damage
@@ -781,6 +789,10 @@ const PLAIN_ABILITY_PHRASES = {
   sporolith: PRICKLET_PHRASES,
   stonewarden: PRICKLET_PHRASES,
   jadolith: PRICKLET_PHRASES,
+  daubling: DAUBLING_PHRASES,
+  daubwasp: DAUBLING_PHRASES,
+  claymason: DAUBLING_PHRASES,
+  kilnwarden: DAUBLING_PHRASES,
 };
 
 /**
@@ -1184,6 +1196,21 @@ export function getAbilityTags(creatureId, key, abilityLevel) {
       if (abilityLevel == null || abilityLevel >= 4) tags.push("poison");
     }
     if (key === "unique" && (abilityLevel == null || abilityLevel >= 4)) tags.push("dispeldebuff");
+  }
+  const isDaublingLine = getRootDef(creatureId)?.id === "daubling";
+  if (isDaublingLine) {
+    // Mud Pellet only lowers Attack, and Sealing Shell only dispels, from
+    // their 4th upgrade on. "Lowest" is this game's existing Weakest tag.
+    // Clay Rampart's damage bonus is its own percentage with no pill.
+    if (key === "basic") {
+      tags.push("closest");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("attackdown");
+    }
+    if (key === "special") tags.push("weakest", "row");
+    if (key === "unique") {
+      tags.push("shield");
+      if (abilityLevel == null || abilityLevel >= 4) tags.push("dispeldebuff");
+    }
   }
   const isZephyrcooLine = getRootDef(creatureId)?.id === "stormwyvern";
   if (isZephyrcooLine) {

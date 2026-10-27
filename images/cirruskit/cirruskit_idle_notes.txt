@@ -1,0 +1,9 @@
+Idle animation: 30 unique frames, 512 x 512 each, 6 columns x 5 rows. 64ms per frame (15.625 frames/second), 1.92-second continuous loop.
+
+Every frame derives from cirruskit_base.png. No redraw, recoloring, or cross-fading. Head and chest rise up to 6px; upper tail sways up to 10px sideways; feet stay planted. The tail is separated from the body and moved with a uniform horizontal shift along each row, tapering to zero at its root. This preserves its outline thickness and prevents the black bulges caused by the previous horizontal deformation mask.
+
+A periodic phase sampled at n/30 produces the entire loop without a duplicate last frame. The first frame exactly matches the base; the last approaches it as part of continuous motion.
+
+Both cirruskit_idle.json and the game configuration in src/data/creatureArt.js use the same 30 frames, 6 columns and 64ms holds. The preview shows the actual spritesheet at 130px and 512px using the same CSS step-end playback approach as the game.
+
+Verified: 30 distinct frames, exact starting pose, no duplicate ending, stationary feet, unclipped canvas, and game/export timing agreement. The measured last-to-first change at 130px is within the range of ordinary adjacent changes. Normal resampling blends edge colors; the underlying base artwork is unchanged.

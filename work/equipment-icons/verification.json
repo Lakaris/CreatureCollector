@@ -1,0 +1,2349 @@
+{
+  "verifiedUtc": "2026-10-27T04:43:31.4001359Z",
+  "total": 233,
+  "newlyCreated": 232,
+  "existingAnchorCharm": 1,
+  "format": "PNG",
+  "width": 256,
+  "height": 256,
+  "transparentBackground": true,
+  "generationTool": "image_gen.imagegen",
+  "iconDirectory": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\equipment_icons",
+  "visualReviewSizes": [
+    64,
+    32,
+    13
+  ],
+  "items": [
+    {
+      "ordinal": 1,
+      "name": "Iron Band",
+      "filename": "ironband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30063,
+      "solidPixels": 34455,
+      "sha256": "8367DEE7FBBF9D0DECE19B590B4E1137A19AEB706E8B7C3C166E0F53C5D673E7"
+    },
+    {
+      "ordinal": 2,
+      "name": "Leather Vambrace",
+      "filename": "leathervambrace.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36213,
+      "solidPixels": 28470,
+      "sha256": "873D2783F204F8F14431DFB96A6D318A058B0EE3AAE7E28DD70546CD6355AA4A"
+    },
+    {
+      "ordinal": 3,
+      "name": "Boarhide Wrap",
+      "filename": "boarhidewrap.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32670,
+      "solidPixels": 31789,
+      "sha256": "A5A21D7E9A6AD0CF77437D3B885EEAA08F12D3B33FDC311586F4BF8D2677353E"
+    },
+    {
+      "ordinal": 4,
+      "name": "Stone Brace",
+      "filename": "stonebrace.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30466,
+      "solidPixels": 34064,
+      "sha256": "8EF7CF33FAD43689E7B74C23DBFAA4B7F7023F0FDD3E3DCA1078D001ABCBC6DA"
+    },
+    {
+      "ordinal": 5,
+      "name": "Wooden Buckler",
+      "filename": "woodenbuckler.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 24440,
+      "solidPixels": 40244,
+      "sha256": "CE6536C3B28C78A0E9E67D9DD1D171C21F7DC95CC9D5B31CAE001E4F7053B17D"
+    },
+    {
+      "ordinal": 6,
+      "name": "Bone Guard",
+      "filename": "boneguard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35300,
+      "solidPixels": 29291,
+      "sha256": "D611E39609D08559E89C819DB51FF87F7108683E9780126040EDB75A6FF064A3"
+    },
+    {
+      "ordinal": 7,
+      "name": "Iron Knuckles",
+      "filename": "ironknuckles.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35362,
+      "solidPixels": 28249,
+      "sha256": "8F316C1B752E0D9AC233E4B7193AAF229081D4DEF2C0AC6432FFB37416A6B4DA"
+    },
+    {
+      "ordinal": 8,
+      "name": "Bronze Spikes",
+      "filename": "bronzespikes.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40693,
+      "solidPixels": 23857,
+      "sha256": "9B860CB617B8DB69704FE22F111F61C31D4DA8736AAE5EED0BCE3980CD920EF1"
+    },
+    {
+      "ordinal": 9,
+      "name": "Rawhide Wraps",
+      "filename": "rawhidewraps.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30449,
+      "solidPixels": 33994,
+      "sha256": "08A5EDF071347E16E6441C51D62F8444F1FFDF699DA7FD55BCB04CC4DA0E2880"
+    },
+    {
+      "ordinal": 10,
+      "name": "Silver Armlet",
+      "filename": "silverarmlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38158,
+      "solidPixels": 26038,
+      "sha256": "7CBC6B0291314EED329B3601FDEB8FEFEB5C0FE93341988DFB43F462FFE2A0E0"
+    },
+    {
+      "ordinal": 11,
+      "name": "Falcon Bracer",
+      "filename": "falconbracer.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35260,
+      "solidPixels": 29339,
+      "sha256": "40CB22E93C7C84DCB7A5CF7CF9F4DCAA527BD7B9C9850919325EB0B62964E53A"
+    },
+    {
+      "ordinal": 12,
+      "name": "Guardian Crest",
+      "filename": "guardiancrest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33906,
+      "solidPixels": 30691,
+      "sha256": "0269897AECBDC7CA10E099F2A43AEA0B45EC37E2CBD7247530C12B77FB028928"
+    },
+    {
+      "ordinal": 13,
+      "name": "Tortoise Shell",
+      "filename": "tortoiseshell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29304,
+      "solidPixels": 35391,
+      "sha256": "C232542925C80120422D9118759B78DD6A07F2E86676AB1C9A82F073664AF5A4"
+    },
+    {
+      "ordinal": 14,
+      "name": "War Gauntlet",
+      "filename": "wargauntlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30290,
+      "solidPixels": 34308,
+      "sha256": "72E413AF601E36E1ADDBDA4871C47C021666504BB00A37AD3105954527FD2912"
+    },
+    {
+      "ordinal": 15,
+      "name": "Wolf Fang Claw",
+      "filename": "wolffangclaw.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34919,
+      "solidPixels": 29320,
+      "sha256": "A333A6095F03D8BB512DB486BCFE9F86972BC93C4AD58846D277CA4895CD1CB1"
+    },
+    {
+      "ordinal": 16,
+      "name": "Life Sigil",
+      "filename": "lifesigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34673,
+      "solidPixels": 30016,
+      "sha256": "837FAC68FFEB0CB71A6A98B0A0FBC2FD833D8E67F7A0E810946AF7D0206F730F"
+    },
+    {
+      "ordinal": 17,
+      "name": "Fury Sigil",
+      "filename": "furysigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37863,
+      "solidPixels": 26814,
+      "sha256": "4DA3526145678930A43734FC783CB6C35C693FF887450283B0DAD8FAE4BE5A6E"
+    },
+    {
+      "ordinal": 18,
+      "name": "Iron Sigil",
+      "filename": "ironsigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33516,
+      "solidPixels": 31130,
+      "sha256": "3F04E4DC9C5E8F2337674193EEFA954DFCB8D6AFE3C744F0C48847B604CF047A"
+    },
+    {
+      "ordinal": 19,
+      "name": "Kindled Charm",
+      "filename": "kindledcharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40369,
+      "solidPixels": 24031,
+      "sha256": "B3FE413DC4B35F1C3E8C2685417B51AA2064B0BC1260396E5E89222AC403A306"
+    },
+    {
+      "ordinal": 20,
+      "name": "Dewdrop Charm",
+      "filename": "dewdropcharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 42785,
+      "solidPixels": 21876,
+      "sha256": "0AE088F50E43220E85035BE4E8F12A0EE8524B76A40A9DB9E0FBEAA90E7FCB1C"
+    },
+    {
+      "ordinal": 21,
+      "name": "Coral Band",
+      "filename": "coralband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36768,
+      "solidPixels": 27569,
+      "sha256": "011BB57297BB85DF33D851F30E1C0A7840B3FCAC3F1CE46F687E12D1CE115895"
+    },
+    {
+      "ordinal": 22,
+      "name": "Thorn Ring",
+      "filename": "thornring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38931,
+      "solidPixels": 25351,
+      "sha256": "EB4388379BCF80E48671790E2EF260D8C65D7982155A9F7B2EA2F2A979BD7F41"
+    },
+    {
+      "ordinal": 23,
+      "name": "Pebble Talisman",
+      "filename": "pebbletalisman.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39826,
+      "solidPixels": 24909,
+      "sha256": "76575F7E0B670D39CA4A2A9EA24B1A02F3637DE4448AC8AD7167280B7D6523A2"
+    },
+    {
+      "ordinal": 24,
+      "name": "Clay Bangle",
+      "filename": "claybangle.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31888,
+      "solidPixels": 32555,
+      "sha256": "D1242508D476854238E8E474AB5201F44A7D77DEE4F63EFE9DCC691E03137EA7"
+    },
+    {
+      "ordinal": 25,
+      "name": "Breeze Feather",
+      "filename": "breezefeather.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41642,
+      "solidPixels": 22950,
+      "sha256": "F2A750C43C86A126577EBEE38385422372C5BB62372A1C447AD15D93F2CCD999"
+    },
+    {
+      "ordinal": 26,
+      "name": "Zephyr Knot",
+      "filename": "zephyrknot.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35189,
+      "solidPixels": 28940,
+      "sha256": "1282E85DC5882C807F7CF17F9BF37AB6AA59C3B134A75FD3BF1FBFA74CCE46EE"
+    },
+    {
+      "ordinal": 27,
+      "name": "Capacitor Charm",
+      "filename": "capacitorcharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39754,
+      "solidPixels": 24859,
+      "sha256": "E447EDD1204197970EFBCB455F1FC9D7943799C5539685DCFFBE3DEE8AD95A3B"
+    },
+    {
+      "ordinal": 28,
+      "name": "Copper Coil",
+      "filename": "coppercoil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35784,
+      "solidPixels": 28821,
+      "sha256": "8073CE7DE0EF7A0F878FA8AD5D3B6591E00FA5E057009A0BD6FC9860BA2DD64C"
+    },
+    {
+      "ordinal": 29,
+      "name": "Sunbeam Locket",
+      "filename": "sunbeamlocket.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32217,
+      "solidPixels": 32413,
+      "sha256": "E56FEEFB430C280294C67E54FEA6C987DCCCD71AD1ACDAB2B795F53402F864A5"
+    },
+    {
+      "ordinal": 30,
+      "name": "Glow Band",
+      "filename": "glowband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30150,
+      "solidPixels": 34439,
+      "sha256": "70ABBBCBAF3E1BA348C89D6FD2B6B4A2C7D431C3FBF1F54964C4CD1C1BEB159E"
+    },
+    {
+      "ordinal": 31,
+      "name": "Duskfang Charm",
+      "filename": "duskfangcharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 43207,
+      "solidPixels": 20667,
+      "sha256": "A093C909E9E55053B160517E46ABCF0FCA31A10E81F625C00D2A4E3823C583D4"
+    },
+    {
+      "ordinal": 32,
+      "name": "Umbral Thread",
+      "filename": "umbralthread.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40100,
+      "solidPixels": 23553,
+      "sha256": "C0A796F8D0A84F1D53914DEBE5795E88A7FF9495F12E5D00774B3BFFAD1F0E18"
+    },
+    {
+      "ordinal": 33,
+      "name": "Duelist's Edge",
+      "filename": "duelistsedge.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 52155,
+      "solidPixels": 12285,
+      "sha256": "AEEBC5380C422B635E19C7255181A109B2D67EC9303BFFAE9115CE26DF43DDD1"
+    },
+    {
+      "ordinal": 34,
+      "name": "Hunter's Mark",
+      "filename": "huntersmark.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41708,
+      "solidPixels": 22893,
+      "sha256": "1938B974B898BDB18427365C614A62E126ED90C6A7BA33FE2685D88DA7EA1C1F"
+    },
+    {
+      "ordinal": 35,
+      "name": "Squire's Plate",
+      "filename": "squiresplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31810,
+      "solidPixels": 32638,
+      "sha256": "E378BD8427D8E3E10D0A20EB0996943500FF8AB85B6E60C8960B3636E8D48627"
+    },
+    {
+      "ordinal": 36,
+      "name": "Grit Band",
+      "filename": "gritband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32712,
+      "solidPixels": 31997,
+      "sha256": "C21B42D6AD32C7B2DB641DA4688D946605F8733EF54BCB4640D7E97F23695B4D"
+    },
+    {
+      "ordinal": 37,
+      "name": "Mender's Charm",
+      "filename": "menderscharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34835,
+      "solidPixels": 29796,
+      "sha256": "44D0929272E175D273668A978C3C45CB6D365ABA15511BB310A470544AFA540B"
+    },
+    {
+      "ordinal": 38,
+      "name": "Chorus Bell",
+      "filename": "chorusbell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28746,
+      "solidPixels": 35622,
+      "sha256": "8F78EA52EDED3C2B310EE496FFDAA81F6F2EDA3B6BA026DB783A32D01CD3E0B1"
+    },
+    {
+      "ordinal": 39,
+      "name": "Brawler's Grip",
+      "filename": "brawlersgrip.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31927,
+      "solidPixels": 32785,
+      "sha256": "CBEC8F6B41C05B5DA93A327E7B567931D482B622CF938E9FD9B604684D5ECC8F"
+    },
+    {
+      "ordinal": 40,
+      "name": "Charger's Greaves",
+      "filename": "chargersgreaves.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40047,
+      "solidPixels": 24537,
+      "sha256": "51DA268F02B681476E2CB6EC2B642A8EA54E78333317B89275FE2DC8B4C614F4"
+    },
+    {
+      "ordinal": 41,
+      "name": "Keen Scope",
+      "filename": "keenscope.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41801,
+      "solidPixels": 22937,
+      "sha256": "D43242F558F50533AFA7F94807779EEC689716D1D0BD5BBEF1BF4521DE7664CD"
+    },
+    {
+      "ordinal": 42,
+      "name": "Light Quiver",
+      "filename": "lightquiver.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41546,
+      "solidPixels": 23025,
+      "sha256": "DD8AADE2F1BCF7F42AE1B463B07103C2D68AFA18CC04091C99D35163AA357E79"
+    },
+    {
+      "ordinal": 43,
+      "name": "Focus Band",
+      "filename": "focusband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39734,
+      "solidPixels": 24657,
+      "sha256": "A2B2EAD4CD4A59BE21925864B10B195BE271E33989D2A821773503AB7AB3DF0E"
+    },
+    {
+      "ordinal": 44,
+      "name": "Leech Ring",
+      "filename": "leechring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34405,
+      "solidPixels": 29979,
+      "sha256": "BED616615A925786E216DBD3FB789465E96B945689F4B7F33AB7917E023E83B2"
+    },
+    {
+      "ordinal": 45,
+      "name": "Traveler's Cloak",
+      "filename": "travelerscloak.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32003,
+      "solidPixels": 32632,
+      "sha256": "E1FB9D0A34CB34F68A87FA054FBA3F886B83BC90E2E0B8043BCC7A620CEE5A57"
+    },
+    {
+      "ordinal": 46,
+      "name": "Lucky Coin",
+      "filename": "luckycoin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 24271,
+      "solidPixels": 40401,
+      "sha256": "3FA5E7320F53FA9A1327E63947E8F20CD4828AAC5809CCD7425C7C29016D4E42"
+    },
+    {
+      "ordinal": 47,
+      "name": "Sentry Emblem",
+      "filename": "sentryemblem.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29892,
+      "solidPixels": 34791,
+      "sha256": "BC90C8FC5857EAEE9262219D8D66544BF962ED400786E63F94D1EEF8F570C468"
+    },
+    {
+      "ordinal": 48,
+      "name": "Anchor Charm",
+      "filename": "anchorcharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 42607,
+      "solidPixels": 21336,
+      "sha256": "86BB1D849B6491482CC491EEDFF0905CF33B9E1637A34044048EDFD49FB23069"
+    },
+    {
+      "ordinal": 49,
+      "name": "Runner's Band",
+      "filename": "runnersband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39527,
+      "solidPixels": 24960,
+      "sha256": "A05026AE75CF4BD2928C36954CEC1CEC6EB61A31AA060B74469FA8846C060D74"
+    },
+    {
+      "ordinal": 50,
+      "name": "Tar Droplet",
+      "filename": "tardroplet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31844,
+      "solidPixels": 32846,
+      "sha256": "4E56D573191B1ACEB1B997E083779CEA4079AC9697B520EE3BEA4E2D377D6A73"
+    },
+    {
+      "ordinal": 51,
+      "name": "Amber Bead",
+      "filename": "amberbead.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 26639,
+      "solidPixels": 38067,
+      "sha256": "BA54639616E70AD28136A130BD6E07A367F7DE5CAD8A1A9F8DF8E4AE3B34F5EF"
+    },
+    {
+      "ordinal": 52,
+      "name": "Wax Cell",
+      "filename": "waxcell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29934,
+      "solidPixels": 34765,
+      "sha256": "92A460AB8708E88883B3E0E496D26A759679CE449D62DEEF68CBC3F45186902C"
+    },
+    {
+      "ordinal": 53,
+      "name": "Cricket Chirp",
+      "filename": "cricketchirp.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38361,
+      "solidPixels": 26215,
+      "sha256": "9EA0F42102AC23866A391DA58F048D2209A4D8753CA5D157BF238330D14A549B"
+    },
+    {
+      "ordinal": 54,
+      "name": "Molted Skin",
+      "filename": "moltedskin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32446,
+      "solidPixels": 31475,
+      "sha256": "34F29AD2F79A52975CD1E3753189E2A239A5D1EF9D21EC149C21E36B1F5A44A5"
+    },
+    {
+      "ordinal": 55,
+      "name": "Hydra Tooth",
+      "filename": "hydratooth.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40626,
+      "solidPixels": 23967,
+      "sha256": "DF2D445E524010A67B04510916E7BBA30F6AC0673D72AAB621AA06BF09FDA23F"
+    },
+    {
+      "ordinal": 56,
+      "name": "Crest of Conquest",
+      "filename": "crestofconquest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 26683,
+      "solidPixels": 37953,
+      "sha256": "98ED94E9BE3C470F7B0A6D45C7EB892223B28D106B86BD858C730C3BCFE7A3FA"
+    },
+    {
+      "ordinal": 57,
+      "name": "Warlord's Seal",
+      "filename": "warlordsseal.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27369,
+      "solidPixels": 37312,
+      "sha256": "6760EB09066FE0B6A42FE09EEE6F649CCEA9009583CEFBC162374D0B080747B5"
+    },
+    {
+      "ordinal": 58,
+      "name": "Citadel Core",
+      "filename": "citadelcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27003,
+      "solidPixels": 37486,
+      "sha256": "61CF54D3F1A2F5399D186CF608AA6A8842E36EDA5D700671E173AE30DA6398D3"
+    },
+    {
+      "ordinal": 59,
+      "name": "Infernal Glove",
+      "filename": "infernalglove.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31323,
+      "solidPixels": 33230,
+      "sha256": "E59E955D5E8B7206760E738E656C057CCA91137868C937F6BEF04F1F07FA2075"
+    },
+    {
+      "ordinal": 60,
+      "name": "Life Crest",
+      "filename": "lifecrest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33095,
+      "solidPixels": 31425,
+      "sha256": "50E48AF4F16DDD205511E35E2A2E85104A206CBB30FD28C51E272A0D9147D7C7"
+    },
+    {
+      "ordinal": 61,
+      "name": "Fury Crest",
+      "filename": "furycrest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39761,
+      "solidPixels": 24785,
+      "sha256": "47487BE6C44C152A4328D6B8C58A07AF82FBBF2DA0DB6ED3D915DDBD895791B6"
+    },
+    {
+      "ordinal": 62,
+      "name": "Iron Crest",
+      "filename": "ironcrest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32467,
+      "solidPixels": 32242,
+      "sha256": "6FA6DBF04FE764494F759595EA9E8FD4CC989833B15C54750728B44DA829474F"
+    },
+    {
+      "ordinal": 63,
+      "name": "Cinder Ward",
+      "filename": "cinderward.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37769,
+      "solidPixels": 26917,
+      "sha256": "019C597E73D621DF84A90682AEF8EF296FA0FC632A17FBB4702715E486E83119"
+    },
+    {
+      "ordinal": 64,
+      "name": "Tide Guard",
+      "filename": "tideguard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31043,
+      "solidPixels": 33591,
+      "sha256": "BB96291C86733B209F4F107D583EEB2EE4BC1CD19B78CE4B653F569C2D6D1388"
+    },
+    {
+      "ordinal": 65,
+      "name": "Bark Shield",
+      "filename": "barkshield.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30106,
+      "solidPixels": 34566,
+      "sha256": "9B15A741B24F5405218D40296169D301308F8987C5CC78ADEFB32A8DDCD4284F"
+    },
+    {
+      "ordinal": 66,
+      "name": "Stone Bulwark",
+      "filename": "stonebulwark.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 23853,
+      "solidPixels": 40688,
+      "sha256": "8669A90F2F5E5F4D5C1420DC5FA8D525DCBD495773562DF4EFD3151948CAAD93"
+    },
+    {
+      "ordinal": 67,
+      "name": "Gale Barrier",
+      "filename": "galebarrier.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 24414,
+      "solidPixels": 40237,
+      "sha256": "C190B0DE4006151B64DFD31F63F450615A862287ECB3DC233D3CBA7DF6AE9100"
+    },
+    {
+      "ordinal": 68,
+      "name": "Shadow Veil",
+      "filename": "shadowveil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33850,
+      "solidPixels": 30390,
+      "sha256": "7498A0C5DE204F6F32D701E05C1C0BC178C1B837747B897922BC29BEF86CC0CD"
+    },
+    {
+      "ordinal": 69,
+      "name": "Radiant Aegis",
+      "filename": "radiantaegis.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 25266,
+      "solidPixels": 39427,
+      "sha256": "EF5711822B6CAD258614CCF509BC95CE72F9FE841406DCF93A3C8B28C18EEF59"
+    },
+    {
+      "ordinal": 70,
+      "name": "Scorchmantle",
+      "filename": "scorchmantle.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36835,
+      "solidPixels": 27774,
+      "sha256": "0C22646BAB28A55B93DFD8FD1C06992D756FC13BDB6E9EFB410BA58AC1FF91B3"
+    },
+    {
+      "ordinal": 71,
+      "name": "Tideweave Wrap",
+      "filename": "tideweavewrap.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32934,
+      "solidPixels": 31755,
+      "sha256": "A326EF0D83416AA28CCF6532DE1F62FF69CD08AB0AB10C07C1496AC2888BF28B"
+    },
+    {
+      "ordinal": 72,
+      "name": "Brineplate",
+      "filename": "brineplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32109,
+      "solidPixels": 32401,
+      "sha256": "08E62C69473E35A4093219CEB75DB170DE898828310A838066FEFB55B66C655B"
+    },
+    {
+      "ordinal": 73,
+      "name": "Thornback Vest",
+      "filename": "thornbackvest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33423,
+      "solidPixels": 31069,
+      "sha256": "8465879865E2B98719B7100B5C8E9D0D6F065EB6848930DAF6B9E82E9A8C027F"
+    },
+    {
+      "ordinal": 74,
+      "name": "Bedrock Slab",
+      "filename": "bedrockslab.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36895,
+      "solidPixels": 27852,
+      "sha256": "5B7CC19AA4C251C500631157C91D7DC61CA6A708256B8ABE3001B680717A87EE"
+    },
+    {
+      "ordinal": 75,
+      "name": "Quake Brand",
+      "filename": "quakebrand.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41044,
+      "solidPixels": 23711,
+      "sha256": "15C1005DA578F90C941A5E896C8C4C80C9CA341ED556643FA98DADFFC9509C68"
+    },
+    {
+      "ordinal": 76,
+      "name": "Capacitor Plate",
+      "filename": "capacitorplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31543,
+      "solidPixels": 33099,
+      "sha256": "F571A12510E8632FFF113D7CEAA3F6F25D420D24F0B7F4CE5B516A6681FD73FE"
+    },
+    {
+      "ordinal": 77,
+      "name": "Stormshell Mantle",
+      "filename": "stormshellmantle.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37792,
+      "solidPixels": 26938,
+      "sha256": "FAF47C068CCC1153A7FC50F9FF2ED9AC0D23D2648EDFE5BAFC3C7A2CE091E8B3"
+    },
+    {
+      "ordinal": 78,
+      "name": "Radiant Shroud",
+      "filename": "radiantshroud.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31807,
+      "solidPixels": 32695,
+      "sha256": "5BF9011F8DDDDD1358F0B08B566D6FFD8C82AB96B3277684BA9FF87A79E742A9"
+    },
+    {
+      "ordinal": 79,
+      "name": "Voidthread Cloak",
+      "filename": "voidthreadcloak.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35375,
+      "solidPixels": 29224,
+      "sha256": "620FA7C9D20823F5E47A35B6698AC1EC411577ED6998D178DCDF7F2E573AA815"
+    },
+    {
+      "ordinal": 80,
+      "name": "Galeforce Band",
+      "filename": "galeforceband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39682,
+      "solidPixels": 24704,
+      "sha256": "1E33CB846A62F180DBF84B54177B3CB40F29AB52F03B76A808BC066BDEB746BD"
+    },
+    {
+      "ordinal": 81,
+      "name": "Slipstream Blade",
+      "filename": "slipstreamblade.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 46232,
+      "solidPixels": 18135,
+      "sha256": "AE57BE3BBAF04748988343655994B80BB5CA74A5416AE7743EA038DF693B80F6"
+    },
+    {
+      "ordinal": 82,
+      "name": "Featherweight Wrap",
+      "filename": "featherweightwrap.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37676,
+      "solidPixels": 26730,
+      "sha256": "B19F9FA7D0257DC16D31C79D4E36774C5BD7312A93F2AD21572B922A7A1A77C2"
+    },
+    {
+      "ordinal": 83,
+      "name": "Cyclone Guard",
+      "filename": "cycloneguard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 25331,
+      "solidPixels": 39350,
+      "sha256": "A66EF207B73A5D81DF060386D7B57E151A738FE854A8AC423ACEF6DDCD97F145"
+    },
+    {
+      "ordinal": 84,
+      "name": "Jetstream Sigil",
+      "filename": "jetstreamsigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38235,
+      "solidPixels": 26455,
+      "sha256": "053D1913757B5872BFBB28C05F38B3990DA708C8B5BCD0238ACEE9F211E59758"
+    },
+    {
+      "ordinal": 85,
+      "name": "Sprout Locket",
+      "filename": "sproutlocket.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38535,
+      "solidPixels": 26204,
+      "sha256": "0CF94A92EAA124FF3FA4E379969CDA1BD1EC922DA69B1C66E5965F12A7F12A23"
+    },
+    {
+      "ordinal": 86,
+      "name": "Flarebrand Ring",
+      "filename": "flarebrandring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34685,
+      "solidPixels": 29648,
+      "sha256": "D103C070DC43C02B7D90C5C4CFAE99F383CA5B25A0B9075C707E2F7FC5AF576F"
+    },
+    {
+      "ordinal": 87,
+      "name": "Springwell Ring",
+      "filename": "springwellring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33618,
+      "solidPixels": 30693,
+      "sha256": "F87E8296931903B9A8C45FEDDA0F2876105D580B8799745ACD0C6ED9A2788140"
+    },
+    {
+      "ordinal": 88,
+      "name": "Verdant Weave",
+      "filename": "verdantweave.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35556,
+      "solidPixels": 28844,
+      "sha256": "A52934A98FBC6BAF60BE19FF12D80C9B5676734A6D7C54F25542A2486B6B5D5A"
+    },
+    {
+      "ordinal": 89,
+      "name": "Basalt Ward",
+      "filename": "basaltward.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34076,
+      "solidPixels": 30547,
+      "sha256": "D0D0737D609EF12D4F71B2AB2022ADD243EE236DD9A72EAFA0B96B92E42BB729"
+    },
+    {
+      "ordinal": 90,
+      "name": "Tailwind Talon",
+      "filename": "tailwindtalon.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39468,
+      "solidPixels": 24943,
+      "sha256": "DDA210AD379FE6BB23C5EE8CE29D8E3E6FBF90633B0EEBA251813EA1A0CCCED0"
+    },
+    {
+      "ordinal": 91,
+      "name": "Voltaic Fang",
+      "filename": "voltaicfang.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 43378,
+      "solidPixels": 21312,
+      "sha256": "D8174865A8A83D821313A868B86E29BD3ACE4888560F16E99DEA0DA1FFBCE6C2"
+    },
+    {
+      "ordinal": 92,
+      "name": "Dawnlight Halo",
+      "filename": "dawnlighthalo.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 45070,
+      "solidPixels": 19129,
+      "sha256": "18863435EAF51331A3AFBBFDCB61F493183232B4003DFF217B8839E937F56F24"
+    },
+    {
+      "ordinal": 93,
+      "name": "Gloomreaper Chain",
+      "filename": "gloomreaperchain.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39069,
+      "solidPixels": 25153,
+      "sha256": "CE15AC304D5BA2A445EDF4E166467D7F3272DDE09730BBB4979552F6A20FCF80"
+    },
+    {
+      "ordinal": 94,
+      "name": "Slayer's Band",
+      "filename": "slayersband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 25865,
+      "solidPixels": 38757,
+      "sha256": "32AB4FDD404F5BB8400DA7ECF53215198D316D68750D8FFB337BF1F0462593D5"
+    },
+    {
+      "ordinal": 95,
+      "name": "Bastion Plate",
+      "filename": "bastionplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28352,
+      "solidPixels": 36249,
+      "sha256": "CD304A1745647E11A781A5F2F33DF1D214086364FADBE6957A6DE7A682890E36"
+    },
+    {
+      "ordinal": 96,
+      "name": "Cantor's Beads",
+      "filename": "cantorsbeads.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39069,
+      "solidPixels": 25034,
+      "sha256": "8EC72CF8AF0C789EA9A2C3F1AAE825EB1CDA78EEB2590B8CFCC1E8015DD810A7"
+    },
+    {
+      "ordinal": 97,
+      "name": "Vanguard Gauntlet",
+      "filename": "vanguardgauntlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30080,
+      "solidPixels": 34551,
+      "sha256": "7EDA944E7F13D11C2BDEED88644DE8B69A845A1B3F0098AC453A66ED21755C18"
+    },
+    {
+      "ordinal": 98,
+      "name": "Vanguard Pauldron",
+      "filename": "vanguardpauldron.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28948,
+      "solidPixels": 35684,
+      "sha256": "4E16773682FF43775F65B60E8A2FFC86E9AB19F9A6C30DF354D64D03C9A85082"
+    },
+    {
+      "ordinal": 99,
+      "name": "Longshot Lens",
+      "filename": "longshotlens.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32491,
+      "solidPixels": 32190,
+      "sha256": "BC6E4404BF312047D6B85734434FA4AD31C02932F20249C05D6592C3D3FBA94D"
+    },
+    {
+      "ordinal": 100,
+      "name": "Vampiric Band",
+      "filename": "vampiricband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33704,
+      "solidPixels": 30410,
+      "sha256": "591CED61EE8EFF7C86C28E8F8B74ED0F2E2E9C97D1CB2980A50431B1FC498170"
+    },
+    {
+      "ordinal": 101,
+      "name": "Duelist's Oath",
+      "filename": "duelistsoath.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27241,
+      "solidPixels": 36605,
+      "sha256": "36993C1FE548F3B631F0CAD5290D462CA0B319B22C47F01CC36391676BF9495A"
+    },
+    {
+      "ordinal": 102,
+      "name": "Guardian Idol",
+      "filename": "guardianidol.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30887,
+      "solidPixels": 33711,
+      "sha256": "774526FFA5036FC0042BCCE6313BE7A587CFFB44F2B4418CFA6FEDE013327592"
+    },
+    {
+      "ordinal": 103,
+      "name": "Bulwark Sigil",
+      "filename": "bulwarksigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35239,
+      "solidPixels": 29370,
+      "sha256": "C5EE4A5EABB63494D9EA694BD01C13B80A4FC5C33B3CDFB5752359FA4F2F226D"
+    },
+    {
+      "ordinal": 104,
+      "name": "Sentinel Idol",
+      "filename": "sentinelidol.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34279,
+      "solidPixels": 30256,
+      "sha256": "ECFF222929EAA6B3588BAF6EEEB740BE71B943248A82DB9039093C96AE5CEBD2"
+    },
+    {
+      "ordinal": 105,
+      "name": "Spider Silk Spool",
+      "filename": "spidersilkspool.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 26197,
+      "solidPixels": 38184,
+      "sha256": "B3297E2CCF22FDF312E874584E0CFEDC095984D602161BD9C97D2F7DD182E074"
+    },
+    {
+      "ordinal": 106,
+      "name": "Cocoon Wrap",
+      "filename": "cocoonwrap.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34184,
+      "solidPixels": 30551,
+      "sha256": "AD02DA251E0070C06CAFB03276D57AEFECCE53BC15F357138C637188682373B0"
+    },
+    {
+      "ordinal": 107,
+      "name": "Honeycomb Flask",
+      "filename": "honeycombflask.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33998,
+      "solidPixels": 30690,
+      "sha256": "7AABC7B3D01D91F063EE5A391FC6CA340BA7655514EC7CB90382696CFDAD7616"
+    },
+    {
+      "ordinal": 108,
+      "name": "Tuning Fork",
+      "filename": "tuningfork.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 44056,
+      "solidPixels": 20333,
+      "sha256": "E197D62EDDA9F7348D5486996344290346AD92129EE925EFF05257543B4589C7"
+    },
+    {
+      "ordinal": 109,
+      "name": "Pearl Lacquer",
+      "filename": "pearllacquer.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32091,
+      "solidPixels": 32513,
+      "sha256": "A5875C9CF5B429175E651B1377D139D0B01AC213E0D79F03E7DAC3C134A73CD0"
+    },
+    {
+      "ordinal": 110,
+      "name": "Hunter's Snare",
+      "filename": "hunterssnare.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40546,
+      "solidPixels": 23451,
+      "sha256": "BFACB94EEF14E7739E9ECD1FBC784A21D051DAD5478B3A2F33490693C55ECD08"
+    },
+    {
+      "ordinal": 111,
+      "name": "Beacon Antler",
+      "filename": "beaconantler.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 42561,
+      "solidPixels": 21672,
+      "sha256": "E16AEDA77B2774DA4470F4E60F2DDC38801B06165CADDFF55BFFF5203399DCEE"
+    },
+    {
+      "ordinal": 112,
+      "name": "Warlord's Trophy",
+      "filename": "warlordstrophy.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36268,
+      "solidPixels": 28155,
+      "sha256": "32469EDDBF31E36431F606032CBC5E7967C4A4213DF62B88FE7AD1ABC079CB81"
+    },
+    {
+      "ordinal": 113,
+      "name": "Last Stand Crown",
+      "filename": "laststandcrown.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33029,
+      "solidPixels": 31340,
+      "sha256": "4E0E277092FD2988DDC14C62A78D0E9E067A04710953DD8ACC464A1C0FF4C72C"
+    },
+    {
+      "ordinal": 114,
+      "name": "Lifebinder Pendant",
+      "filename": "lifebinderpendant.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33566,
+      "solidPixels": 31018,
+      "sha256": "FF4937EFE5EB226D7954A694BBDDB459AD56CE46A3F464AD7C56C864FA6F9489"
+    },
+    {
+      "ordinal": 115,
+      "name": "Cicada Husk",
+      "filename": "cicadahusk.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35169,
+      "solidPixels": 29364,
+      "sha256": "D7519BFCAFA23E969598D12646F7630FCBB7201AA70BA7D8A8E147A23630F25A"
+    },
+    {
+      "ordinal": 116,
+      "name": "Life Relic",
+      "filename": "liferelic.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34350,
+      "solidPixels": 30115,
+      "sha256": "0B52EC321FF81850D7E80E1B28171489C7ADE7D32BE2E064BBF961C1CF7CF3D5"
+    },
+    {
+      "ordinal": 117,
+      "name": "Fury Relic",
+      "filename": "furyrelic.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33219,
+      "solidPixels": 31204,
+      "sha256": "EDDC42E84836DA6052541ABF9499421DC868222408766825D8ADCD6725D2F5F1"
+    },
+    {
+      "ordinal": 118,
+      "name": "Iron Relic",
+      "filename": "ironrelic.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28949,
+      "solidPixels": 35649,
+      "sha256": "AE4313D715ADE0F0F5DC086A8100E72BDF487B1B942D23FADA2189A0ED8BDE55"
+    },
+    {
+      "ordinal": 119,
+      "name": "Divine Colossus",
+      "filename": "divinecolossus.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27775,
+      "solidPixels": 36588,
+      "sha256": "57DD8690C99165CD53C11AC4427CBAF6AF76F657C3102A0D5E22530C3EF1478B"
+    },
+    {
+      "ordinal": 120,
+      "name": "Eternal Fortress",
+      "filename": "eternalfortress.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28917,
+      "solidPixels": 35586,
+      "sha256": "921CC8F0F08641D9032F8D4C0F93660E2980FADBBCD3576BC303F58F87F01EDE"
+    },
+    {
+      "ordinal": 121,
+      "name": "Dragon's Claw",
+      "filename": "dragonsclaw.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33599,
+      "solidPixels": 30729,
+      "sha256": "84B0C16B50EE34E3F98545C88FDF44E2E7C48CDB50DF96CC1CA74ECA84AE5E92"
+    },
+    {
+      "ordinal": 122,
+      "name": "Berserk Core",
+      "filename": "berserkcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33033,
+      "solidPixels": 31129,
+      "sha256": "FDE6A220B35E5BB92BA99EA81757F226C742BAE703A5DAC1AD764455493FC0E8"
+    },
+    {
+      "ordinal": 123,
+      "name": "Twin Fang",
+      "filename": "twinfang.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38506,
+      "solidPixels": 25922,
+      "sha256": "8AEA6EB2E02048B5039782C49682627B28D9BD4B0020ACA322A16081D98A98BE"
+    },
+    {
+      "ordinal": 124,
+      "name": "Shockwave Gauntlet",
+      "filename": "shockwavegauntlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31109,
+      "solidPixels": 33557,
+      "sha256": "91584548FEAFD875E588FAD49D526F411859AF8FC030AB3AD0E8C486D1A0FA54"
+    },
+    {
+      "ordinal": 125,
+      "name": "Arrowsplit",
+      "filename": "arrowsplit.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 47642,
+      "solidPixels": 16729,
+      "sha256": "D6FF539B6C83F6A734045432323A95B10D57C7048581A81D7854BF36D4A0CAC6"
+    },
+    {
+      "ordinal": 126,
+      "name": "Thornback Plate",
+      "filename": "thornbackplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27670,
+      "solidPixels": 36828,
+      "sha256": "ED1BDDEC93FDD4585EFEC69A36500CA9345D04919B8EE1A3DD7267C6A3F19CC6"
+    },
+    {
+      "ordinal": 127,
+      "name": "Last Breath Core",
+      "filename": "lastbreathcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28335,
+      "solidPixels": 35730,
+      "sha256": "B686ED3F1206E112008A6C6DE99FD9FCE9392B42E7D1E3C630CC361719557C7C"
+    },
+    {
+      "ordinal": 128,
+      "name": "Shattercrit Ring",
+      "filename": "shattercritring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36684,
+      "solidPixels": 27690,
+      "sha256": "8E9484F008DB9DEDAEF1E2ACA02890623E91CCC8C08F633022EF6C7FD4845A17"
+    },
+    {
+      "ordinal": 129,
+      "name": "Phoenix Core",
+      "filename": "phoenixcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29773,
+      "solidPixels": 34370,
+      "sha256": "589A648FFFBCFBDED028E3C7AE6E3FABFAC8DB463DE7CC1C905FB772A41D299B"
+    },
+    {
+      "ordinal": 130,
+      "name": "Bloodthirster",
+      "filename": "bloodthirster.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 45339,
+      "solidPixels": 19075,
+      "sha256": "2A7DBB8FC206CC708C2D7B6BD04B1B23BE4D81BF3F528D0E11E8D62A222AA4FB"
+    },
+    {
+      "ordinal": 131,
+      "name": "Wyrmblood Chalice",
+      "filename": "wyrmbloodchalice.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37569,
+      "solidPixels": 26772,
+      "sha256": "21AED004D963DA028353A240DF5506E5AAEB88A88E7C9E3B3843ED8938693C4C"
+    },
+    {
+      "ordinal": 132,
+      "name": "Ambrosia Chalice",
+      "filename": "ambrosiachalice.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29733,
+      "solidPixels": 34630,
+      "sha256": "A5C7A759681339960816770CBE2E419CB19540A61F21B19D87152FABD428DBFB"
+    },
+    {
+      "ordinal": 133,
+      "name": "Magpie Brooch",
+      "filename": "magpiebrooch.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31941,
+      "solidPixels": 32489,
+      "sha256": "4B0574C3E40683A8E7F2D584650130DCAE81DE4EDD6B8976C1E2DAD000484861"
+    },
+    {
+      "ordinal": 134,
+      "name": "Echo Conch",
+      "filename": "echoconch.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30940,
+      "solidPixels": 33631,
+      "sha256": "C4E5285C0613C4ADEEA0B03E30F5E79224C3F7D072150525A88B1EE5FAFA0EF1"
+    },
+    {
+      "ordinal": 135,
+      "name": "Mantis Scythe",
+      "filename": "mantisscythe.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 46342,
+      "solidPixels": 17963,
+      "sha256": "87D59659E15A68F8019A99A5F8ED38855B34710987032B3FB78BD3F9E583DA59"
+    },
+    {
+      "ordinal": 136,
+      "name": "Sanguine Fang",
+      "filename": "sanguinefang.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 43623,
+      "solidPixels": 21009,
+      "sha256": "582521BC207888EEF1C259350015EA2250745B275355F089025B1F7AD59CEC2E"
+    },
+    {
+      "ordinal": 137,
+      "name": "Warbuff Plate",
+      "filename": "warbuffplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30004,
+      "solidPixels": 34664,
+      "sha256": "063992A0240124B5DBE8DB0CA0E3BD4BA81911C772950DD787205143E1291422"
+    },
+    {
+      "ordinal": 138,
+      "name": "Seafoam Cloak",
+      "filename": "seafoamcloak.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33406,
+      "solidPixels": 31187,
+      "sha256": "48C9B9E9EA594646DEDD0BF400A23869CDE6516CBAB5A613B61F14FC699B0077"
+    },
+    {
+      "ordinal": 139,
+      "name": "Tidal Grip",
+      "filename": "tidalgrip.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28665,
+      "solidPixels": 35744,
+      "sha256": "B3F86DC06E06D5B7205DE9D4E1071B18627026A068D695B60BA00FA874BC8557"
+    },
+    {
+      "ordinal": 140,
+      "name": "Petrified Core",
+      "filename": "petrifiedcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32810,
+      "solidPixels": 31863,
+      "sha256": "8CF0968DFB2A4F4F84FE0DDDF307FD02F19B3EA494D781CAC706F53321C7BFC6"
+    },
+    {
+      "ordinal": 141,
+      "name": "Tremor Edge",
+      "filename": "tremoredge.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 43875,
+      "solidPixels": 20723,
+      "sha256": "BDF5E7D16886BF4DF9C992A03EBD4C6EA7EF14ECC4B55198D50B6E759671B2AF"
+    },
+    {
+      "ordinal": 142,
+      "name": "Chain Conductor",
+      "filename": "chainconductor.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 46535,
+      "solidPixels": 18041,
+      "sha256": "016D0AABC650215530F82A6251B64281169C38DD138BF554F9FDD192B153E579"
+    },
+    {
+      "ordinal": 143,
+      "name": "Voidheart",
+      "filename": "voidheart.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32139,
+      "solidPixels": 32500,
+      "sha256": "4E5B6E38A778FEBE6422779F7C3E39C21663991C4E3F3E4AF0644318C05D7EF9"
+    },
+    {
+      "ordinal": 144,
+      "name": "Shadow Shroud",
+      "filename": "shadowshroud.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34723,
+      "solidPixels": 29832,
+      "sha256": "4EAAE6F7ADEF0A1DBD122E817546CB137D9A306D3D8643C036FE85288BA07942"
+    },
+    {
+      "ordinal": 145,
+      "name": "Gust Anklets",
+      "filename": "gustanklets.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37527,
+      "solidPixels": 26903,
+      "sha256": "15D3A8BF57B00A8FC24CE6F43B0ED900800BF6F252DA8078CA60B9EE753C48FD"
+    },
+    {
+      "ordinal": 146,
+      "name": "Tempest Blade",
+      "filename": "tempestblade.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 46262,
+      "solidPixels": 18116,
+      "sha256": "4F69F318B315448313BDF998477C5BEDBE513926389EDFA7C2398689180ED923"
+    },
+    {
+      "ordinal": 147,
+      "name": "Cyclone Ring",
+      "filename": "cyclonering.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33463,
+      "solidPixels": 30889,
+      "sha256": "0228985EAE5A018DB2DE63C76A8E7F26723D3269EAE3742227C0AE6704EF37C5"
+    },
+    {
+      "ordinal": 148,
+      "name": "Sirocco Plate",
+      "filename": "siroccoplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27872,
+      "solidPixels": 36705,
+      "sha256": "16736F8089D94C9E894EB09A0B37E66271DB26369B4C9B93C14A0A14AE98F3BA"
+    },
+    {
+      "ordinal": 149,
+      "name": "Rampage Shard",
+      "filename": "rampageshard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35634,
+      "solidPixels": 28923,
+      "sha256": "2933835278ED883B5EC19525B08FACAE0691B05EC6F0510E0BEEF5A878B4057B"
+    },
+    {
+      "ordinal": 150,
+      "name": "Hungering Edge",
+      "filename": "hungeringedge.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 47477,
+      "solidPixels": 16784,
+      "sha256": "3B8FF0B86150D99BC471B1306F3BF7384B49F1DD7780120176258C1918AD2BF1"
+    },
+    {
+      "ordinal": 151,
+      "name": "Ironwall Core",
+      "filename": "ironwallcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 21460,
+      "solidPixels": 43061,
+      "sha256": "BE26D6937A6FE4945FA754F5D0DCF0C83B9415674A373E81D9917EE3BA317BDD"
+    },
+    {
+      "ordinal": 152,
+      "name": "Warlord's Insignia",
+      "filename": "warlordsinsignia.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32759,
+      "solidPixels": 31689,
+      "sha256": "EF890DE730DC4F3FD733C3ED1E1EE16EF9D31649E841176C1BBEE07EB118252A"
+    },
+    {
+      "ordinal": 153,
+      "name": "Eternal Bulwark",
+      "filename": "eternalbulwark.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 23448,
+      "solidPixels": 40994,
+      "sha256": "625C9E29E1A6B3D9034A224B41628788DFE88CCD91BB8B38DE42B805987A621D"
+    },
+    {
+      "ordinal": 154,
+      "name": "Rebuke Gauntlet",
+      "filename": "rebukegauntlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32953,
+      "solidPixels": 31701,
+      "sha256": "28490F6CED6D44756CD4F3ADF1624203B023BC60F357D85944588CC7DA3F2CD7"
+    },
+    {
+      "ordinal": 155,
+      "name": "Guardian's Oath",
+      "filename": "guardiansoath.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33773,
+      "solidPixels": 30696,
+      "sha256": "62843A0024E667CA41F9BF12F51D352E543663557ACBDC5E526A89792273AD11"
+    },
+    {
+      "ordinal": 156,
+      "name": "Twin Soul Crest",
+      "filename": "twinsoulcrest.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31825,
+      "solidPixels": 32866,
+      "sha256": "65E0542265E9B73D89DB05BE80F505F659B124570E6CE3D482D8E8AC9848226E"
+    },
+    {
+      "ordinal": 157,
+      "name": "Amplifier Prism",
+      "filename": "amplifierprism.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34964,
+      "solidPixels": 29671,
+      "sha256": "A98DD63CEBA450C785BCC71A451A6C1BE4C033D21359EB8318C43FFE51EC68A2"
+    },
+    {
+      "ordinal": 158,
+      "name": "Swiftgrace Band",
+      "filename": "swiftgraceband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33770,
+      "solidPixels": 30505,
+      "sha256": "C9C4939B16AEE6939A24B82DECB5BFFB4DDBA4FA0B9949EB203A4DBAB54AF138"
+    },
+    {
+      "ordinal": 159,
+      "name": "Sanctum Seal",
+      "filename": "sanctumseal.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34893,
+      "solidPixels": 29712,
+      "sha256": "07119ECEDC09914424321E93D1948E83991A9540AE07253BBFC19877CD9084EE"
+    },
+    {
+      "ordinal": 160,
+      "name": "Soul Lantern",
+      "filename": "soullantern.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33466,
+      "solidPixels": 30683,
+      "sha256": "F4A7B71329CFFDA0E99EC546B93CF426CBAD9F0B8A71E05106E171CD9DF266A6"
+    },
+    {
+      "ordinal": 161,
+      "name": "Purifier's Chalice",
+      "filename": "purifierschalice.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31486,
+      "solidPixels": 33017,
+      "sha256": "A99098E81365A8B0A8C85D23C4A878D361B9398F1DB76A0755BE3CBC967F3B49"
+    },
+    {
+      "ordinal": 162,
+      "name": "Blessing Mantle",
+      "filename": "blessingmantle.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35799,
+      "solidPixels": 28929,
+      "sha256": "9215CE43241A3184673DCC4A0C0DEBE61BC98C15AE2B68D0E3618A5597BA1615"
+    },
+    {
+      "ordinal": 163,
+      "name": "Overdrive Sigil",
+      "filename": "overdrivesigil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41954,
+      "solidPixels": 22698,
+      "sha256": "68EB046408680F2824C8A5EF1DBE53E4AAE26E4EC4E8A406380666B9B59B564D"
+    },
+    {
+      "ordinal": 164,
+      "name": "Warcry Pendant",
+      "filename": "warcrypendant.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36217,
+      "solidPixels": 28197,
+      "sha256": "F3E68E26C2D018AF2F9CA374D16D90AD33BA20006969DDFE5583508C154FB03F"
+    },
+    {
+      "ordinal": 165,
+      "name": "Ember Chip",
+      "filename": "emberchip.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35979,
+      "solidPixels": 28783,
+      "sha256": "44CA90572D8CDA2178068B40DC61E6EDD8C898C876F2AE3AFD807E8B8AC365ED"
+    },
+    {
+      "ordinal": 166,
+      "name": "Ashen Locket",
+      "filename": "ashenlocket.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35369,
+      "solidPixels": 29278,
+      "sha256": "5C9A3053FD4AD99A9BF49E470625D30A18607CDDF97232414E85A5F13D656743"
+    },
+    {
+      "ordinal": 167,
+      "name": "Kiln Heart",
+      "filename": "kilnheart.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35280,
+      "solidPixels": 29375,
+      "sha256": "9ED6DC6C65E4AD437325CB7DBB8F8AA57D3CAAEBA4C52AC32008D46E06E19320"
+    },
+    {
+      "ordinal": 168,
+      "name": "Flashpoint Ring",
+      "filename": "flashpointring.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35210,
+      "solidPixels": 29038,
+      "sha256": "F8978D7D7844D08AD07C03FA1C80C65A947BDC89125996590456B7CD15E371EB"
+    },
+    {
+      "ordinal": 169,
+      "name": "Everflame Crown",
+      "filename": "everflamecrown.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29556,
+      "solidPixels": 34469,
+      "sha256": "7011AF02F486A695482DFC6045FCB75528832D57488C88725146468F7C2FC69D"
+    },
+    {
+      "ordinal": 170,
+      "name": "Inferno Heart",
+      "filename": "infernoheart.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34745,
+      "solidPixels": 29787,
+      "sha256": "00CE92B949FA7E3F1CE642003A041009A2D97B45844EEAABA90421242FF03AC1"
+    },
+    {
+      "ordinal": 171,
+      "name": "Wildfire Brand",
+      "filename": "wildfirebrand.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35868,
+      "solidPixels": 28618,
+      "sha256": "C679B3CF1BA6CB7B56B2BDA05B748C43A8A630C174955DF0F97E32CEC2A05C1C"
+    },
+    {
+      "ordinal": 172,
+      "name": "Frost Pearl",
+      "filename": "frostpearl.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29740,
+      "solidPixels": 34961,
+      "sha256": "812C27680EB948FDB0975ECBE62D72CADA41F0EE6CCDCB51705054E75D87D85A"
+    },
+    {
+      "ordinal": 173,
+      "name": "Rime Shard",
+      "filename": "rimeshard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39508,
+      "solidPixels": 25226,
+      "sha256": "195B1951A4F371490D74A31D2E28ED9C7A39A4F1360DC470D039CC9446F665D2"
+    },
+    {
+      "ordinal": 174,
+      "name": "Undertow Anchor",
+      "filename": "undertowanchor.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35404,
+      "solidPixels": 28284,
+      "sha256": "2BE123BD033AEDC15D1281A455E7E19CA34DF0B2F370F19737FE988F48D83D3A"
+    },
+    {
+      "ordinal": 175,
+      "name": "Tidecaller Shell",
+      "filename": "tidecallershell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30583,
+      "solidPixels": 34015,
+      "sha256": "C856F80757F4F1127084A39A5B3AEB25FA926661C049E1057D058D2688130466"
+    },
+    {
+      "ordinal": 176,
+      "name": "Absolute Zero",
+      "filename": "absolutezero.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34976,
+      "solidPixels": 29253,
+      "sha256": "91377DFD21CDFF4E9AC915F15C4EE2DCC523AF67C58CC6F152BA94C021C90665"
+    },
+    {
+      "ordinal": 177,
+      "name": "Maelstrom Core",
+      "filename": "maelstromcore.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 26445,
+      "solidPixels": 38232,
+      "sha256": "72414BA9A1C04C571FD5DBB2DA6F849A23437E58BFA69299CB7A58138B4B2DC4"
+    },
+    {
+      "ordinal": 178,
+      "name": "Leviathan Scale",
+      "filename": "leviathanscale.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33676,
+      "solidPixels": 30809,
+      "sha256": "1B86F09484CE7ACC4C9091595E8F67B487B9B8223CAA08D3291B2E3F816F27C8"
+    },
+    {
+      "ordinal": 179,
+      "name": "Nettle Pin",
+      "filename": "nettlepin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 47752,
+      "solidPixels": 16879,
+      "sha256": "DE29BDD4070EA6A5D04CAAB31E3469391A855F59AFBA8CC6C6BA922B3915C719"
+    },
+    {
+      "ordinal": 180,
+      "name": "Strangler Vine",
+      "filename": "stranglervine.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36110,
+      "solidPixels": 27942,
+      "sha256": "D4A0DCB5477F73B0F6217958E5BE58989CE1001AD0F7438932E8DF2E94A49E06"
+    },
+    {
+      "ordinal": 181,
+      "name": "Rootbound Idol",
+      "filename": "rootboundidol.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37198,
+      "solidPixels": 27410,
+      "sha256": "AB8125BE737B1AC5848F1FB47319240E8DD235DA1FCFF0BE285697523E31CD5E"
+    },
+    {
+      "ordinal": 182,
+      "name": "Worldtree Seed",
+      "filename": "worldtreeseed.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34245,
+      "solidPixels": 30106,
+      "sha256": "32DF276F025731F5A1391D4FB0C3EB2F755763464280C1FC0E766D653C7E1096"
+    },
+    {
+      "ordinal": 183,
+      "name": "Pollen Pouch",
+      "filename": "pollenpouch.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31285,
+      "solidPixels": 33199,
+      "sha256": "7AEA3927D27675ADEBCD4A47025F2E981D7EDF9DB0A0DAF461ACC06AA649746D"
+    },
+    {
+      "ordinal": 184,
+      "name": "Toxin Gland",
+      "filename": "toxingland.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36702,
+      "solidPixels": 27899,
+      "sha256": "C6B1AB823FC92B98B77421393FFED0DD1E5A58438A4EB81C5E78FF7D7A20D25A"
+    },
+    {
+      "ordinal": 185,
+      "name": "Sandstone Charm",
+      "filename": "sandstonecharm.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 39591,
+      "solidPixels": 25031,
+      "sha256": "9CC75F0BF1E9B9F028D72B5B26895C7C069F14D186594994F5D3ABE6DF4AC34D"
+    },
+    {
+      "ordinal": 186,
+      "name": "Monolith Shard",
+      "filename": "monolithshard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 45804,
+      "solidPixels": 19052,
+      "sha256": "C618465F6C00543A124DB715C12E34D7473314831F980285E1E97107A171983F"
+    },
+    {
+      "ordinal": 187,
+      "name": "Geode Heart",
+      "filename": "geodeheart.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30297,
+      "solidPixels": 34355,
+      "sha256": "908ABB153550B22BE0150F289F5B884C02ECC52113D6346F227B3C01067FE878"
+    },
+    {
+      "ordinal": 188,
+      "name": "Titan's Keystone",
+      "filename": "titanskeystone.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 23577,
+      "solidPixels": 40982,
+      "sha256": "D790357611583CFE324B031E65E33963268C3CCAE6B1932B0C6454ACFEBAB6F2"
+    },
+    {
+      "ordinal": 189,
+      "name": "Seismic Heart",
+      "filename": "seismicheart.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31550,
+      "solidPixels": 33155,
+      "sha256": "50A171B685D4F5D42B0BE37327CEA8C9A70530FB94263D1C19898EE9D8C3B782"
+    },
+    {
+      "ordinal": 190,
+      "name": "Static Pin",
+      "filename": "staticpin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 47418,
+      "solidPixels": 17277,
+      "sha256": "E4F18A5B9E500CA22297D001E84359AC4189CCA02EC0AB7C36DDFD18D9285EA9"
+    },
+    {
+      "ordinal": 191,
+      "name": "Tesla Coil",
+      "filename": "teslacoil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35079,
+      "solidPixels": 29374,
+      "sha256": "D7F8555EEB7DEC97283872287DD2097867047758E243FCE4ED12ADD53D653FC0"
+    },
+    {
+      "ordinal": 192,
+      "name": "Overcharge Cell",
+      "filename": "overchargecell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31935,
+      "solidPixels": 32758,
+      "sha256": "D74C36DC8189EE350A599A1DCE6AD54AB3AA2499DE61229C8DA44582AF857876"
+    },
+    {
+      "ordinal": 193,
+      "name": "Lightning Rod",
+      "filename": "lightningrod.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 44801,
+      "solidPixels": 19561,
+      "sha256": "115262B144A94B92DACF6479E3725CFCCF296C01518EB8C91506326515510273"
+    },
+    {
+      "ordinal": 194,
+      "name": "Railgun Coil",
+      "filename": "railguncoil.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35417,
+      "solidPixels": 29233,
+      "sha256": "4DF3476DFB40AD3093B21CE6D9CEE511CDB6CC24FCC1508E5BCBAD274BD6D5E9"
+    },
+    {
+      "ordinal": 195,
+      "name": "Hex Nail",
+      "filename": "hexnail.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 46365,
+      "solidPixels": 18322,
+      "sha256": "5C3D11D11D6D163C18CDBF8F8AA2177CD4EEB60BA870BCBB6202B38AFCDC5650"
+    },
+    {
+      "ordinal": 196,
+      "name": "Grave Lily",
+      "filename": "gravelily.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38230,
+      "solidPixels": 26234,
+      "sha256": "3B1510A104193796617496CFC9984B42B383E3AB38DAA116A108888633562B08"
+    },
+    {
+      "ordinal": 197,
+      "name": "Soul Jar",
+      "filename": "souljar.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28443,
+      "solidPixels": 36177,
+      "sha256": "3B9A7354514F8F17189677CCA986E29E3E792422633ED670CDB7FD3C2F172E10"
+    },
+    {
+      "ordinal": 198,
+      "name": "Curse Tablet",
+      "filename": "cursetablet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32022,
+      "solidPixels": 32091,
+      "sha256": "101B77721A99EFA6EC294616AB679CB39ADFEFE2582F3374022FC67A46EE0E98"
+    },
+    {
+      "ordinal": 199,
+      "name": "Reaper's Lantern",
+      "filename": "reaperslantern.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 45253,
+      "solidPixels": 18632,
+      "sha256": "E609B041DBBB007516E3BF80C068B5B9BE078AD5E0671417884758E7279061EC"
+    },
+    {
+      "ordinal": 200,
+      "name": "Eclipse Mirror",
+      "filename": "eclipsemirror.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36080,
+      "solidPixels": 28662,
+      "sha256": "D47BA8880FEE374D3599CA5C6C82DB9D845A21DDB9FBC7D201C46D57EB700F94"
+    },
+    {
+      "ordinal": 201,
+      "name": "Prism Shard",
+      "filename": "prismshard.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 37197,
+      "solidPixels": 27458,
+      "sha256": "9AA71F54F9C8BFAA34B3226291205461B5697B68FBA0B30CA18018BBB2915E73"
+    },
+    {
+      "ordinal": 202,
+      "name": "Halo Pin",
+      "filename": "halopin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 44910,
+      "solidPixels": 19485,
+      "sha256": "8D011B3A9F6CF42F725013676D62781E7A52E61BE8928A89763A7D3786EAF34C"
+    },
+    {
+      "ordinal": 203,
+      "name": "Sanctuary Lamp",
+      "filename": "sanctuarylamp.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 35089,
+      "solidPixels": 29127,
+      "sha256": "6A13A612B548B4276E00B008E51C1D5D3E7C346F0F555B62BA3C02F8658E9760"
+    },
+    {
+      "ordinal": 204,
+      "name": "Solar Lens",
+      "filename": "solarlens.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36534,
+      "solidPixels": 28167,
+      "sha256": "1456F172CF51AFE341B8F570D5189D4FD5580695117EEDD00FAEF20E02E143FD"
+    },
+    {
+      "ordinal": 205,
+      "name": "Dawn Chime",
+      "filename": "dawnchime.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 44837,
+      "solidPixels": 19527,
+      "sha256": "1B9C9A7D82B98C7BA111B3FCEAAA5D6C694A6001F15C50E3F550ECE8AF3ED33F"
+    },
+    {
+      "ordinal": 206,
+      "name": "Aegis Feather",
+      "filename": "aegisfeather.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 36960,
+      "solidPixels": 27692,
+      "sha256": "439994294B65521ADBEB35534FEC014397FA375AB62D8F2EC713297BF8CD1274"
+    },
+    {
+      "ordinal": 207,
+      "name": "Sunforge Crown",
+      "filename": "sunforgecrown.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 27676,
+      "solidPixels": 36452,
+      "sha256": "29AFF3CB8BDC9D70E672B2C8EE408963C153203946F09EF9A8E1B97736A7DA3E"
+    },
+    {
+      "ordinal": 208,
+      "name": "Whetstone",
+      "filename": "whetstone.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33011,
+      "solidPixels": 31698,
+      "sha256": "759E226C703A881377E9E7B3D6F9A142DD76983268E2220C87F57FD245E69F50"
+    },
+    {
+      "ordinal": 209,
+      "name": "Ambush Fang",
+      "filename": "ambushfang.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41495,
+      "solidPixels": 23174,
+      "sha256": "9A968F3AEA58BAF1DEE692DF70E1F3C3C4566BEB2DE599A7F9EC9D4FCE780919"
+    },
+    {
+      "ordinal": 210,
+      "name": "Finisher's Coin",
+      "filename": "finisherscoin.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 25699,
+      "solidPixels": 38979,
+      "sha256": "DF4D6E8B65BD5D5C8A0CAEDC2BCB266C436166DC7D911C204A399A769AD778D6"
+    },
+    {
+      "ordinal": 211,
+      "name": "Glass Blade",
+      "filename": "glassblade.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 42042,
+      "solidPixels": 22406,
+      "sha256": "9560F222FFEC271C76B04BA24AE8FF13DB07464A2AC59911F48CDA0995D1F79F"
+    },
+    {
+      "ordinal": 212,
+      "name": "Bloodrush Crown",
+      "filename": "bloodrushcrown.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30651,
+      "solidPixels": 33284,
+      "sha256": "D8AA8B9CB89D4BBA3219448BF5E3932DBCD88E0F31926086C499D2D7D74E96F0"
+    },
+    {
+      "ordinal": 213,
+      "name": "Warpath Greaves",
+      "filename": "warpathgreaves.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38813,
+      "solidPixels": 25659,
+      "sha256": "DC9948B50B510F462C2EF3BD8C17B5558157F72716170ED76B161B1D62D499DC"
+    },
+    {
+      "ordinal": 214,
+      "name": "Bramble Cuff",
+      "filename": "bramblecuff.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 38988,
+      "solidPixels": 25448,
+      "sha256": "A5083BC730177DBEF7F25DC81B847963DE2384FAD441E5214D618B7CF01C100E"
+    },
+    {
+      "ordinal": 215,
+      "name": "Quartz Chip",
+      "filename": "quartzchip.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31337,
+      "solidPixels": 33387,
+      "sha256": "3197383284518D09BB00B597F9FE54D3B6F1D2ED6BD7BC47A211A2A4D87E9606"
+    },
+    {
+      "ordinal": 216,
+      "name": "Burrow Band",
+      "filename": "burrowband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31628,
+      "solidPixels": 32778,
+      "sha256": "9DBEB3FB9BD56CE3029D40C1DA202A2C30D34F5BD111BD45C4809C6AD593D093"
+    },
+    {
+      "ordinal": 217,
+      "name": "Dynamo Band",
+      "filename": "dynamoband.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32235,
+      "solidPixels": 32351,
+      "sha256": "8D843C173AE28ED0B3EB0A9CFEE3409CC563278A271E4962C03664D8939A474E"
+    },
+    {
+      "ordinal": 218,
+      "name": "Grounding Rod",
+      "filename": "groundingrod.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 42378,
+      "solidPixels": 22341,
+      "sha256": "6C65D914E38E25E03DAF0E3D1B11C8F1841B48AD3490867435F847CA122441BE"
+    },
+    {
+      "ordinal": 219,
+      "name": "Ion Thread",
+      "filename": "ionthread.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41086,
+      "solidPixels": 23016,
+      "sha256": "20845A2064CB8CBB951C8782588FFBF27E1309D60DF06D0DD5E33BBB64FDEBC9"
+    },
+    {
+      "ordinal": 220,
+      "name": "Beetle Carapace",
+      "filename": "beetlecarapace.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 30601,
+      "solidPixels": 34059,
+      "sha256": "7575FF52F339C1EABEECCC64F024892CC1EA2A772307154A8E04919712AE1C83"
+    },
+    {
+      "ordinal": 221,
+      "name": "Fault Line Gauntlet",
+      "filename": "faultlinegauntlet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 31383,
+      "solidPixels": 33284,
+      "sha256": "C43F6BD0D83F71638C7E7EF872491D8E519E5AA717C5EC458AFE66F6215714A7"
+    },
+    {
+      "ordinal": 222,
+      "name": "Shale Anklet",
+      "filename": "shaleanklet.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41254,
+      "solidPixels": 23095,
+      "sha256": "553B66DA84505E6C78FD72FD7FEC660CC7DA81B77298F7CC2FAC250E2AF918A4"
+    },
+    {
+      "ordinal": 223,
+      "name": "Hollow Mask",
+      "filename": "hollowmask.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32324,
+      "solidPixels": 32435,
+      "sha256": "1F03DB7DB4198A3C8DB84ECCE2CBFFD0C027A7D7B9DF0C54FDF36082636CA8DA"
+    },
+    {
+      "ordinal": 224,
+      "name": "Adrenal Gland",
+      "filename": "adrenalgland.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34648,
+      "solidPixels": 30021,
+      "sha256": "AE332DDD399035A57E92F6F513EE315A5D916C72EC4C7AAAAB835C7E6E53C978"
+    },
+    {
+      "ordinal": 225,
+      "name": "Thief's Hourglass",
+      "filename": "thiefshourglass.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28111,
+      "solidPixels": 35918,
+      "sha256": "1481648C681F18F075115CA97A54704CEE393D8373A2B03208F7D5021FB03C3E"
+    },
+    {
+      "ordinal": 226,
+      "name": "Nightshade Bead",
+      "filename": "nightshadebead.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34827,
+      "solidPixels": 29865,
+      "sha256": "1F6870A5621913F4FB0C1032C38EF769AAB3D1D6848CBD20C72657D1B221226A"
+    },
+    {
+      "ordinal": 227,
+      "name": "Whirlwind Axe",
+      "filename": "whirlwindaxe.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 34712,
+      "solidPixels": 29193,
+      "sha256": "6BCF47014951C2407087E6402FB72CC58F3A3028D062B7D157C0CFF4B5C0B6C6"
+    },
+    {
+      "ordinal": 228,
+      "name": "Hawkeye Lens",
+      "filename": "hawkeyelens.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 32895,
+      "solidPixels": 31596,
+      "sha256": "D414CCEB4DD311D7DA144CF9F2D7B0007018C8471E890FA97E57B3972A2DBD51"
+    },
+    {
+      "ordinal": 229,
+      "name": "Volley Quiver",
+      "filename": "volleyquiver.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 41156,
+      "solidPixels": 23279,
+      "sha256": "176027D25CBDC7D55621D95FCB536892BD5B86278EB4838A2451D17342B493AE"
+    },
+    {
+      "ordinal": 230,
+      "name": "Pangolin Plate",
+      "filename": "pangolinplate.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 29638,
+      "solidPixels": 34950,
+      "sha256": "C6B610FDCD3719DFF5EB52B6388E5F29F8CB6B2A85766AD2CCF258593C8A8279"
+    },
+    {
+      "ordinal": 231,
+      "name": "Sloth Claw",
+      "filename": "slothclaw.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 33818,
+      "solidPixels": 30507,
+      "sha256": "6B368BD0B8E649284F4194BDDE16D6EB98C29E05978EA860F3EB86A3FA418ED5"
+    },
+    {
+      "ordinal": 232,
+      "name": "Snail Shell",
+      "filename": "snailshell.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 28617,
+      "solidPixels": 36094,
+      "sha256": "0C54CD5C7701D9FBF5DBBA400B623EAC34F85BDC1E88334E0473A98BD27E408B"
+    },
+    {
+      "ordinal": 233,
+      "name": "Puppeteer's Strings",
+      "filename": "puppeteersstrings.png",
+      "width": 256,
+      "height": 256,
+      "transparentPixels": 40064,
+      "solidPixels": 23972,
+      "sha256": "FC3E582DF9FA1B514BA92D12E742500F0549AEA9AA21092273BF1E84F57BEFED"
+    }
+  ]
+}

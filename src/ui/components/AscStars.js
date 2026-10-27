@@ -2,89 +2,62 @@
 
 import React from "../../react.js";
 
-// One star's worth of row. Every slot is the same 1em-wide box whether or not
-// it is ringed, so a row of mixed slots stays evenly spaced and letter-spacing
-// on the row widens the gaps uniformly.
-//
-// A ringed slot is worth two ascensions: the filled ★ with a larger hollow ☆
-// around it. Both glyphs are absolutely centred in the box, which is what keeps
-// them concentric -- laid out inline they would share a baseline and the small
-// star would sit low rather than inside the ring. Centring on the box (rather
-// than riding the text baseline) is also what keeps the tall ring off the
-// bottom edge of whatever strip the row sits in.
-//
-// Each glyph is pinned by its OWN centre (left/top 50% + translate(-50%,-50%))
-// rather than stretched edge-to-edge with text-align:center. The ring is 1.28em
-// inside a 1em slot, so under text-align it is overflowing content: Chrome
-// centres that, but WebKit clamps it to the start edge, which slid the ring
-// right of the small star on iOS. Centring each box sidesteps how an engine
-// chooses to align overflow.
-function StarSlot({ringed,style}){
-  const centred={position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",lineHeight:1,whiteSpace:"nowrap"};
-  return React.createElement("span",{style:{position:"relative",display:"inline-block",width:"1em",height:"1em",verticalAlign:"middle",...style}},
-    ringed&&React.createElement("span",{style:{...centred,fontSize:"1.28em"}},"☆"),
-    React.createElement("span",{style:{...centred,fontSize:ringed?"0.72em":"1em"}},"★")
-  );
+// One star slot: a 1em picture, the band's filled star for a slot worth two
+// ascensions, its hollow star otherwise. Every slot is the same box, so a row
+// stays evenly spaced and `gap` on the row is the one spacing knob.
+function StarSlot({filled,images}){
+  return React.createElement("img",{src:filled?images.filled:images.hollow,alt:"",draggable:false,
+    style:{display:"inline-block",width:"1em",height:"1em",objectFit:"contain",verticalAlign:"middle",flexShrink:0}});
 }
 
-// `max` is how many ascensions still draw as individual stars before the
-// display collapses to "12★" -- callers with room for a wider row raise it.
-// `doubled` is how many of those stars are worth two, drawn ringed from the
-// left, so a five-slot row can read anywhere from 1 to 10.
-// `colors` gives each slot its own colour (the rainbow band); without it the
-// whole row inherits one colour from `style`. `slotted` draws even plain rows
-// as fixed-width slots, so every row in a grid lines up the same way.
-function AscStars({n,style,max=5,doubled=0,colors,slotted}){
-  if(!n)return null;
-  if(n>max)return React.createElement("span",{className:"asc-stars",style},n+"★");
-  if(!doubled&&!colors&&!slotted)return React.createElement("span",{className:"asc-stars",style},"★".repeat(n));
+// `n` stars (at most five, see ascStarTier), the first `doubled` of them
+// filled. `images` ({hollow, filled}) is the band's star art. Star size is
+// the row's font-size, set through `style`.
+function AscStars({n,doubled=0,images,style}){
+  if(!n||!images)return null;
   const slots=[];
-  for(let i=0;i<n;i++){
-    slots.push(React.createElement(StarSlot,{
-      key:i,
-      ringed:i<doubled,
-      style:colors?{color:colors[i%colors.length]}:undefined,
-    }));
-  }
+  for(let i=0;i<n;i++)slots.push(React.createElement(StarSlot,{key:i,filled:i<doubled,images}));
   // inline-flex rather than an inline run: it centres the slots on the row's
-  // own box instead of a text baseline (a baseline leaves the row sitting low)
-  // and makes `gap` the one knob for how far apart the stars sit.
-  return React.createElement("span",{className:"asc-stars",style:{display:"inline-flex",alignItems:"center",...style}},slots);
+  // own box instead of a text baseline (a baseline leaves the row sitting low).
+  return React.createElement("span",{style:{display:"inline-flex",alignItems:"center",...style}},slots);
 }
 
 // Ascensions run 1-50 as five bands of ten, and a band never shows more than
-// five stars: the first five fill the slots one plain star at a time, and the
-// second five ring those same slots left to right, each ring worth two. So 7
-// is three plain stars with the leftmost two ringed. Colour says which band --
-// black, bronze, silver, gold, rainbow.
-//
-// Rainbow colours each slot separately instead of sweeping one gradient across
-// the row. A gradient has to be painted as a background clipped to the text,
-// and that clip doesn't reach the ring's absolutely-positioned glyphs -- the
-// whole row rendered invisible. Per-slot colours also stay put as the row
-// grows, so a creature's third star is always the same green.
-const ASC_TIERS=[
-  {color:"#111827"},
-  {color:"#B87333"},
-  {color:"#7F868D"},
-  {color:"#EF9F27"},
-  {colors:["#E24B4A","#EF9F27","#63991F","#22B8CF","#7F77DD"]},
-];
+// five stars: the first five add hollow stars one at a time, and the second
+// five fill those same slots in left to right, each filled star worth two. So
+// 6 is one filled star and four hollow; 10 is five filled. The band's metal
+// says which ten -- grey, bronze, silver, platinum, gold (art in
+// images/item_icons/ascensions).
+const STAR_ART="images/item_icons/ascensions/";
+const ASC_TIERS=["grey","bronze","silver","platinum","gold"].map((metal)=>({
+  hollow:STAR_ART+"hollow"+metal+"star.png",filled:STAR_ART+metal+"star.png",
+}));
 
-/** Splits an ascension count into stars to draw, how many of them are ringed
- *  (worth two), and the band's colouring. */
+/** Splits an ascension count into stars to draw, how many of them are filled
+ *  (worth two), and the band's star art. */
 export function ascStarTier(n){
-  const empty={count:0,doubled:0,style:undefined,colors:null};
-  if(!(n>0))return empty;
+  if(!(n>0))return {count:0,doubled:0,images:null};
   const band=Math.min(ASC_TIERS.length-1,Math.floor((n-1)/10));
   const within=n-band*10;
-  const tier=ASC_TIERS[band];
-  return {
-    count:Math.min(5,within),
-    doubled:Math.max(0,within-5),
-    style:tier.color?{color:tier.color}:undefined,
-    colors:tier.colors||null,
-  };
+  return {count:Math.min(5,within),doubled:Math.max(0,within-5),images:ASC_TIERS[band]};
+}
+
+/** A creature's ascension row: ascStarTier straight into AscStars. `size` is
+ *  the star size -- px, or any CSS length. */
+export function CreatureAscStars({asc,size=12,style}){
+  const t=ascStarTier(asc);
+  return React.createElement(AscStars,{n:t.count,doubled:t.doubled,images:t.images,style:{fontSize:size,gap:1,...style}});
+}
+
+/** Gear's ascension row. Gear ascends 0-10, which is exactly the first band
+ *  of the creature scheme -- five hollow stars, then filling in -- so it
+ *  reuses ascStarTier and the same star art. Fully ascended gear (10) shows
+ *  five gold stars instead of grey, so maxed gear stands out. `size` is the
+ *  star size in px. */
+export function GearAscStars({asc,size=12,style}){
+  const t=ascStarTier(asc);
+  const images=asc>=10?ASC_TIERS[ASC_TIERS.length-1]:t.images;
+  return React.createElement(AscStars,{n:t.count,doubled:t.doubled,images,style:{fontSize:size,gap:1,...style}});
 }
 
 export default AscStars;

@@ -5,7 +5,7 @@
 // per-type tiers of 10 fixed stages.
 
 import React, { useState } from "../../../react.js";
-import { iconText } from "../../components/IconText.js";
+import { iconText, typeIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
@@ -694,11 +694,11 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                     React.createElement("div", { style: { position: "absolute", top: 0, left: 0, width: planTile * 2, height: planTile * 2, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3, borderRadius: 10, boxShadow: "inset 0 0 0 2px rgba(245,158,11,0.75)" } },
                       React.createElement(CreatureIcon, { def: d, size: planTile * 2, contain: true }),
                       React.createElement("span", { style: { position: "absolute", top: 2, left: "50%", transform: "translateX(-50%)", fontSize: 12, lineHeight: 1 } }, "👑"),
-                      React.createElement("span", { style: { position: "absolute", top: 3, left: 4, fontSize: 9, lineHeight: 1 } }, TYPE_EMOJI[d.type] || ""),
-                      React.createElement("span", { style: { position: "absolute", top: 3, right: 4, fontSize: 9, lineHeight: 1 } }, d.attackType === "Ranged" ? "🏹" : "⚔️")
+                      React.createElement("span", { style: { position: "absolute", top: 3, left: 4, fontSize: 9, lineHeight: 1 } }, typeIcon(d.type)),
+                      React.createElement("span", { style: { position: "absolute", top: 3, right: 4, fontSize: 9, lineHeight: 1 } }, rangeIcon(d.attackType === "Ranged" ? "Ranged" : "Melee"))
                     ));
                 }
-                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, TYPE_EMOJI[d.type] || ""), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, d.attackType === "Ranged" ? "🏹" : "⚔️"), React.createElement(CreatureIcon, { def: d, size: planTile, contain: true }));
+                return React.createElement("div", { style: { position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement("span", { style: { position: "absolute", top: 1, left: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, typeIcon(d.type)), React.createElement("span", { style: { position: "absolute", top: 1, right: 2, fontSize: 8, lineHeight: 1, pointerEvents: "none" } }, rangeIcon(d.attackType === "Ranged" ? "Ranged" : "Melee")), React.createElement(CreatureIcon, { def: d, size: planTile, contain: true }));
               })());
             })).flat()
           )
@@ -839,8 +839,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               ),
               React.createElement("div", { style: { opacity: isPlaced ? 0.4 : 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 } },
                 React.createElement("div", { style: { position: "relative", lineHeight: 1 } },
-                  React.createElement("div", { style: { position: "absolute", top: -2, left: -6, fontSize: 10, lineHeight: 1 } }, TYPE_EMOJI[def.type] || ""),
-                  React.createElement("div", { style: { position: "absolute", top: -2, right: -6, fontSize: 10, lineHeight: 1 } }, def.attackType === "Ranged" ? "🏹" : "⚔️"),
+                  React.createElement("div", { style: { position: "absolute", top: -2, left: -6, fontSize: 10, lineHeight: 1 } }, typeIcon(def.type)),
+                  React.createElement("div", { style: { position: "absolute", top: -2, right: -6, fontSize: 10, lineHeight: 1 } }, rangeIcon(def.attackType === "Ranged" ? "Ranged" : "Melee")),
                   React.createElement(CreatureIcon, { def, size: 24, style: { marginTop: 6 } })
                 ),
                 React.createElement("div", { style: { fontSize: 8, color: "#333", fontWeight: 600, textAlign: "center", lineHeight: 1.2, maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, def.name),

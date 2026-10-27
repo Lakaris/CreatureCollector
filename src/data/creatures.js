@@ -1046,6 +1046,37 @@ export const CREATURES=[
      special:{name:"Shared Flame",charge:12,upgrades:["Heal 20 HP","Heal 26 HP","Heal 33 HP","Heal 42 HP","Heal 42 HP. All other allies gain Heal Over Time"]},
      unique:{name:"Rekindle",upgrades:["Gain 1% increased Healing for each 10% missing Health. Revive with 100% Health the first time this creature is defeated.","Gain 2% increased Healing for each 10% missing Health. Revive with 100% Health the first time this creature is defeated.","Gain 3% increased Healing for each 10% missing Health. Revive with 100% Health the first time this creature is defeated.","Gain 4% increased Healing for each 10% missing Health. Revive with 100% Health the first time this creature is defeated.","Gain 5% increased Healing for each 10% missing Health. Revive with 100% Health the first time this creature is defeated."]}
    },role:"Support",attackType:"Ranged",evolutionOf:"cauterix",shardsToAscend:18,ascensionsToEvolve:null},
+  // Mud wasp line: Common, 4 stages, one kit shared verbatim across every
+  // stage. A potter wasp that plasters clay walls over its allies. Kit:
+  // battle/playerAbilities/daublingLine.js.
+  {id:"daubling",name:"Daubling",emoji:"🏺",type:"Earth",rarity:"common",description:"A wasp grub that hatched inside a clay pot and never quite left. It flicks mud at anything that knocks on the lid.",
+   stats:{hp:42,atk:26,def:26,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+   abilities:{
+     basic:{name:"Mud Pellet",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Clay Rampart",charge:14,upgrades:["Shield the Row with the Lowest ally for 25% of this creature's Attack","Shield the Row with the Lowest ally for 30% of this creature's Attack","Shield the Row with the Lowest ally for 35% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack. They deal 30% more damage while this Shield persists"]},
+     unique:{name:"Sealing Shell",upgrades:["The first time an ally falls below 50% Health, Shield them for 50% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 65% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 80% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack and dispel all debuffs on them"]}
+   },role:"Support",attackType:"Ranged",shardsToAscend:5,ascensionsToEvolve:15,evolutionId:"daubwasp"},
+  {id:"daubwasp",name:"Daubwasp",emoji:"🐝",type:"Earth",rarity:"common",description:"Freshly winged and carrying more mud than it weighs. It patches cracks in walls that aren't its own, out of principle.",
+   stats:{hp:69,atk:43,def:43,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+   abilities:{
+     basic:{name:"Mud Pellet",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Clay Rampart",charge:14,upgrades:["Shield the Row with the Lowest ally for 25% of this creature's Attack","Shield the Row with the Lowest ally for 30% of this creature's Attack","Shield the Row with the Lowest ally for 35% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack. They deal 30% more damage while this Shield persists"]},
+     unique:{name:"Sealing Shell",upgrades:["The first time an ally falls below 50% Health, Shield them for 50% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 65% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 80% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack and dispel all debuffs on them"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"daubling",shardsToAscend:8,ascensionsToEvolve:30,evolutionId:"claymason"},
+  {id:"claymason",name:"Claymason",emoji:"🪰",type:"Earth",rarity:"common",description:"A master potter of the hive. Its walls go up in seconds and dry harder than stone, and it still complains about the brickwork.",
+   stats:{hp:98,atk:61,def:61,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+   abilities:{
+     basic:{name:"Mud Pellet",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Clay Rampart",charge:14,upgrades:["Shield the Row with the Lowest ally for 25% of this creature's Attack","Shield the Row with the Lowest ally for 30% of this creature's Attack","Shield the Row with the Lowest ally for 35% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack. They deal 30% more damage while this Shield persists"]},
+     unique:{name:"Sealing Shell",upgrades:["The first time an ally falls below 50% Health, Shield them for 50% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 65% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 80% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack and dispel all debuffs on them"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"daubwasp",shardsToAscend:12,ascensionsToEvolve:45,evolutionId:"kilnwarden"},
+  {id:"kilnwarden",name:"Kilnwarden",emoji:"🧱",type:"Earth",rarity:"common",description:"A great wasp with a body like fired clay. Whole villages once sheltered behind its ramparts, and a few of them are still standing.",
+   stats:{hp:132,atk:82,def:80,spd:1,abilitySpeed:1,crit:4,critDmg:30},
+   abilities:{
+     basic:{name:"Mud Pellet",upgrades:["12 dmg","15 dmg","19 dmg","24 dmg","24 dmg and inflict Attack Down"]},
+     special:{name:"Clay Rampart",charge:14,upgrades:["Shield the Row with the Lowest ally for 25% of this creature's Attack","Shield the Row with the Lowest ally for 30% of this creature's Attack","Shield the Row with the Lowest ally for 35% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack","Shield the Row with the Lowest ally for 40% of this creature's Attack. They deal 30% more damage while this Shield persists"]},
+     unique:{name:"Sealing Shell",upgrades:["The first time an ally falls below 50% Health, Shield them for 50% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 65% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 80% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack","The first time an ally falls below 50% Health, Shield them for 100% of this creature's Attack and dispel all debuffs on them"]}
+   },role:"Support",attackType:"Ranged",evolutionOf:"claymason",shardsToAscend:18,ascensionsToEvolve:null},
 ];
 
 export const CREATURE_MAP=Object.fromEntries(CREATURES.map(c=>[c.id,c]));
@@ -1061,6 +1092,11 @@ CREATURE_MAP["__vine_minion"]={id:"__vine_minion",emoji:"🌱",name:"Vine Minion
 // summoning ability's tier; stats here are only a fallback shape.
 CREATURE_MAP["__wisp"]={id:"__wisp",emoji:"🕯️",name:"Wisp",type:"Dark",role:"Tank",attackType:"Melee",stats:{hp:25,atk:0,def:0,spd:1,abilitySpeed:1,crit:4,critDmg:30},abilities:{basic:{name:"Beckon",description:"Taunt an enemy"},special:{name:"Ghostly Step",charge:10,description:"Teleport beside a random enemy"},unique:{name:"Grave Grudge",description:"Deal damage to the enemy that defeated this creature equal to 10% of the Summoner's Health"}}};
 
+// The Dark Boss's Totems (see makeTotem in data/bosses.js and darkTotemModule
+// in battle/bosses/dark.js). Battle-only like the two above. They never attack
+// -- each Basic buffs the boss -- and stand on 0.5 Speed, half the usual.
+CREATURE_MAP["__dark_totem"]={id:"__dark_totem",emoji:"🎋",name:"Bamboo Totem",type:"Dark",role:"Support",attackType:"Ranged",stats:{hp:70,atk:0,def:15,spd:0.5,abilitySpeed:1,crit:0,critDmg:0},abilities:{basic:{name:"Chant",description:"Buffs the Dark Boss with a buff that can't be dispelled"}}};
+
 /**
  * Bosses are creatures too: one "__boss_<kit>" entry per boss kit, generated
  * from DUNGEON_BOSSES (data/bosses.js) so a boss's name, type, stats and card
@@ -1071,7 +1107,7 @@ CREATURE_MAP["__wisp"]={id:"__wisp",emoji:"🕯️",name:"Wisp",type:"Dark",role
  * under whichever dungeon boss's name and stats the day borrows.
  */
 for (const b of DUNGEON_BOSSES) {
-  CREATURE_MAP["__boss_" + b.key] = { id: "__boss_" + b.key, emoji: "👾", name: b.name, type: b.type, role: "Boss", attackType: "Melee", size: 2, classes: ["boss"], stats: b.baseStats, abilities: b.abilities };
+  CREATURE_MAP["__boss_" + b.key] = { id: "__boss_" + b.key, emoji: "👾", name: b.name, type: b.type, role: "Boss", attackType: b.attackType || "Melee", size: 2, classes: ["boss"], stats: b.baseStats, abilities: b.abilities };
 }
 CREATURE_MAP["__boss_daily"] = { id: "__boss_daily", emoji: "👾", name: "Daily Boss", type: "Daily", role: "Boss", attackType: "Melee", size: 2, classes: ["boss"], stats: DUNGEON_BOSSES[0].baseStats, abilities: DUNGEON_BOSSES[0].abilities };
 

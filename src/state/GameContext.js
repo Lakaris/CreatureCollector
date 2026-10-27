@@ -134,7 +134,7 @@ function stripUnknownCreatures(parsed) {
     }
     return grid;
   };
-  for (const field of ["arenaPlanGrid", "dungeonPlanGrid", "labyrinthPlanGrid", "dailyBossPlanGrid"]) {
+  for (const field of ["arenaPlanGrid", "dungeonPlanGrid", "labyrinthPlanGrid", "dailyBossPlanGrid", "trialsPlanGrid"]) {
     prune(parsed[field]);
   }
   if (!known(parsed.featuredCreatureId)) parsed.featuredCreatureId = null;
@@ -307,6 +307,19 @@ export function GameProvider({ children }) {
   const [arenaProgress, setArenaProgress] = useState(() =>
     initialSave?.arenaProgress ?? Object.fromEntries(ARENA_TABS.map((t) => [t.id, 1]))
   );
+
+  // ── Trials ───────────────────────────────────────────────────────────────
+  // One Arena-style track (ArenaScreen in "trials" mode), keyed "trials" so the
+  // screen reads it the way it reads an Arena tab. Kept apart from arenaLevels /
+  // arenaProgress on purpose: Arena quests count every key of those, and a
+  // Trials win is not an Arena win.
+  const [trialsLevels, setTrialsLevels] = useState(() => initialSave?.trialsLevels ?? { trials: 1 });
+  const [trialsProgress, setTrialsProgress] = useState(() => initialSave?.trialsProgress ?? { trials: 1 });
+  const [trialsPlanGrid, setTrialsPlanGrid] = useState(() => initialSave?.trialsPlanGrid ?? {});
+  // Stage number (1-500, level-major) -> the LAST team that beat it:
+  // { team: {"r,c": creatureId}, levels: {creatureId: level}, at: ms }. Shown on
+  // the Trials screen so a player can look up / share a winning lineup.
+  const [trialsClears, setTrialsClears] = useState(() => initialSave?.trialsClears ?? {});
 
   // ── Labyrinth ────────────────────────────────────────────────────────────
   // A single endless track (unlike Arena's per-tab tiers): depth climbs by one
@@ -544,6 +557,7 @@ export function GameProvider({ children }) {
     currencies, owned, unlockedSkins, skinShards, everOwnedCreatureIds,
     equipmentLevels, equipmentAscensions, equipmentCopies, equipFavorites,
     pity, arenaLevels, arenaProgress,
+    trialsLevels, trialsProgress, trialsPlanGrid, trialsClears,
     labyrinthDepth, labyrinthBestDepth, labyrinthFloor10WarningSeen,
     arenaPlanGrid, dungeonPlanGrid, labyrinthPlanGrid, dailyBossPlanGrid,
     farmPlots, farmFieldLevel, farmFieldLastHarvest, farmFieldSeed, farmCrops, plotUpgrades, specialPurchased, plotsUnlocked, purchasedOneTimeBundles,
@@ -676,6 +690,9 @@ export function GameProvider({ children }) {
     pity, setPity,
     // arena
     arenaLevels, setArenaLevels, arenaProgress, setArenaProgress,
+    // trials
+    trialsLevels, setTrialsLevels, trialsProgress, setTrialsProgress, trialsPlanGrid, setTrialsPlanGrid,
+    trialsClears, setTrialsClears,
     // labyrinth
     labyrinthDepth, setLabyrinthDepth, labyrinthBestDepth, setLabyrinthBestDepth,
     labyrinthFloor10WarningSeen, setLabyrinthFloor10WarningSeen,

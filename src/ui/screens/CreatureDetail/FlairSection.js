@@ -148,7 +148,13 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
     // page scrolls (the tab bar stays pinned). The art covers it,
     // bottom-anchored and never stretched; the creature stands
     // PORTRAIT_FEET_BOTTOM up, the same spot on the art as elsewhere.
-    React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
+    //
+    // The square IS capped at 55% of the screen height, though. On a phone that
+    // never bites (the width runs out first), but in a wide window a full-width
+    // square was taller than the screen and squeezed the Titles/Aura/Background/
+    // Item lists below it down to nothing. Past the cap the stage goes wider
+    // than tall, and the cover sizing crops the art's top instead.
+    React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",maxHeight:"calc(var(--vh) * 55)",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
       React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
     ),
     React.createElement("div",{style:{flex:flairTab==="feed"?"1 0 auto":1,minHeight:0,overflow:flairTab==="feed"?"visible":"hidden",display:"flex",flexDirection:"column"}},

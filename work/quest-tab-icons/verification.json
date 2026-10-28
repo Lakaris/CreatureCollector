@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Progression",
+    "path": "images/ui_icons/quests/progression.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Daily",
+    "path": "images/ui_icons/quests/daily.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Creature",
+    "path": "images/ui_icons/quests/creature.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Gear",
+    "path": "images/ui_icons/quests/gear.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Dungeon",
+    "path": "images/ui_icons/quests/dungeon.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  {
+    "name": "Arena",
+    "path": "images/ui_icons/quests/arena.png",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  }
+]

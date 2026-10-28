@@ -1,0 +1,1 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');sharp('work/cirruskit-attack-outline-repair/frames/frame-1.png').extract({left:110,top:355,width:60,height:70}).resize(480,560,{kernel:'nearest'}).flatten({background:'#ffffff'}).png().toFile('work/cirruskit-attack-outline-repair/diagnostics/join-2.png');

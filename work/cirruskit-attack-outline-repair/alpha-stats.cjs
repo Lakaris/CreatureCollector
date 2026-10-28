@@ -1,0 +1,1 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');let p=PNG.sync.read(fs.readFileSync('work/cirruskit-walk-belly-separation/layers/foreground.png')),h={};for(let i=3;i<p.data.length;i+=4)h[p.data[i]]=(h[p.data[i]]||0)+1;console.log(Object.entries(h).sort((a,b)=>b[1]-a[1]).slice(0,10));

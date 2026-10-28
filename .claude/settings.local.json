@@ -235,7 +235,9 @@
       "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\02685bd8-cafc-46d4-910d-d864d942f36f\\\\scratchpad\\\\symbols.ps1\" -Apply)",
       "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\02685bd8-cafc-46d4-910d-d864d942f36f\\\\scratchpad\\\\addimport.ps1\")",
       "PowerShell($s=\"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\02685bd8-cafc-46d4-910d-d864d942f36f\\\\scratchpad\\\\symbols2.ps1\"; $t=[IO.File]::ReadAllText\\($s,[Text.Encoding]::UTF8\\); [IO.File]::WriteAllText\\($s,$t,\\(New-Object System.Text.UTF8Encoding\\($true\\)\\)\\); & $s)",
-      "PowerShell($s=\"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\02685bd8-cafc-46d4-910d-d864d942f36f\\\\scratchpad\\\\battleicons.ps1\"; $t=[IO.File]::ReadAllText\\($s,[Text.Encoding]::UTF8\\); [IO.File]::WriteAllText\\($s,$t,\\(New-Object System.Text.UTF8Encoding\\($true\\)\\)\\); & $s)"
+      "PowerShell($s=\"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\02685bd8-cafc-46d4-910d-d864d942f36f\\\\scratchpad\\\\battleicons.ps1\"; $t=[IO.File]::ReadAllText\\($s,[Text.Encoding]::UTF8\\); [IO.File]::WriteAllText\\($s,$t,\\(New-Object System.Text.UTF8Encoding\\($true\\)\\)\\); & $s)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; Get-ChildItem images/flair/backgrounds | % { $i=[System.Drawing.Image]::FromFile\\($_.FullName\\); \"$\\($_.Name\\) $\\($i.Width\\)x$\\($i.Height\\) $\\([math]::Round\\($_.Length/1KB\\)\\)KB\"; $i.Dispose\\(\\) }; Get-Content src/ui/uiScale.js -TotalCount 40)",
+      "PowerShell(& \"C:\\\\Users\\\\Annie\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Annie-Desktop-Stuff-CreatureCollector\\\\d2db3464-552c-4d04-9549-8c743c8e589a\\\\scratchpad\\\\bgs.ps1\")"
     ]
   }
 }

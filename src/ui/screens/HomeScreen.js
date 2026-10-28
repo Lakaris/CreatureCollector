@@ -1,7 +1,7 @@
 // Home tab: featured creature plus entries into quests, daily, and battle pass.
 
 import React from "../../react.js";
-import { uiIcon, iconText } from "../components/IconText.js";
+import { uiIcon, iconText, notificationDot } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
 import { FLAIR_AURA_MAP, backdropImage } from "../../data/flair.js";
@@ -24,17 +24,21 @@ const COLLECTION_TAB_LEFT_PCT = ((TABS.findIndex(t=>t.id==="collection")+0.5)/TA
 
 // The height the bottom panel is guaranteed, so its 96px-min tiles always fit.
 // The art gives way to this, never the other way round: the panel is positioned
-// at top:HOME_ART with bottom:0, so any art taller than the scene minus this
-// leaves the panel zero height and its tiles spill out under the nav bar.
+// at top:HOME_ART_BOTTOM with bottom:0, so any art taller than the scene minus
+// this leaves the panel zero height and its tiles spill out under the nav bar.
 const HOME_PANEL_MIN = 120;
-// Edge length of the Home scene's square background art: the scene's full
-// width -- its content box (100cqw) plus the 16px side padding either side --
-// or whatever height is left once the panel has taken its share, if that's
-// smaller (a wide or short window), so the whole image always fits.
-const HOME_ART = "min(100cqw + 32px, 100cqh + 32px - " + HOME_PANEL_MIN + "px)";
-// Where the creature's feet sit, measured down from the scene's top: 7% up
-// from the bottom of the art, as on the creature and Flair pages.
-const HOME_FEET_TOP = "calc(0.93 * " + HOME_ART + ")";
+// Edge length of the Home scene's square background art: always the scene's
+// full width -- its content box (100cqw) plus the 16px side padding either
+// side -- so it runs edge to edge on any window shape.
+const HOME_ART_SIDE = "calc(100cqw + 32px)";
+// Where the art ends, measured down from the scene's top: its full side on a
+// phone, or whatever height is left once the panel has taken its share, if
+// that's smaller (a wide or short window). In that case the square is pulled
+// up past the scene's top and its top is cropped, like the creature page.
+const HOME_ART_BOTTOM = "min(100cqw + 32px, 100cqh + 32px - " + HOME_PANEL_MIN + "px)";
+// Where the creature's feet sit, measured down from the scene's top: 7% of
+// the art's side up from its bottom, as on the creature and Flair pages.
+const HOME_FEET_TOP = "calc(" + HOME_ART_BOTTOM + " - 0.07 * " + HOME_ART_SIDE + ")";
 
 function HomeScreen(){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, dailyClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, newPlayerGiftEndsAt, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow, pendingDungeonReveal, setPendingDungeonReveal } = useGame();
@@ -83,7 +87,7 @@ function HomeScreen(){
     React.createElement("span",{style:{width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,lineHeight:1,flexShrink:0}},icon),
     React.createElement("span",{style:{fontSize:10.5,fontWeight:700,color:"#3f3a78",textAlign:"center",lineHeight:1.15}},label,
       sub&&React.createElement("span",{style:{display:"block",fontSize:9.5,fontWeight:600,color:"#6366f1",marginTop:2}},sub)),
-    dot&&React.createElement("div",{style:{position:"absolute",top:-3,right:-3,width:12,height:12,borderRadius:"50%",background:"#ef4444",border:"2px solid #fff",boxSizing:"border-box"}}),
+    dot&&notificationDot(16,{position:"absolute",top:-4,right:-4}),
     extra
   );
   // A small round button in the top bar (Settings, Daily). Dimmed and inert
@@ -94,7 +98,7 @@ function HomeScreen(){
     style:{position:"relative",width:34,height:34,margin:"-5px 0",borderRadius:"50%",border:"1.5px solid #e0e0e0",background:"#f5f5f5",fontSize:17,cursor:tutorialRestricted?"not-allowed":"pointer",opacity:tutorialRestricted?0.4:1,display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1,flexShrink:0}
   },
     emoji,
-    dot&&React.createElement("div",{style:{position:"absolute",top:-2,right:-2,width:11,height:11,borderRadius:"50%",background:"#ef4444",border:"2px solid #fff",boxSizing:"border-box"}})
+    dot&&notificationDot(14,{position:"absolute",top:-3,right:-3})
   );
 
   // Tutorial 2 (post-Set-1 Dungeon reveal): unlike the original tutorial's
@@ -179,15 +183,16 @@ function HomeScreen(){
       React.createElement(CurrencyChip,{currency:"gems",emoji:"💎",value:currencies.gems})
     )}),
     // The Home scene: the whole area between the header and the nav bar. The
-    // featured creature's equipped background art is shown WHOLE at the top
-    // -- a HOME_ART square, never stretched -- with plain page below it. The
+    // featured creature's equipped background art fills the width at the top
+    // -- a HOME_ART_SIDE square, never stretched, its top cropped on a wide
+    // window -- with plain page below it. The
     // creature stands at HOME_FEET_TOP, the same spot on the art as on the
     // creature and Flair pages. A size container so those offsets resolve
     // against this area. The negative margins cancel the header's 12px bottom
     // margin (so the art meets the top bar) and .app-content's 16px side
     // padding (so it runs edge to edge).
     React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,position:"relative",margin:"-12px -16px 0",padding:16,overflow:"hidden",containerType:"size"}},
-    homeBackdrop&&React.createElement("div",{style:{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:HOME_ART,height:HOME_ART,backgroundImage:'url("'+homeBackdrop+'")',backgroundSize:"100% 100%",pointerEvents:"none"}}),
+    homeBackdrop&&React.createElement("div",{style:{position:"absolute",top:"calc(" + HOME_ART_BOTTOM + " - " + HOME_ART_SIDE + ")",left:0,width:HOME_ART_SIDE,height:HOME_ART_SIDE,backgroundImage:'url("'+homeBackdrop+'")',backgroundSize:"100% 100%",pointerEvents:"none"}}),
     // The creature, with its equipped aura glowing behind it. No name, type,
     // flair title or Change button -- the display creature is picked in
     // Settings.
@@ -198,7 +203,7 @@ function HomeScreen(){
     // The bottom panel: a soft lavender area starting exactly where the art
     // ends (never over it), holding the menu row -- Quests, Battle Pass,
     // Descend and the New Player Welcome Gift -- centred in it.
-    React.createElement("div",{style:{position:"absolute",top:HOME_ART,left:0,right:0,bottom:0,background:"linear-gradient(180deg, #f6f4ff 0%, #f5f5f5 70%)",boxShadow:"0 -6px 18px rgba(0,0,0,0.10)",display:"flex",alignItems:"center",justifyContent:"center",gap:10,padding:"0 16px"}},
+    React.createElement("div",{style:{position:"absolute",top:HOME_ART_BOTTOM,left:0,right:0,bottom:0,background:"linear-gradient(180deg, #f6f4ff 0%, #f5f5f5 70%)",boxShadow:"0 -6px 18px rgba(0,0,0,0.10)",display:"flex",alignItems:"center",justifyContent:"center",gap:10,padding:"0 16px"}},
       // The tutorial's "descend" step shows Descend alone, live, with the
       // guide arrow on it -- the step walks the player through that button.
       tutorialStep==="descend"&&descendTile,

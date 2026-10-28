@@ -1,0 +1,212 @@
+{
+  "image": "cirruskit_attack.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 5,
+  "rows": 5,
+  "loop": false,
+  "totalDurationMs": 400,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 5,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 6,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 7,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 8,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 9,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 10,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 11,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 12,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 13,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 14,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 15,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 16,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 17,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 18,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 19,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 20,
+      "x": 0,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 21,
+      "x": 512,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 22,
+      "x": 1024,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 23,
+      "x": 1536,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    },
+    {
+      "index": 24,
+      "x": 2048,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 16
+    }
+  ],
+  "notes": "Airborne pounce in place: narrowed eyes and open mouth; crouch, push off, reach both front paws forward as the hindquarters rise, land on the front paws, recover. Existing original head and mane texture stays together; independently articulated original limb layers. First and last frames exactly match cirruskit_base.png. Read left to right, top to bottom. 25 frames at 16ms fit the existing 400ms battle attack window."
+}

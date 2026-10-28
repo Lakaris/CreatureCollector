@@ -1,7 +1,7 @@
 // Tabbed quest board with per-quest and per-batch claiming.
 
 import React from "../../react.js";
-import { iconText, currencyIcon } from "../components/IconText.js";
+import { iconText, currencyIcon, notificationDot } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { QUEST_TABS, DAILY_MISSIONS, QUEST_DEFS, REWARD_LABELS, REWARD_DESC } from "../../data/quests.js";
 import { EQUIPMENT_MAP } from "../../data/equipment.js";
@@ -197,7 +197,7 @@ function QuestsScreen({onBack}){
           },
             React.createElement("span",{style:{fontSize:20}},locked?iconText("🔒"):t.emoji),
             t.label,
-            !locked&&tDone&&(t.id==="daily"||tBatchIdx<tBatches.length)&&React.createElement("span",{style:{position:"absolute",top:6,right:6,width:8,height:8,borderRadius:"50%",background:"#ef4444"}})
+            !locked&&tDone&&(t.id==="daily"||tBatchIdx<tBatches.length)&&notificationDot(11,{position:"absolute",top:4,right:4})
           );
         })
       ),

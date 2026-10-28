@@ -1,0 +1,192 @@
+[
+  {
+    "frame": 1,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 2,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 3,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 4,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 5,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 6,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 7,
+    "changedPixels": 2195,
+    "bounds": [
+      88,
+      373,
+      211,
+      440
+    ]
+  },
+  {
+    "frame": 8,
+    "changedPixels": 4919,
+    "bounds": [
+      76,
+      348,
+      205,
+      424
+    ]
+  },
+  {
+    "frame": 9,
+    "changedPixels": 5447,
+    "bounds": [
+      68,
+      330,
+      199,
+      410
+    ]
+  },
+  {
+    "frame": 10,
+    "changedPixels": 5984,
+    "bounds": [
+      57,
+      296,
+      189,
+      383
+    ]
+  },
+  {
+    "frame": 11,
+    "changedPixels": 6289,
+    "bounds": [
+      52,
+      278,
+      184,
+      368
+    ]
+  },
+  {
+    "frame": 12,
+    "changedPixels": 6555,
+    "bounds": [
+      46,
+      274,
+      177,
+      366
+    ]
+  },
+  {
+    "frame": 13,
+    "changedPixels": 6809,
+    "bounds": [
+      40,
+      271,
+      169,
+      365
+    ]
+  },
+  {
+    "frame": 14,
+    "changedPixels": 6561,
+    "bounds": [
+      44,
+      281,
+      174,
+      373
+    ]
+  },
+  {
+    "frame": 15,
+    "changedPixels": 6203,
+    "bounds": [
+      52,
+      301,
+      184,
+      391
+    ]
+  },
+  {
+    "frame": 16,
+    "changedPixels": 6009,
+    "bounds": [
+      57,
+      312,
+      190,
+      400
+    ]
+  },
+  {
+    "frame": 17,
+    "changedPixels": 5141,
+    "bounds": [
+      71,
+      345,
+      200,
+      423
+    ]
+  },
+  {
+    "frame": 18,
+    "changedPixels": 2614,
+    "bounds": [
+      87,
+      373,
+      210,
+      442
+    ]
+  },
+  {
+    "frame": 19,
+    "changedPixels": 515,
+    "bounds": [
+      91,
+      380,
+      212,
+      445
+    ]
+  },
+  {
+    "frame": 20,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 21,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 22,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 23,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 24,
+    "changedPixels": 0,
+    "bounds": null
+  },
+  {
+    "frame": 25,
+    "changedPixels": 0,
+    "bounds": null
+  }
+]

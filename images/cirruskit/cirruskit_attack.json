@@ -208,5 +208,5 @@
       "durationMs": 16
     }
   ],
-  "notes": "Quick attack in place: focused narrowed eyes, open mouth, crouch, pounce and soft landing. 25 frames at 16ms fit the existing 400ms battle attack display. First and last frames exactly match cirruskit_base.png. Read left to right, top to bottom. Original head and mane artwork moves as a rigid group; only the local eyes and mouth use the generated attack expression."
+  "notes": "Airborne pounce in place: narrowed eyes and open mouth; crouch, push off, reach both front paws forward as the hindquarters rise, land on the front paws, recover. Existing original head and mane texture stays together; independently articulated original limb layers. First and last frames exactly match cirruskit_base.png. Read left to right, top to bottom. 25 frames at 16ms fit the existing 400ms battle attack window."
 }

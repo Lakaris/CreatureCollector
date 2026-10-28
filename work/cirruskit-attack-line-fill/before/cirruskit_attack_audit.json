@@ -1,0 +1,327 @@
+{
+  "frames": 25,
+  "grid": [
+    5,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "durationMs": 400,
+  "loop": false,
+  "firstAndLastMatchBaseExactly": true,
+  "pouncePosesAndTimingUnchanged": true,
+  "noCanvasClipping": true,
+  "oneConnectedSilhouettePerFrame": true,
+  "noSmallEnclosedSeams": true,
+  "unchangedHeadManePixels": 1781826,
+  "changedPixels": 128991,
+  "gameAndPreviewTimingMatch": true,
+  "fitsBattleAttackWindow": true,
+  "protectedAssetFilesUnchanged": 18,
+  "method": "Repaired tail/rear-leg layer ownership, restored the original tail texture under the join, re-inked physical limb contours inside their existing silhouettes, and sealed small enclosed sampling cracks. No new generated art, blur filters or color grading.",
+  "visualReview": "Inspected the rear/tail join and both front legs in every frame, plus full-size airborne details and full-pose contact sheets.",
+  "perFrame": [
+    {
+      "frame": 1,
+      "phase": "wind-up",
+      "bounds": [
+        16,
+        49,
+        504,
+        466
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 2,
+      "phase": "wind-up",
+      "bounds": [
+        16,
+        54,
+        504,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 3,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        64,
+        504,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 4,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        70,
+        504,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 5,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        76,
+        504,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 6,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        83,
+        503,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 7,
+      "phase": "takeoff",
+      "bounds": [
+        16,
+        61,
+        503,
+        456
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 8,
+      "phase": "takeoff",
+      "bounds": [
+        16,
+        39,
+        503,
+        450
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 9,
+      "phase": "takeoff",
+      "bounds": [
+        15,
+        33,
+        503,
+        444
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 10,
+      "phase": "airborne",
+      "bounds": [
+        9,
+        17,
+        502,
+        435
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 11,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        7,
+        505,
+        431
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 12,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        8,
+        504,
+        440
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 13,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        10,
+        504,
+        449
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 14,
+      "phase": "airborne",
+      "bounds": [
+        11,
+        16,
+        505,
+        454
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 15,
+      "phase": "airborne",
+      "bounds": [
+        21,
+        27,
+        506,
+        461
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 16,
+      "phase": "landing",
+      "bounds": [
+        25,
+        33,
+        507,
+        465
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 17,
+      "phase": "landing",
+      "bounds": [
+        23,
+        54,
+        504,
+        464
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 18,
+      "phase": "landing",
+      "bounds": [
+        22,
+        76,
+        504,
+        464
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 19,
+      "phase": "landing",
+      "bounds": [
+        22,
+        78,
+        505,
+        463
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 20,
+      "phase": "recover",
+      "bounds": [
+        20,
+        73,
+        505,
+        463
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 21,
+      "phase": "recover",
+      "bounds": [
+        19,
+        70,
+        505,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 22,
+      "phase": "recover",
+      "bounds": [
+        19,
+        67,
+        505,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 23,
+      "phase": "recover",
+      "bounds": [
+        18,
+        59,
+        505,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 24,
+      "phase": "recover",
+      "bounds": [
+        17,
+        52,
+        504,
+        462
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    },
+    {
+      "frame": 25,
+      "phase": "recover",
+      "bounds": [
+        16,
+        49,
+        504,
+        466
+      ],
+      "connectedComponents": 1,
+      "smallEnclosedSeams": 0
+    }
+  ]
+}

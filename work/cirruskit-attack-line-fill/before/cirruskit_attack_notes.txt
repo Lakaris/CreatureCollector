@@ -1,0 +1,10 @@
+Cirruskit attack — pounce outline cleanup, 2026-10-27
+Transparent PNG spritesheet: cirruskit_attack.png
+25 frames, 512 × 512 pixels per frame; 5 columns × 5 rows.
+Play once, 16 ms per frame, 400 ms total. First and last frames exactly equal cirruskit_base.png.
+Preview includes normal, half, and quarter speed plus frame stepping.
+Motion reference: ginger-cat-cat-jumping.gif supplied by the user. Reference used only for the airborne reach and forepaw-first landing; no props added.
+This revision preserves every pounce pose and its timing. It removes tail slivers from the rear-leg cutout, restores the full tail texture under the join, closes small enclosed seams, and keeps visible leg-edge strokes from thinning during bends.
+The source head, mane pattern, tail palette and expression are reused. Each rendered layer samples its source once; no crossfades, optical flow, blur filters or per-frame recoloring.
+No new generated artwork in this revision. Existing eyes and mouth came from the built-in image editor; original prompt in workspace: work/cirruskit-attack/image-edit-prompt.txt.
+Previous attack files are backed up at work/cirruskit-attack-outline-repair/before/. Idle, flavor and move files are unchanged.

@@ -1,0 +1,10 @@
+Cirruskit attack — airborne pounce revision, 2026-10-27
+Transparent PNG spritesheet: cirruskit_attack.png
+25 frames, 512 × 512 pixels per frame; 5 columns × 5 rows.
+Play once, 16 ms per frame, 400 ms total. First and last frames exactly equal cirruskit_base.png.
+Preview includes normal, half, and quarter speed plus frame stepping.
+Motion reference: ginger-cat-cat-jumping.gif supplied by the user. Reference used only for the airborne reach and forepaw-first landing; no props added.
+This revision changes the existing editable animation rig: coordinated foreleg reach, lifting hind legs, a forward body pitch, tail follow-through and landing compression.
+The source head, mane pattern, tail palette and expression are reused. Each rendered layer samples its source once; no crossfades, optical flow, blur filters or per-frame recoloring.
+No new generated artwork in this revision. Existing eyes and mouth came from the built-in image editor; original prompt in workspace: work/cirruskit-attack/image-edit-prompt.txt.
+Previous attack files are backed up at work/cirruskit-attack-pounce/before/. Idle, flavor and move files are unchanged.

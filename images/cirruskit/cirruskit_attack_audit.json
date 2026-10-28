@@ -1,4 +1,5 @@
 {
+  "repair": "Fill only the missing outer ink segment at the mane/front-leg junction",
   "frames": 25,
   "grid": [
     5,
@@ -8,252 +9,289 @@
     512,
     512
   ],
-  "totalDurationMs": 400,
-  "frameDurationMs": 16,
-  "loop": false,
-  "firstAndLastMatchBaseExactly": true,
-  "sourceTextureChecks": {
-    "headAndFace": 1832300,
-    "maneColorsAndSwirls": 369500,
-    "tailAndPaws": 1411725
-  },
-  "maximumLiftPx": 34,
-  "noCanvasClipping": true,
-  "oneConnectedSilhouettePerFrame": true,
-  "gameAndPreviewTimingMatch": true,
-  "fitsBattleAttackWindow": true,
-  "existingIdleFlavorMoveAssetsUnchanged": true,
-  "generatedExpressionRegions": [
-    "left eye",
-    "right eye",
-    "mouth"
+  "affectedFrames": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
   ],
-  "method": "Built-in image editor created the expression. Local face patches use that master; existing head/mane and body artwork move with rigid whole-pixel translations. No frame crossfades or full-character redraws.",
+  "totalChangedPixels": 1060,
+  "allOtherPixelsExactlyUnchanged": true,
+  "existingOpaqueArtworkExactlyUnchanged": true,
+  "firstAndLastFramesExactlyUnchanged": true,
+  "timingAndMetadataByteIdentical": true,
+  "otherAnimationsUnchanged": true,
+  "noCanvasClipping": true,
+  "method": "Localized missing-ink fill on the existing rendered frames; no rerendering, recoloring, or pose changes.",
   "perFrame": [
     {
       "frame": 1,
-      "phase": "wind-up",
-      "expression": "normal",
-      "headDownPx": 0,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 0,
+      "bounds": {
+        "left": 420,
+        "top": 360,
+        "right": 436,
+        "bottom": 375
+      }
     },
     {
       "frame": 2,
-      "phase": "wind-up",
-      "expression": "normal",
-      "headDownPx": 2,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 19,
+      "bounds": {
+        "left": 420,
+        "top": 362,
+        "right": 436,
+        "bottom": 377
+      }
     },
     {
       "frame": 3,
-      "phase": "wind-up",
-      "expression": "focused",
-      "headDownPx": 5,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 33,
+      "bounds": {
+        "left": 420,
+        "top": 367,
+        "right": 436,
+        "bottom": 382
+      }
     },
     {
       "frame": 4,
-      "phase": "wind-up",
-      "expression": "focused",
-      "headDownPx": 9,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 40,
+      "bounds": {
+        "left": 420,
+        "top": 370,
+        "right": 436,
+        "bottom": 385
+      }
     },
     {
       "frame": 5,
-      "phase": "wind-up",
-      "expression": "attack",
-      "headDownPx": 14,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 56,
+      "bounds": {
+        "left": 418,
+        "top": 374,
+        "right": 434,
+        "bottom": 389
+      }
     },
     {
       "frame": 6,
-      "phase": "wind-up",
-      "expression": "attack",
-      "headDownPx": 19,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 51,
+      "bounds": {
+        "left": 417,
+        "top": 379,
+        "right": 433,
+        "bottom": 394
+      }
     },
     {
       "frame": 7,
-      "phase": "wind-up",
-      "expression": "attack",
-      "headDownPx": 22,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 55,
+      "bounds": {
+        "left": 413,
+        "top": 371,
+        "right": 429,
+        "bottom": 386
+      }
     },
     {
       "frame": 8,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 17,
-      "liftPx": 8,
-      "reachPx": 1,
-      "connectedComponents": 1
+      "changedPixels": 42,
+      "bounds": {
+        "left": 410,
+        "top": 363,
+        "right": 426,
+        "bottom": 378
+      }
     },
     {
       "frame": 9,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 9,
-      "liftPx": 22,
-      "reachPx": 2,
-      "connectedComponents": 1
+      "changedPixels": 43,
+      "bounds": {
+        "left": 407,
+        "top": 361,
+        "right": 423,
+        "bottom": 376
+      }
     },
     {
       "frame": 10,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 32,
-      "reachPx": 4,
-      "connectedComponents": 1
+      "changedPixels": 40,
+      "bounds": {
+        "left": 401,
+        "top": 358,
+        "right": 417,
+        "bottom": 373
+      }
     },
     {
       "frame": 11,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 34,
-      "reachPx": 5,
-      "connectedComponents": 1
+      "changedPixels": 36,
+      "bounds": {
+        "left": 398,
+        "top": 355,
+        "right": 414,
+        "bottom": 370
+      }
     },
     {
       "frame": 12,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 32,
-      "reachPx": 5,
-      "connectedComponents": 1
+      "changedPixels": 42,
+      "bounds": {
+        "left": 391,
+        "top": 365,
+        "right": 407,
+        "bottom": 380
+      }
     },
     {
       "frame": 13,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 26,
-      "reachPx": 4,
-      "connectedComponents": 1
+      "changedPixels": 48,
+      "bounds": {
+        "left": 384,
+        "top": 375,
+        "right": 400,
+        "bottom": 390
+      }
     },
     {
       "frame": 14,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 18,
-      "reachPx": 3,
-      "connectedComponents": 1
+      "changedPixels": 54,
+      "bounds": {
+        "left": 388,
+        "top": 378,
+        "right": 404,
+        "bottom": 393
+      }
     },
     {
       "frame": 15,
-      "phase": "pounce",
-      "expression": "attack",
-      "headDownPx": 0,
-      "liftPx": 9,
-      "reachPx": 1,
-      "connectedComponents": 1
+      "changedPixels": 55,
+      "bounds": {
+        "left": 396,
+        "top": 384,
+        "right": 412,
+        "bottom": 399
+      }
     },
     {
       "frame": 16,
-      "phase": "landing",
-      "expression": "attack",
-      "headDownPx": 8,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 54,
+      "bounds": {
+        "left": 400,
+        "top": 387,
+        "right": 416,
+        "bottom": 402
+      }
     },
     {
       "frame": 17,
-      "phase": "landing",
-      "expression": "attack",
-      "headDownPx": 16,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 55,
+      "bounds": {
+        "left": 406,
+        "top": 390,
+        "right": 422,
+        "bottom": 405
+      }
     },
     {
       "frame": 18,
-      "phase": "landing",
-      "expression": "attack",
-      "headDownPx": 20,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 52,
+      "bounds": {
+        "left": 412,
+        "top": 392,
+        "right": 428,
+        "bottom": 407
+      }
     },
     {
       "frame": 19,
-      "phase": "landing",
-      "expression": "attack",
-      "headDownPx": 17,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 55,
+      "bounds": {
+        "left": 414,
+        "top": 388,
+        "right": 430,
+        "bottom": 403
+      }
     },
     {
       "frame": 20,
-      "phase": "recover",
-      "expression": "focused",
-      "headDownPx": 13,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 57,
+      "bounds": {
+        "left": 417,
+        "top": 379,
+        "right": 433,
+        "bottom": 394
+      }
     },
     {
       "frame": 21,
-      "phase": "recover",
-      "expression": "focused",
-      "headDownPx": 9,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 58,
+      "bounds": {
+        "left": 419,
+        "top": 374,
+        "right": 435,
+        "bottom": 389
+      }
     },
     {
       "frame": 22,
-      "phase": "recover",
-      "expression": "focused",
-      "headDownPx": 5,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 57,
+      "bounds": {
+        "left": 419,
+        "top": 372,
+        "right": 435,
+        "bottom": 387
+      }
     },
     {
       "frame": 23,
-      "phase": "recover",
-      "expression": "normal",
-      "headDownPx": 2,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 39,
+      "bounds": {
+        "left": 419,
+        "top": 367,
+        "right": 435,
+        "bottom": 382
+      }
     },
     {
       "frame": 24,
-      "phase": "recover",
-      "expression": "normal",
-      "headDownPx": 1,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 19,
+      "bounds": {
+        "left": 419,
+        "top": 362,
+        "right": 435,
+        "bottom": 377
+      }
     },
     {
       "frame": 25,
-      "phase": "recover",
-      "expression": "normal",
-      "headDownPx": 0,
-      "liftPx": 0,
-      "reachPx": 0,
-      "connectedComponents": 1
+      "changedPixels": 0,
+      "bounds": {
+        "left": 420,
+        "top": 360,
+        "right": 436,
+        "bottom": 375
+      }
     }
   ]
 }

@@ -1,0 +1,2 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+for(let n=0;n<25;n++){const p=PNG.sync.read(fs.readFileSync(`work/cirruskit-attack-pounce/frames/frame-${n}.png`));let x0=512,y0=512,x1=0,y1=0,border=0;for(let y=0;y<512;y++)for(let x=0;x<512;x++)if(p.data[(y*512+x)*4+3]>=30){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);if(!x||!y||x===511||y===511)border++;}console.log({frame:n+1,bounds:[x0,y0,x1,y1],border});}

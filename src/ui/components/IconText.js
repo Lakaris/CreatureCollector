@@ -72,6 +72,17 @@ export function uiIcon(name, alt) {
   return iconImg({ src: "images/ui_icons/" + name + ".png", alt: alt || "" });
 }
 
+/** The red "something's waiting" dot, `size` px, positioned by the caller's
+ * `style` (usually absolute, on a corner). The art carries its own dark
+ * outline, so it needs no white ring to stand off busy backgrounds. */
+export function notificationDot(size, style) {
+  return React.createElement("img", {
+    src: "images/ui_icons/symbols/notificationdot.png",
+    alt: "", "aria-hidden": "true", draggable: false,
+    style: { display: "block", width: size, height: size, pointerEvents: "none", ...style },
+  });
+}
+
 // Currency art by currency key (the keys of `currencies`, REWARD_LABELS and
 // reward tables). Gear Shards (⚔️ / 🔧), Dungeon Passes (🎫) and the element
 // melons (🔥 💧 🌿...) share their emoji with other things -- the Arena, Pass

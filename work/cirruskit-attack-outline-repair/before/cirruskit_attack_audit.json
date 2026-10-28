@@ -1,0 +1,298 @@
+{
+  "frames": 25,
+  "grid": [
+    5,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "durationMs": 400,
+  "loop": false,
+  "firstAndLastMatchBaseExactly": true,
+  "noCanvasClipping": true,
+  "oneConnectedSilhouettePerFrame": true,
+  "gameAndPreviewTimingMatch": true,
+  "fitsBattleAttackWindow": true,
+  "protectedAssetFilesUnchanged": 18,
+  "method": "Existing editable animation layers with keyed leg articulation, body pitch and airborne translation. Single-pass source sampling, no crossfades, no blur filters, no color grading or per-frame image generation. Original face and mane move together.",
+  "visualReview": "Reviewed every pose on contact sheets, airborne poses at full size, and all poses at 130px game size.",
+  "perFrame": [
+    {
+      "frame": 1,
+      "phase": "wind-up",
+      "bounds": [
+        16,
+        49,
+        504,
+        466
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 2,
+      "phase": "wind-up",
+      "bounds": [
+        16,
+        54,
+        504,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 3,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        64,
+        504,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 4,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        70,
+        504,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 5,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        76,
+        504,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 6,
+      "phase": "wind-up",
+      "bounds": [
+        17,
+        83,
+        503,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 7,
+      "phase": "takeoff",
+      "bounds": [
+        16,
+        61,
+        503,
+        456
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 8,
+      "phase": "takeoff",
+      "bounds": [
+        16,
+        39,
+        503,
+        450
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 9,
+      "phase": "takeoff",
+      "bounds": [
+        15,
+        33,
+        503,
+        444
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 10,
+      "phase": "airborne",
+      "bounds": [
+        9,
+        17,
+        502,
+        435
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 11,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        7,
+        505,
+        431
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 12,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        8,
+        504,
+        440
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 13,
+      "phase": "airborne",
+      "bounds": [
+        5,
+        10,
+        504,
+        449
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 14,
+      "phase": "airborne",
+      "bounds": [
+        11,
+        16,
+        505,
+        454
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 15,
+      "phase": "airborne",
+      "bounds": [
+        21,
+        27,
+        506,
+        461
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 16,
+      "phase": "landing",
+      "bounds": [
+        25,
+        33,
+        507,
+        465
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 17,
+      "phase": "landing",
+      "bounds": [
+        23,
+        54,
+        504,
+        464
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 18,
+      "phase": "landing",
+      "bounds": [
+        22,
+        76,
+        504,
+        464
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 19,
+      "phase": "landing",
+      "bounds": [
+        22,
+        78,
+        505,
+        463
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 20,
+      "phase": "recover",
+      "bounds": [
+        20,
+        73,
+        505,
+        463
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 21,
+      "phase": "recover",
+      "bounds": [
+        19,
+        70,
+        505,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 22,
+      "phase": "recover",
+      "bounds": [
+        19,
+        67,
+        505,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 23,
+      "phase": "recover",
+      "bounds": [
+        18,
+        59,
+        505,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 24,
+      "phase": "recover",
+      "bounds": [
+        17,
+        52,
+        504,
+        462
+      ],
+      "connectedComponents": 1
+    },
+    {
+      "frame": 25,
+      "phase": "recover",
+      "bounds": [
+        16,
+        49,
+        504,
+        466
+      ],
+      "connectedComponents": 1
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+{
+  "repair": "Fill only the missing outer ink segment at the mane/front-leg junction",
+  "frames": 25,
+  "grid": [
+    5,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "affectedFrames": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "totalChangedPixels": 1060,
+  "allOtherPixelsExactlyUnchanged": true,
+  "existingOpaqueArtworkExactlyUnchanged": true,
+  "firstAndLastFramesExactlyUnchanged": true,
+  "timingAndMetadataByteIdentical": true,
+  "otherAnimationsUnchanged": true,
+  "noCanvasClipping": true,
+  "method": "Localized missing-ink fill on the existing rendered frames; no rerendering, recoloring, or pose changes.",
+  "perFrame": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "bounds": {
+        "left": 420,
+        "top": 360,
+        "right": 436,
+        "bottom": 375
+      }
+    },
+    {
+      "frame": 2,
+      "changedPixels": 19,
+      "bounds": {
+        "left": 420,
+        "top": 362,
+        "right": 436,
+        "bottom": 377
+      }
+    },
+    {
+      "frame": 3,
+      "changedPixels": 33,
+      "bounds": {
+        "left": 420,
+        "top": 367,
+        "right": 436,
+        "bottom": 382
+      }
+    },
+    {
+      "frame": 4,
+      "changedPixels": 40,
+      "bounds": {
+        "left": 420,
+        "top": 370,
+        "right": 436,
+        "bottom": 385
+      }
+    },
+    {
+      "frame": 5,
+      "changedPixels": 56,
+      "bounds": {
+        "left": 418,
+        "top": 374,
+        "right": 434,
+        "bottom": 389
+      }
+    },
+    {
+      "frame": 6,
+      "changedPixels": 51,
+      "bounds": {
+        "left": 417,
+        "top": 379,
+        "right": 433,
+        "bottom": 394
+      }
+    },
+    {
+      "frame": 7,
+      "changedPixels": 55,
+      "bounds": {
+        "left": 413,
+        "top": 371,
+        "right": 429,
+        "bottom": 386
+      }
+    },
+    {
+      "frame": 8,
+      "changedPixels": 42,
+      "bounds": {
+        "left": 410,
+        "top": 363,
+        "right": 426,
+        "bottom": 378
+      }
+    },
+    {
+      "frame": 9,
+      "changedPixels": 43,
+      "bounds": {
+        "left": 407,
+        "top": 361,
+        "right": 423,
+        "bottom": 376
+      }
+    },
+    {
+      "frame": 10,
+      "changedPixels": 40,
+      "bounds": {
+        "left": 401,
+        "top": 358,
+        "right": 417,
+        "bottom": 373
+      }
+    },
+    {
+      "frame": 11,
+      "changedPixels": 36,
+      "bounds": {
+        "left": 398,
+        "top": 355,
+        "right": 414,
+        "bottom": 370
+      }
+    },
+    {
+      "frame": 12,
+      "changedPixels": 42,
+      "bounds": {
+        "left": 391,
+        "top": 365,
+        "right": 407,
+        "bottom": 380
+      }
+    },
+    {
+      "frame": 13,
+      "changedPixels": 48,
+      "bounds": {
+        "left": 384,
+        "top": 375,
+        "right": 400,
+        "bottom": 390
+      }
+    },
+    {
+      "frame": 14,
+      "changedPixels": 54,
+      "bounds": {
+        "left": 388,
+        "top": 378,
+        "right": 404,
+        "bottom": 393
+      }
+    },
+    {
+      "frame": 15,
+      "changedPixels": 55,
+      "bounds": {
+        "left": 396,
+        "top": 384,
+        "right": 412,
+        "bottom": 399
+      }
+    },
+    {
+      "frame": 16,
+      "changedPixels": 54,
+      "bounds": {
+        "left": 400,
+        "top": 387,
+        "right": 416,
+        "bottom": 402
+      }
+    },
+    {
+      "frame": 17,
+      "changedPixels": 55,
+      "bounds": {
+        "left": 406,
+        "top": 390,
+        "right": 422,
+        "bottom": 405
+      }
+    },
+    {
+      "frame": 18,
+      "changedPixels": 52,
+      "bounds": {
+        "left": 412,
+        "top": 392,
+        "right": 428,
+        "bottom": 407
+      }
+    },
+    {
+      "frame": 19,
+      "changedPixels": 55,
+      "bounds": {
+        "left": 414,
+        "top": 388,
+        "right": 430,
+        "bottom": 403
+      }
+    },
+    {
+      "frame": 20,
+      "changedPixels": 57,
+      "bounds": {
+        "left": 417,
+        "top": 379,
+        "right": 433,
+        "bottom": 394
+      }
+    },
+    {
+      "frame": 21,
+      "changedPixels": 58,
+      "bounds": {
+        "left": 419,
+        "top": 374,
+        "right": 435,
+        "bottom": 389
+      }
+    },
+    {
+      "frame": 22,
+      "changedPixels": 57,
+      "bounds": {
+        "left": 419,
+        "top": 372,
+        "right": 435,
+        "bottom": 387
+      }
+    },
+    {
+      "frame": 23,
+      "changedPixels": 39,
+      "bounds": {
+        "left": 419,
+        "top": 367,
+        "right": 435,
+        "bottom": 382
+      }
+    },
+    {
+      "frame": 24,
+      "changedPixels": 19,
+      "bounds": {
+        "left": 419,
+        "top": 362,
+        "right": 435,
+        "bottom": 377
+      }
+    },
+    {
+      "frame": 25,
+      "changedPixels": 0,
+      "bounds": {
+        "left": 420,
+        "top": 360,
+        "right": 436,
+        "bottom": 375
+      }
+    }
+  ]
+}

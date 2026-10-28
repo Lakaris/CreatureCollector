@@ -1,0 +1,52 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "size": [
+    256,
+    256
+  ],
+  "transparent_background": true,
+  "items": [
+    {
+      "name": "Progression",
+      "filename": "progression.png",
+      "design": "Three broad chunky turquoise steps ascending from lower-left to upper-right, forming a compact staircase. A single thick warm-gold arrow rises diagonally above the steps toward upper-right. Clear progress/upgrading symbol. Only three big steps and one arrow, no flag, dots or extra markings.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Progression.\nSubject: Three broad chunky turquoise steps ascending from lower-left to upper-right, forming a compact staircase. A single thick warm-gold arrow rises diagonally above the steps toward upper-right. Clear progress/upgrading symbol. Only three big steps and one arrow, no flag, dots or extra markings.",
+      "destination": "images/ui_icons/quests/progression.png"
+    },
+    {
+      "name": "Daily",
+      "filename": "daily.png",
+      "design": "One compact warm-ivory square calendar page with a broad coral-red header and TWO chunky dark binding loops. One very large emerald-green checkmark centered on the otherwise blank page. No dates, grid, numbers, writing or star. Slightly rounded corners, front view.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Daily.\nSubject: One compact warm-ivory square calendar page with a broad coral-red header and TWO chunky dark binding loops. One very large emerald-green checkmark centered on the otherwise blank page. No dates, grid, numbers, writing or star. Slightly rounded corners, front view.",
+      "destination": "images/ui_icons/quests/daily.png"
+    },
+    {
+      "name": "Creature",
+      "filename": "creature.png",
+      "design": "Exactly ONE large friendly paw-print symbol made of one broad rounded violet central pad and FOUR large rounded toe pads in a gentle arc above it. All five separate shapes have very thick plum outlines, bright lilac highlights and deep-purple shadows. Wide transparent gaps between toes and central pad. Paw PRINT ONLY: no actual creature, limb, face, head, silhouette, claws or fur.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Creature.\nSubject: Exactly ONE large friendly paw-print symbol made of one broad rounded violet central pad and FOUR large rounded toe pads in a gentle arc above it. All five separate shapes have very thick plum outlines, bright lilac highlights and deep-purple shadows. Wide transparent gaps between toes and central pad. Paw PRINT ONLY: no actual creature, limb, face, head, silhouette, claws or fur.",
+      "destination": "images/ui_icons/quests/creature.png"
+    },
+    {
+      "name": "Gear",
+      "filename": "gear.png",
+      "design": "One squat front-facing silver-gray breastplate with a broad warm-gold rim and two small squared shoulder tabs. One large teal neck opening and a single broad slate-blue shadow across the metal. Simple strong equipment silhouette, no wearer, face, body, tiny rivets, straps, crest or extra weapon.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Gear.\nSubject: One squat front-facing silver-gray breastplate with a broad warm-gold rim and two small squared shoulder tabs. One large teal neck opening and a single broad slate-blue shadow across the metal. Simple strong equipment silhouette, no wearer, face, body, tiny rivets, straps, crest or extra weapon.",
+      "destination": "images/ui_icons/quests/gear.png"
+    },
+    {
+      "name": "Dungeon",
+      "filename": "dungeon.png",
+      "design": "One squat stone dungeon entrance: a chunky gray-blue masonry arch made of FIVE large stones surrounding a dark-violet opening. Inside the arch are exactly THREE thick vertical silver portcullis bars crossed by one thick horizontal bar. Broad gold central latch on the crossing bar. No steps, arrow, towers, vines, little stone chips or scenery. Compact readable gated entrance.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Dungeon.\nSubject: One squat stone dungeon entrance: a chunky gray-blue masonry arch made of FIVE large stones surrounding a dark-violet opening. Inside the arch are exactly THREE thick vertical silver portcullis bars crossed by one thick horizontal bar. Broad gold central latch on the crossing bar. No steps, arrow, towers, vines, little stone chips or scenery. Compact readable gated entrance.",
+      "destination": "images/ui_icons/quests/dungeon.png"
+    },
+    {
+      "name": "Arena",
+      "filename": "arena.png",
+      "design": "One compact combat emblem: a broad coral-red shield with a thick bronze-gold rim in front of TWO simple crossed silver swords. The sword tips project above the shield and short teal handles project below, balanced and symmetrical. Shield face has one broad red highlight and is otherwise blank. Large simple shapes, no small rivets, crest, lettering or decorative elements.",
+      "prompt": "Use case: stylized-concept. Create exactly ONE quest-tab icon for a cute creature-collecting game, matching its existing cartoon equipment, eggs and mission-scroll icons. Square PNG with genuine transparent background. Chunky rounded proportions, VERY THICK smooth near-black plum-brown outline (about10-13px at final256px), simple flat rich colors, one broad highlight and one clean cel-shaded shadow. Opaque artwork, transparent holes and background. Designed to be unmistakable at64x64 and still identifiable at13x13: few large shapes, broad negative spaces, no fine details. Center the entire item with approximately10px safe transparent margins inside the final256x256 canvas. No text, numbers, labels, characters, creatures, UI background tile, vignette, cast shadow, glow haze, floating sparkles or watermarks.\nCategory name for metadata only: Arena.\nSubject: One compact combat emblem: a broad coral-red shield with a thick bronze-gold rim in front of TWO simple crossed silver swords. The sword tips project above the shield and short teal handles project below, balanced and symmetrical. Shield face has one broad red highlight and is otherwise blank. Large simple shapes, no small rivets, crest, lettering or decorative elements.",
+      "destination": "images/ui_icons/quests/arena.png"
+    }
+  ]
+}

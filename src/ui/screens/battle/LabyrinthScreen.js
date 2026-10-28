@@ -508,7 +508,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     const allUnits = [...snap.playerUnits, ...snap.enemyUnits];
     const selectedUnit = battleSelectedUid ? allUnits.find((u) => u.uid === battleSelectedUid) : null;
     return React.createElement("div", { key: "sfv455", className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
-      React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 10, background: "#fff", borderBottom: "1px solid #e0e0e0", flexShrink: 0 } },
+      React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 10, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)", flexShrink: 0 } },
         React.createElement("div", { style: { flex: 1 } },
           React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111" } }, "🌀 Labyrinth — Floor " + depth)
         ),
@@ -622,7 +622,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           React.createElement("button", { onClick: () => setBossInfoOpen(false), style: { width: "100%", padding: "9px 0", background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "Close")
         )
       ),
-      React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
+      React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
         // Locked during the first-ever Descend (tutorialStep "labyrinth") --
         // the player's meant to fight the floor, not back out of it.
         React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; setGridInfoCreature(null); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },

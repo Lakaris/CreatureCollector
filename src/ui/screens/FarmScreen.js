@@ -136,7 +136,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
   }
 
   return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
-    React.createElement("div",{style:{padding:"16px 16px 0",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",paddingBottom:12,background:"#fff"}},
+    React.createElement("div",{style:{padding:"16px 16px 0",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid var(--bar-line)",paddingBottom:12,background:"var(--bar-bg)"}},
       onBack&&React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
@@ -204,7 +204,25 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       // bottom of the card instead of the page overflowing on tall screens
       // or leaving a big empty gap on short ones -- same treatment as Hatch.
       React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px 16px",flex:1,minHeight:0,display:"flex",flexDirection:"column",overflow:"hidden"}},
-        React.createElement("div",{style:{fontSize:13,fontWeight:700,marginBottom:8,color:"#333"}},"Accumulated"),
+        // Upgrade rides on the heading row: it costs the list no height and
+        // keeps the field card above free for its art.
+        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginBottom:8}},
+          React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#333"}},"Accumulated"),
+          farmFieldLevel<maxLevel&&React.createElement("div",{style:{position:"relative"}},
+            (farmGuideStep==="upgradeField"||(fertilizerUpgradeLock&&!showFieldUpgrade))&&React.createElement("div",{style:{position:"absolute",right:"100%",top:"50%",transform:"translate(0,-50%)",marginRight:6,fontSize:22,color:"#534AB7",animation:"pointerBounceX 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("➡️")),
+            React.createElement("button",{
+              "data-guide-target":"upgradeField",
+              disabled:farmInteractionLocked&&!fertilizerUpgradeLock,
+              onClick:()=>{if(farmInteractionLocked&&!fertilizerUpgradeLock)return;setShowFieldUpgrade(true);if(farmGuideStep==="upgradeField")setFarmGuideStep(null);},
+              style:{padding:"4px 10px",border:"none",borderRadius:10,fontWeight:700,fontSize:12,whiteSpace:"nowrap",
+                cursor:(farmInteractionLocked&&!fertilizerUpgradeLock)?"not-allowed":"pointer",background:(farmInteractionLocked&&!fertilizerUpgradeLock)?"#ccc":"#534AB7",color:"#fff",transition:"background .2s",
+                display:"flex",alignItems:"center",gap:6},
+            },
+              React.createElement("span",null,"Upgrade"),
+              React.createElement("span",{style:{fontSize:11,fontWeight:600,opacity:0.85,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?undefined:"#ffcdd2"}},iconText("🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost))
+            )
+          )
+        ),
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,color:"#888",marginBottom:4}},
           React.createElement("span",null,atCap?iconText("⚠️ Storage full! Harvest now"):"Time since last harvest: "+fmtTime(elapsedMs)),
           React.createElement("span",null,Math.min(Math.round(elapsedHours/FIELD_CAP_HOURS*100),100)+"%")
@@ -220,7 +238,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
         (accumulated>0||Object.keys(fieldBonuses).length>0)
           // Shrinks and scrolls once a long haul outgrows the card, so the
           // Harvest/Upgrade buttons below always stay in place on screen.
-          ?React.createElement("div",{style:{marginBottom:10,flex:"0 1 auto",minHeight:0,overflowY:"auto"}},
+          ?React.createElement("div",{style:{marginBottom:10,flex:"0 1 auto",minHeight:0,overflowY:"auto",paddingRight:6}},
             accumulated>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
                 React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({key:"food",emoji:"🍖",label:"Food",desc:REWARD_DESC.food||""});}},currencyIcon("food","🍖")),
@@ -248,22 +266,19 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               );
             })
           )
-          :React.createElement("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",padding:"6px 0",marginBottom:10}},"Nothing yet — check back soon"),
-        React.createElement("div",{style:{flex:1,minHeight:0}}),
-        // "Available in" lives at the bottom of the card, directly above the
-        // Harvest button, instead of floating mid-card. The rate itself
-        // isn't duplicated here -- it's already in the (i) info popup.
-        !canHarvest&&!atCap&&React.createElement("div",{style:{fontSize:12,color:"#888",textAlign:"center",marginBottom:8,flexShrink:0}},
-          "Harvest available in "+fmtTime(Math.max(0,farmFieldLastHarvest+3600000-now))
-        ),
-        React.createElement("div",{style:{display:"flex",gap:8,marginBottom:0,position:"relative",flexShrink:0}},
+          :React.createElement("div",{style:{fontSize:12,color:"#aaa",textAlign:"center",padding:"6px 0",marginBottom:10}},"Nothing yet")
+      ),
+      // Harvest sits under the Accumulated card, not inside it, so the list
+      // gets the card's full height. The wait until it unlocks is the
+      // disabled button's own label rather than an extra line above it.
+      React.createElement("div",{style:{display:"flex",gap:8,position:"relative",flexShrink:0}},
           harvestTutorialLock&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-40,transform:"translate(-50%,0)",fontSize:28,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
           React.createElement("button",{
             onClick:harvest,
             disabled:!canHarvest||fertilizerUpgradeLock||fertilizerDoneLock,
             style:{flex:1,padding:"12px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:15,cursor:(canHarvest&&!fertilizerUpgradeLock&&!fertilizerDoneLock)?"pointer":"default",
               background:(canHarvest&&!fertilizerUpgradeLock&&!fertilizerDoneLock)?"#4caf50":"#ccc",color:"#fff",transition:"background .2s"},
-          },"Harvest"),
+          },(!canHarvest&&!atCap)?"Harvest in "+fmtTime(Math.max(0,farmFieldLastHarvest+3600000-now)):"Harvest"),
           !atCap&&React.createElement("button",{
             disabled:farmInteractionLocked,
             onClick:()=>{
@@ -281,29 +296,6 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
               cursor:farmInteractionLocked?"not-allowed":"pointer",background:farmInteractionLocked?"#ccc":"#534AB7",color:"#fff",whiteSpace:"nowrap"}
           },iconText("⚡ "+Math.ceil(500*Math.max(0,FIELD_CAP_HOURS*3600000-elapsedMs)/(FIELD_CAP_HOURS*3600000))+" 💎"))
         ),
-        React.createElement("div",{style:{marginTop:10}}),
-        farmFieldLevel>=maxLevel
-          ?React.createElement("div",{style:{textAlign:"center",fontSize:13,color:"#888",padding:"4px 0"}},iconText("Field max level ✅"))
-          :React.createElement(React.Fragment,null,
-            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
-              React.createElement("div",null)
-            ),
-            React.createElement("div",{style:{position:"relative"}},
-              (farmGuideStep==="upgradeField"||(fertilizerUpgradeLock&&!showFieldUpgrade))&&React.createElement("div",{style:{position:"absolute",left:"50%",top:-32,transform:"translate(-50%,0)",fontSize:26,color:"#534AB7",animation:"pointerBounce 1s ease-in-out infinite",zIndex:6,pointerEvents:"none",filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.25))"}},iconText("⬇️")),
-              React.createElement("button",{
-                "data-guide-target":"upgradeField",
-                disabled:farmInteractionLocked&&!fertilizerUpgradeLock,
-                onClick:()=>{if(farmInteractionLocked&&!fertilizerUpgradeLock)return;setShowFieldUpgrade(true);if(farmGuideStep==="upgradeField")setFarmGuideStep(null);},
-                style:{width:"100%",padding:"8px 0",border:"none",borderRadius:10,fontWeight:700,fontSize:14,
-                  cursor:(farmInteractionLocked&&!fertilizerUpgradeLock)?"not-allowed":"pointer",background:(farmInteractionLocked&&!fertilizerUpgradeLock)?"#ccc":"#534AB7",color:"#fff",transition:"background .2s",
-                  display:"flex",flexDirection:"column",alignItems:"center",gap:1},
-              },
-                React.createElement("span",null,"Upgrade Field"),
-                React.createElement("span",{style:{fontSize:11,fontWeight:600,opacity:0.85,color:(currencies.ancientFertilizer||0)>=upgradeFertilizerCost?undefined:"#ffcdd2"}},iconText("🪴 "+(currencies.ancientFertilizer||0)+" / "+upgradeFertilizerCost))
-              )
-            )
-          )
-      ),
     ),
     // flex:1 grid with 3 even rows fills the screen edge-to-edge instead of
     // fixed-height cards that leave the page free to scroll -- same

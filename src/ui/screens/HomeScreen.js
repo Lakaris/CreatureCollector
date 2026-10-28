@@ -4,7 +4,7 @@ import React from "../../react.js";
 import { uiIcon, iconText, notificationDot } from "../components/IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { FLAIR_AURA_MAP, backdropImage } from "../../data/flair.js";
+import { FLAIR_AURA_MAP, backdropImage, PORTRAIT_CREATURE_PX } from "../../data/flair.js";
 import { QUEST_DEFS } from "../../data/quests.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
 import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
@@ -197,9 +197,9 @@ function HomeScreen(){
     // flair title or Change button -- the display creature is picked in
     // Settings.
     // Each anchored by its bottom edge at HOME_FEET_TOP (translate -100%).
-    auraDef&&React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",fontSize:160,lineHeight:1,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},auraDef.emoji),
+    auraDef&&React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",fontSize:Math.round(PORTRAIT_CREATURE_PX*4/3),lineHeight:1,opacity:0.18,pointerEvents:"none",userSelect:"none",filter:"blur(8px)"}},auraDef.emoji),
     React.createElement("div",{style:{position:"absolute",left:"50%",top:HOME_FEET_TOP,transform:"translate(-50%,-100%)",lineHeight:1,filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.15))"}},
-      def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:120,showcase:true}):React.createElement("span",{style:{fontSize:120,lineHeight:1}},"🐣")),
+      def?React.createElement(CreatureIcon,{def,ownedData,unlockedSkins:unlockedSkins||[],size:PORTRAIT_CREATURE_PX,showcase:true}):React.createElement("span",{style:{fontSize:PORTRAIT_CREATURE_PX,lineHeight:1}},"🐣")),
     // The bottom panel: a soft lavender area starting exactly where the art
     // ends (never over it), holding the menu row -- Quests, Battle Pass,
     // Descend and the New Player Welcome Gift -- centred in it.

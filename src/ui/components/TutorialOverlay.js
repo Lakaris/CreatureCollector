@@ -662,7 +662,7 @@ function TutorialOverlay() {
           // header
           React.createElement(
             "div",
-            { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
+            { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
             React.createElement(
               "div",
               { style: { flex: 1, textAlign: "center" } },
@@ -916,7 +916,7 @@ function TutorialOverlay() {
           { style: { position: "absolute", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
           React.createElement(
             "div",
-            { style: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 16px 12px", flexShrink: 0, background: "#fff", borderBottom: "1px solid #e0e0e0" } },
+            { style: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px 16px 12px", flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
             !battleOutcome &&
               React.createElement(
                 "button",

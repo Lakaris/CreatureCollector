@@ -428,7 +428,7 @@ function TestBattleScreen({ onBack }) {
 
   function backToPlanning() { stopLoops(); pausedRef.current = false; setPaused(false); setBattling(false); setOutcome(null); setBSnap(null); setAtkEffects([]); setBattleSelectedUid(null); }
 
-  const header = React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 16px", flexShrink: 0 } },
+  const header = React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)", padding: "12px 16px", flexShrink: 0 } },
     React.createElement("button", { onClick: () => { stopLoops(); onBack && onBack(); }, style: { background: "none", border: "none", fontSize: 18, cursor: "pointer", padding: 0, lineHeight: 1 } }, "←"),
     React.createElement("div", { style: { fontSize: 16, fontWeight: 700 } }, "🧪 Test Battle"),
     React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: "#b45309", background: "#fef3c7", borderRadius: 6, padding: "2px 7px" } }, "DEBUG")

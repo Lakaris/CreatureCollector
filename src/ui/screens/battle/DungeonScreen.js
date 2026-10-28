@@ -422,7 +422,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const selectedUnit=dBattleSelected?.type==="unit"?allUnits.find(u=>u.uid===dBattleSelected.uid):null;
     const selectedBoss=dBattleSelected?.type==="boss"?snapBoss:null;
     return React.createElement("div",{key:"sfv352",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
             React.createElement("span",{style:{fontSize:13,fontWeight:800,color:"#111"}},"🏰 "+boss?.name),
@@ -549,7 +549,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const highlightCells=getHighlightTiles(boss.key,dPlanHighlight,planGeo);
     return React.createElement("div",{key:"sfv472",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       dAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dAbilityTagPopup,onClose:()=>setDAbilityTagPopup(null)}),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
         React.createElement("button",{onClick:()=>{setDPlanning(false);},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
         React.createElement("div",{style:{flex:1,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
@@ -779,7 +779,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   // from the catalog, so a new type item appears here on its own. The back
   // arrow returns to the Dungeon.
   if(showRewards&&boss)return React.createElement("div",{key:"sfvrewards",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
-    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid var(--bar-line)",background:"var(--bar-bg)",flexShrink:0}},
       React.createElement("button",{onClick:()=>setShowRewards(false),"aria-label":"Back",style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1,flexShrink:0}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),

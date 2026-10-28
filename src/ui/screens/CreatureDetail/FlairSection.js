@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "../../../react.js";
 import { iconText, uiIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
-import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
+import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE, PORTRAIT_CREATURE_PX } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
@@ -157,7 +157,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
     // Item lists below it down to nothing. Past the cap the stage goes wider
     // than tall, and the cover sizing crops the art's top instead.
     React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",maxHeight:"calc(var(--vh) * 55)",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
-      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
+      React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:PORTRAIT_CREATURE_PX,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
     ),
     React.createElement("div",{style:{flex:flairTab==="feed"?"1 0 auto":1,minHeight:0,overflow:flairTab==="feed"?"visible":"hidden",display:"flex",flexDirection:"column"}},
       // Feed tab: the equipped-flair row fills the space under the portrait,

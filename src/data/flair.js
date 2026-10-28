@@ -417,6 +417,10 @@ export function backdropImage(ownedData){
  * stage size. cqw/cqh resolve against the stage, which PORTRAIT_STAGE_STYLE
  * makes a size container. */
 export const PORTRAIT_FEET_BOTTOM="calc(0.07 * max(100cqw, 100cqh))";
+/** The showcased creature's size, in px, on Home, the creature page and the
+ * Flair stage -- shared so all three previews match. 512px art cells stay
+ * fully sharp up to about this size on a 3x phone at the 1.15 app scale. */
+export const PORTRAIT_CREATURE_PX=150;
 /** The portrait stage's shared styling. Pulls it out over the card's 12px
  * padding on the top, left and right, so backdrop art runs to the card's
  * edges (its top corners matching the card's 12px radius) -- the stage's

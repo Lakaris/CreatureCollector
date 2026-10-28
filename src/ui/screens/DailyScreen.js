@@ -141,7 +141,7 @@ function DailyScreen({onBack}){
     // White top bar with a back arrow, matching every other screen in the
     // game, instead of the round "✕" button that used to float at the
     // bottom of this one.
-    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid var(--bar-line)",background:"var(--bar-bg)",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),

@@ -306,7 +306,7 @@ function TrialsHome({ onBack, viewIdx, progIdx, maxIdx, stage, enemyLevel, enemi
         h("div", { style: { fontSize: 13, color: "#888", marginBottom: 4 } }, REWARD_DESC[reward.key] || ""),
         h("button", { onClick: () => setRewardOpen(false), style: { marginTop: 20, padding: "10px 28px", borderRadius: 12, border: "none", background: "#534AB7", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "OK"))),
     // header -- the winning team sits top right, on beaten levels only
-    h("div", { style: { padding: "16px 16px 12px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #e0e0e0", background: "#fff", flexShrink: 0 } },
+    h("div", { style: { padding: "16px 16px 12px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid var(--bar-line)", background: "var(--bar-bg)", flexShrink: 0 } },
       h("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#555", padding: 0, lineHeight: 1 } }, h("i", { className: "ti ti-arrow-left" })),
       h("div", { style: { fontSize: 18, fontWeight: 700, flex: 1 } }, "⚔️ Trials"),
       showTeam && h("button", {

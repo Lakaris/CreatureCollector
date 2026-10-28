@@ -465,7 +465,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     const allUnits=[...snap.playerUnits,...snap.enemyUnits];
     const selectedUnit=battleSelectedUid?allUnits.find(u=>u.uid===battleSelectedUid):null;
     return React.createElement("div",{key:"sfv388",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},arenaTabIcon(tabDef)," "+arenaTitle(tabDef)+" — Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
         ),
@@ -567,7 +567,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     return React.createElement("div",{key:"sfv483",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       arenaAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:arenaAbilityTagPopup,onClose:()=>setArenaAbilityTagPopup(null)}),
       // header
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
         React.createElement("button",{onClick:()=>{setPlanning(false);setGridInfoCreature(null);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
           React.createElement("i",{className:"ti ti-arrow-left"})
         ),
@@ -813,7 +813,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
       )
     );})(),
     arenaLockMsg&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:300,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},arenaLockMsg),
-    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid var(--bar-line)",background:"var(--bar-bg)",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),

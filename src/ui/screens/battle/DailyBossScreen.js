@@ -498,7 +498,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     const selectedBoss=battleSelected?.type==="boss"?snap.boss:null;
     return React.createElement("div",{key:"sfv463",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
       // header — boss HP updated via RAF (id="battle-boss-hp"), text via React
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},(foughtBoss||boss).name+" — Lv."+level),
           React.createElement("div",{style:{marginTop:4,height:20,background:"#eee",borderRadius:6,overflow:"hidden",width:"100%",position:"relative"}},
@@ -711,7 +711,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     dailyAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dailyAbilityTagPopup,onClose:()=>setDailyAbilityTagPopup(null)}),
     React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
     // header
-    React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"#fff",borderBottom:"1px solid #e0e0e0"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
       React.createElement("button",{onClick:()=>{setPhase("idle");},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
@@ -928,7 +928,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   );
   // Main screen
   return React.createElement("div",{key:"sfv894",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
-    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #e0e0e0",background:"#fff",flexShrink:0}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid var(--bar-line)",background:"var(--bar-bg)",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),

@@ -204,7 +204,7 @@ function TreasureScreen({onBack}){
     treasurePopupEl,
     setCompletePopupEl,
     redeemPopupEl,
-    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"16px 16px 12px",background:"#fff",borderBottom:"1px solid #e0e0e0",flexShrink:0}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,padding:"16px 16px 12px",background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
       React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),

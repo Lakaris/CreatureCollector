@@ -19,7 +19,7 @@ function ScreenHeader({ title, onBack, backDisabled, left, right, edgeToEdge = t
   return React.createElement("div", {
     style: {
       display: "flex", alignItems: "center", gap: 12,
-      background: "#fff", borderBottom: "1px solid #e0e0e0",
+      background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)",
       margin: edgeToEdge ? "0 -16px 12px" : "0 0 12px",
       padding: "16px 16px 12px", flexShrink: 0,
       position: "sticky", top: 0, zIndex: 5

@@ -169,7 +169,7 @@ function QuestsScreen({onBack}){
   return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200}},
     questRewardPopupEl,
     lockedMsg&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:300,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},lockedMsg),
-    React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid #e0e0e0",flexShrink:0,background:"#fff",display:"flex",alignItems:"center",gap:8}},
+    React.createElement("div",{style:{padding:"16px 16px 12px",borderBottom:"1px solid var(--bar-line)",flexShrink:0,background:"var(--bar-bg)",display:"flex",alignItems:"center",gap:8}},
       React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111"}},headerTitle),
       questTab==="general"&&React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#534AB7",background:"#f0effe",border:"1px solid #d8d4fb",borderRadius:20,padding:"2px 10px"}},"Set "+(batchIdx+1))
     ),

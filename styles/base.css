@@ -26,7 +26,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
    so it must not be scaled with the rest of the UI -- dividing by the scale
    first cancels the transform out and leaves the notch clearance the size the
    device actually asked for. */
-.nav{display:flex;gap:4px;background:#fff;border-top:1px solid #e0e0e0;padding:10px 10px calc(18px + env(safe-area-inset-bottom) / var(--ui-scale,1));flex-shrink:0}
+/* The app's lavender chrome: the bottom nav and every screen's top header bar. */
+:root{--bar-bg:#e9e4fa;--bar-line:#d6cff2}
+.nav{display:flex;gap:4px;background:var(--bar-bg);border-top:1px solid var(--bar-line);padding:10px 10px calc(18px + env(safe-area-inset-bottom) / var(--ui-scale,1));flex-shrink:0}
 .nav-btn{flex:1;padding:7px 2px;border:none;background:transparent;border-radius:10px;font-size:10px;font-weight:500;cursor:pointer;color:#888;transition:all .15s}
 .nav-btn.active{color:#534AB7}
 .nav-btn i{display:block;font-size:17px;margin-bottom:2px}

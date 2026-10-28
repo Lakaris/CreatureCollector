@@ -121,7 +121,7 @@ function NavBar({ tab, setTab, onNavigate, style }) {
               // two shift 7px inward.
               position: "absolute", left: "50%", bottom: -6, width: 76, height: 76,
               marginLeft: -38 + (i === 0 ? 7 : i === TABS.length - 1 ? -7 : 0),
-              borderRadius: "50%", background: "#fff", border: "3px solid #e6e3fa", boxSizing: "border-box",
+              borderRadius: "50%", background: "#fff", border: "3px solid #d6cff2", boxSizing: "border-box",
               boxShadow: "0 -3px 10px rgba(83,74,183,0.15)",
               // Packed toward the top rather than centred: the label then sits
               // near the circle's middle, where it's wide enough for

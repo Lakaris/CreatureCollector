@@ -6,7 +6,7 @@ import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_CYCLE, CORE_STAT_CYCLE, LEVEL_STAT_CYCLE, GEAR_FILTER_STATS, STAT_LABELS, STAT_DESCRIPTIONS, STAT_DECIMALS, formatStat, formatStatBonus, shortStatLabel } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG, EQUIPMENT_DEFS, EQUIPMENT_MAP, EQUIP_MAX_ASCENSION, EQUIP_ASC_COSTS } from "../../../data/equipment.js";
-import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE } from "../../../data/flair.js";
+import { BUFF_STAT_LABEL, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE, PORTRAIT_CREATURE_PX } from "../../../data/flair.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../../data/types.js";
 import { getRootDef, getChain, makeOwnedCreature, calcStats, energyCost, getSpecialCharge, getSpecialChargeAt, MAX_LEVEL, MAX_ASCENSION } from "../../../core/creatures.js";
 import { statPctGain, flairStatGain, roundFractional } from "../../../core/stats.js";
@@ -909,7 +909,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         // spot of the art as on the Flair stage -- leaving the room above for
         // effects.
         React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,borderRadius:0,...backdrop}},
-          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:130,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
+          React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:PORTRAIT_CREATURE_PX,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
         ),
         // Top-right: level, with the ascension stars tucked under it. Same
         // banded row the Collection cards draw (colour = band of ten, ringed

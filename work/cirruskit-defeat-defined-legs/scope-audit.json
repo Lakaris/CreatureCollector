@@ -1,0 +1,150 @@
+{
+  "changesConfinedToLegsAndJoins": true,
+  "headAndManeInteriorPreservedWithinAlphaCompositingTolerance": true,
+  "frames": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "firstChangedRow": null,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 2,
+      "changedPixels": 490,
+      "firstChangedRow": 395,
+      "unchangedHeadPixels": 72329
+    },
+    {
+      "frame": 3,
+      "changedPixels": 490,
+      "firstChangedRow": 395,
+      "unchangedHeadPixels": 72328
+    },
+    {
+      "frame": 4,
+      "changedPixels": 490,
+      "firstChangedRow": 395,
+      "unchangedHeadPixels": 72327
+    },
+    {
+      "frame": 5,
+      "changedPixels": 490,
+      "firstChangedRow": 395,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 6,
+      "changedPixels": 14285,
+      "firstChangedRow": 334,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 7,
+      "changedPixels": 15449,
+      "firstChangedRow": 338,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 8,
+      "changedPixels": 17582,
+      "firstChangedRow": 346,
+      "unchangedHeadPixels": 72330
+    },
+    {
+      "frame": 9,
+      "changedPixels": 18745,
+      "firstChangedRow": 354,
+      "unchangedHeadPixels": 72335
+    },
+    {
+      "frame": 10,
+      "changedPixels": 18836,
+      "firstChangedRow": 360,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 11,
+      "changedPixels": 19404,
+      "firstChangedRow": 372,
+      "unchangedHeadPixels": 72327
+    },
+    {
+      "frame": 12,
+      "changedPixels": 19896,
+      "firstChangedRow": 377,
+      "unchangedHeadPixels": 72334
+    },
+    {
+      "frame": 13,
+      "changedPixels": 20283,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 14,
+      "changedPixels": 20572,
+      "firstChangedRow": 372,
+      "unchangedHeadPixels": 72334
+    },
+    {
+      "frame": 15,
+      "changedPixels": 20517,
+      "firstChangedRow": 373,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 16,
+      "changedPixels": 20315,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72330
+    },
+    {
+      "frame": 17,
+      "changedPixels": 20202,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72334
+    },
+    {
+      "frame": 18,
+      "changedPixels": 20192,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72331
+    },
+    {
+      "frame": 19,
+      "changedPixels": 20269,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72332
+    },
+    {
+      "frame": 20,
+      "changedPixels": 20312,
+      "firstChangedRow": 375,
+      "unchangedHeadPixels": 72334
+    },
+    {
+      "frame": 21,
+      "changedPixels": 20337,
+      "firstChangedRow": 374,
+      "unchangedHeadPixels": 72332
+    },
+    {
+      "frame": 22,
+      "changedPixels": 20337,
+      "firstChangedRow": 374,
+      "unchangedHeadPixels": 72332
+    },
+    {
+      "frame": 23,
+      "changedPixels": 20337,
+      "firstChangedRow": 374,
+      "unchangedHeadPixels": 72332
+    },
+    {
+      "frame": 24,
+      "changedPixels": 20337,
+      "firstChangedRow": 374,
+      "unchangedHeadPixels": 72332
+    }
+  ]
+}

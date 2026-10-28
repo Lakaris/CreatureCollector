@@ -104,11 +104,11 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     setFieldHarvests(c=>c+1);
     setNow(Date.now());
     const items=[
-      {emoji:"🍖",label:"Food",amount:accumulated},
-      {emoji:"🔧",label:"Gear Shards",amount:accumulatedShards},
+      {key:"food",emoji:"🍖",label:"Food",amount:accumulated},
+      {key:"equipShards",emoji:"🔧",label:"Gear Shards",amount:accumulatedShards},
       ...Object.entries(fieldBonuses).map(([k,v])=>{
         const m=MELON_TYPES.find(m=>m.key===k);
-        return {emoji:m?m.emoji:"🍬",label:m?m.label:"Candy",amount:v};
+        return {key:k,emoji:m?m.emoji:"🍬",label:m?m.label:"Candy",amount:v};
       })
     ];
     setHarvestPopup(items);
@@ -218,7 +218,9 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
           }})
         ),
         (accumulated>0||Object.keys(fieldBonuses).length>0)
-          ?React.createElement("div",{style:{marginBottom:10}},
+          // Shrinks and scrolls once a long haul outgrows the card, so the
+          // Harvest/Upgrade buttons below always stay in place on screen.
+          ?React.createElement("div",{style:{marginBottom:10,flex:"0 1 auto",minHeight:0,overflowY:"auto"}},
             accumulated>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
                 React.createElement("span",{style:{fontSize:20,cursor:"pointer"},onClick:e=>{e.stopPropagation();if(farmInteractionLocked)return;setDescPopup({key:"food",emoji:"🍖",label:"Food",desc:REWARD_DESC.food||""});}},currencyIcon("food","🍖")),

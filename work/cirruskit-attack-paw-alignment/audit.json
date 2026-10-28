@@ -1,0 +1,264 @@
+{
+  "repair": "Reduce the near rear paw rotation during the pounce",
+  "frames": 25,
+  "grid": [
+    5,
+    5
+  ],
+  "frameSize": [
+    512,
+    512
+  ],
+  "durationMs": 400,
+  "affectedFrames": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "totalChangedPixels": 82752,
+  "maximumPawAngleBefore": 70,
+  "maximumPawAngleAfter": 32.028,
+  "allPixelsOutsideRearLegUnchanged": true,
+  "previousFrontOutlineFillPreserved": true,
+  "firstAndLastFramesExactlyUnchanged": true,
+  "timingAndMetadataByteIdentical": true,
+  "otherAnimationsUnchanged": true,
+  "noCanvasClipping": true,
+  "oneConnectedSilhouettePerFrame": true,
+  "noSmallEnclosedSeams": true,
+  "method": "Limited the rear leg rotation in the existing editable rig. Applied only that leg delta to the latest saved frames, preserving subsequent outline repairs.",
+  "perFrame": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 0,
+      "correctedPawAngleDegrees": 0,
+      "bounds": null
+    },
+    {
+      "frame": 2,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 1.037037037037037,
+      "correctedPawAngleDegrees": 1.037037037037037,
+      "bounds": null
+    },
+    {
+      "frame": 3,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 2.962962962962963,
+      "correctedPawAngleDegrees": 2.962962962962963,
+      "bounds": null
+    },
+    {
+      "frame": 4,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 4,
+      "correctedPawAngleDegrees": 4,
+      "bounds": null
+    },
+    {
+      "frame": 5,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 6.5,
+      "correctedPawAngleDegrees": 6.5,
+      "bounds": null
+    },
+    {
+      "frame": 6,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 9,
+      "correctedPawAngleDegrees": 9,
+      "bounds": null
+    },
+    {
+      "frame": 7,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 21,
+      "correctedPawAngleDegrees": 21,
+      "bounds": null
+    },
+    {
+      "frame": 8,
+      "changedPixels": 4576,
+      "oldPawAngleDegrees": 33,
+      "correctedPawAngleDegrees": 32.028,
+      "bounds": [
+        79,
+        339,
+        250,
+        424
+      ]
+    },
+    {
+      "frame": 9,
+      "changedPixels": 7217,
+      "oldPawAngleDegrees": 40,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        74,
+        327,
+        248,
+        415
+      ]
+    },
+    {
+      "frame": 10,
+      "changedPixels": 8585,
+      "oldPawAngleDegrees": 52.99999999999999,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        69,
+        296,
+        244,
+        397
+      ]
+    },
+    {
+      "frame": 11,
+      "changedPixels": 9108,
+      "oldPawAngleDegrees": 60,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        67,
+        278,
+        242,
+        387
+      ]
+    },
+    {
+      "frame": 12,
+      "changedPixels": 9484,
+      "oldPawAngleDegrees": 65,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        63,
+        274,
+        237,
+        390
+      ]
+    },
+    {
+      "frame": 13,
+      "changedPixels": 9803,
+      "oldPawAngleDegrees": 70,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        59,
+        271,
+        231,
+        392
+      ]
+    },
+    {
+      "frame": 14,
+      "changedPixels": 9534,
+      "oldPawAngleDegrees": 65.85185185185185,
+      "correctedPawAngleDegrees": 32.00000000000001,
+      "bounds": [
+        62,
+        281,
+        234,
+        398
+      ]
+    },
+    {
+      "frame": 15,
+      "changedPixels": 8954,
+      "oldPawAngleDegrees": 58.148148148148145,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        67,
+        301,
+        242,
+        409
+      ]
+    },
+    {
+      "frame": 16,
+      "changedPixels": 8676,
+      "oldPawAngleDegrees": 54,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        70,
+        312,
+        245,
+        414
+      ]
+    },
+    {
+      "frame": 17,
+      "changedPixels": 6815,
+      "oldPawAngleDegrees": 38.5,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        75,
+        339,
+        249,
+        426
+      ]
+    },
+    {
+      "frame": 18,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 23,
+      "correctedPawAngleDegrees": 23,
+      "bounds": null
+    },
+    {
+      "frame": 19,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 18.333333333333332,
+      "correctedPawAngleDegrees": 18.333333333333332,
+      "bounds": null
+    },
+    {
+      "frame": 20,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 9.666666666666668,
+      "correctedPawAngleDegrees": 9.666666666666668,
+      "bounds": null
+    },
+    {
+      "frame": 21,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 5,
+      "correctedPawAngleDegrees": 5,
+      "bounds": null
+    },
+    {
+      "frame": 22,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 4.21875,
+      "correctedPawAngleDegrees": 4.21875,
+      "bounds": null
+    },
+    {
+      "frame": 23,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 2.5,
+      "correctedPawAngleDegrees": 2.5,
+      "bounds": null
+    },
+    {
+      "frame": 24,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 0.78125,
+      "correctedPawAngleDegrees": 0.78125,
+      "bounds": null
+    },
+    {
+      "frame": 25,
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 0,
+      "correctedPawAngleDegrees": 0,
+      "bounds": null
+    }
+  ]
+}

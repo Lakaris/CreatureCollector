@@ -1,0 +1,489 @@
+{
+  "source": "Current game assets read from src/data/flair.js",
+  "referenceScreenshot": "C:/Users/Annie/Desktop/Screenshot 2026-10-27 232522.png",
+  "creatureBoxFraction": 0.22,
+  "stageAspect": 1.630188679245283,
+  "feetBottomFraction": 0.07,
+  "items": [
+    {
+      "id": "bg_plains",
+      "name": "Open Plains",
+      "path": "images/flair/backgrounds/OpenPlains.jpg",
+      "description": "A simple stretch of flat grassy plains"
+    },
+    {
+      "id": "bg_beach",
+      "name": "Sandy Beach",
+      "path": "images/flair/backgrounds/SandyBeach.jpg",
+      "description": "Warm sand with gentle waves in the distance"
+    },
+    {
+      "id": "bg_forest",
+      "name": "Forest Clearing",
+      "path": "images/flair/backgrounds/ForestClearing.jpg",
+      "description": "A quiet clearing surrounded by tall trees"
+    },
+    {
+      "id": "bg_cave",
+      "name": "Rocky Cave",
+      "path": "images/flair/backgrounds/RockyCave.jpg",
+      "description": "A dim cave with stone walls and a dirt floor"
+    },
+    {
+      "id": "bg_field",
+      "name": "Flower Field",
+      "path": "images/flair/backgrounds/FlowerField.jpg",
+      "description": "A colorful field dotted with wildflowers"
+    },
+    {
+      "id": "bg_pond",
+      "name": "Pond Side",
+      "path": "images/flair/backgrounds/PondSide.jpg",
+      "description": "A muddy bank beside a still pond"
+    },
+    {
+      "id": "bg_dusk",
+      "name": "Dusk Sky",
+      "path": "images/flair/backgrounds/DuskSky.jpg",
+      "description": "A warm orange and pink dusk horizon"
+    },
+    {
+      "id": "bg_night",
+      "name": "Starry Night",
+      "path": "images/flair/backgrounds/StarryNight.jpg",
+      "description": "A clear night sky with twinkling stars"
+    },
+    {
+      "id": "bg_barn",
+      "name": "Old Barn",
+      "path": "images/flair/backgrounds/OldBarn.jpg",
+      "description": "A weathered barn with hay scattered around"
+    },
+    {
+      "id": "bg_hills",
+      "name": "Rolling Hills",
+      "path": "images/flair/backgrounds/RollingHills.jpg",
+      "description": "Gentle hills rolling into the horizon"
+    },
+    {
+      "id": "bg_river",
+      "name": "River Bank",
+      "path": "images/flair/backgrounds/RiverBank.jpg",
+      "description": "A calm river flowing past mossy rocks"
+    },
+    {
+      "id": "bg_fog",
+      "name": "Tide Pools",
+      "path": "images/flair/backgrounds/TidePools.jpg",
+      "description": "Wet rocks dotted with starfish and shallow pools"
+    },
+    {
+      "id": "bg_mud",
+      "name": "Muddy Swamp",
+      "path": "images/flair/backgrounds/MuddySwamp.jpg",
+      "description": "A boggy swamp with murky water patches"
+    },
+    {
+      "id": "bg_snow_plain",
+      "name": "Snowy Field",
+      "path": "images/flair/backgrounds/SnowyField.jpg",
+      "description": "A flat field blanketed in fresh snow"
+    },
+    {
+      "id": "bg_village",
+      "name": "Secluded Cove",
+      "path": "images/flair/backgrounds/SecludedCove.jpg",
+      "description": "A hidden sandy cove sheltered by towering sea rocks"
+    },
+    {
+      "id": "bg_market",
+      "name": "Pine Forest",
+      "path": "images/flair/backgrounds/PineForest.jpg",
+      "description": "Tall dark evergreens over a floor of needles"
+    },
+    {
+      "id": "bg_canyon",
+      "name": "Dry Canyon",
+      "path": "images/flair/backgrounds/DryCanyon.jpg",
+      "description": "A cracked canyon floor under harsh sun"
+    },
+    {
+      "id": "bg_autumn",
+      "name": "Autumn Woods",
+      "path": "images/flair/backgrounds/AutumnWoods.jpg",
+      "description": "Trees blazing with red and gold autumn color"
+    },
+    {
+      "id": "bg_sunrise",
+      "name": "Sunrise Meadow",
+      "path": "images/flair/backgrounds/SunriseMeadow.jpg",
+      "description": "A dewy meadow glowing in soft sunrise light"
+    },
+    {
+      "id": "bg_dock",
+      "name": "Grassy Dunes",
+      "path": "images/flair/backgrounds/GrassyDunes.jpg",
+      "description": "Sand hills held together by tall beach grass"
+    },
+    {
+      "id": "bg_volcano",
+      "name": "Volcanic Ridge",
+      "path": "images/flair/backgrounds/VolcanicRidge.jpg",
+      "description": "A smoking ridge overlooking a lava lake"
+    },
+    {
+      "id": "bg_glacier",
+      "name": "Glacier Cliffs",
+      "path": "images/flair/backgrounds/GlacierCliffs.jpg",
+      "description": "Towering blue-white ice cliffs in the arctic"
+    },
+    {
+      "id": "bg_storm",
+      "name": "Stormy Cliffs",
+      "path": "images/flair/backgrounds/StormyCliffs.jpg",
+      "description": "Crashing waves and lightning-lit dark cliffs"
+    },
+    {
+      "id": "bg_jungle",
+      "name": "Dense Jungle",
+      "path": "images/flair/backgrounds/DenseJungle.jpg",
+      "description": "A thick jungle teeming with vines and ferns"
+    },
+    {
+      "id": "bg_ruins",
+      "name": "Ancient Ruins",
+      "path": "images/flair/backgrounds/AncientRuins.jpg",
+      "description": "Crumbling stone pillars of a forgotten civilization"
+    },
+    {
+      "id": "bg_desert_night",
+      "name": "Desert Night",
+      "path": "images/flair/backgrounds/DesertNight.jpg",
+      "description": "A vast dark desert under a brilliant moon"
+    },
+    {
+      "id": "bg_waterfall",
+      "name": "Waterfall Grotto",
+      "path": "images/flair/backgrounds/WaterfallGrotto.jpg",
+      "description": "A lush grotto hidden behind a cascading waterfall"
+    },
+    {
+      "id": "bg_tundra",
+      "name": "Frozen Tundra",
+      "path": "images/flair/backgrounds/FrozenTundra.jpg",
+      "description": "A windswept icy tundra under grey skies"
+    },
+    {
+      "id": "bg_mushroom",
+      "name": "Mushroom Forest",
+      "path": "images/flair/backgrounds/MushroomForest.jpg",
+      "description": "A forest of glowing oversized mushrooms"
+    },
+    {
+      "id": "bg_sky_islands",
+      "name": "Sky Islands",
+      "path": "images/flair/backgrounds/SkyIslands.jpg",
+      "description": "Floating islands drifting above the clouds"
+    },
+    {
+      "id": "bg_deep_sea",
+      "name": "Deep Sea Floor",
+      "path": "images/flair/backgrounds/DeepSeaFloor.jpg",
+      "description": "The glowing bioluminescent ocean floor"
+    },
+    {
+      "id": "bg_catacombs",
+      "name": "Catacombs",
+      "path": "images/flair/backgrounds/Catacombs.jpg",
+      "description": "Ancient bone-lined tunnels lit by dim torches"
+    },
+    {
+      "id": "bg_crystal_cave",
+      "name": "Crystal Cave",
+      "path": "images/flair/backgrounds/CrystalCave.jpg",
+      "description": "A cavern encrusted with glittering gemstone walls"
+    },
+    {
+      "id": "bg_arena",
+      "name": "Stone Bridge",
+      "path": "images/flair/backgrounds/StoneBridge.jpg",
+      "description": "An old arched stone bridge over a babbling creek"
+    },
+    {
+      "id": "bg_clocktower",
+      "name": "Cactus Flats",
+      "path": "images/flair/backgrounds/CactusFlats.jpg",
+      "description": "Saguaros and scrub on sun-baked red dirt"
+    },
+    {
+      "id": "bg_shipwreck",
+      "name": "Shipwreck",
+      "path": "images/flair/backgrounds/Shipwreck.jpg",
+      "description": "A sunken ship resting on the sea floor"
+    },
+    {
+      "id": "bg_bamboo",
+      "name": "Bamboo Grove",
+      "path": "images/flair/backgrounds/BambooGrove.jpg",
+      "description": "A serene grove of tall swaying bamboo"
+    },
+    {
+      "id": "bg_aurora",
+      "name": "Aurora Valley",
+      "path": "images/flair/backgrounds/AuroraValley.jpg",
+      "description": "A snowy valley under dancing aurora lights"
+    },
+    {
+      "id": "bg_savanna",
+      "name": "Savanna Dusk",
+      "path": "images/flair/backgrounds/SavannaDusk.jpg",
+      "description": "A wide savanna bathed in fiery dusk light"
+    },
+    {
+      "id": "bg_haunted",
+      "name": "Cloudy Skies",
+      "path": "images/flair/backgrounds/CloudySkies.jpg",
+      "description": "Soft white clouds drifting across a bright sky"
+    },
+    {
+      "id": "bg_sky_fortress",
+      "name": "Coral Reef",
+      "path": "images/flair/backgrounds/CoralReef.jpg",
+      "description": "Colorful coral with schools of fish swimming past"
+    },
+    {
+      "id": "bg_void_rift",
+      "name": "Redwood Grove",
+      "path": "images/flair/backgrounds/RedwoodGrove.jpg",
+      "description": "Towering red trunks with sunlight slanting between them"
+    },
+    {
+      "id": "bg_lava_sea",
+      "name": "Lava Sea",
+      "path": "images/flair/backgrounds/LavaSea.jpg",
+      "description": "A churning ocean of molten rock under red skies"
+    },
+    {
+      "id": "bg_storm_eye",
+      "name": "Hot Springs",
+      "path": "images/flair/backgrounds/HotSprings.jpg",
+      "description": "Steaming pools tucked among snowy rocks"
+    },
+    {
+      "id": "bg_ancient_god",
+      "name": "Mangrove Swamp",
+      "path": "images/flair/backgrounds/MangroveSwamp.jpg",
+      "description": "Twisted roots arching over dark, still water"
+    },
+    {
+      "id": "bg_astral",
+      "name": "Kelp Forest",
+      "path": "images/flair/backgrounds/KelpForest.jpg",
+      "description": "Tall swaying kelp with sunlight rippling from above"
+    },
+    {
+      "id": "bg_frozen_palace",
+      "name": "Alpine Lake",
+      "path": "images/flair/backgrounds/AlpineLake.jpg",
+      "description": "A mirror-still lake ringed by snowy peaks"
+    },
+    {
+      "id": "bg_titan_bones",
+      "name": "Titan's Graveyard",
+      "path": "images/flair/backgrounds/TitansGraveyard.jpg",
+      "description": "A vast field of colossal creature bones jutting from the earth"
+    },
+    {
+      "id": "bg_eclipse",
+      "name": "Cloud Forest",
+      "path": "images/flair/backgrounds/CloudForest.jpg",
+      "description": "Moss-draped trees wrapped in drifting mist"
+    },
+    {
+      "id": "bg_overgrown_city",
+      "name": "Seagrass Meadow",
+      "path": "images/flair/backgrounds/SeagrassMeadow.jpg",
+      "description": "An underwater field of waving grass lit by sunbeams"
+    },
+    {
+      "id": "bg_thunder_peaks",
+      "name": "Thunder Peaks",
+      "path": "images/flair/backgrounds/ThunderPeaks.jpg",
+      "description": "Mountain peaks where continuous storms rage eternally"
+    },
+    {
+      "id": "bg_ocean_abyss",
+      "name": "Ocean Abyss",
+      "path": "images/flair/backgrounds/OceanAbyss.jpg",
+      "description": "The crushing darkness of the deepest ocean trench"
+    },
+    {
+      "id": "bg_dragon_nest",
+      "name": "Desert Oasis",
+      "path": "images/flair/backgrounds/DesertOasis.jpg",
+      "description": "Palms circling a clear pool among the dunes"
+    },
+    {
+      "id": "bg_time_ruins",
+      "name": "Lotus Lake",
+      "path": "images/flair/backgrounds/LotusLake.jpg",
+      "description": "Pink lotus flowers rising above calm green water"
+    },
+    {
+      "id": "bg_mirror_world",
+      "name": "Glass Beach",
+      "path": "images/flair/backgrounds/GlassBeach.jpg",
+      "description": "A shore of smooth, colorful sea glass"
+    },
+    {
+      "id": "bg_celestial_garden",
+      "name": "Celestial Garden",
+      "path": "images/flair/backgrounds/CelestialGarden.jpg",
+      "description": "A garden floating among the stars, blooming eternally"
+    },
+    {
+      "id": "bg_war_torn",
+      "name": "Winter Taiga",
+      "path": "images/flair/backgrounds/WinterTaiga.jpg",
+      "description": "Snow-heavy spruce forest under a low winter sun"
+    },
+    {
+      "id": "bg_soul_river",
+      "name": "Rainbow Plains",
+      "path": "images/flair/backgrounds/RainbowPlains.jpg",
+      "description": "Open grassland under a bright arching rainbow"
+    },
+    {
+      "id": "bg_worldtree",
+      "name": "World Tree",
+      "path": "images/flair/backgrounds/WorldTree.jpg",
+      "description": "The roots and canopy of an impossibly large world tree"
+    },
+    {
+      "id": "bg_neon_city",
+      "name": "Starlit Meadow",
+      "path": "images/flair/backgrounds/StarlitMeadow.jpg",
+      "description": "A grassy meadow under a sky full of stars"
+    },
+    {
+      "id": "bg_genesis",
+      "name": "Erupting Caldera",
+      "path": "images/flair/backgrounds/EruptingCaldera.jpg",
+      "description": "A volcano mid-eruption, its ash cloud crackling with lightning"
+    },
+    {
+      "id": "bg_end_of_time",
+      "name": "Calving Glacier",
+      "path": "images/flair/backgrounds/CalvingGlacier.jpg",
+      "description": "A towering wall of ice collapsing into the sea"
+    },
+    {
+      "id": "bg_pantheon",
+      "name": "Tepui Falls",
+      "path": "images/flair/backgrounds/TepuiFalls.jpg",
+      "description": "A flat-topped mountain pouring waterfalls off every side"
+    },
+    {
+      "id": "bg_infinite_void",
+      "name": "Infinite Void",
+      "path": "images/flair/backgrounds/InfiniteVoid.jpg",
+      "description": "An endless, featureless void of absolute nothingness"
+    },
+    {
+      "id": "bg_heart_of_sun",
+      "name": "Nova Nebula",
+      "path": "images/flair/backgrounds/NovaNebula.jpg",
+      "description": "A glowing cloud of colorful gas left by an exploding star"
+    },
+    {
+      "id": "bg_shattered_world",
+      "name": "Shattered World",
+      "path": "images/flair/backgrounds/ShatteredWorld.jpg",
+      "description": "A planet mid-explosion, chunks drifting through space"
+    },
+    {
+      "id": "bg_nightmare",
+      "name": "Living Nightmare",
+      "path": "images/flair/backgrounds/LivingNightmare.jpg",
+      "description": "A shifting, screaming dreamscape of impossible geometry"
+    },
+    {
+      "id": "bg_rebirth",
+      "name": "Endless Space",
+      "path": "images/flair/backgrounds/EndlessSpace.jpg",
+      "description": "Deep space scattered with distant stars and planets"
+    },
+    {
+      "id": "bg_divine_throne",
+      "name": "Dragon's Hoard",
+      "path": "images/flair/backgrounds/DragonsHoard.jpg",
+      "description": "A vast cavern heaped with gold and jewels"
+    },
+    {
+      "id": "bg_oblivion",
+      "name": "Moonbow Falls",
+      "path": "images/flair/backgrounds/MoonbowFalls.jpg",
+      "description": "A waterfall at night crowned by a pale moonlit rainbow"
+    },
+    {
+      "id": "bg_war_of_gods",
+      "name": "Frozen Falls",
+      "path": "images/flair/backgrounds/FrozenFalls.jpg",
+      "description": "A great waterfall frozen solid mid-cascade"
+    },
+    {
+      "id": "bg_primordial_sea",
+      "name": "Primordial Sea",
+      "path": "images/flair/backgrounds/PrimordialSea.jpg",
+      "description": "The infinite ocean that existed before the world was born"
+    },
+    {
+      "id": "bg_omniscience",
+      "name": "Penitente Field",
+      "path": "images/flair/backgrounds/PenitenteField.jpg",
+      "description": "Tall blade-like spikes of snow on a high plateau"
+    },
+    {
+      "id": "bg_singularity",
+      "name": "Bioluminescent Cavern",
+      "path": "images/flair/backgrounds/BioluminescentCavern.jpg",
+      "description": "Glowing mushrooms and blue pools deep underground"
+    },
+    {
+      "id": "bg_false_heaven",
+      "name": "Hanging Gardens",
+      "path": "images/flair/backgrounds/HangingGardens.jpg",
+      "description": "Terraced gardens with vines spilling over every edge"
+    },
+    {
+      "id": "bg_death_realm",
+      "name": "Sunken Temple",
+      "path": "images/flair/backgrounds/SunkenTemple.jpg",
+      "description": "An underwater shrine of pillars lit by shafts of light"
+    },
+    {
+      "id": "bg_universe_forge",
+      "name": "Monarch Grove",
+      "path": "images/flair/backgrounds/MonarchGrove.jpg",
+      "description": "Trees blanketed in thousands of orange butterflies"
+    },
+    {
+      "id": "bg_eclipse_throne",
+      "name": "Colossal Whirlpool",
+      "path": "images/flair/backgrounds/ColossalWhirlpool.jpg",
+      "description": "A vast spiraling vortex in the open sea"
+    },
+    {
+      "id": "bg_firstlight",
+      "name": "Snow Ghost Ridge",
+      "path": "images/flair/backgrounds/SnowGhostRidge.jpg",
+      "description": "Trees buried in snow and rime until they look like giant figures"
+    },
+    {
+      "id": "bg_beyond",
+      "name": "Hydrothermal Vents",
+      "path": "images/flair/backgrounds/HydrothermalVents.jpg",
+      "description": "Smoking chimneys rising from the deep sea floor"
+    }
+  ]
+}

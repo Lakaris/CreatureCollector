@@ -80,6 +80,7 @@ export const CREATURE_ART = {
     idle: { src: "images/cirruskit/cirruskit_idle.png", frames: 30, columns: 6, durations: Array(30).fill(64) },
     move: { src: "images/cirruskit/cirruskit_move.png", frames: 30, columns: 6, durations: Array(30).fill(50) },
     attack: { src: "images/cirruskit/cirruskit_attack.png", frames: 25, columns: 5, durations: Array(25).fill(16), loop: false },
+    defeat: { src: "images/cirruskit/cirruskit_defeat.png", frames: 24, columns: 6, durations: Array(24).fill(30), loop: false },
     flavor: { src: "images/cirruskit/cirruskit_flavor.png", frames: 12, columns: 4, durations: [600, 80, 184, 208, 176, 192, 144, 144, 184, 80, 80, 360] },
   },
 

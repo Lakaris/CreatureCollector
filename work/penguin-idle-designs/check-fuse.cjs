@@ -1,0 +1,2 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
+(async()=>{for(const [n,f] of [['before','exec-d2d12e98-671b-4f8e-b7f9-493e4cf30bbf.png'],['after','exec-c9f759ed-e07b-4f76-831a-5dce850096ee.png']])await sharp('C:/Users/Annie/.codex/generated_images/01a17e8f-4dcd-7fb2-bf5e-79c211523db9/'+f).extract({left:740,top:0,width:270,height:460}).flatten({background:'#dddde4'}).png().toFile('work/penguin-idle-designs/fuse-'+n+'-review.png');})();

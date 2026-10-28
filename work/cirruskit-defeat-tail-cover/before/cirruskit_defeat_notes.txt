@@ -1,0 +1,22 @@
+Cirruskit defeated animation
+
+Transparent PNG spritesheet: 3072 x 2048 px; 6 columns x 4 rows.
+24 frames, each 512 x 512 px, 30 ms per frame, 720 ms total.
+Plays once; keep the final defeated frame displayed.
+The HTML preview holds the last frame until Replay is pressed.
+The first frame exactly matches cirruskit_base.png.
+
+Pose revision: near and far legs are staggered so all four paws are visible, with clear limb joins and separate silhouettes. The far hind paw is unfolded to show its full shape. Timing, face, mane, body and tail motion are retained. Existing editable layers were reposed.
+Expression artwork reused from the prior defeat animation: built-in image_gen tool, edit mode, transparent output.
+Only the new eye and mouth regions were incorporated into the original art.
+The original mane pattern, tail pattern, colours, paws and other details supply the animation layers.
+Final prompt: ../../../work/cirruskit-defeat-defined-legs/image-edit-prompt.txt
+
+Use case: precise-object-edit
+Asset type: Expression master for a transparent 2D game animation.
+Input image 1 is the edit target and the exact Cirruskit character design.
+Change only the two eyes and mouth. Replace both oval eyes completely with clear dark-plum X-shaped eyes, using two simple rounded thick strokes for each X. Keep each X centred where the corresponding original eye was; the farther right eye remains slightly smaller. Remove the original eye outlines, irises and highlights, filling their former area with the same existing grey face colour and shading.
+Change the smiling mouth into a small slack defeated mouth with a tiny pink tongue peeking downward. Keep the original brown nose and whiskers unchanged. Expression is cute, cartoony and knocked out, with no injuries.
+Keep the standing pose, proportions, exact framing, head and ear shapes, original grey shading, white forehead swirls, cream cloud mane with every swirl, blue-and-cream tail pattern, paws, original thick dark-plum outlines and all colours unchanged. Do not redraw the rest of the character or alter the lighting. No new effects, props, shadows, stars, text, borders or additional characters.
+Output one complete character in exactly the same square composition as the reference, on a genuinely transparent background. Crisp clean edges; no blur or glow.
+

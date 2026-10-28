@@ -31,133 +31,118 @@
   },
   {
     "frame": 7,
-    "changedPixels": 2195,
-    "bounds": [
-      88,
-      373,
-      211,
-      440
-    ]
+    "changedPixels": 0,
+    "bounds": null
   },
   {
     "frame": 8,
-    "changedPixels": 4919,
+    "changedPixels": 4576,
     "bounds": [
-      76,
-      348,
-      205,
+      79,
+      339,
+      250,
       424
     ]
   },
   {
     "frame": 9,
-    "changedPixels": 5447,
+    "changedPixels": 7217,
     "bounds": [
-      68,
-      330,
-      199,
-      410
+      74,
+      327,
+      248,
+      415
     ]
   },
   {
     "frame": 10,
-    "changedPixels": 5984,
+    "changedPixels": 8585,
     "bounds": [
-      57,
+      69,
       296,
-      189,
-      383
+      244,
+      397
     ]
   },
   {
     "frame": 11,
-    "changedPixels": 6289,
+    "changedPixels": 9108,
     "bounds": [
-      52,
+      67,
       278,
-      184,
-      368
+      242,
+      387
     ]
   },
   {
     "frame": 12,
-    "changedPixels": 6555,
+    "changedPixels": 9484,
     "bounds": [
-      46,
+      63,
       274,
-      177,
-      366
+      237,
+      390
     ]
   },
   {
     "frame": 13,
-    "changedPixels": 6809,
+    "changedPixels": 9803,
     "bounds": [
-      40,
+      59,
       271,
-      169,
-      365
+      231,
+      392
     ]
   },
   {
     "frame": 14,
-    "changedPixels": 6561,
+    "changedPixels": 9534,
     "bounds": [
-      44,
+      62,
       281,
-      174,
-      373
+      234,
+      398
     ]
   },
   {
     "frame": 15,
-    "changedPixels": 6203,
+    "changedPixels": 8954,
     "bounds": [
-      52,
+      67,
       301,
-      184,
-      391
+      242,
+      409
     ]
   },
   {
     "frame": 16,
-    "changedPixels": 6009,
+    "changedPixels": 8676,
     "bounds": [
-      57,
+      70,
       312,
-      190,
-      400
+      245,
+      414
     ]
   },
   {
     "frame": 17,
-    "changedPixels": 5141,
+    "changedPixels": 6815,
     "bounds": [
-      71,
-      345,
-      200,
-      423
+      75,
+      339,
+      249,
+      426
     ]
   },
   {
     "frame": 18,
-    "changedPixels": 2614,
-    "bounds": [
-      87,
-      373,
-      210,
-      442
-    ]
+    "changedPixels": 0,
+    "bounds": null
   },
   {
     "frame": 19,
-    "changedPixels": 515,
-    "bounds": [
-      91,
-      380,
-      212,
-      445
-    ]
+    "changedPixels": 0,
+    "bounds": null
   },
   {
     "frame": 20,

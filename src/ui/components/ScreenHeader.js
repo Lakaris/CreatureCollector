@@ -9,7 +9,7 @@ import { iconText, currencyIcon } from "./IconText.js";
 // `currency` (a currencies key) picks the icon by key -- needed when the
 // emoji is shared with something else, like Gear Shards' ⚔️.
 export function CurrencyChip({ currency, emoji, value }) {
-  return React.createElement("div", { className: "chip" },
+  return React.createElement("div", { className: "chip currency-chip" },
     currency ? currencyIcon(currency, emoji) : iconText(emoji),
     React.createElement("span", null, formatNum(value))
   );
@@ -36,7 +36,7 @@ function ScreenHeader({ title, onBack, backDisabled, left, right, edgeToEdge = t
     // Single line + ellipsis so a wide right side (badges, dev pills) can
     // never wrap the title and change the bar's height.
     React.createElement("div", { style: { fontSize: 18, fontWeight: 700, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, title),
-    right && React.createElement("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } }, right)
+    right && React.createElement("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, flexShrink: 0 } }, right)
   );
 }
 

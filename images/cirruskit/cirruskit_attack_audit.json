@@ -1,5 +1,5 @@
 {
-  "repair": "Fill only the missing outer ink segment at the mane/front-leg junction",
+  "repair": "Reduce the near rear paw rotation during the pounce",
   "frames": 25,
   "grid": [
     5,
@@ -9,13 +9,8 @@
     512,
     512
   ],
+  "durationMs": 400,
   "affectedFrames": [
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
     8,
     9,
     10,
@@ -25,273 +20,245 @@
     14,
     15,
     16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24
+    17
   ],
-  "totalChangedPixels": 1060,
-  "allOtherPixelsExactlyUnchanged": true,
-  "existingOpaqueArtworkExactlyUnchanged": true,
+  "totalChangedPixels": 82752,
+  "maximumPawAngleBefore": 70,
+  "maximumPawAngleAfter": 32.028,
+  "allPixelsOutsideRearLegUnchanged": true,
+  "previousFrontOutlineFillPreserved": true,
   "firstAndLastFramesExactlyUnchanged": true,
   "timingAndMetadataByteIdentical": true,
   "otherAnimationsUnchanged": true,
   "noCanvasClipping": true,
-  "method": "Localized missing-ink fill on the existing rendered frames; no rerendering, recoloring, or pose changes.",
+  "oneConnectedSilhouettePerFrame": true,
+  "noSmallEnclosedSeams": true,
+  "method": "Limited the rear leg rotation in the existing editable rig. Applied only that leg delta to the latest saved frames, preserving subsequent outline repairs.",
   "perFrame": [
     {
       "frame": 1,
       "changedPixels": 0,
-      "bounds": {
-        "left": 420,
-        "top": 360,
-        "right": 436,
-        "bottom": 375
-      }
+      "oldPawAngleDegrees": 0,
+      "correctedPawAngleDegrees": 0,
+      "bounds": null
     },
     {
       "frame": 2,
-      "changedPixels": 19,
-      "bounds": {
-        "left": 420,
-        "top": 362,
-        "right": 436,
-        "bottom": 377
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 1.037037037037037,
+      "correctedPawAngleDegrees": 1.037037037037037,
+      "bounds": null
     },
     {
       "frame": 3,
-      "changedPixels": 33,
-      "bounds": {
-        "left": 420,
-        "top": 367,
-        "right": 436,
-        "bottom": 382
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 2.962962962962963,
+      "correctedPawAngleDegrees": 2.962962962962963,
+      "bounds": null
     },
     {
       "frame": 4,
-      "changedPixels": 40,
-      "bounds": {
-        "left": 420,
-        "top": 370,
-        "right": 436,
-        "bottom": 385
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 4,
+      "correctedPawAngleDegrees": 4,
+      "bounds": null
     },
     {
       "frame": 5,
-      "changedPixels": 56,
-      "bounds": {
-        "left": 418,
-        "top": 374,
-        "right": 434,
-        "bottom": 389
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 6.5,
+      "correctedPawAngleDegrees": 6.5,
+      "bounds": null
     },
     {
       "frame": 6,
-      "changedPixels": 51,
-      "bounds": {
-        "left": 417,
-        "top": 379,
-        "right": 433,
-        "bottom": 394
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 9,
+      "correctedPawAngleDegrees": 9,
+      "bounds": null
     },
     {
       "frame": 7,
-      "changedPixels": 55,
-      "bounds": {
-        "left": 413,
-        "top": 371,
-        "right": 429,
-        "bottom": 386
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 21,
+      "correctedPawAngleDegrees": 21,
+      "bounds": null
     },
     {
       "frame": 8,
-      "changedPixels": 42,
-      "bounds": {
-        "left": 410,
-        "top": 363,
-        "right": 426,
-        "bottom": 378
-      }
+      "changedPixels": 4576,
+      "oldPawAngleDegrees": 33,
+      "correctedPawAngleDegrees": 32.028,
+      "bounds": [
+        79,
+        339,
+        250,
+        424
+      ]
     },
     {
       "frame": 9,
-      "changedPixels": 43,
-      "bounds": {
-        "left": 407,
-        "top": 361,
-        "right": 423,
-        "bottom": 376
-      }
+      "changedPixels": 7217,
+      "oldPawAngleDegrees": 40,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        74,
+        327,
+        248,
+        415
+      ]
     },
     {
       "frame": 10,
-      "changedPixels": 40,
-      "bounds": {
-        "left": 401,
-        "top": 358,
-        "right": 417,
-        "bottom": 373
-      }
+      "changedPixels": 8585,
+      "oldPawAngleDegrees": 52.99999999999999,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        69,
+        296,
+        244,
+        397
+      ]
     },
     {
       "frame": 11,
-      "changedPixels": 36,
-      "bounds": {
-        "left": 398,
-        "top": 355,
-        "right": 414,
-        "bottom": 370
-      }
+      "changedPixels": 9108,
+      "oldPawAngleDegrees": 60,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        67,
+        278,
+        242,
+        387
+      ]
     },
     {
       "frame": 12,
-      "changedPixels": 42,
-      "bounds": {
-        "left": 391,
-        "top": 365,
-        "right": 407,
-        "bottom": 380
-      }
+      "changedPixels": 9484,
+      "oldPawAngleDegrees": 65,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        63,
+        274,
+        237,
+        390
+      ]
     },
     {
       "frame": 13,
-      "changedPixels": 48,
-      "bounds": {
-        "left": 384,
-        "top": 375,
-        "right": 400,
-        "bottom": 390
-      }
+      "changedPixels": 9803,
+      "oldPawAngleDegrees": 70,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        59,
+        271,
+        231,
+        392
+      ]
     },
     {
       "frame": 14,
-      "changedPixels": 54,
-      "bounds": {
-        "left": 388,
-        "top": 378,
-        "right": 404,
-        "bottom": 393
-      }
+      "changedPixels": 9534,
+      "oldPawAngleDegrees": 65.85185185185185,
+      "correctedPawAngleDegrees": 32.00000000000001,
+      "bounds": [
+        62,
+        281,
+        234,
+        398
+      ]
     },
     {
       "frame": 15,
-      "changedPixels": 55,
-      "bounds": {
-        "left": 396,
-        "top": 384,
-        "right": 412,
-        "bottom": 399
-      }
+      "changedPixels": 8954,
+      "oldPawAngleDegrees": 58.148148148148145,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        67,
+        301,
+        242,
+        409
+      ]
     },
     {
       "frame": 16,
-      "changedPixels": 54,
-      "bounds": {
-        "left": 400,
-        "top": 387,
-        "right": 416,
-        "bottom": 402
-      }
+      "changedPixels": 8676,
+      "oldPawAngleDegrees": 54,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        70,
+        312,
+        245,
+        414
+      ]
     },
     {
       "frame": 17,
-      "changedPixels": 55,
-      "bounds": {
-        "left": 406,
-        "top": 390,
-        "right": 422,
-        "bottom": 405
-      }
+      "changedPixels": 6815,
+      "oldPawAngleDegrees": 38.5,
+      "correctedPawAngleDegrees": 32,
+      "bounds": [
+        75,
+        339,
+        249,
+        426
+      ]
     },
     {
       "frame": 18,
-      "changedPixels": 52,
-      "bounds": {
-        "left": 412,
-        "top": 392,
-        "right": 428,
-        "bottom": 407
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 23,
+      "correctedPawAngleDegrees": 23,
+      "bounds": null
     },
     {
       "frame": 19,
-      "changedPixels": 55,
-      "bounds": {
-        "left": 414,
-        "top": 388,
-        "right": 430,
-        "bottom": 403
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 18.333333333333332,
+      "correctedPawAngleDegrees": 18.333333333333332,
+      "bounds": null
     },
     {
       "frame": 20,
-      "changedPixels": 57,
-      "bounds": {
-        "left": 417,
-        "top": 379,
-        "right": 433,
-        "bottom": 394
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 9.666666666666668,
+      "correctedPawAngleDegrees": 9.666666666666668,
+      "bounds": null
     },
     {
       "frame": 21,
-      "changedPixels": 58,
-      "bounds": {
-        "left": 419,
-        "top": 374,
-        "right": 435,
-        "bottom": 389
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 5,
+      "correctedPawAngleDegrees": 5,
+      "bounds": null
     },
     {
       "frame": 22,
-      "changedPixels": 57,
-      "bounds": {
-        "left": 419,
-        "top": 372,
-        "right": 435,
-        "bottom": 387
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 4.21875,
+      "correctedPawAngleDegrees": 4.21875,
+      "bounds": null
     },
     {
       "frame": 23,
-      "changedPixels": 39,
-      "bounds": {
-        "left": 419,
-        "top": 367,
-        "right": 435,
-        "bottom": 382
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 2.5,
+      "correctedPawAngleDegrees": 2.5,
+      "bounds": null
     },
     {
       "frame": 24,
-      "changedPixels": 19,
-      "bounds": {
-        "left": 419,
-        "top": 362,
-        "right": 435,
-        "bottom": 377
-      }
+      "changedPixels": 0,
+      "oldPawAngleDegrees": 0.78125,
+      "correctedPawAngleDegrees": 0.78125,
+      "bounds": null
     },
     {
       "frame": 25,
       "changedPixels": 0,
-      "bounds": {
-        "left": 420,
-        "top": 360,
-        "right": 436,
-        "bottom": 375
-      }
+      "oldPawAngleDegrees": 0,
+      "correctedPawAngleDegrees": 0,
+      "bounds": null
     }
   ]
 }

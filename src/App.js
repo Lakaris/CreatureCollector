@@ -2,7 +2,7 @@
 // Global state lives in src/state/GameContext.js; screens read it directly,
 // so App only wires up navigation callbacks.
 import React from "./react.js";
-import { iconText } from "./ui/components/IconText.js";
+import { iconText, currencyIcon } from "./ui/components/IconText.js";
 
 import { TYPE_EMOJI } from "./data/types.js";
 import { DUNGEON_BOSSES } from "./data/bosses.js";
@@ -156,21 +156,28 @@ function HarvestPopup() {
     React.createElement(
       "div",
       { style: { padding: "40px 24px 0", fontSize: 20, fontWeight: 700, color: "#333", textAlign: "center", marginBottom: 20 } },
-      "🌾 Harvest Results"
+      iconText("🌾 Harvest Results")
     ),
     React.createElement(
       "div",
-      { style: { flex: 1, overflowY: "auto", padding: "0 24px", display: "flex", flexWrap: "wrap", gap: 10, alignContent: "flex-start" } },
-      harvestPopup.slice(0, revealedCount).map((item, i) =>
-        React.createElement(
-          "div",
-          { key: i, style: { display: "flex", alignItems: "center", gap: 8, width: 160, padding: "8px 12px", background: "#fff", borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", animation: "fadeIn .25s ease" } },
-          React.createElement("span", { style: { fontSize: 24, flexShrink: 0 } }, item.emoji),
+      { style: { flex: 1, overflowY: "auto", padding: "0 24px", display: "flex", flexDirection: "column" } },
+      // A harvest yields only a handful of items, so they're drawn large and
+      // centred in the space. Auto margins (not justifyContent) centre the
+      // list while there's room and still let a long one scroll from the top.
+      React.createElement(
+        "div",
+        { style: { margin: "auto 0", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12, width: "100%", maxWidth: 420, alignSelf: "center" } },
+        harvestPopup.slice(0, revealedCount).map((item, i) =>
           React.createElement(
             "div",
-            { style: { minWidth: 0 } },
-            React.createElement("div", { style: { fontSize: 11, color: "#888", lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, item.label),
-            React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: "#2e7d32" } }, "+" + formatNum(item.amount))
+            { key: i, style: { display: "flex", alignItems: "center", gap: 12, width: "calc(50% - 6px)", boxSizing: "border-box", minWidth: 0, padding: "16px 14px", background: "#fff", borderRadius: 16, boxShadow: "0 1px 6px rgba(0,0,0,0.08)", animation: "fadeIn .25s ease" } },
+            React.createElement("span", { style: { fontSize: 40, lineHeight: 1, flexShrink: 0 } }, item.key ? currencyIcon(item.key, item.emoji) : iconText(item.emoji)),
+            React.createElement(
+              "div",
+              { style: { minWidth: 0 } },
+              React.createElement("div", { style: { fontSize: 13, color: "#888", lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, item.label),
+              React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: "#2e7d32" } }, "+" + formatNum(item.amount))
+            )
           )
         )
       )

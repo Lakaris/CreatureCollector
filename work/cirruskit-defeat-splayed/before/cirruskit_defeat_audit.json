@@ -1,0 +1,364 @@
+{
+  "sheet": [
+    3072,
+    2048
+  ],
+  "cell": [
+    512,
+    512
+  ],
+  "frameCount": 24,
+  "totalDurationMs": 720,
+  "loop": false,
+  "holdLastFrame": true,
+  "firstFrameMatchesBase": true,
+  "finalFourFramesIdentical": true,
+  "protectedAssetsUnchanged": 24,
+  "apngDecodedFramesMatch": true,
+  "previewHoldsFinalFrame": true,
+  "gameRegistrationMatches": true,
+  "frames": [
+    {
+      "frame": 1,
+      "bounds": [
+        16,
+        42,
+        504,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": []
+    },
+    {
+      "frame": 2,
+      "bounds": [
+        16,
+        43,
+        504,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3671
+      ]
+    },
+    {
+      "frame": 3,
+      "bounds": [
+        16,
+        41,
+        504,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3560
+      ]
+    },
+    {
+      "frame": 4,
+      "bounds": [
+        16,
+        40,
+        503,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3466
+      ]
+    },
+    {
+      "frame": 5,
+      "bounds": [
+        16,
+        42,
+        503,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3370
+      ]
+    },
+    {
+      "frame": 6,
+      "bounds": [
+        16,
+        47,
+        502,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3332
+      ]
+    },
+    {
+      "frame": 7,
+      "bounds": [
+        16,
+        56,
+        502,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3290
+      ]
+    },
+    {
+      "frame": 8,
+      "bounds": [
+        16,
+        71,
+        501,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3227
+      ]
+    },
+    {
+      "frame": 9,
+      "bounds": [
+        16,
+        86,
+        499,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3194
+      ]
+    },
+    {
+      "frame": 10,
+      "bounds": [
+        16,
+        94,
+        499,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3169
+      ]
+    },
+    {
+      "frame": 11,
+      "bounds": [
+        16,
+        108,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    },
+    {
+      "frame": 12,
+      "bounds": [
+        16,
+        116,
+        496,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3043
+      ]
+    },
+    {
+      "frame": 13,
+      "bounds": [
+        16,
+        112,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3103
+      ]
+    },
+    {
+      "frame": 14,
+      "bounds": [
+        16,
+        108,
+        498,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3162,
+        1
+      ]
+    },
+    {
+      "frame": 15,
+      "bounds": [
+        16,
+        109,
+        498,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3139
+      ]
+    },
+    {
+      "frame": 16,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3087,
+        1
+      ]
+    },
+    {
+      "frame": 17,
+      "bounds": [
+        16,
+        112,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3064
+      ]
+    },
+    {
+      "frame": 18,
+      "bounds": [
+        16,
+        112,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3074
+      ]
+    },
+    {
+      "frame": 19,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3083
+      ]
+    },
+    {
+      "frame": 20,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    },
+    {
+      "frame": 21,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    },
+    {
+      "frame": 22,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    },
+    {
+      "frame": 23,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    },
+    {
+      "frame": 24,
+      "bounds": [
+        16,
+        111,
+        497,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3095,
+        1
+      ]
+    }
+  ]
+}

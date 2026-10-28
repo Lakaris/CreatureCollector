@@ -1,0 +1,225 @@
+{
+  "frames": [
+    {
+      "index": 0,
+      "durationMs": 30,
+      "body": 0,
+      "head": 0,
+      "angle": 0,
+      "expression": "normal",
+      "phase": "dazed"
+    },
+    {
+      "index": 1,
+      "durationMs": 30,
+      "body": 0,
+      "head": -1,
+      "angle": -0.5,
+      "expression": "normal",
+      "phase": "dazed"
+    },
+    {
+      "index": 2,
+      "durationMs": 30,
+      "body": 0,
+      "head": -2,
+      "angle": -1,
+      "expression": "dazed",
+      "phase": "dazed"
+    },
+    {
+      "index": 3,
+      "durationMs": 30,
+      "body": 0,
+      "head": -3,
+      "angle": -1.5,
+      "expression": "dazed",
+      "phase": "dazed"
+    },
+    {
+      "index": 4,
+      "durationMs": 30,
+      "body": 0,
+      "head": -4,
+      "angle": -2,
+      "expression": "defeat",
+      "phase": "dazed"
+    },
+    {
+      "index": 5,
+      "durationMs": 30,
+      "body": 5,
+      "head": 3,
+      "angle": -2.5,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 6,
+      "durationMs": 30,
+      "body": 10,
+      "head": 10,
+      "angle": -3,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 7,
+      "durationMs": 30,
+      "body": 23,
+      "head": 25.5,
+      "angle": -4,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 8,
+      "durationMs": 30,
+      "body": 36,
+      "head": 41,
+      "angle": -5,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 9,
+      "durationMs": 30,
+      "body": 43.25925925925926,
+      "head": 49.55555555555556,
+      "angle": -5.777777777777778,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 10,
+      "durationMs": 30,
+      "body": 56.74074074074074,
+      "head": 65.44444444444444,
+      "angle": -7.222222222222222,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 11,
+      "durationMs": 30,
+      "body": 64,
+      "head": 74,
+      "angle": -8,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 12,
+      "durationMs": 30,
+      "body": 60.5,
+      "head": 69,
+      "angle": -7,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 13,
+      "durationMs": 30,
+      "body": 57,
+      "head": 64,
+      "angle": -6,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 14,
+      "durationMs": 30,
+      "body": 58.03703703703704,
+      "head": 65.29629629629629,
+      "angle": -6.362962962962963,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 15,
+      "durationMs": 30,
+      "body": 59.96296296296296,
+      "head": 67.70370370370371,
+      "angle": -7.037037037037037,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 16,
+      "durationMs": 30,
+      "body": 61,
+      "head": 69,
+      "angle": -7.4,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 17,
+      "durationMs": 30,
+      "body": 60.84375,
+      "head": 68.84375,
+      "angle": -7.3375,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 18,
+      "durationMs": 30,
+      "body": 60.5,
+      "head": 68.5,
+      "angle": -7.2,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 19,
+      "durationMs": 30,
+      "body": 60.15625,
+      "head": 68.15625,
+      "angle": -7.0625,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 20,
+      "durationMs": 30,
+      "body": 60,
+      "head": 68,
+      "angle": -7,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 21,
+      "durationMs": 30,
+      "body": 60,
+      "head": 68,
+      "angle": -7,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 22,
+      "durationMs": 30,
+      "body": 60,
+      "head": 68,
+      "angle": -7,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 23,
+      "durationMs": 30,
+      "body": 60,
+      "head": 68,
+      "angle": -7,
+      "expression": "defeat",
+      "phase": "defeated"
+    }
+  ],
+  "columns": 6,
+  "rows": 4,
+  "totalDurationMs": 720,
+  "loop": false,
+  "holdLastFrame": true
+}

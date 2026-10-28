@@ -1,0 +1,15 @@
+{
+  "poseKeysAndTimingsUnchanged": true,
+  "smallRearLegHiddenFromFrame10": true,
+  "visualReview": {
+    "frames": 24,
+    "regions": [
+      "nose and mouth",
+      "hip swirl",
+      "tail join",
+      "mane and front leg"
+    ],
+    "enlargedContactSheets": 9
+  },
+  "smallAlphaHoles": []
+}

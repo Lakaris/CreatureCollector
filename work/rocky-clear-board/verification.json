@@ -1,0 +1,155 @@
+{
+  "destination": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+  "original_sha256": "c94f76914b0deec011513bbd7ebf7e4f0fcd3733cc4370434c726c7e2199b979",
+  "output_sha256": "34caa344e43423f82984e08ad80c8398e13c5b73b9289909036543245d5962fa",
+  "width": 1080,
+  "height": 2400,
+  "format": "JPEG",
+  "checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "grid": [
+        5,
+        8
+      ],
+      "board_bounds": [
+        62,
+        67,
+        257,
+        379
+      ],
+      "protected_source_bounds": [
+        182,
+        440,
+        895,
+        1548
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "grid": [
+        5,
+        8
+      ],
+      "board_bounds": [
+        76,
+        83,
+        314,
+        464
+      ],
+      "protected_source_bounds": [
+        188,
+        239,
+        892,
+        1339
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "grid": [
+        5,
+        8
+      ],
+      "board_bounds": [
+        70,
+        76,
+        290,
+        428
+      ],
+      "protected_source_bounds": [
+        186,
+        204,
+        894,
+        1308
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    },
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "grid": [
+        6,
+        10
+      ],
+      "board_bounds": [
+        67,
+        67,
+        253,
+        377
+      ],
+      "protected_source_bounds": [
+        199,
+        440,
+        881,
+        1541
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "grid": [
+        6,
+        10
+      ],
+      "board_bounds": [
+        57,
+        83,
+        333,
+        543
+      ],
+      "protected_source_bounds": [
+        135,
+        239,
+        945,
+        1558
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "grid": [
+        6,
+        10
+      ],
+      "board_bounds": [
+        42,
+        76,
+        318,
+        536
+      ],
+      "protected_source_bounds": [
+        102,
+        204,
+        978,
+        1632
+      ],
+      "margin_screen_px": 8,
+      "decorative_overlap_pixels": 0
+    }
+  ],
+  "validation_scope": "Planning layouts for the three supplied phone sizes, with both board shapes and an 8-screen-pixel safety margin. Estimated placements, not live captures or an all-screen guarantee."
+}

@@ -11,3 +11,5 @@ Checked all 30 frames, with particular attention to frames 22 and 23. 10,410 com
 Current rebuild: ../../work/cirruskit-walk-belly-separation/rebuild.cjs. The previous delivered spritesheet and metadata are backed up in its before/ folder. This revision changes the animation layer structure, contour and attachment weights using the existing source artwork and code-generated masks. No new image generation was used.
 
 The HTML preview provides synchronized reference timing, full-size and 130 px views, and frame inspection controls. Reload an already-open tab to load the updated sheet.
+
+Belly contour revision (2026-10-28): restored the base-image curve and heavier outline between the near rear and front legs across all 30 frames. Only the local belly area was replaced; all pixels outside it match the prior sheet exactly. Original limb poses, tail, face, mane, timing and frame count are unchanged. The patch follows the existing body bob and remains behind the foreground legs. The current scoped update is in work/cirruskit-walk-base-belly/build.cjs; it starts from the preserved sheet in before/.

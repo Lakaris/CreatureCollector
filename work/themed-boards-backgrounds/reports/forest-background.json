@@ -1,0 +1,52 @@
+{
+  "id": "forest-background",
+  "theme": "forest",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/forest.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b550705c-052c-4683-989d-9f699bc4fd25.png",
+  "source_sha256": "b1c6a1db1a649782c505f5e42804e237f6bd43f25ae1b363c073db23385a0dcb",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 644375,
+  "sha256": "a958029c4a6e21b84455b81005b11f75f5177cee362bfa9489414a99ea8817a2",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+for(const f of ['images/cirruskit/cirruskit_base.png','work/cirruskit-defeat-curved-belly/review/source-body.png']){const p=PNG.sync.read(fs.readFileSync(f)),rows=[];for(let x=160;x<=410;x+=10){let edge=0,ink=[];for(let y=385;y<432;y++){const i=(y*512+x)*4;if(p.data[i+3]>=128)edge=y;if(p.data[i+3]>128&&p.data[i]<60&&p.data[i+1]<40)ink.push(y);}rows.push({x,edge,ink:ink.length?[ink[0],ink.at(-1)]:[]});}console.log(f,JSON.stringify(rows));}

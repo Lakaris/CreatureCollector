@@ -1,0 +1,16 @@
+{
+  "id": "water-dungeon-5x8",
+  "theme": "water-dungeon",
+  "name": "Water Dungeon",
+  "kind": "board",
+  "cols": 5,
+  "rows": 8,
+  "width": 1000,
+  "height": 1600,
+  "destination": "images/board_backgrounds/water-dungeon5x8.jpg",
+  "references": [
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+  ],
+  "prompt": "Use case: precise-object-edit / themed variant. Create a Water Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty teal, slate blue, sea-glass cyan and cool gray.\nChange ONLY the floor material and its colors to: pale desaturated blue-gray smooth worn limestone with faint irregular sea-glass teal mottling; sparse tiny flat mineral flecks, no liquid or wet reflections. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0f343533-69e8-4496-9cd5-90d82ab6ddc6.png"
+}

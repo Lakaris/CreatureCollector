@@ -1,0 +1,625 @@
+{
+  "motionAndTimingsUnchanged": true,
+  "smallFarHindLegHiddenFromFrame10": true,
+  "unchangedUpperArtworkPixelsChecked": 4504064,
+  "pawWidthMeasurementsWithinOnePixel": 76,
+  "reviewedFrames": 24,
+  "changeBounds": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 2,
+      "changedPixels": 7481,
+      "bounds": [
+        114,
+        345,
+        454,
+        466
+      ]
+    },
+    {
+      "frame": 3,
+      "changedPixels": 7485,
+      "bounds": [
+        114,
+        345,
+        454,
+        466
+      ]
+    },
+    {
+      "frame": 4,
+      "changedPixels": 7489,
+      "bounds": [
+        114,
+        345,
+        454,
+        466
+      ]
+    },
+    {
+      "frame": 5,
+      "changedPixels": 7491,
+      "bounds": [
+        114,
+        345,
+        454,
+        466
+      ]
+    },
+    {
+      "frame": 6,
+      "changedPixels": 7593,
+      "bounds": [
+        112,
+        349,
+        456,
+        467
+      ]
+    },
+    {
+      "frame": 7,
+      "changedPixels": 7501,
+      "bounds": [
+        110,
+        353,
+        457,
+        468
+      ]
+    },
+    {
+      "frame": 8,
+      "changedPixels": 7390,
+      "bounds": [
+        102,
+        361,
+        463,
+        473
+      ]
+    },
+    {
+      "frame": 9,
+      "changedPixels": 7198,
+      "bounds": [
+        95,
+        368,
+        468,
+        477
+      ]
+    },
+    {
+      "frame": 10,
+      "changedPixels": 6657,
+      "bounds": [
+        88,
+        374,
+        473,
+        481
+      ]
+    },
+    {
+      "frame": 11,
+      "changedPixels": 6631,
+      "bounds": [
+        76,
+        385,
+        482,
+        488
+      ]
+    },
+    {
+      "frame": 12,
+      "changedPixels": 6431,
+      "bounds": [
+        69,
+        391,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 13,
+      "changedPixels": 6684,
+      "bounds": [
+        69,
+        389,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 14,
+      "changedPixels": 6815,
+      "bounds": [
+        69,
+        386,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 15,
+      "changedPixels": 6789,
+      "bounds": [
+        69,
+        387,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 16,
+      "changedPixels": 6664,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 17,
+      "changedPixels": 6553,
+      "bounds": [
+        69,
+        389,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 18,
+      "changedPixels": 6652,
+      "bounds": [
+        69,
+        389,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 19,
+      "changedPixels": 6674,
+      "bounds": [
+        69,
+        389,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 20,
+      "changedPixels": 6657,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 21,
+      "changedPixels": 6599,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 22,
+      "changedPixels": 6599,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 23,
+      "changedPixels": 6599,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    },
+    {
+      "frame": 24,
+      "changedPixels": 6599,
+      "bounds": [
+        69,
+        388,
+        487,
+        492
+      ]
+    }
+  ],
+  "pawMeasurements": [
+    {
+      "frame": 2,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 3,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 4,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 5,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 6,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 11,
+        "target": 10
+      },
+      "farHind": {
+        "width": 8,
+        "target": 9
+      }
+    },
+    {
+      "frame": 7,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 11,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 8,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 11,
+        "target": 10
+      },
+      "farHind": {
+        "width": 9,
+        "target": 9
+      }
+    },
+    {
+      "frame": 9,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 11,
+        "target": 10
+      },
+      "farHind": {
+        "width": 18,
+        "target": 9,
+        "occluded": true,
+        "note": "The paw is behind the torso here; the scan crosses overlapping outlines and is not a standalone width measurement."
+      }
+    },
+    {
+      "frame": 10,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 11,
+        "target": 10
+      }
+    },
+    {
+      "frame": 11,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 12,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 13,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 14,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 15,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 16,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 17,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 18,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 19,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 20,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 21,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 22,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 23,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    },
+    {
+      "frame": 24,
+      "nearHind": {
+        "width": 10,
+        "target": 10
+      },
+      "nearFront": {
+        "width": 11,
+        "target": 11
+      },
+      "farFront": {
+        "width": 10,
+        "target": 10
+      }
+    }
+  ]
+}

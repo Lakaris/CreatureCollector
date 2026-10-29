@@ -1,0 +1,54 @@
+{
+  "id": "thunder-dungeon-5x8",
+  "theme": "thunder-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/thunder-dungeon5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-733b7516-c461-42a8-86ff-4345b26fd75b.png",
+  "source_sha256": "eb90572959472ca4293a8fab015221c33c0c3ad5d5e62034304ae3bb3c32ae55",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 393825,
+  "sha256": "651978b860460912272636ad18346afaa83b701d6b3dafd998df1187f611bb8f",
+  "resampled": true,
+  "x_centers": [
+    200.004,
+    400.02,
+    599.986,
+    799.996
+  ],
+  "y_centers": [
+    199.999,
+    399.996,
+    599.994,
+    799.995,
+    999.979,
+    1199.995,
+    1399.989
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.0386,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      200.3229161984392,
+      400.1165191171035,
+      599.6997481159133,
+      799.5949262321938
+    ],
+    "y": [
+      200.009043574286,
+      399.9250428832489,
+      599.7346102719579,
+      799.942290044352,
+      999.7655884341368,
+      1199.920089522059,
+      1399.6354176925602
+    ]
+  },
+  "geometric_correction_passes": 1
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Rocky outlined board 6 x 10",
+    "path": "images/board_backgrounds/rocky6x10outlined.jpg",
+    "width": 1200,
+    "height": 2000,
+    "format": "JPEG",
+    "bytes": 269392
+  },
+  {
+    "name": "Rocky outlined board 5 x 8",
+    "path": "images/board_backgrounds/rocky5x8outlined.jpg",
+    "width": 1000,
+    "height": 1600,
+    "format": "JPEG",
+    "bytes": 197564
+  }
+]

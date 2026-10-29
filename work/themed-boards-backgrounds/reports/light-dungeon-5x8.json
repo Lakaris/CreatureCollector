@@ -1,0 +1,54 @@
+{
+  "id": "light-dungeon-5x8",
+  "theme": "light-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/light-dungeon5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1ce10099-2fd9-49c1-a758-da5b4a9c77c9.png",
+  "source_sha256": "bb04488245e1b0a8ded3cb898cd1f1b3319a6fdb97fe4277aedc8e315cb2cf25",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 371184,
+  "sha256": "7296c258ac2ae1f50c9e2c577c3497a05d3dd1ae5204a4ca154296c1e92276ab",
+  "resampled": true,
+  "x_centers": [
+    199.986,
+    399.971,
+    600.018,
+    800.012
+  ],
+  "y_centers": [
+    199.981,
+    400.009,
+    599.984,
+    800.005,
+    999.985,
+    1199.993,
+    1399.99
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.0385,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      199.92596883655455,
+      399.70612775207655,
+      599.2752549733358,
+      799.2085846386279
+    ],
+    "y": [
+      199.91085772620596,
+      400.1947341915555,
+      599.8723196329605,
+      800.0114597246064,
+      999.8717365112293,
+      1199.8504773532861,
+      1399.5025976266845
+    ]
+  },
+  "geometric_correction_passes": 1
+}

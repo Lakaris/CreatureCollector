@@ -37,14 +37,6 @@ export const DUNGEON_PASS_DAILY_CAP_BONUS = 10;
 export const DUNGEON_PASS_OVERFLOW_MULT = 3;
 
 /**
- * Width the planning phase holds back for the info column beside the board
- * (see useFitTile's `reserveW`). Enough for the card's own padding plus an
- * ability row -- its "SPECIAL" label and the Effects pill, side by side -- so
- * the column is never narrower than the smallest thing it has to show.
- */
-export const PLAN_PANEL_MIN_W = 160;
-
-/**
  * Critical hits have no constants here on purpose: BOTH halves are stats.
  * `crit` is the chance one lands and `critDmg` how much extra damage it deals,
  * each in percentage points, carried per creature in data/creatures.js and per

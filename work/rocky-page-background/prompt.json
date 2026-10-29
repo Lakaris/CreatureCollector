@@ -1,0 +1,13 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "prompt": "Use case: style-transfer / precise-object-edit.\nAsset: a separate full-screen portrait game background behind a battle board and UI panels, 1536 x 2048 pixels, 3:4 portrait, opaque.\nInput image 1 is the existing RockyCave backdrop to simplify and recompose. Input image 2 is the matching rocky battle board: use ONLY its muted warm-gray, dusty lavender and taupe palette and its simple cartoon stone shading. Do NOT include the board, its grid, border, tiles or UI in the new background.\nCreate a very simple quiet rocky cavern clearing in the same illustrated game world. Clean rounded chunky rock silhouettes, broad flat cel-shaded faces, a few smooth outlines. Make it far less busy and much lower contrast than the original cave. Sparse large rock/ledge shapes are confined to the outer 12–18 percent of the sides and a few corners, with mild asymmetry. The central 70 percent of the width and 80 percent of the height must stay spacious, almost featureless, soft muted stone and atmospheric lavender-gray, because gameplay panels will cover it. No central focal object, cave opening, tunnel, bright window, horizon stripe, dramatic light beam or sharp texture. The floor and distant walls should gently blend in tone; the center should feel like part of the same rocky place rather than a blank cutout or an empty framed panel.\nMatch the board palette, slightly darker so its pale floor stands out: warm gray/taupe stone and subdued lavender shadows. Broad, softly separated values. Muted plum-gray outlines only on the few edge rocks, never black or stark. Simple 2–3 tone cartoon/cel shading per edge shape, like the reference game's items and backgrounds. Soft low-contrast broad shapes in the center; no realistic texture, fine grain, detailed cracks, speckles, tiny busy rubble or painterly brush noise. A handful of large flat color patches is enough. No blue glowing opening, saturated orange floor, saturated purple accent, flowers, plants, crystals, lava, characters, creatures, objects, text, symbols, grid lines, dividers, board, frames or rounded-corner masking. Full bleed all edges. Designed to remain coherent when scaled to fill and cropped on different screens: every edge shape is expendable and nothing important sits near an edge. Output only one finished portrait background.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-f6681789-70c0-4e2b-ad27-b4ec2abdd11d.png",
+  "references": [
+    "images/flair/backgrounds/RockyCave.jpg",
+    "images/board_backgrounds/rocky5x8.jpg"
+  ],
+  "destination": "images/battle_backgrounds/rocky.jpg",
+  "width": 1536,
+  "height": 2048,
+  "format": "JPEG"
+}

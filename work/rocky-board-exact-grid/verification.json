@@ -1,0 +1,158 @@
+{
+  "method": "Per-row and per-column geometric resampling; line centers constrained to exact multiples of 200 pixels. No generative redraw. Purple variants share the corrected base artwork.",
+  "sources": [
+    {
+      "file": "rocky5x8.jpg",
+      "sha256": "72dd139d4d005cf20eae9b1a5f9eebc8ff67af4ee9f1d680eee152b56f75d1e8",
+      "measured_centers": {
+        "x": [
+          206.64740823307204,
+          401.59995197074636,
+          597.1608352527066,
+          792.3541070660154
+        ],
+        "y": [
+          205.24742796743885,
+          401.83067521204595,
+          598.7422748966837,
+          794.8720638294266,
+          986.6643660989539,
+          1189.3535305969322,
+          1383.612818280414
+        ]
+      }
+    },
+    {
+      "file": "rocky6x10.jpg",
+      "sha256": "3533fd6ec4ec4e211c3f807ea73a67053040e59e45ee5a2b274fe7e8ddab6484",
+      "measured_centers": {
+        "x": [
+          204.3603041064228,
+          402.3425194079326,
+          600.3972771976037,
+          798.4182450481392,
+          995.9369969633613
+        ],
+        "y": [
+          207.71880598113188,
+          403.96945617645906,
+          597.8331893375905,
+          793.6735623185025,
+          990.3015839893955,
+          1188.552928148514,
+          1391.8449397400054,
+          1588.5083551776665,
+          1783.704266817376
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "file": "rocky5x8.jpg",
+      "sha256": "efaa0bb3c4650c121e9f40428a72c975d2775a7fb7233aef5a203c40e6fd82b6",
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "x_centers": [
+        200.129,
+        400.003,
+        599.997,
+        799.867
+      ],
+      "y_centers": [
+        200.08,
+        399.996,
+        600.013,
+        800.04,
+        999.9,
+        1200.084,
+        1399.801
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.2156,
+      "purple_divider_y": null
+    },
+    {
+      "file": "rocky5x8purple.jpg",
+      "sha256": "d6999b82a035a0f176a54efd2a9474ef16a0f0e93b09ad1943daa14374eeb0d2",
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "x_centers": [
+        200.129,
+        400.003,
+        599.997,
+        799.867
+      ],
+      "y_centers": [
+        200.08,
+        399.996,
+        600.013,
+        800.04,
+        1000.0,
+        1200.084,
+        1399.801
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.2156,
+      "purple_divider_y": 1000
+    },
+    {
+      "file": "rocky6x10.jpg",
+      "sha256": "d63a4115475c0a3340a4ad5ce223a048084cc835ba18a8f456641b016b07ea95",
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "x_centers": [
+        200.054,
+        400.007,
+        599.999,
+        800.008,
+        999.949
+      ],
+      "y_centers": [
+        200.044,
+        400.013,
+        599.975,
+        799.949,
+        999.975,
+        1199.925,
+        1400.026,
+        1599.997,
+        1799.827
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.1977,
+      "purple_divider_y": null
+    },
+    {
+      "file": "rocky6x10purple.jpg",
+      "sha256": "824ce6d53a366f07e36202fde154a2687d4f3eea1963b34985c5b521d7f35c6d",
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "x_centers": [
+        200.054,
+        400.007,
+        599.999,
+        800.008,
+        999.949
+      ],
+      "y_centers": [
+        200.044,
+        400.013,
+        599.975,
+        799.949,
+        999.975,
+        1199.914,
+        1400.026,
+        1599.997,
+        1799.827
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.1977,
+      "purple_divider_y": 1200
+    }
+  ]
+}

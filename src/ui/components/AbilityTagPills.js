@@ -1,19 +1,14 @@
 // The tag-pill row and definition popup shared by every screen that shows an
-// ability card (creature page, dex, and the battle planning panels).
+// ability card (creature page, dex, and the battle planning info sheets).
 //
 // Targeting tags (Closest/Farthest/Weakest) render as their own pills; all
 // other tags collapse into one "Effects" pill whose popup lists every effect
 // with its description, so stacked effects never crowd the ability name.
 //
-// `compact` collapses EVERYTHING into that one pill, targeting included. The
-// battle planning panels use it: they are a narrow column beside the board, and
-// two pills there wrap the ability name onto another line. Nothing is lost --
-// the targeting definitions move into the popup under their own heading.
-//
 // Popup payloads: a tag key string (single definition, also used for the ⚡
-// "energy" pill the creature page/dex render themselves), or {effects:[...],
-// targeting:[...]} (the list view; `targeting` only in compact mode). Screens
-// keep the payload in their own state and render AbilityTagPopup with it.
+// "energy" pill the creature page/dex render themselves), or {effects:[...]}
+// (the list view). Screens keep the payload in their own state and render
+// AbilityTagPopup with it.
 
 import React from "../../react.js";
 import { ABILITY_TAG_DEFS, splitAbilityTags } from "../../core/abilityText.js";
@@ -37,23 +32,11 @@ const EFFECTS_PILL_STYLE = {
 
 /**
  * Pills for one ability's tags. `onOpen` receives the popup payload (tag key
- * or {effects, targeting}); the caller stores it and renders AbilityTagPopup
- * with it. `compact` folds targeting into the single pill (see header).
+ * or {effects}); the caller stores it and renders AbilityTagPopup with it.
  */
-export function AbilityTagPills({ tags, onOpen, compact }) {
+export function AbilityTagPills({ tags, onOpen }) {
   if (!tags || !tags.length) return null;
   const { targeting, effects } = splitAbilityTags(tags);
-  if (compact) {
-    // One pill for everything, always the amber "Effects" one -- including for
-    // an ability whose only tags are targeting. The pill is the panel's single
-    // "there is more to read here" control, so it should look and read the same
-    // on every ability; varying its label and colour by what happens to be
-    // inside made a column of abilities look like it had two kinds of button.
-    return React.createElement("button", {
-      onClick: (e) => { e.stopPropagation(); onOpen({ effects, targeting }); },
-      style: EFFECTS_PILL_STYLE,
-    }, "Effects");
-  }
   return React.createElement(React.Fragment, null,
     effects.length > 0 && React.createElement("button", {
       key: "effects",
@@ -131,14 +114,13 @@ export function summonKit(def) {
 }
 
 /**
- * One entry in the list view: coloured label, description, and any extras.
- * `color` separates the amber Effects entries from the purple Targeting ones,
- * matching the pill colours those tags carry when they render standalone.
+ * One entry in the list view: label (in the Effects pill's amber),
+ * description, and any extras.
  */
-function tagEntry(tag, color, last) {
+function tagEntry(tag, last) {
   const def = ABILITY_TAG_DEFS[tag];
   return React.createElement("div", { key: tag, style: { marginBottom: last ? 16 : 12 } },
-    React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color, marginBottom: 2 } },
+    React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: EFFECTS_COLOR, marginBottom: 2 } },
       def.label, undispellableNote(def), maxStacksNote(def)),
     React.createElement("div", { style: { fontSize: 12, color: "#555", lineHeight: 1.4 } }, def.description),
     stackingLine(def),
@@ -146,27 +128,15 @@ function tagEntry(tag, color, last) {
   );
 }
 
-/** Section heading, shown only when the popup holds both kinds of tag. */
-function sectionHeading(text, first) {
-  return React.createElement("div", {
-    style: { fontSize: 10, fontWeight: 800, color: "#999", textTransform: "uppercase", letterSpacing: 0.5, marginTop: first ? 0 : 4, marginBottom: 6 },
-  }, text);
-}
-
-/** Full-screen definition popup: one tag, or the collapsed pill's list. */
+/** Full-screen definition popup: one tag, or the Effects pill's list. */
 export function AbilityTagPopup({ popup, onClose }) {
   if (!popup) return null;
   const isList = typeof popup === "object";
   const effects = isList ? popup.effects || [] : null;
-  // Only compact mode sends targeting through; the standalone pills open their
-  // own single-tag view as before.
-  const targeting = isList ? popup.targeting || [] : [];
-  const bothKinds = isList && effects.length > 0 && targeting.length > 0;
   return React.createElement("div", {
     onClick: onClose,
-    // Above 300, which is what the screens that can open this sit at (the
-    // Daily Boss's narrow-screen info popup renders after this one in the
-    // tree, so at an equal z-index it covered the definition it opened).
+    // Above 300, which is what the screens that can open this sit at, so a
+    // popup rendered after this one in the tree can't cover the definition.
     style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 400 },
   },
     React.createElement("div", {
@@ -177,12 +147,7 @@ export function AbilityTagPopup({ popup, onClose }) {
         ? React.createElement(React.Fragment, null,
             // Titled to match the pill that opened it, whatever it holds.
             React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 10 } }, "Effects"),
-            // Targeting first: it says who the ability picks, which is the
-            // thing you read before what happens to them.
-            bothKinds && sectionHeading("Targeting", true),
-            targeting.map((tag, i) => tagEntry(tag, "#534AB7", !bothKinds && i === targeting.length - 1)),
-            bothKinds && sectionHeading("Effects", false),
-            effects.map((tag, i) => tagEntry(tag, EFFECTS_COLOR, i === effects.length - 1))
+            effects.map((tag, i) => tagEntry(tag, i === effects.length - 1))
           )
         : React.createElement(React.Fragment, null,
             React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 8 } },

@@ -1,4 +1,5 @@
 const fs=require('fs'),zlib=require('zlib'),crypto=require('crypto');
+const atomicWrite=(path,data)=>{const temp=path+'.building-'+process.pid;fs.writeFileSync(temp,data);fs.renameSync(temp,path);};
 const {PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
 const dir='images/waddlepop',meta=JSON.parse(fs.readFileSync(`${dir}/waddlepop_flavor.json`)),sheet=PNG.sync.read(fs.readFileSync(`${dir}/${meta.image}`));
 const size=meta.frameWidth,total=meta.frames.reduce((sum,f)=>sum+f.durationMs,0),version=crypto.createHash('sha256').update(fs.readFileSync(`${dir}/${meta.image}`)).digest('hex').slice(0,12);
@@ -13,11 +14,11 @@ for(const [n,frame]of meta.frames.entries()){
   const stride=size*4,raw=Buffer.alloc(size*(stride+1));for(let y=0;y<size;y++){const from=((frame.y+y)*sheet.width+frame.x)*4;sheet.data.copy(raw,y*(stride+1)+1,from,from+stride);}
   const compressed=zlib.deflateSync(raw);if(n===0)chunks.push(chunk('IDAT',compressed));else{const sequence=Buffer.alloc(4);sequence.writeUInt32BE(seq++);chunks.push(chunk('fdAT',Buffer.concat([sequence,compressed])));}
 }
-chunks.push(chunk('IEND',Buffer.alloc(0)));fs.writeFileSync(`${dir}/waddlepop_flavor_preview.png`,Buffer.concat(chunks));
+chunks.push(chunk('IEND',Buffer.alloc(0)));atomicWrite(`${dir}/waddlepop_flavor_preview.png`,Buffer.concat(chunks));
 
 let html=fs.readFileSync('work/waddlepop-flavor/preview-template.html','utf8');
 const replacements={VERSION:version,COLS:meta.columns*100,ROWS:meta.rows*100,MAX:meta.frames.length-1,COUNT:meta.frames.length,SECONDS:(total/1000).toFixed(3),DURATIONS:JSON.stringify(meta.frames.map(f=>f.durationMs)),COLUMN_COUNT:meta.columns,ROW_COUNT:meta.rows,TOTAL:total};
 for(const [name,value]of Object.entries(replacements))html=html.replaceAll('__'+name+'__',String(value));
-fs.writeFileSync(dir+'/waddlepop_flavor_preview.html',html);
+atomicWrite(dir+'/waddlepop_flavor_preview.html',html);
 console.log(JSON.stringify({frames:meta.frames.length,totalMs:total,frameInspectionControls:true}));
 

@@ -3,7 +3,7 @@
   "frameWidth": 512,
   "frameHeight": 512,
   "columns": 6,
-  "rows": 5,
+  "rows": 7,
   "loop": false,
   "totalDurationMs": 2340,
   "frames": [
@@ -13,7 +13,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 300
+      "durationMs": 60,
+      "sourcePoseIndex": 0
     },
     {
       "index": 1,
@@ -21,7 +22,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 0
     },
     {
       "index": 2,
@@ -29,7 +31,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 0
     },
     {
       "index": 3,
@@ -37,7 +40,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 0
     },
     {
       "index": 4,
@@ -45,7 +49,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 0
     },
     {
       "index": 5,
@@ -53,7 +58,8 @@
       "y": 0,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 1
     },
     {
       "index": 6,
@@ -61,7 +67,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 2
     },
     {
       "index": 7,
@@ -69,7 +76,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 3
     },
     {
       "index": 8,
@@ -77,7 +85,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 4
     },
     {
       "index": 9,
@@ -85,7 +94,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 5
     },
     {
       "index": 10,
@@ -93,7 +103,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 6
     },
     {
       "index": 11,
@@ -101,7 +112,8 @@
       "y": 512,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 7
     },
     {
       "index": 12,
@@ -109,7 +121,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 8
     },
     {
       "index": 13,
@@ -117,7 +130,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 9
     },
     {
       "index": 14,
@@ -125,7 +139,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 10
     },
     {
       "index": 15,
@@ -133,7 +148,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 11
     },
     {
       "index": 16,
@@ -141,7 +157,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 12
     },
     {
       "index": 17,
@@ -149,7 +166,8 @@
       "y": 1024,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 13
     },
     {
       "index": 18,
@@ -157,7 +175,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 14
     },
     {
       "index": 19,
@@ -165,7 +184,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 15
     },
     {
       "index": 20,
@@ -173,7 +193,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 16
     },
     {
       "index": 21,
@@ -181,7 +202,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 17
     },
     {
       "index": 22,
@@ -189,7 +211,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 18
     },
     {
       "index": 23,
@@ -197,7 +220,8 @@
       "y": 1536,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 19
     },
     {
       "index": 24,
@@ -205,7 +229,8 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 20
     },
     {
       "index": 25,
@@ -213,7 +238,8 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 21
     },
     {
       "index": 26,
@@ -221,7 +247,8 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 22
     },
     {
       "index": 27,
@@ -229,7 +256,8 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 23
     },
     {
       "index": 28,
@@ -237,7 +265,8 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 60
+      "durationMs": 60,
+      "sourcePoseIndex": 24
     },
     {
       "index": 29,
@@ -245,8 +274,163 @@
       "y": 2048,
       "width": 512,
       "height": 512,
-      "durationMs": 360
+      "durationMs": 60,
+      "sourcePoseIndex": 25
+    },
+    {
+      "index": 30,
+      "x": 0,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 26
+    },
+    {
+      "index": 31,
+      "x": 512,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 27
+    },
+    {
+      "index": 32,
+      "x": 1024,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 28
+    },
+    {
+      "index": 33,
+      "x": 1536,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 34,
+      "x": 2048,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 35,
+      "x": 2560,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 36,
+      "x": 0,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 37,
+      "x": 512,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 38,
+      "x": 1024,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
     }
   ],
-  "notes": "Stumble, fumble the snow bomb left and right, catch and settle. First and last frames are pixel-identical to waddlepop_idle.png. Original character artwork supplies all moving character pixels; reconstructed bomb underside is exposed briefly during fumble."
+  "expressions": [
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "half",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-small",
+    "squeezed-closed",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-closed",
+    "half",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base"
+  ],
+  "effects": {
+    "detachedNervousDroplets": {
+      "side": "viewer-left",
+      "count": 3,
+      "frameRanges": [
+        [
+          13,
+          18
+        ],
+        [
+          20,
+          25
+        ]
+      ],
+      "style": "Bold dark outlines, slightly larger, closer to the flipper; remain detached"
+    },
+    "fuseSpark": {
+      "alwaysVisible": true,
+      "animatedThroughout": true,
+      "frameIntervalMs": 60,
+      "fuseLengthPreserved": true
+    }
+  },
+  "notes": "39 transparent 512px frames at 60ms, 2340ms total. The hands make small alternating grip adjustments during the fumble, moving no more than 4px beyond their prior positions. Face shape, expressions, body movement, feet, bomb wobble, nervous droplets and timing are preserved. The fuse keeps sparking throughout. First and last frames match waddlepop_idle.png exactly.",
+  "bombMotion": {
+    "angularGain": 1.6,
+    "horizontalGain": 1.25
+  },
+  "handMotion": {
+    "maximumAddedMovementPx": 3.5365703709333673,
+    "maximumRotationDeg": 1.2,
+    "faceAndBodyUnchanged": true
+  }
 }

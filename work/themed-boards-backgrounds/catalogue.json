@@ -1,0 +1,570 @@
+{
+  "tool": "Built-in ImageGen",
+  "themes": [
+    {
+      "slug": "water-dungeon",
+      "name": "Water Dungeon",
+      "palette": "dusty teal, slate blue, sea-glass cyan and cool gray",
+      "scene": "A quiet tidal grotto with smooth blue-gray stone walls and a few broad shell-like stone forms at the far edges. A few subdued turquoise facets are embedded in the side walls. Keep the broad central floor DRY blue-gray stone; small dark water recesses may appear only at the very bottom outer corners, never through the central floor.",
+      "floor": "pale desaturated blue-gray smooth worn limestone with faint irregular sea-glass teal mottling; sparse tiny flat mineral flecks, no liquid or wet reflections"
+    },
+    {
+      "slug": "fire-dungeon",
+      "name": "Fire Dungeon",
+      "palette": "muted terracotta, smoky mauve, charcoal and restrained amber",
+      "scene": "A warm ember dungeon: broad terracotta cavern walls with a few simple carved stone recesses and a dim amber ember glow tucked into the extreme side edges. Dry smoky stone floor, quiet hazy central wall. Emphasize a sheltered underground ember chamber rather than an outdoor volcano; no flowing lava across the floor.",
+      "floor": "pale muted terracotta and warm ash stone, faint broad dusty rose and clay mottling, only tiny flat ash flecks; no fire, embers, glowing cracks or lava on the board"
+    },
+    {
+      "slug": "nature-dungeon",
+      "name": "Nature Dungeon",
+      "palette": "muted sage, olive, gray-green and soft earthy taupe",
+      "scene": "An ancient overgrown stone sanctuary inside a cavern. Two unequal broad broken stone wall forms at the far sides carry simple large vine and leaf silhouettes; a little moss at their bases. Keep vines, plants and masonry at the edges. Broad open sage-gray stone floor, low-contrast distant wall, no central altar. This is an indoor overgrown temple, distinct from an outdoor forest.",
+      "floor": "pale sage-gray worn stone with muted olive and taupe flat patches and a few faint leaf-shaped surface impressions; no raised plants, vines or roots"
+    },
+    {
+      "slug": "earth-dungeon",
+      "name": "Earth Dungeon",
+      "palette": "warm ochre, muted sandstone, dusty mauve and clay brown",
+      "scene": "A sheltered earthen sandstone cavern with broad layered ochre walls and a few chunky faceted ledges at asymmetric outer edges. The center is a quiet sand-colored distant wall and wide dry compacted earth floor. A very small dull geode facet may sit embedded at one side, not in the center. No pits, paths, objects or stone piles across the clearing.",
+      "floor": "light sandy ochre compacted earth and worn sandstone with sparse broad muted clay mottling and tiny flat grain marks; no large rocks, geodes, pits or cracks"
+    },
+    {
+      "slug": "wind-dungeon",
+      "name": "Wind Dungeon",
+      "palette": "pale blue-gray, dusty turquoise, ivory and muted cool taupe",
+      "scene": "A quiet high-altitude wind sanctuary, open to a soft pale sky. Rounded wind-worn stone arches and ledges occupy only the outer sides; a few broad soft cloud ribbons sit high at the outer edges. Keep the central view low-contrast and spacious, with a wide dry pale blue-gray stone floor and no central opening, staircase or pedestal.",
+      "floor": "pale cool gray-blue wind-worn stone with soft ivory and faint cyan flat patches, sparse very small flat scuff marks; no cloud banks, swirling lines, arrows, feathers or structures on the board"
+    },
+    {
+      "slug": "thunder-dungeon",
+      "name": "Thunder Dungeon",
+      "palette": "desaturated lavender slate, steel blue, dull amber and gray",
+      "scene": "A storm-charged cavern with broad slate walls and a few very simple amber mineral facets embedded at asymmetric far edges. One restrained short angular lightning glow inside a far side wall recess may identify the element, never across the middle. Dry lavender-gray stone floor; quiet dim center with no central device, wires or pylons.",
+      "floor": "light lavender-gray slate with broad muted steel-blue patches and a very few tiny pale ochre mineral flecks; no lightning bolts, electricity, glow, coils or raised crystals on the board"
+    },
+    {
+      "slug": "dark-dungeon",
+      "name": "Dark Dungeon",
+      "palette": "dusty violet, muted plum, blue-gray and soft charcoal",
+      "scene": "A quiet shadow cavern with broad rounded dark violet stone side walls, one simple shallow gothic stone arch fragment near an outer edge and low-contrast distant rock silhouettes. Keep the central area readable in muted middle values rather than black. Dry dusty mauve-gray floor, restrained edge shadows. No eyes, faces, runes, portal or central glowing object.",
+      "floor": "medium-light muted mauve-gray stone with soft desaturated violet and cool gray patches, sparse flat dust flecks; keep the floor light enough for colored creatures, no symbols or holes"
+    },
+    {
+      "slug": "light-dungeon",
+      "name": "Light Dungeon",
+      "palette": "warm ivory, pale champagne, muted gold and lavender-gray",
+      "scene": "A calm radiant stone sanctuary with broad ivory arches or column fragments at asymmetric far edges, soft muted gold trims and a quiet pale warm distant wall. Broad pale limestone floor. Diffuse gentle light only, no beam through the center, no altar, halo, sun disk or bright white focal point. Simple low-contrast welcoming atmosphere.",
+      "floor": "pale warm ivory limestone with faint champagne and lavender-gray mottling, a few very small flat gold-toned mineral flecks; no glow, emblems, marble veins or decorative medallions"
+    },
+    {
+      "slug": "forest",
+      "name": "Forest",
+      "palette": "muted woodland green, sage, soft olive and warm earth",
+      "scene": "An outdoor forest clearing with chunky rounded trunks at unequal outer edges, broad simple leaf canopy shapes at the upper corners, and soft distant tree silhouettes. Wide open mossy earth clearing in the middle and foreground, few low plants confined to lower outer edges. No trail, stream or central tree. Warm gentle filtered light, no dramatic sunbeams. Clearly an outdoor woodland rather than an enclosed nature temple.",
+      "floor": "pale muted olive-sage compacted soil with soft warm tan and moss-green flat patches, at most a few tiny flat fallen leaf impressions; no grass tufts, roots, trees, stones or plants protruding from the surface"
+    },
+    {
+      "slug": "arena",
+      "name": "Arena",
+      "palette": "warm sandy beige, muted limestone, dusty burgundy and soft slate blue",
+      "scene": "A small friendly fantasy colosseum, with broad low-detail stone seating and arches confined to the distant upper band and outer sides. Two unequal subdued cloth banners tucked at far edges, one burgundy and one dusty blue. Wide empty pale sand arena floor fills the central and lower areas. No crowds, weapons, trophies, gates in the center, markings or battle props.",
+      "floor": "light warm beige packed arena sand with faint irregular dusty tan patches and a few very subtle flat scuffs; no circles, tracks, footprints, symbols, stonework or props"
+    },
+    {
+      "slug": "volcano",
+      "name": "Volcano",
+      "palette": "muted basalt mauve-gray, ash beige, smoky plum and subdued burnt orange",
+      "scene": "An outdoor volcanic caldera with broad low-detail basalt ridges at the outer edges, distant muted volcanic silhouettes high in the background and a soft smoky mauve sky. A very restrained burnt-orange lava glow may sit in distant far-edge fissures, never the central floor. A broad safe dry ash-stone clearing remains open through the middle and foreground. No eruption plume or huge central volcano focal point. Clearly outdoors, distinct from the Fire Dungeon.",
+      "floor": "pale ash-gray volcanic stone with soft dusty mauve and subdued warm charcoal patches, a few tiny flat rust-colored mineral flecks; no lava, glowing cracks, vents, craters, embers or rocks"
+    }
+  ],
+  "assets": [
+    {
+      "id": "water-dungeon-background",
+      "theme": "water-dungeon",
+      "name": "Water Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/water-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Water Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty teal, slate blue, sea-glass cyan and cool gray.\nSCENE: A quiet tidal grotto with smooth blue-gray stone walls and a few broad shell-like stone forms at the far edges. A few subdued turquoise facets are embedded in the side walls. Keep the broad central floor DRY blue-gray stone; small dark water recesses may appear only at the very bottom outer corners, never through the central floor.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale desaturated blue-gray smooth worn limestone with faint irregular sea-glass teal mottling; sparse tiny flat mineral flecks, no liquid or wet reflections. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "water-dungeon-5x8",
+      "theme": "water-dungeon",
+      "name": "Water Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/water-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Water Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty teal, slate blue, sea-glass cyan and cool gray.\nChange ONLY the floor material and its colors to: pale desaturated blue-gray smooth worn limestone with faint irregular sea-glass teal mottling; sparse tiny flat mineral flecks, no liquid or wet reflections. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "water-dungeon-6x10",
+      "theme": "water-dungeon",
+      "name": "Water Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/water-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Water Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty teal, slate blue, sea-glass cyan and cool gray.\nChange ONLY the floor material and its colors to: pale desaturated blue-gray smooth worn limestone with faint irregular sea-glass teal mottling; sparse tiny flat mineral flecks, no liquid or wet reflections. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "fire-dungeon-background",
+      "theme": "fire-dungeon",
+      "name": "Fire Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/fire-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Fire Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted terracotta, smoky mauve, charcoal and restrained amber.\nSCENE: A warm ember dungeon: broad terracotta cavern walls with a few simple carved stone recesses and a dim amber ember glow tucked into the extreme side edges. Dry smoky stone floor, quiet hazy central wall. Emphasize a sheltered underground ember chamber rather than an outdoor volcano; no flowing lava across the floor.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale muted terracotta and warm ash stone, faint broad dusty rose and clay mottling, only tiny flat ash flecks; no fire, embers, glowing cracks or lava on the board. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "fire-dungeon-5x8",
+      "theme": "fire-dungeon",
+      "name": "Fire Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/fire-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Fire Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted terracotta, smoky mauve, charcoal and restrained amber.\nChange ONLY the floor material and its colors to: pale muted terracotta and warm ash stone, faint broad dusty rose and clay mottling, only tiny flat ash flecks; no fire, embers, glowing cracks or lava on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "fire-dungeon-6x10",
+      "theme": "fire-dungeon",
+      "name": "Fire Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/fire-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Fire Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted terracotta, smoky mauve, charcoal and restrained amber.\nChange ONLY the floor material and its colors to: pale muted terracotta and warm ash stone, faint broad dusty rose and clay mottling, only tiny flat ash flecks; no fire, embers, glowing cracks or lava on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "nature-dungeon-background",
+      "theme": "nature-dungeon",
+      "name": "Nature Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/nature-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Nature Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted sage, olive, gray-green and soft earthy taupe.\nSCENE: An ancient overgrown stone sanctuary inside a cavern. Two unequal broad broken stone wall forms at the far sides carry simple large vine and leaf silhouettes; a little moss at their bases. Keep vines, plants and masonry at the edges. Broad open sage-gray stone floor, low-contrast distant wall, no central altar. This is an indoor overgrown temple, distinct from an outdoor forest.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale sage-gray worn stone with muted olive and taupe flat patches and a few faint leaf-shaped surface impressions; no raised plants, vines or roots. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "nature-dungeon-5x8",
+      "theme": "nature-dungeon",
+      "name": "Nature Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/nature-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Nature Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted sage, olive, gray-green and soft earthy taupe.\nChange ONLY the floor material and its colors to: pale sage-gray worn stone with muted olive and taupe flat patches and a few faint leaf-shaped surface impressions; no raised plants, vines or roots. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "nature-dungeon-6x10",
+      "theme": "nature-dungeon",
+      "name": "Nature Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/nature-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Nature Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted sage, olive, gray-green and soft earthy taupe.\nChange ONLY the floor material and its colors to: pale sage-gray worn stone with muted olive and taupe flat patches and a few faint leaf-shaped surface impressions; no raised plants, vines or roots. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "earth-dungeon-background",
+      "theme": "earth-dungeon",
+      "name": "Earth Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/earth-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Earth Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ochre, muted sandstone, dusty mauve and clay brown.\nSCENE: A sheltered earthen sandstone cavern with broad layered ochre walls and a few chunky faceted ledges at asymmetric outer edges. The center is a quiet sand-colored distant wall and wide dry compacted earth floor. A very small dull geode facet may sit embedded at one side, not in the center. No pits, paths, objects or stone piles across the clearing.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: light sandy ochre compacted earth and worn sandstone with sparse broad muted clay mottling and tiny flat grain marks; no large rocks, geodes, pits or cracks. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "earth-dungeon-5x8",
+      "theme": "earth-dungeon",
+      "name": "Earth Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/earth-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Earth Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ochre, muted sandstone, dusty mauve and clay brown.\nChange ONLY the floor material and its colors to: light sandy ochre compacted earth and worn sandstone with sparse broad muted clay mottling and tiny flat grain marks; no large rocks, geodes, pits or cracks. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "earth-dungeon-6x10",
+      "theme": "earth-dungeon",
+      "name": "Earth Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/earth-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Earth Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ochre, muted sandstone, dusty mauve and clay brown.\nChange ONLY the floor material and its colors to: light sandy ochre compacted earth and worn sandstone with sparse broad muted clay mottling and tiny flat grain marks; no large rocks, geodes, pits or cracks. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "wind-dungeon-background",
+      "theme": "wind-dungeon",
+      "name": "Wind Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/wind-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Wind Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: pale blue-gray, dusty turquoise, ivory and muted cool taupe.\nSCENE: A quiet high-altitude wind sanctuary, open to a soft pale sky. Rounded wind-worn stone arches and ledges occupy only the outer sides; a few broad soft cloud ribbons sit high at the outer edges. Keep the central view low-contrast and spacious, with a wide dry pale blue-gray stone floor and no central opening, staircase or pedestal.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale cool gray-blue wind-worn stone with soft ivory and faint cyan flat patches, sparse very small flat scuff marks; no cloud banks, swirling lines, arrows, feathers or structures on the board. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "wind-dungeon-5x8",
+      "theme": "wind-dungeon",
+      "name": "Wind Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/wind-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Wind Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: pale blue-gray, dusty turquoise, ivory and muted cool taupe.\nChange ONLY the floor material and its colors to: pale cool gray-blue wind-worn stone with soft ivory and faint cyan flat patches, sparse very small flat scuff marks; no cloud banks, swirling lines, arrows, feathers or structures on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "wind-dungeon-6x10",
+      "theme": "wind-dungeon",
+      "name": "Wind Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/wind-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Wind Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: pale blue-gray, dusty turquoise, ivory and muted cool taupe.\nChange ONLY the floor material and its colors to: pale cool gray-blue wind-worn stone with soft ivory and faint cyan flat patches, sparse very small flat scuff marks; no cloud banks, swirling lines, arrows, feathers or structures on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "thunder-dungeon-background",
+      "theme": "thunder-dungeon",
+      "name": "Thunder Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/thunder-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Thunder Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: desaturated lavender slate, steel blue, dull amber and gray.\nSCENE: A storm-charged cavern with broad slate walls and a few very simple amber mineral facets embedded at asymmetric far edges. One restrained short angular lightning glow inside a far side wall recess may identify the element, never across the middle. Dry lavender-gray stone floor; quiet dim center with no central device, wires or pylons.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: light lavender-gray slate with broad muted steel-blue patches and a very few tiny pale ochre mineral flecks; no lightning bolts, electricity, glow, coils or raised crystals on the board. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "thunder-dungeon-5x8",
+      "theme": "thunder-dungeon",
+      "name": "Thunder Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/thunder-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Thunder Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: desaturated lavender slate, steel blue, dull amber and gray.\nChange ONLY the floor material and its colors to: light lavender-gray slate with broad muted steel-blue patches and a very few tiny pale ochre mineral flecks; no lightning bolts, electricity, glow, coils or raised crystals on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "thunder-dungeon-6x10",
+      "theme": "thunder-dungeon",
+      "name": "Thunder Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/thunder-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Thunder Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: desaturated lavender slate, steel blue, dull amber and gray.\nChange ONLY the floor material and its colors to: light lavender-gray slate with broad muted steel-blue patches and a very few tiny pale ochre mineral flecks; no lightning bolts, electricity, glow, coils or raised crystals on the board. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "dark-dungeon-background",
+      "theme": "dark-dungeon",
+      "name": "Dark Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/dark-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Dark Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty violet, muted plum, blue-gray and soft charcoal.\nSCENE: A quiet shadow cavern with broad rounded dark violet stone side walls, one simple shallow gothic stone arch fragment near an outer edge and low-contrast distant rock silhouettes. Keep the central area readable in muted middle values rather than black. Dry dusty mauve-gray floor, restrained edge shadows. No eyes, faces, runes, portal or central glowing object.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: medium-light muted mauve-gray stone with soft desaturated violet and cool gray patches, sparse flat dust flecks; keep the floor light enough for colored creatures, no symbols or holes. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "dark-dungeon-5x8",
+      "theme": "dark-dungeon",
+      "name": "Dark Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/dark-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Dark Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty violet, muted plum, blue-gray and soft charcoal.\nChange ONLY the floor material and its colors to: medium-light muted mauve-gray stone with soft desaturated violet and cool gray patches, sparse flat dust flecks; keep the floor light enough for colored creatures, no symbols or holes. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "dark-dungeon-6x10",
+      "theme": "dark-dungeon",
+      "name": "Dark Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/dark-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Dark Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: dusty violet, muted plum, blue-gray and soft charcoal.\nChange ONLY the floor material and its colors to: medium-light muted mauve-gray stone with soft desaturated violet and cool gray patches, sparse flat dust flecks; keep the floor light enough for colored creatures, no symbols or holes. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "light-dungeon-background",
+      "theme": "light-dungeon",
+      "name": "Light Dungeon",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/light-dungeon.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Light Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ivory, pale champagne, muted gold and lavender-gray.\nSCENE: A calm radiant stone sanctuary with broad ivory arches or column fragments at asymmetric far edges, soft muted gold trims and a quiet pale warm distant wall. Broad pale limestone floor. Diffuse gentle light only, no beam through the center, no altar, halo, sun disk or bright white focal point. Simple low-contrast welcoming atmosphere.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale warm ivory limestone with faint champagne and lavender-gray mottling, a few very small flat gold-toned mineral flecks; no glow, emblems, marble veins or decorative medallions. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "light-dungeon-5x8",
+      "theme": "light-dungeon",
+      "name": "Light Dungeon",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/light-dungeon5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Light Dungeon board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ivory, pale champagne, muted gold and lavender-gray.\nChange ONLY the floor material and its colors to: pale warm ivory limestone with faint champagne and lavender-gray mottling, a few very small flat gold-toned mineral flecks; no glow, emblems, marble veins or decorative medallions. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "light-dungeon-6x10",
+      "theme": "light-dungeon",
+      "name": "Light Dungeon",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/light-dungeon6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Light Dungeon board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ivory, pale champagne, muted gold and lavender-gray.\nChange ONLY the floor material and its colors to: pale warm ivory limestone with faint champagne and lavender-gray mottling, a few very small flat gold-toned mineral flecks; no glow, emblems, marble veins or decorative medallions. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "forest-background",
+      "theme": "forest",
+      "name": "Forest",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/forest.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Forest mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted woodland green, sage, soft olive and warm earth.\nSCENE: An outdoor forest clearing with chunky rounded trunks at unequal outer edges, broad simple leaf canopy shapes at the upper corners, and soft distant tree silhouettes. Wide open mossy earth clearing in the middle and foreground, few low plants confined to lower outer edges. No trail, stream or central tree. Warm gentle filtered light, no dramatic sunbeams. Clearly an outdoor woodland rather than an enclosed nature temple.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale muted olive-sage compacted soil with soft warm tan and moss-green flat patches, at most a few tiny flat fallen leaf impressions; no grass tufts, roots, trees, stones or plants protruding from the surface. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "forest-5x8",
+      "theme": "forest",
+      "name": "Forest",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/forest5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Forest board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted woodland green, sage, soft olive and warm earth.\nChange ONLY the floor material and its colors to: pale muted olive-sage compacted soil with soft warm tan and moss-green flat patches, at most a few tiny flat fallen leaf impressions; no grass tufts, roots, trees, stones or plants protruding from the surface. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "forest-6x10",
+      "theme": "forest",
+      "name": "Forest",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/forest6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Forest board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted woodland green, sage, soft olive and warm earth.\nChange ONLY the floor material and its colors to: pale muted olive-sage compacted soil with soft warm tan and moss-green flat patches, at most a few tiny flat fallen leaf impressions; no grass tufts, roots, trees, stones or plants protruding from the surface. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "arena-background",
+      "theme": "arena",
+      "name": "Arena",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/arena.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Arena mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm sandy beige, muted limestone, dusty burgundy and soft slate blue.\nSCENE: A small friendly fantasy colosseum, with broad low-detail stone seating and arches confined to the distant upper band and outer sides. Two unequal subdued cloth banners tucked at far edges, one burgundy and one dusty blue. Wide empty pale sand arena floor fills the central and lower areas. No crowds, weapons, trophies, gates in the center, markings or battle props.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: light warm beige packed arena sand with faint irregular dusty tan patches and a few very subtle flat scuffs; no circles, tracks, footprints, symbols, stonework or props. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "arena-5x8",
+      "theme": "arena",
+      "name": "Arena",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/arena5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Arena board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm sandy beige, muted limestone, dusty burgundy and soft slate blue.\nChange ONLY the floor material and its colors to: light warm beige packed arena sand with faint irregular dusty tan patches and a few very subtle flat scuffs; no circles, tracks, footprints, symbols, stonework or props. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "arena-6x10",
+      "theme": "arena",
+      "name": "Arena",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/arena6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Arena board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm sandy beige, muted limestone, dusty burgundy and soft slate blue.\nChange ONLY the floor material and its colors to: light warm beige packed arena sand with faint irregular dusty tan patches and a few very subtle flat scuffs; no circles, tracks, footprints, symbols, stonework or props. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "volcano-background",
+      "theme": "volcano",
+      "name": "Volcano",
+      "kind": "background",
+      "width": 1440,
+      "height": 3200,
+      "destination": "images/battle_backgrounds/volcano.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+      ],
+      "prompt": "Use case: stylized-concept. Create one NEW Volcano mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted basalt mauve-gray, ash beige, smoky plum and subdued burnt orange.\nSCENE: An outdoor volcanic caldera with broad low-detail basalt ridges at the outer edges, distant muted volcanic silhouettes high in the background and a soft smoky mauve sky. A very restrained burnt-orange lava glow may sit in distant far-edge fissures, never the central floor. A broad safe dry ash-stone clearing remains open through the middle and foreground. No eruption plume or huge central volcano focal point. Clearly outdoors, distinct from the Fire Dungeon.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale ash-gray volcanic stone with soft dusty mauve and subdued warm charcoal patches, a few tiny flat rust-colored mineral flecks; no lava, glowing cracks, vents, craters, embers or rocks. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison."
+    },
+    {
+      "id": "volcano-5x8",
+      "theme": "volcano",
+      "name": "Volcano",
+      "kind": "board",
+      "cols": 5,
+      "rows": 8,
+      "width": 1000,
+      "height": 1600,
+      "destination": "images/board_backgrounds/volcano5x8.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Volcano board variant from this existing 5-column by 8-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted basalt mauve-gray, ash beige, smoky plum and subdued burnt orange.\nChange ONLY the floor material and its colors to: pale ash-gray volcanic stone with soft dusty mauve and subdued warm charcoal patches, a few tiny flat rust-colored mineral flecks; no lava, glowing cracks, vents, craters, embers or rocks. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 5 columns and 8 rows, evenly spaced SQUARE cells. Output canvas 1000 x 1600 pixels (5:8 aspect). Internal vertical line centers at x=200, 400, 600, 800; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    },
+    {
+      "id": "volcano-6x10",
+      "theme": "volcano",
+      "name": "Volcano",
+      "kind": "board",
+      "cols": 6,
+      "rows": 10,
+      "width": 1200,
+      "height": 2000,
+      "destination": "images/board_backgrounds/volcano6x10.jpg",
+      "references": [
+        "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+      ],
+      "prompt": "Use case: precise-object-edit / themed variant. Create a Volcano board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted basalt mauve-gray, ash beige, smoky plum and subdued burnt orange.\nChange ONLY the floor material and its colors to: pale ash-gray volcanic stone with soft dusty mauve and subdued warm charcoal patches, a few tiny flat rust-colored mineral flecks; no lava, glowing cracks, vents, craters, embers or rocks. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only."
+    }
+  ],
+  "resolution_note": "Export sizes are exact. Actual native render sizes are recorded; any resampling is disclosed.",
+  "board_note": "Mathematical geometric correction after generation constrains grid centers to 200 px intervals; no purple variants."
+}

@@ -15,6 +15,7 @@ import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { equipBonus, equipBonusStr } from "../../core/equipment.js";
 import CreatureAbilitySummary from "./CreatureAbilitySummary.js";
 import CreatureIcon from "./CreatureIcon.js";
+import { PlanInfoSheet, SheetHeader, SheetAbilityRow, ABILITY_LABELS } from "./PlanInfoSheet.js";
 
 const TUTORIAL_LINES = [
   "You wake up on the shore of a deserted looking island with no memory of how you got there.",
@@ -80,7 +81,7 @@ function TutorialOverlay() {
     tutorialPlayerCell: playerCell, setTutorialPlayerCell: setPlayerCell,
   } = useGame();
   const [selectedEgg, setSelectedEgg] = useState(null);
-  // Which side-panel is showing: null | { type: "enemy" | "player", minimized }
+  // Which info sheet is showing: null | { type: "enemy" | "player" }
   const [sidePanel, setSidePanel] = useState(null);
   // Some browsers still fire a trailing click on the drag source right after
   // a completed drop; without this guard that click immediately un-places
@@ -137,7 +138,7 @@ function TutorialOverlay() {
       g.timer = setTimeout(() => {
         if (g.mode === "pending") {
           g.mode = "holding";
-          setSidePanel({ type: "player", minimized: false });
+          setSidePanel({ type: "player" });
         }
       }, HOLD_MS);
     } else {
@@ -662,10 +663,12 @@ function TutorialOverlay() {
           // header
           React.createElement(
             "div",
-            { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
+            { className: "plan-header", style: { padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
+            // No back button here; the empty first cell keeps the title centred.
+            React.createElement("div", null),
             React.createElement(
               "div",
-              { style: { flex: 1, textAlign: "center" } },
+              { style: { textAlign: "center" } },
               React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, "Planning Phase")
             ),
             React.createElement(
@@ -686,10 +689,10 @@ function TutorialOverlay() {
               "Fight →"
             )
           ),
-          // grid + side info panel
+          // grid, centred
           React.createElement(
             "div",
-            { style: { flex: 1, overflowY: "auto", display: "flex", justifyContent: "flex-start", alignItems: "flex-start", padding: 16, gap: 12 } },
+            { style: { flex: 1, overflowY: "auto", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: 16 } },
             React.createElement(
               "div",
               {
@@ -716,7 +719,7 @@ function TutorialOverlay() {
                           e.stopPropagation();
                           if (suppressClickRef.current) { suppressClickRef.current = false; return; }
                           if (isPlayerCell) { setPlayerCell(null); return; }
-                          if (isEnemyCell) { setSidePanel({ type: "enemy", minimized: false }); return; }
+                          if (isEnemyCell) { setSidePanel({ type: "enemy" }); return; }
                           if (isPlayerZone && !playerCell) setPlayerCell(key);
                         },
                         style: {
@@ -760,79 +763,15 @@ function TutorialOverlay() {
                   })
                 ).flat()
               )
-            ),
-            // Side panel -- mirrors ArenaScreen's planning-phase enemy/ally
-            // panels: name/type/level header, minimize toggle, abilities.
-            // Shown for either the enemy (tap) or the player's creature
-            // (press-and-hold), one at a time.
-            sidePanel &&
-              (() => {
-                const panelDef = sidePanel.type === "enemy" ? enemyDef : pickedDef;
-                const subtitle =
-                  panelDef.type + " · " + (panelDef.attackType || "Melee") + " · Lv." +
-                  (sidePanel.type === "enemy" ? TUTORIAL_ENEMY_LEVEL : 1) +
-                  " · " + (sidePanel.type === "enemy" ? "Enemy" : "Ally");
-                const minimized = sidePanel.minimized;
-                return React.createElement(
-                  "div",
-                  { style: { flex: 1, minWidth: 0, background: "#fff", borderRadius: 14, padding: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
-                  React.createElement(
-                    "button",
-                    {
-                      onClick: (e) => { e.stopPropagation(); setSidePanel((p) => ({ ...p, minimized: !p.minimized })); },
-                      style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 },
-                    },
-                    minimized ? "＋" : "－"
-                  ),
-                  React.createElement(
-                    "div",
-                    { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: minimized ? 0 : 12 } },
-                    React.createElement(CreatureIcon, { def: panelDef, size: 28 }),
-                    React.createElement(
-                      "div",
-                      null,
-                      React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, panelDef.name),
-                      React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, subtitle)
-                    )
-                  ),
-                  !minimized &&
-                    React.createElement(
-                      React.Fragment,
-                      null,
-                      React.createElement(
-                        "div",
-                        { style: { fontSize: 9, fontWeight: 700, color: "#888", marginBottom: 2, display: "flex", justifyContent: "space-between" } },
-                        React.createElement("span", null, "HP"),
-                        React.createElement("span", null, panelDef.stats.hp)
-                      ),
-                      React.createElement(
-                        "div",
-                        { style: { height: 6, background: "#eee", borderRadius: 3, overflow: "hidden", marginBottom: 10 } },
-                        React.createElement("div", { style: { height: "100%", width: "100%", background: "#22c55e", borderRadius: 3 } })
-                      ),
-                      Object.entries(panelDef.abilities).map(([k, abl]) => {
-                        if (!abl) return null;
-                        return React.createElement(
-                          "div",
-                          { key: k, style: { marginBottom: 10 } },
-                          React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 } }, k === "unique" ? "Passive" : k === "basic" ? "Basic" : "Special"),
-                          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
-                          // The enemy fights with a maxed kit like every other
-                          // enemy (see makeArenaBattle); the player's starter
-                          // is level 1, so it shows the base tier.
-                          React.createElement("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, abl.upgrades ? abl.upgrades[sidePanel.type === "enemy" ? Math.min(MAX_ABILITY_LEVEL, abl.upgrades.length - 1) : 0] : "")
-                        );
-                      })
-                    )
-                );
-              })()
+            )
           ),
           // roster tray
           React.createElement(
             "div",
             {
               ref: trayRef,
-              style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },
+              // The info sheet takes the tray's place while open.
+              style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0, ...(sidePanel ? { display: "none" } : null) },
             },
             React.createElement(
               "div",
@@ -883,6 +822,46 @@ function TutorialOverlay() {
               )
             )
           ),
+          // Info sheet -- the same popup every planning screen uses
+          // (PlanInfoSheet): name/type/level header, then abilities. Shown for
+          // either the enemy (tap) or the player's creature (press-and-hold),
+          // one at a time.
+          sidePanel &&
+            (() => {
+              const panelDef = sidePanel.type === "enemy" ? enemyDef : pickedDef;
+              const subtitle =
+                panelDef.type + " · " + (panelDef.attackType || "Melee") + " · Lv." +
+                (sidePanel.type === "enemy" ? TUTORIAL_ENEMY_LEVEL : 1) +
+                " · " + (sidePanel.type === "enemy" ? "Enemy" : "Ally");
+              return React.createElement(
+                PlanInfoSheet,
+                { onClose: () => setSidePanel(null) },
+                React.createElement(SheetHeader, { icon: React.createElement(CreatureIcon, { def: panelDef, size: 28 }), title: panelDef.name, subtitle }),
+                React.createElement(
+                  "div",
+                  { style: { fontSize: 10, fontWeight: 700, color: "#888", marginBottom: 2, display: "flex", justifyContent: "space-between" } },
+                  React.createElement("span", null, "HP"),
+                  React.createElement("span", null, panelDef.stats.hp)
+                ),
+                React.createElement(
+                  "div",
+                  { style: { height: 6, background: "#eee", borderRadius: 3, overflow: "hidden", marginBottom: 12 } },
+                  React.createElement("div", { style: { height: "100%", width: "100%", background: "#22c55e", borderRadius: 3 } })
+                ),
+                Object.entries(panelDef.abilities).map(([k, abl]) =>
+                  abl &&
+                  React.createElement(SheetAbilityRow, {
+                    key: k,
+                    label: ABILITY_LABELS[k] || k,
+                    name: abl.name,
+                    // The enemy fights with a maxed kit like every other enemy
+                    // (see makeArenaBattle); the player's starter is level 1,
+                    // so it shows the base tier.
+                    desc: abl.upgrades ? abl.upgrades[sidePanel.type === "enemy" ? Math.min(MAX_ABILITY_LEVEL, abl.upgrades.length - 1) : 0] : "",
+                  })
+                )
+              );
+            })(),
           // Ghost that follows the pointer during a custom drag.
           isDragging &&
             React.createElement(

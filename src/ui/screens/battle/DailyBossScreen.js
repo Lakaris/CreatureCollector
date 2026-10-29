@@ -9,26 +9,31 @@ import { CREATURE_MAP } from "../../../data/creatures.js";
 import { STAT_LABELS, formatStatBonus } from "../../../data/rarity.js";
 import { EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST } from "../../../data/types.js";
-import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
+import { DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import { makeArenaBattle, makeBossUnit, addBossToBattle, bossOf } from "../../../battle/state.js";
 import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
-import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { PlanInfoSheet, SheetHeader, SheetAbilityRow, CreatureSheetBody, allyDesc, ABILITY_LABELS } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import GearRewardGrid from "../../../ui/components/GearRewardGrid.js";
 import GearPreviewPopup from "../../../ui/components/GearPreviewPopup.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
-import { getAbilityTags } from "../../../core/abilityText.js";
-import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
+import { AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
-import { isAppNarrow, appWidth } from "../../../ui/uiScale.js";
+import { appWidth } from "../../../ui/uiScale.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
-import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE } from "../../../battle/constants.js";
+import { boardArt, boardCellClass, BATTLE_BACKDROP } from "../../boardArt.js";
+import useBattlePause, { BATTLE_PAUSED_CLASS, DEV_PAUSE_BTN } from "../../hooks/useBattlePause.js";
+import { DEV_MODE } from "../../../config.js";
+
+const dailyBoardArt=boardArt(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS);
 
 /**
  * Every Daily Boss runs the same generic kit (see battle/bosses/daily.js),
@@ -36,13 +41,9 @@ import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON
  * is why this doesn't read the abilities off the DUNGEON_BOSSES entry the
  * screen borrows for name and type.
  *
- * Built here once rather than inline: the side panel and the narrow-screen
- * popup both show it, and as two inline copies they were already one edit away
- * from disagreeing. Tags follow the same rules as the dungeon bosses' (see
- * data/bosses.js) -- Rising Fury's attack growth has no honest tag, so it has
- * none.
+ * Tags follow the same rules as the dungeon bosses' (see data/bosses.js) --
+ * Rising Fury's attack growth has no honest tag, so it has none.
  */
-const DAILY_ABILITY_LABELS={basic:"Basic",special:"Special",unique:"Passive"};
 function dailyAbilitiesFor(type){
   return {
     basic:{name:type+" Strike",description:"Deals "+type+" damage to the nearest enemy",tags:["closest"]},
@@ -102,51 +103,16 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [holdPct,setHoldPct]=useState(0);
   const hs=React.useRef({delay:null,raf:null,id:null,fired:false});
   const HOLD_DELAY=350,HOLD_MS=700;
+  // The planning info sheet shows one card at a time: the boss (tap it on the
+  // board) or a pressed creature.
   const [gridInfoCreature,setGridInfoCreature]=useState(null);
-  const [bossMinimized,setBossMinimized]=useState(false);
-  const [creatureMinimized,setCreatureMinimized]=useState(false);
+  const [bossSheetOpen,setBossSheetOpen]=useState(false);
+  function closeSheet(){setBossSheetOpen(false);setGridInfoCreature(null);}
+  // Leaving planning closes it, so it never greets you on the way back in.
+  useEffect(()=>{if(phase!=="planning")closeSheet();},[phase]);
   const [dailyAbilityTagPopup,setDailyAbilityTagPopup]=useState(null);
-  const rightPanelRef=React.useRef(null);
-  React.useLayoutEffect(()=>{
-    if(!rightPanelRef.current)return;
-    if(gridInfoCreature){
-      setCreatureMinimized(false);
-      const el=rightPanelRef.current;
-      if(el.scrollHeight>el.clientHeight+4)setBossMinimized(true);
-    } else {
-      setBossMinimized(false);
-      setCreatureMinimized(false);
-    }
-  },[gridInfoCreature]);
-  // Whichever panel the player just expanded wins the space; if the two together
-  // don't fit, the OTHER panel auto-minimizes to make room.
-  function expandDailyPanel(which){
-    requestAnimationFrame(()=>{
-      const el=rightPanelRef.current;if(!el)return;
-      if(el.scrollHeight>el.clientHeight+4){
-        if(which==="boss")setCreatureMinimized(true);else setBossMinimized(true);
-      }
-    });
-  }
   const ghs=React.useRef({timer:null,fired:false});
   const [confirmForfeitOpen,setConfirmForfeitOpen]=useState(false);
-  // On narrow screens the boss's side panel starts hidden (see
-  // .daily-boss-panel in components.css) and holding the boss reveals it --
-  // the same side panel a held creature gets, not a popup. On wide screens
-  // the panel is always there. Both read the breakpoint from uiScale, in
-  // design pixels: a raw window.innerWidth check here would drift from the
-  // stylesheet as the UI scale changes.
-  const [bossPanelOpen,setBossPanelOpen]=useState(false);
-  const bhs=React.useRef({timer:null,fired:false});
-  const [isNarrowScreen,setIsNarrowScreen]=useState(()=>typeof window!=="undefined"&&isAppNarrow());
-  useEffect(()=>{
-    function onResize(){setIsNarrowScreen(isAppNarrow());}
-    window.addEventListener("resize",onResize);
-    window.addEventListener("orientationchange",onResize);
-    return ()=>{window.removeEventListener("resize",onResize);window.removeEventListener("orientationchange",onResize);};
-  },[]);
-  useEffect(()=>{if(!isNarrowScreen)setBossPanelOpen(false);},[isNarrowScreen]);
-  function showBossPanel(){setBossPanelOpen(true);setBossMinimized(false);expandDailyPanel("boss");}
   function beginHold(creatureId,onComplete){
     endHold();
     hs.current.fired=false;
@@ -187,16 +153,17 @@ function DailyBossScreen({onBack,onViewCreature}){
   const [bSnap,setBSnap]=useState(null);
   const [atkEffects,setAtkEffects]=useState([]);
   const [battleSelected,setBattleSelected]=useState(null); // {type:"unit",uid} | {type:"boss"} | null
-  // Battle layout, picked by the room actually available (design pixels) rather
-  // than the app-wide narrow breakpoint, so the info card sits BESIDE the grid
-  // whenever it fits:
-  //   "sides" -- damage chart | grid | info card (three columns fit)
-  //   "right" -- grid | info card over damage chart (one side column fits)
-  //   "below" -- grid, then damage chart and info card side by side under it
-  const BATTLE_SIDE_W=150,BATTLE_GAP=10,BATTLE_PAD=12;
+  // Battle layout, picked by the room actually available (design pixels). The
+  // damage chart always sits beside the grid (the info card is a popup,
+  // UnitInfoPopup):
+  //   "sides" -- damage chart | grid | empty column (three columns fit; the
+  //              empty one keeps the grid centred)
+  //   "tight" -- damage chart | grid, the chart narrowing into whatever is
+  //              left (on a phone, ~70px -- see DamageChart.js)
+  const BATTLE_SIDE_W=150,BATTLE_GAP=10,BATTLE_TIGHT_GAP=6,BATTLE_PAD=12;
   function pickBattleLayout(){
     const avail=appWidth()-2*BATTLE_PAD,grid=GRID_COLS*TILE;
-    return avail>=grid+2*(BATTLE_SIDE_W+BATTLE_GAP)?"sides":avail>=grid+BATTLE_SIDE_W+BATTLE_GAP?"right":"below";
+    return avail>=grid+2*(BATTLE_SIDE_W+BATTLE_GAP)?"sides":"tight";
   }
   const [battleLayout,setBattleLayout]=useState(()=>typeof window!=="undefined"?pickBattleLayout():"sides");
   useEffect(()=>{
@@ -272,6 +239,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     if(tickRef.current){clearInterval(tickRef.current);tickRef.current=null;}
     if(rafRef.current){cancelAnimationFrame(rafRef.current);rafRef.current=null;}
   }
+  const pause=useBattlePause({tickRef,startRef:battleStartRef,startTicking:()=>{tickRef.current=setInterval(runTick,Math.round(TICK_MS/speedRef.current));}});
   function runTick(){
     const s=bRef.current; if(!s)return;
     const {newFx,acted,now}=runBattleTick(s,{gridRows:GRID_ROWS,gridCols:GRID_COLS});
@@ -325,14 +293,16 @@ function DailyBossScreen({onBack,onViewCreature}){
     }
   }
   function startBattle(){
-    stopLoops();
+    stopLoops();pause.reset();
     speedRef.current=speedRef.current; moveAnimMsRef.current=Math.round(TICK_MS/speedRef.current*0.84);
     setFoughtBoss(boss);
     bRef.current=initBattle(planGrid);
     setBSnap(null); setAtkEffects([]); setBattleLog([]); setBattleSelected(null);
     setPhase("battling");setBossTimeLeft(60);battleStartRef.current=Date.now();
     startRenderLoop();
-    tickRef.current=setInterval(runTick,TICK_MS);
+    // At the saved speed, like cycleSpeed and the other modes -- a bare TICK_MS
+    // ran a 2x fight's moves at 1x while its timer counted down at 2x.
+    tickRef.current=setInterval(runTick,Math.round(TICK_MS/speedRef.current));
   }
   function cycleSpeed(){
     const next=battleSpeed===1?2:1;
@@ -343,11 +313,15 @@ function DailyBossScreen({onBack,onViewCreature}){
     if(tickRef.current){clearInterval(tickRef.current);tickRef.current=setInterval(runTick,Math.round(TICK_MS/next));}
   }
   function retry(){
-    stopLoops(); bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
+    stopLoops(); pause.reset(); bRef.current=null; setBSnap(null); setAtkEffects([]); setBattleSelected(null);
     setPhase("planning"); setBattleLog([]); setLogStep(0);
   }
   function forfeitFight(){
-    stopLoops();
+    // Ignored once the fight is decided (loop stopped, not just paused): its
+    // result and rewards are already settled and the outcome is on a timer --
+    // forfeiting then would also count a lost fight and roll consolation gear.
+    if(!tickRef.current&&!pause.paused)return;
+    stopLoops();pause.reset();
     setDailyBossData(prev=>({...prev,date:today,fights:(isToday?(prev.fights||0):0)+1,wins:(isToday?(prev.wins||0):0)}));
     if(!rewardsCollectedToday){
       const consolation=rollDungeonRewards(5,boss.type,level);
@@ -407,7 +381,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   // every tile it would be able to reach from the cell under the pointer.
   const rangePreview=useRangePreview(GRID_ROWS,GRID_COLS);
   // Planning board shrinks to its column rather than making it scroll.
-  const [planAreaRef,planTile,planClamped]=useFitTile(GRID_ROWS,GRID_COLS,TILE,{reserveW:PLAN_PANEL_MIN_W});
+  const [planAreaRef,planTile,planClamped]=useFitTile(GRID_ROWS,GRID_COLS,TILE);
   /** The creature a drag is carrying, from either origin (tray or grid cell). */
   function draggedCreature(){return dragId||(dragCell?planGrid[dragCell]:null);}
   function previewAt(cid,r,c){if(!cid){rangePreview.clear();return;}rangePreview.show(cid,r,c,owned&&owned[cid]);}
@@ -496,7 +470,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     const now=Date.now();
     const selectedUnit=battleSelected?.type==="unit"?snap.playerUnits.find(u=>u.uid===battleSelected.uid):null;
     const selectedBoss=battleSelected?.type==="boss"?snap.boss:null;
-    return React.createElement("div",{key:"sfv463",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv463",className:"screen-fade"+(pause.paused?" "+BATTLE_PAUSED_CLASS:""),style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
       // header — boss HP updated via RAF (id="battle-boss-hp"), text via React
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
@@ -506,6 +480,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             React.createElement("div",{id:"battle-boss-hp-pct",style:{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:"#fff",textShadow:"0 1px 2px rgba(0,0,0,0.5)",pointerEvents:"none"}},Math.ceil(snap.boss.hp/bossMaxHp*100)+"%")
           )
         ),
+        DEV_MODE&&phase==="battling"&&React.createElement("button",{onClick:pause.toggle,style:{...DEV_PAUSE_BTN,background:pause.paused?"#16a34a":"#b45309"}},pause.paused?"▶ Resume":"⏸ Pause"),
         phase==="battling"&&React.createElement("button",{onClick:()=>setConfirmForfeitOpen(true),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},iconText("🏳 Forfeit")),
         React.createElement("button",{onClick:cycleSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},battleSpeed+"x ⚡")
       ),
@@ -514,12 +489,11 @@ function DailyBossScreen({onBack,onViewCreature}){
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:bossTimeLeft<=10?"#ef4444":"#534AB7"}},iconText(bossTimeLeft+"s ⏱")),
         // Named grid areas let the same three pieces move between the layouts
         // (see pickBattleLayout) without remounting the board.
-        React.createElement("div",{style:{display:"grid",justifyContent:"center",alignItems:"start",gap:BATTLE_GAP,width:"100%",boxSizing:"border-box",
-          ...(battleLayout==="sides"?{gridTemplateColumns:BATTLE_SIDE_W+"px auto "+BATTLE_SIDE_W+"px",gridTemplateAreas:'"chart board info"'}
-            :battleLayout==="right"?{gridTemplateColumns:"auto "+BATTLE_SIDE_W+"px",gridTemplateRows:"auto 1fr",gridTemplateAreas:'"board info" "board chart"'}
-            :{gridTemplateColumns:BATTLE_SIDE_W+"px "+BATTLE_SIDE_W+"px",gridTemplateAreas:'"board board" "chart info"'})}},
+        React.createElement("div",{style:{display:"grid",justifyContent:"center",alignItems:"start",width:"100%",boxSizing:"border-box",
+          ...(battleLayout==="sides"?{gap:BATTLE_GAP,gridTemplateColumns:BATTLE_SIDE_W+"px auto "+BATTLE_SIDE_W+"px",gridTemplateAreas:'"chart board ."'}
+            :{gap:BATTLE_TIGHT_GAP,gridTemplateColumns:"minmax(0,"+BATTLE_SIDE_W+"px) auto",gridTemplateAreas:'"chart board"'})}},
         React.createElement("div",{style:{gridArea:"chart"}},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
-        React.createElement("div",{style:{gridArea:"board",justifySelf:"center",width:GRID_COLS*TILE,height:GRID_ROWS*TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+        React.createElement("div",{className:dailyBoardArt.className,style:{gridArea:"board",justifySelf:"center",width:GRID_COLS*TILE,height:GRID_ROWS*TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0,...dailyBoardArt.style}},
           // boss overlay — position managed by RAF
           React.createElement("div",{
             ref:el=>{bossDomRef.current=el;if(el){el.style.left=(snap.boss.col*TILE)+"px";el.style.top=(snap.boss.row*TILE)+"px";}},
@@ -539,7 +513,7 @@ function DailyBossScreen({onBack,onViewCreature}){
           React.createElement("div",{style:{position:"absolute",top:0,left:0,display:"grid",gridTemplateColumns:`repeat(${GRID_COLS},${TILE}px)`,gridTemplateRows:`repeat(${GRID_ROWS},${TILE}px)`,gap:0}},
             Array.from({length:GRID_ROWS},(_,r)=>Array.from({length:GRID_COLS},(_,c)=>{
               const BORDER="1px solid #bbb";
-              return React.createElement("div",{key:r+","+c,style:{
+              return React.createElement("div",{key:r+","+c,className:boardCellClass(r),style:{
                 width:TILE,height:TILE,
                 background:"#fff",
                 borderTop:r===0?"0":BORDER,
@@ -674,7 +648,7 @@ function DailyBossScreen({onBack,onViewCreature}){
             )
           )
         ),
-        React.createElement("div",{style:{gridArea:"info"}},selectedUnit?React.createElement(UnitInfoPanel,{
+        selectedUnit?React.createElement(UnitInfoPopup,{
           def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:"Ally",
@@ -683,14 +657,14 @@ function DailyBossScreen({onBack,onViewCreature}){
           abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setBattleSelected(null)
-        }):selectedBoss?React.createElement(UnitInfoPanel,{
+        }):selectedBoss&&React.createElement(UnitInfoPopup,{
           emoji:TYPE_EMOJI[boss.type]||"👾",
           name:(foughtBoss||boss).name,
           subtitle:"Boss",
           hp:selectedBoss.hp,maxHp:selectedBoss.maxHp,shield:selectedBoss.shield,
           debuffs:debuffsFor(selectedBoss),
           onClose:()=>setBattleSelected(null)
-        }):React.createElement("div",{style:{width:150,flexShrink:0}}))
+        })
         )
       ),
       confirmForfeitOpen&&React.createElement("div",{onClick:()=>setConfirmForfeitOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
@@ -709,27 +683,25 @@ function DailyBossScreen({onBack,onViewCreature}){
   // Planning screen
   if(phase==="planning")return React.createElement(React.Fragment,null,
     dailyAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dailyAbilityTagPopup,onClose:()=>setDailyAbilityTagPopup(null)}),
-    React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
     // header
-    React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
+    React.createElement("div",{className:"plan-header",style:{padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
       React.createElement("button",{onClick:()=>{setPhase("idle");},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
         React.createElement("i",{className:"ti ti-arrow-left"})
       ),
-      React.createElement("div",{style:{flex:1,textAlign:"center"}},
+      React.createElement("div",{style:{textAlign:"center"}},
         React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
       ),
       React.createElement("button",{onClick:Object.keys(planGrid).length>0?startBattle:undefined,style:{background:Object.keys(planGrid).length>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:Object.keys(planGrid).length>0?"pointer":"default"}},"Fight →")
     ),
     // grid. Never scrolls -- planTile shrinks the board to whatever height
     // this row ends up with (see useFitTile).
-    React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
-      React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative"}},
+    React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"center",alignItems:"flex-start",padding:16}},
+      React.createElement("div",{className:dailyBoardArt.className,style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",...dailyBoardArt.style}},
+      // The boss: tap it for its info sheet.
       React.createElement("div",{
-        onMouseDown:isNarrowScreen?()=>{bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;showBossPanel();},180);}:undefined,
-        onMouseUp:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
-        onTouchStart:isNarrowScreen?(e)=>{e.preventDefault();bhs.current.fired=false;bhs.current.timer=setTimeout(()=>{bhs.current.fired=true;showBossPanel();},180);}:undefined,
-        onTouchEnd:isNarrowScreen?()=>{if(bhs.current.timer){clearTimeout(bhs.current.timer);bhs.current.timer=null;}}:undefined,
-        style:{position:"absolute",left:2*planTile,top:1*planTile,width:2*planTile,height:2*planTile,display:"flex",alignItems:"center",justifyContent:"center",fontSize:Math.round(planTile*1.13),lineHeight:1,pointerEvents:isNarrowScreen?"auto":"none",cursor:isNarrowScreen?"pointer":"default",zIndex:10,userSelect:"none"}
+        onClick:()=>{setGridInfoCreature(null);setBossSheetOpen(true);},
+        style:{position:"absolute",left:2*planTile,top:1*planTile,width:2*planTile,height:2*planTile,display:"flex",alignItems:"center",justifyContent:"center",fontSize:Math.round(planTile*1.13),lineHeight:1,cursor:"pointer",zIndex:10,userSelect:"none"}
       },TYPE_EMOJI[boss.type]||"👾"),
       React.createElement("div",{
         style:{
@@ -748,15 +720,15 @@ function DailyBossScreen({onBack,onViewCreature}){
             const isDivider=r===PLAYER_START_ROW;
             const BORDER="1px solid #bbb";
             return React.createElement("div",{
-              key,"data-cell":key,
+              key,"data-cell":key,className:boardCellClass(r,PLAYER_START_ROW),
               draggable:!!(isPlayerZone&&creatureId),
               onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
               onDragEnd:isPlayerZone&&creatureId?()=>rangePreview.clear():undefined,
               onDragOver:isPlayerZone?(e)=>{e.preventDefault();previewAt(draggedCreature(),r,c);}:()=>rangePreview.clear(),
               onDrop:isPlayerZone?(e)=>{e.preventDefault();rangePreview.clear();handleCellDrop(r,c);}:undefined,
-              onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);}):undefined,
+              onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},180);}):undefined,
               onMouseUp:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
-              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
+              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},180);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
               onTouchEnd:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
               style:{
                 width:planTile,height:planTile,
@@ -777,75 +749,12 @@ function DailyBossScreen({onBack,onViewCreature}){
           })
         ).flat()
       )
-      ),
-      // right-side info panels
-      React.createElement("div",{ref:rightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
-        // boss panel (always top 50%)
-        (()=>{
-          const abilityLabels=DAILY_ABILITY_LABELS;
-          const bossStats=getBossStats(boss,level);
-          const dailyAbilities=dailyAbilitiesFor(boss.type);
-          return React.createElement("div",{className:"daily-boss-panel"+(bossPanelOpen?" open":""),style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
-            React.createElement("button",{onClick:()=>setBossMinimized(p=>{const next=!p;if(!next)expandDailyPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},bossMinimized?"＋":"－"),
-            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:bossMinimized?0:4}},
-              React.createElement("div",{style:{fontSize:28,lineHeight:1}},TYPE_EMOJI[boss.type]||"👾"),
-              React.createElement("div",null,
-                React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},boss.name),
-                React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},boss.type+" · Lv."+level)
-              )
-            ),
-            !bossMinimized&&Object.entries(dailyAbilities).map(([k,abl])=>{
-              return React.createElement("div",{key:k,style:{marginBottom:10}},
-                React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-                  abl.tags&&abl.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                    React.createElement(AbilityTagPills,{tags:abl.tags,onOpen:setDailyAbilityTagPopup,compact:true})
-                  )
-                ),
-                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-                React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.description)
-              );
-            })
-          );
-        })(),
-        // creature panel (bottom 50%, shown when a creature is held)
-        (()=>{
-          if(!gridInfoCreature)return React.createElement("div",{style:{flex:"0 0 50%"}});
-          const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
-          const def=CREATURE_MAP[gridInfoCreature];
-          const oc=owned&&owned[gridInfoCreature];
-          if(!def)return React.createElement("div",{style:{flex:"0 0 50%"}});
-          return React.createElement("div",{style:{flex:"0 0 50%",background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",overflowY:"auto",boxSizing:"border-box",position:"relative"}},
-            React.createElement("button",{onClick:()=>setCreatureMinimized(p=>{const next=!p;if(!next)expandDailyPanel("creature");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},creatureMinimized?"＋":"－"),
-            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:creatureMinimized?0:12}},
-              React.createElement("div",null,
-                React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
-                React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))
-              )
-            ),
-            !creatureMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
-              if(!abl)return null;
-              const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
-              const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
-              const abilityTags=getAbilityTags(def.id,k);
-              return React.createElement("div",{key:k,style:{marginBottom:10}},
-                React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                  React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-                  abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                    React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDailyAbilityTagPopup,compact:true})
-                  )
-                ),
-                React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-                desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
-              );
-            })
-          );
-        })()
       )
     ),
     // creature list
     React.createElement("div",{
-      style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
+      // The info sheet takes the tray's place while open.
+      style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0,...(bossSheetOpen||gridInfoCreature?{display:"none"}:null)},
       onDragOver:e=>{e.preventDefault();rangePreview.clear();},
       onDrop:e=>{
         e.preventDefault();
@@ -922,7 +831,19 @@ function DailyBossScreen({onBack,onViewCreature}){
           );
         })
       )
-    )
+    ),
+    // info sheet: the boss or a pressed creature
+    bossSheetOpen&&React.createElement(PlanInfoSheet,{onClose:closeSheet},
+      React.createElement(SheetHeader,{icon:TYPE_EMOJI[boss.type]||"👾",title:boss.name,subtitle:boss.type+" · Lv."+level}),
+      Object.entries(dailyAbilitiesFor(boss.type)).map(([k,abl])=>React.createElement(SheetAbilityRow,{key:k,label:ABILITY_LABELS[k]||k,tags:abl.tags,name:abl.name,desc:abl.description,onTag:setDailyAbilityTagPopup}))
+    ),
+    gridInfoCreature&&CREATURE_MAP[gridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeSheet},
+      React.createElement(CreatureSheetBody,{
+        def:CREATURE_MAP[gridInfoCreature],
+        subtitle:CREATURE_MAP[gridInfoCreature].type+" · "+(CREATURE_MAP[gridInfoCreature].attackType||"Melee")+(owned?.[gridInfoCreature]?" · Lv."+owned[gridInfoCreature].level:""),
+        descFor:allyDesc(owned?.[gridInfoCreature]),
+        onTag:setDailyAbilityTagPopup,
+      }))
   ),
   touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
   );

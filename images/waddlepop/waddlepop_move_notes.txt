@@ -1,0 +1,9 @@
+Waddlepop move: walk in place with a lightly bouncing snowball bomb and a continuously sparking fuse.
+24 frames; 6 columns x 4 rows; 512 x 512 px per frame. Transparent PNG spritesheet.
+Read left to right, top to bottom. Loop at 50 ms per frame (20 fps), 1.2 seconds per full two-step cycle.
+Frame 1 uses the base pose with corrected foot outlines. The final frame approaches the initial pose without duplicating it, avoiding a pause at the loop.
+Feet alternate lifting and planting, with a maximum 10 px lift and 6 px horizontal stride. The torso and face move as one rigid shape; the feet rotate without stretching.
+Both feet have complete 6.25 px dark contours, including the upper edges against the belly. All 24 frames were visually inspected at enlarged size and checked for continuous opaque dark borders.
+The existing bomb and fuse artwork are reused. A hidden lower-body fill was prepared with the built-in image tool to keep the belly contour continuous behind the stepping feet.
+All 24 frames checked for connected feet, stray components, clipping, intact face geometry and a visible fuse spark.
+The idle image and flavor animation are unchanged.

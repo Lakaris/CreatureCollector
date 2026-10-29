@@ -1,0 +1,60 @@
+{
+  "id": "water-dungeon-6x10",
+  "theme": "water-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/water-dungeon6x10.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-fd0acefc-fa88-4ac9-a856-ef1b6a70a388.png",
+  "source_sha256": "ae1ca36c26d59c9e100bcc34d2773a8c047ab91505ad5e8fbacc4249d00dd279",
+  "native_render_size": [
+    971,
+    1619
+  ],
+  "width": 1200,
+  "height": 2000,
+  "format": "JPEG",
+  "bytes": 590378,
+  "sha256": "902bb8b651595bc878006544e3c6b78dd4e8ab6cc8b3185d4e122df4a628ef40",
+  "resampled": true,
+  "x_centers": [
+    199.996,
+    399.992,
+    599.995,
+    800.005,
+    999.996
+  ],
+  "y_centers": [
+    199.996,
+    399.989,
+    599.992,
+    799.987,
+    1000.004,
+    1200.01,
+    1400.007,
+    1599.995,
+    1800.003
+  ],
+  "checked_cross_sections": 312,
+  "max_center_error_px": 0.0231,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      200.02222949136745,
+      400.11652931791343,
+      600.5214218173243,
+      800.9134633659672,
+      1000.461854696598
+    ],
+    "y": [
+      199.43353632515036,
+      399.1911750958456,
+      599.5692671642885,
+      799.7241740230015,
+      1000.0304280429954,
+      1200.0804413517274,
+      1400.0799917667475,
+      1600.1125189613176,
+      1800.1044228959538
+    ]
+  },
+  "geometric_correction_passes": 1
+}

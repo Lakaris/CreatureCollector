@@ -1,0 +1,4 @@
+Use case: precise-object-edit.
+Edit target: the supplied transparent Waddlepop penguin image, with two raised flippers and no bomb.
+Prepare a hidden animation layer by removing BOTH raised flippers entirely. Leave only the head/tuft, round torso and two orange feet. Reconstruct the small hidden sides of the head/shoulders/torso with the same blue feathers and smooth, thick near-black outlines. The head joins directly to the compact round torso; no neck, no arm stumps, no hands, no wings. The cream face and belly stay one continuous patch, and the existing dark cheek contours remain.
+Preserve the exact original character, proportions, pose, position, scale, face geometry, eyes, beak, tuft, feet, colors, shading and artwork wherever already visible. Keep the entire 512-square composition and generous empty upper area. Do not recenter or enlarge the penguin. Do not add anything. Transparent background, no ground, no text, no effects.

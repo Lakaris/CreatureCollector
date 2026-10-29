@@ -1,0 +1,15 @@
+{
+  "id": "forest-background",
+  "theme": "forest",
+  "name": "Forest",
+  "kind": "background",
+  "width": 1440,
+  "height": 3200,
+  "destination": "images/battle_backgrounds/forest.jpg",
+  "references": [
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+  ],
+  "prompt": "Use case: stylized-concept. Create one NEW Forest mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted woodland green, sage, soft olive and warm earth.\nSCENE: An outdoor forest clearing with chunky rounded trunks at unequal outer edges, broad simple leaf canopy shapes at the upper corners, and soft distant tree silhouettes. Wide open mossy earth clearing in the middle and foreground, few low plants confined to lower outer edges. No trail, stream or central tree. Warm gentle filtered light, no dramatic sunbeams. Clearly an outdoor woodland rather than an enclosed nature temple.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale muted olive-sage compacted soil with soft warm tan and moss-green flat patches, at most a few tiny flat fallen leaf impressions; no grass tufts, roots, trees, stones or plants protruding from the surface. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b550705c-052c-4683-989d-9f699bc4fd25.png"
+}

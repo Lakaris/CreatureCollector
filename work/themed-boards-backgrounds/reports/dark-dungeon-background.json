@@ -1,0 +1,52 @@
+{
+  "id": "dark-dungeon-background",
+  "theme": "dark-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/dark-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-96d6fce1-c663-4be3-9dd8-e6493db73173.png",
+  "source_sha256": "15d8bcc27fdeea8e15860e15ee880a066097857b0ae9942ef6cb65cadc5728d0",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 588834,
+  "sha256": "3a1de6b20abeec545f3ea6dc0beeefbc9cd505b46ca018bcbb1a13e1c59f918f",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

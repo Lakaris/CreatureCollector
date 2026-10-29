@@ -1,0 +1,52 @@
+{
+  "id": "water-dungeon-background",
+  "theme": "water-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/water-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b4d1e47b-7d34-4515-ae73-b72cd98b2a3f.png",
+  "source_sha256": "74665e2b04fbd852c55f9e36348a72cba8207b9214535d07f079f23e66c16504",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 609772,
+  "sha256": "bbc2e5ea29f4af4b5d25d60d7f0b4f48bda6df5c8778dcf1c0f11e5cfee45429",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

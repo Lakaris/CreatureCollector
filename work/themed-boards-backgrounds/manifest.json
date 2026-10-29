@@ -1,0 +1,1855 @@
+{
+  "themes": 11,
+  "backgrounds": 11,
+  "boards": 22,
+  "images": 33,
+  "format": "JPEG",
+  "background_dimensions": [
+    1440,
+    3200
+  ],
+  "board_dimensions": [
+    [
+      1000,
+      1600
+    ],
+    [
+      1200,
+      2000
+    ]
+  ],
+  "tile_spacing_px": 200,
+  "maximum_measured_grid_center_error_px": 0.0753,
+  "purple_dividers": false,
+  "tool": "Built-in ImageGen",
+  "resolution_note": "Backgrounds are resampled exports from smaller native renders, not native 1440 x 3200 generation. Native dimensions for every image are recorded below.",
+  "integration_note": "New image assets only. Existing rocky art and game mode assignments were not changed.",
+  "files": [
+    {
+      "id": "water-dungeon-background",
+      "theme": "water-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/water-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b4d1e47b-7d34-4515-ae73-b72cd98b2a3f.png",
+      "source_sha256": "74665e2b04fbd852c55f9e36348a72cba8207b9214535d07f079f23e66c16504",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 609772,
+      "sha256": "bbc2e5ea29f4af4b5d25d60d7f0b4f48bda6df5c8778dcf1c0f11e5cfee45429",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "water-dungeon-5x8",
+      "theme": "water-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/water-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0f343533-69e8-4496-9cd5-90d82ab6ddc6.png",
+      "source_sha256": "03ba7736b55c05c5fa35fd92c225d8fcb5150048c99860eca4317e85d195c3d2",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 431617,
+      "sha256": "66ce4039861e8208e1ada43f0c4fb531ba33431fed40905577b2c9f6fabc9170",
+      "resampled": true,
+      "x_centers": [
+        199.986,
+        399.978,
+        599.988,
+        799.998
+      ],
+      "y_centers": [
+        199.995,
+        400.004,
+        599.998,
+        800.001,
+        1000.0,
+        1200.001,
+        1399.996
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0395,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.85435406325482,
+          399.89305057277284,
+          599.6666516593571,
+          799.3025869680638
+        ],
+        "y": [
+          199.74223358568068,
+          399.85136982308376,
+          599.5586827029526,
+          799.5611890418825,
+          999.4516400868046,
+          1199.5745368043401,
+          1399.6119140350913
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "water-dungeon-6x10",
+      "theme": "water-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/water-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-fd0acefc-fa88-4ac9-a856-ef1b6a70a388.png",
+      "source_sha256": "ae1ca36c26d59c9e100bcc34d2773a8c047ab91505ad5e8fbacc4249d00dd279",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 590378,
+      "sha256": "902bb8b651595bc878006544e3c6b78dd4e8ab6cc8b3185d4e122df4a628ef40",
+      "resampled": true,
+      "x_centers": [
+        199.996,
+        399.992,
+        599.995,
+        800.005,
+        999.996
+      ],
+      "y_centers": [
+        199.996,
+        399.989,
+        599.992,
+        799.987,
+        1000.004,
+        1200.01,
+        1400.007,
+        1599.995,
+        1800.003
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0231,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          200.02222949136745,
+          400.11652931791343,
+          600.5214218173243,
+          800.9134633659672,
+          1000.461854696598
+        ],
+        "y": [
+          199.43353632515036,
+          399.1911750958456,
+          599.5692671642885,
+          799.7241740230015,
+          1000.0304280429954,
+          1200.0804413517274,
+          1400.0799917667475,
+          1600.1125189613176,
+          1800.1044228959538
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "fire-dungeon-background",
+      "theme": "fire-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/fire-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-06d0ba47-2f44-4b64-8af1-299a23750592.png",
+      "source_sha256": "7147c3c360e5f0c5d5941d431b8b73ff418bddd8066ea11cbe0f56da19b78a40",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 660568,
+      "sha256": "d5cff8da1000c096eca35d480444a5c3fc86a5baa3fa0bd3ea4e7f65678dfb91",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "fire-dungeon-5x8",
+      "theme": "fire-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/fire-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-806b9acd-2d69-442b-8eab-0bdb45b41a43.png",
+      "source_sha256": "3b9a032df16912424ae84d7be34b625141ea2a5109229fd89ed42eb5bdb72537",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 420042,
+      "sha256": "254dbe9c57728bb8dc685f73039fd611cf08e6563c8905c9533342c9f7092715",
+      "resampled": true,
+      "x_centers": [
+        199.984,
+        400.021,
+        600.035,
+        799.976
+      ],
+      "y_centers": [
+        200.003,
+        400.006,
+        600.015,
+        800.01,
+        1000.014,
+        1200.007,
+        1400.002
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0576,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.8417845675767,
+          399.4617678772619,
+          599.2486742942906,
+          798.9482904965653
+        ],
+        "y": [
+          200.2773511056971,
+          400.31181000089214,
+          600.1435635519066,
+          800.3191572185834,
+          1000.1012757602145,
+          1200.2337439375701,
+          1400.1470514409582
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "fire-dungeon-6x10",
+      "theme": "fire-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/fire-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0c087cea-a219-4bc5-a915-3c39d6b332c3.png",
+      "source_sha256": "50c83a15a7523af82af368af87c46bc4dd85591fb23d1b319ccd0e9d546d796f",
+      "native_render_size": [
+        972,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 580110,
+      "sha256": "80b8a8a9903d9574a83057dab411f5939e396f2da14b8b659baa3e0fcafa0811",
+      "resampled": true,
+      "x_centers": [
+        199.971,
+        400.006,
+        599.986,
+        799.991,
+        1000.017
+      ],
+      "y_centers": [
+        199.993,
+        399.99,
+        600.0,
+        800.001,
+        1000.002,
+        1199.991,
+        1399.993,
+        1599.999,
+        1799.99
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.048,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          198.5329972495055,
+          399.5207030168122,
+          599.4719085380874,
+          799.6274801992016,
+          1000.4875911398076
+        ],
+        "y": [
+          199.8101562886101,
+          399.77064657905186,
+          600.0427469744867,
+          800.2864556356681,
+          999.9842545583978,
+          1199.6071111495112,
+          1399.4880757444873,
+          1599.6957187651285,
+          1799.5346954262475
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "nature-dungeon-background",
+      "theme": "nature-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/nature-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ac413880-5ab5-4e32-b042-d1f7e9ffed52.png",
+      "source_sha256": "0af14fe9bb478aa29c31b39ddaaac4863ef4a560e971be0e08e84045dbe8eeee",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 683676,
+      "sha256": "14885cfdb9f1e04bcdf9d2ec85fbd60a959ace8acc1e1aa3ab5d589850b8e4e0",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "nature-dungeon-5x8",
+      "theme": "nature-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/nature-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-4bda071c-24eb-4b58-9b9f-bfe18f1c8850.png",
+      "source_sha256": "543aa5f9edfed104f140a9a76bb6a892f163181ec67fe90c8966c686baf16cc7",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 389782,
+      "sha256": "a0625a9b813f09f5aa46442194c3b338ba4c115b874283c06ea80b9a254d7738",
+      "resampled": true,
+      "x_centers": [
+        200.008,
+        399.972,
+        599.963,
+        800.001
+      ],
+      "y_centers": [
+        199.995,
+        400.008,
+        600.0,
+        800.023,
+        999.985,
+        1199.998,
+        1399.996
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0612,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          200.02002103478517,
+          399.92331085271906,
+          599.8138709082581,
+          799.2555080563504
+        ],
+        "y": [
+          200.00827037612572,
+          400.28194546721284,
+          599.9954810849628,
+          800.2563338190157,
+          999.7517762771328,
+          1199.8749084007009,
+          1399.7118887763065
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "nature-dungeon-6x10",
+      "theme": "nature-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/nature-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-30278401-240f-46e2-a83e-ac96e5bdf888.png",
+      "source_sha256": "1dc2b04db1aaeafcb1d71db4cf9ba2271dba31688a55384f9e594cd336d4bcdc",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 589769,
+      "sha256": "0e4e9d4416804e82570e3ca2c34d3029d7ae88a35422d0df20bfd9bb56937069",
+      "resampled": true,
+      "x_centers": [
+        199.982,
+        400.01,
+        599.98,
+        799.988,
+        1000.006
+      ],
+      "y_centers": [
+        199.976,
+        399.999,
+        599.987,
+        799.987,
+        1000.0,
+        1199.982,
+        1399.992,
+        1600.003,
+        1799.978
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0459,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.86523107010282,
+          401.849619663615,
+          599.7860514998818,
+          799.4010509577184,
+          1000.0603865236022
+        ],
+        "y": [
+          198.86577338688323,
+          399.0810938756308,
+          599.2470230625311,
+          799.6470995315332,
+          1000.0551160255683,
+          1199.6689232884262,
+          1399.918414490409,
+          1600.2044227916163,
+          1799.2128432647914
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "earth-dungeon-background",
+      "theme": "earth-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/earth-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d03fc628-4def-4ce4-a59c-b91efdf04834.png",
+      "source_sha256": "e7212c3ff35f081778057865a611b56a7493fe1b6c8378d52c1e86c67694fc74",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 647287,
+      "sha256": "a1d74c23ac30cc0f9a7a4294ce7ca1a6e52693db6bbc8641167652ab2ae1e212",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "earth-dungeon-5x8",
+      "theme": "earth-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/earth-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7d7923c0-8aa4-49bc-b493-4dec8ffd9310.png",
+      "source_sha256": "5b0e15e73caa8352b47458e5f6c6ff340ce19340d95057007e5b5bdc10e31ce0",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 437770,
+      "sha256": "1f6b77b12d8a18f655a276f31bba6009204706b2004c392a685e19df59f4b195",
+      "resampled": true,
+      "x_centers": [
+        200.0,
+        399.992,
+        599.975,
+        799.99
+      ],
+      "y_centers": [
+        200.009,
+        400.006,
+        599.989,
+        800.016,
+        999.994,
+        1199.999,
+        1399.998
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0543,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.99741790605964,
+          399.96184940541883,
+          599.8835545481259,
+          799.3672749442723
+        ],
+        "y": [
+          200.13433709301643,
+          400.13289561088993,
+          599.8935341495124,
+          800.1422228040187,
+          999.7661998722501,
+          1199.875051983214,
+          1399.704304539056
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "earth-dungeon-6x10",
+      "theme": "earth-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/earth-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-8e432b66-a856-4280-b29a-7f3decc7997f.png",
+      "source_sha256": "976b78f1d04dde1afb826b57298480652d6238bf73ede441ebf7d4a8a2638b2a",
+      "native_render_size": [
+        972,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 586109,
+      "sha256": "7e70bbaa54b5482d73eea1a817f7d7f2f7aa80a9d9a70268c21d61a874f06471",
+      "resampled": true,
+      "x_centers": [
+        199.967,
+        400.011,
+        599.994,
+        799.996,
+        1000.01
+      ],
+      "y_centers": [
+        199.99,
+        399.995,
+        599.988,
+        799.995,
+        999.986,
+        1199.976,
+        1399.98,
+        1600.002,
+        1799.982
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0505,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          197.88897899759556,
+          399.4270661050421,
+          599.6268730389077,
+          799.9386050700359,
+          1000.6115064452704
+        ],
+        "y": [
+          198.83551815869976,
+          398.4069364023468,
+          598.6837747374104,
+          798.9702688385405,
+          999.5490564106149,
+          1199.5743281221676,
+          1399.8189614208143,
+          1600.0022601215626,
+          1799.7980724944462
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "wind-dungeon-background",
+      "theme": "wind-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/wind-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a2e0e1bd-166a-4b99-be47-ab4b99314d65.png",
+      "source_sha256": "b74311b6adf6334af6a36588df661cd5ced64043917fa122b33a18bc57230028",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 640220,
+      "sha256": "abba841bad57c499d64b74954adac551b7814e66c0aae25e949324b2c0890f9f",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "wind-dungeon-5x8",
+      "theme": "wind-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/wind-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1adbb545-4184-4834-9fea-95abfac6629e.png",
+      "source_sha256": "a1b8593bc4e894d1186f72e0f6742a719bdd60da511ec1ddb5b377784a3597b4",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 407388,
+      "sha256": "d0f03f9a66ad36828316f83c720c68be82f97859d94043dad9e16c02708a8503",
+      "resampled": true,
+      "x_centers": [
+        199.996,
+        400.02,
+        599.972,
+        799.993
+      ],
+      "y_centers": [
+        199.996,
+        400.003,
+        599.997,
+        800.001,
+        1000.001,
+        1200.005,
+        1399.988
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.042,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.9822353034019,
+          400.07958243242297,
+          599.8212576112297,
+          799.4007868676424
+        ],
+        "y": [
+          199.8146855672686,
+          399.81978691505446,
+          599.50306688998,
+          799.5121016035638,
+          999.3696425184904,
+          1199.5735251689425,
+          1399.3918848203728
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "wind-dungeon-6x10",
+      "theme": "wind-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/wind-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-52c0768c-f29e-4e37-8651-279bd92fc624.png",
+      "source_sha256": "4811013e5c33e299719e6e9a5627d695cd8c7ebd04e24782dc2a229cf42b94bb",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 526049,
+      "sha256": "74c505cccc3edaa8d7d68ee6868e359301aa2d878e0bfd9c8614f2074e851e3a",
+      "resampled": true,
+      "x_centers": [
+        199.977,
+        400.018,
+        599.999,
+        799.997,
+        1000.02
+      ],
+      "y_centers": [
+        200.004,
+        399.989,
+        599.996,
+        799.971,
+        1000.012,
+        1199.989,
+        1400.004,
+        1599.999,
+        1799.986
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0363,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.10393961091043,
+          400.8160967729067,
+          600.0453931683849,
+          800.0866775851847,
+          1001.1753648192733
+        ],
+        "y": [
+          198.24270505925537,
+          398.5124652272215,
+          598.9045365411354,
+          798.8509313981433,
+          999.1776963836924,
+          1198.9598130675806,
+          1399.4264158839135,
+          1599.9518379931762,
+          1799.9251573435058
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "thunder-dungeon-background",
+      "theme": "thunder-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/thunder-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-86cd3f6f-812f-4d19-aaba-4b8f36eaeaf5.png",
+      "source_sha256": "0a46ebfacdf8f4f6eeaa6f1a0c1fbfa1deaeae7810c7bc7aad8ce8c6f6201931",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 626620,
+      "sha256": "df62549c1c38b1db3a3bda67b24ce3ed230b4aebe919299f5ac9299355f4d06d",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "thunder-dungeon-5x8",
+      "theme": "thunder-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/thunder-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-733b7516-c461-42a8-86ff-4345b26fd75b.png",
+      "source_sha256": "eb90572959472ca4293a8fab015221c33c0c3ad5d5e62034304ae3bb3c32ae55",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 393825,
+      "sha256": "651978b860460912272636ad18346afaa83b701d6b3dafd998df1187f611bb8f",
+      "resampled": true,
+      "x_centers": [
+        200.004,
+        400.02,
+        599.986,
+        799.996
+      ],
+      "y_centers": [
+        199.999,
+        399.996,
+        599.994,
+        799.995,
+        999.979,
+        1199.995,
+        1399.989
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0386,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          200.3229161984392,
+          400.1165191171035,
+          599.6997481159133,
+          799.5949262321938
+        ],
+        "y": [
+          200.009043574286,
+          399.9250428832489,
+          599.7346102719579,
+          799.942290044352,
+          999.7655884341368,
+          1199.920089522059,
+          1399.6354176925602
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "thunder-dungeon-6x10",
+      "theme": "thunder-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/thunder-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9abf5131-1113-4e83-8725-49f27167e4f8.png",
+      "source_sha256": "81192911deff9ca944b9a96c6d59683b0e347e23e81052d617dd3a8e37727037",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 554608,
+      "sha256": "79923982d5c6d01089b8b2826d2d497f32695f32e2ddd7172ac9d63d7c665068",
+      "resampled": true,
+      "x_centers": [
+        199.979,
+        399.983,
+        599.995,
+        800.009,
+        1000.011
+      ],
+      "y_centers": [
+        199.989,
+        400.018,
+        599.992,
+        799.964,
+        999.986,
+        1200.034,
+        1399.965,
+        1599.962,
+        1799.981
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.047,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.9152430095046,
+          399.92745383815236,
+          599.9658030149898,
+          800.0406075759182,
+          1000.0514419223587
+        ],
+        "y": [
+          199.65773217678617,
+          399.3075220609323,
+          599.3242307721091,
+          799.5498239026867,
+          999.9551385444054,
+          1200.2617047840145,
+          1400.6711450212895,
+          1600.586686401099,
+          1800.4279919181024
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "dark-dungeon-background",
+      "theme": "dark-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/dark-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-96d6fce1-c663-4be3-9dd8-e6493db73173.png",
+      "source_sha256": "15d8bcc27fdeea8e15860e15ee880a066097857b0ae9942ef6cb65cadc5728d0",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 588834,
+      "sha256": "3a1de6b20abeec545f3ea6dc0beeefbc9cd505b46ca018bcbb1a13e1c59f918f",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "dark-dungeon-5x8",
+      "theme": "dark-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/dark-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-17c31e4f-fd0d-4717-b45c-c440d75d1859.png",
+      "source_sha256": "942ed85e4071ccbdaed3ca054059fdcff839321efcbbb97be352f5234a83028a",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 349002,
+      "sha256": "3efd8cb22c2644268aa50682200fe052481f2cc6700ce0bc0430ee9dc2bd1315",
+      "resampled": true,
+      "x_centers": [
+        199.993,
+        399.987,
+        599.97,
+        799.989
+      ],
+      "y_centers": [
+        200.001,
+        400.002,
+        599.991,
+        800.003,
+        999.992,
+        1200.003,
+        1399.988
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.042,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.72958625374858,
+          399.50621834310846,
+          599.6619181639483,
+          799.3074091019805
+        ],
+        "y": [
+          199.75171593890587,
+          399.863490148284,
+          599.5892175477397,
+          799.73541531947,
+          999.4305815612124,
+          1199.717736377679,
+          1399.4433901052275
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "dark-dungeon-6x10",
+      "theme": "dark-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/dark-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7aff2eda-a0c7-4fb4-a4fd-6d90959578a9.png",
+      "source_sha256": "6480c52345158dbe241fb7420f1963439ba934f7b85ebd54d786406276f91cce",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 495825,
+      "sha256": "33ab8b8f98002cb50130b5954575b1831e3d9b71e5ace18fc3c3174991014532",
+      "resampled": true,
+      "x_centers": [
+        200.0,
+        399.993,
+        600.004,
+        799.992,
+        1000.004
+      ],
+      "y_centers": [
+        199.992,
+        399.984,
+        600.005,
+        799.997,
+        999.992,
+        1200.006,
+        1399.988,
+        1599.992,
+        1799.987
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0395,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          200.32715341942807,
+          400.8355681988997,
+          600.2957947966779,
+          799.7681910847855,
+          1000.3490897015567
+        ],
+        "y": [
+          199.50100598804877,
+          399.6062682064603,
+          600.0021690311313,
+          800.2820880818601,
+          1000.300086788798,
+          1200.2934598743204,
+          1400.8815312850006,
+          1600.9314772361724,
+          1800.3211287422253
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "light-dungeon-background",
+      "theme": "light-dungeon",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/light-dungeon.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-6fe0ecf7-c98e-4ef9-a1d4-4fa7a2a36bd3.png",
+      "source_sha256": "6448773a289243fb7b28f8c159789f7ebd1bca9096b990c127659e2c8b1660b3",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 615423,
+      "sha256": "ab5f7ee1b7a4d79774a8aa7b9988c32b8de36689f2f1e040a057ad4f1a49463a",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "light-dungeon-5x8",
+      "theme": "light-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/light-dungeon5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1ce10099-2fd9-49c1-a758-da5b4a9c77c9.png",
+      "source_sha256": "bb04488245e1b0a8ded3cb898cd1f1b3319a6fdb97fe4277aedc8e315cb2cf25",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 371184,
+      "sha256": "7296c258ac2ae1f50c9e2c577c3497a05d3dd1ae5204a4ca154296c1e92276ab",
+      "resampled": true,
+      "x_centers": [
+        199.986,
+        399.971,
+        600.018,
+        800.012
+      ],
+      "y_centers": [
+        199.981,
+        400.009,
+        599.984,
+        800.005,
+        999.985,
+        1199.993,
+        1399.99
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0385,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.92596883655455,
+          399.70612775207655,
+          599.2752549733358,
+          799.2085846386279
+        ],
+        "y": [
+          199.91085772620596,
+          400.1947341915555,
+          599.8723196329605,
+          800.0114597246064,
+          999.8717365112293,
+          1199.8504773532861,
+          1399.5025976266845
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "light-dungeon-6x10",
+      "theme": "light-dungeon",
+      "kind": "board",
+      "destination": "images/board_backgrounds/light-dungeon6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-520afdb6-e022-4902-ba8f-caee93bc1401.png",
+      "source_sha256": "3540e69397ceec2c0617529e1cf4562ae2bf9b785e2c4bf954e21b9b94700401",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 587990,
+      "sha256": "97c39c2b7feff59a9a78d497efabab5ac83e08e369a03333cb954bbf8fd17263",
+      "resampled": true,
+      "x_centers": [
+        199.971,
+        399.984,
+        599.986,
+        799.997,
+        999.998
+      ],
+      "y_centers": [
+        199.966,
+        399.986,
+        599.975,
+        799.949,
+        999.961,
+        1200.021,
+        1400.012,
+        1599.999,
+        1799.949
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0585,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.64639105660868,
+          399.4649203300423,
+          599.5933943291014,
+          799.754537719247,
+          999.3407574926546
+        ],
+        "y": [
+          199.70733801892914,
+          399.42571384118656,
+          599.3502527473229,
+          799.6152122435049,
+          999.7271701289226,
+          1200.1170680742316,
+          1400.2593146826969,
+          1600.2667046766535,
+          1800.6209498271728
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "forest-background",
+      "theme": "forest",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/forest.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b550705c-052c-4683-989d-9f699bc4fd25.png",
+      "source_sha256": "b1c6a1db1a649782c505f5e42804e237f6bd43f25ae1b363c073db23385a0dcb",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 644375,
+      "sha256": "a958029c4a6e21b84455b81005b11f75f5177cee362bfa9489414a99ea8817a2",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "forest-5x8",
+      "theme": "forest",
+      "kind": "board",
+      "destination": "images/board_backgrounds/forest5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-433df4d2-905e-4aae-99db-2817f4a79bb2.png",
+      "source_sha256": "af5d35721f7ce23677a45fc2fca3010c65c882e61a6194dc30a393037b47aabd",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 383270,
+      "sha256": "5dad64b355011380ee14444637619f314d50350b5a63897825161892bf55b81b",
+      "resampled": true,
+      "x_centers": [
+        199.982,
+        399.97,
+        599.994,
+        800.007
+      ],
+      "y_centers": [
+        199.99,
+        400.008,
+        599.991,
+        799.995,
+        1000.008,
+        1199.999,
+        1399.997
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0512,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.82169452876278,
+          399.738990642015,
+          599.5060845365355,
+          799.195179343868
+        ],
+        "y": [
+          199.87280963265445,
+          400.13028638618835,
+          599.8043998225322,
+          799.9586866067542,
+          1000.0307208688465,
+          1199.862625042338,
+          1399.8301379325962
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "forest-6x10",
+      "theme": "forest",
+      "kind": "board",
+      "destination": "images/board_backgrounds/forest6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-47450c54-a25b-4879-9462-087fc800960c.png",
+      "source_sha256": "997891e0a14c8cfe5e79d13befaf2fffb314ad11084393c52d5501f4eb007c27",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 545379,
+      "sha256": "1b781cdd1f8f77d4d43e45e409a7afdbb1bc7ec1cc36b2df1061fe9067ad2deb",
+      "resampled": true,
+      "x_centers": [
+        199.969,
+        400.014,
+        599.992,
+        799.995,
+        1000.036
+      ],
+      "y_centers": [
+        199.981,
+        399.994,
+        599.996,
+        799.985,
+        999.982,
+        1199.981,
+        1399.988,
+        1599.997,
+        1799.974
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0664,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          198.12155528550994,
+          400.2260823217978,
+          600.5089975186995,
+          801.3630624019388,
+          1002.4831332237899
+        ],
+        "y": [
+          198.75297136418513,
+          398.7526852615756,
+          598.8913264934063,
+          799.3621301061596,
+          999.3699112959438,
+          1199.3222232854791,
+          1399.633404481754,
+          1599.8378584863085,
+          1799.7641051793792
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "arena-background",
+      "theme": "arena",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/arena.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-e7bf5c62-6204-4e00-a559-9b14f9303013.png",
+      "source_sha256": "8d4978eaf110b4a11fdae22d3ab6e20edf339bcec67481434098958bcbbd4511",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 619375,
+      "sha256": "fddfe71559205f86dd7614d230f341b5e2191dcd6d8ede540cb5dda74aa2b4e3",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "arena-5x8",
+      "theme": "arena",
+      "kind": "board",
+      "destination": "images/board_backgrounds/arena5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-5d890522-4417-4fff-985e-dad085d3b4e2.png",
+      "source_sha256": "dadb4e99a49e4664759774c06f2351b864b238e3352d61baac897812eb64aef5",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 364749,
+      "sha256": "bc5577c74583172cf6deabe88e4d10491e9825a526e0a2e79d84bffb96d23e7e",
+      "resampled": true,
+      "x_centers": [
+        199.995,
+        399.988,
+        599.995,
+        799.994
+      ],
+      "y_centers": [
+        199.989,
+        400.009,
+        599.996,
+        800.004,
+        1000.0,
+        1200.004,
+        1399.992
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0301,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.74661915493016,
+          399.69272319701645,
+          599.5141551530379,
+          799.4056372357479
+        ],
+        "y": [
+          199.50106858096967,
+          399.698072086961,
+          599.4802965000512,
+          799.5922253741178,
+          999.3902816982306,
+          1199.4680749932772,
+          1399.439371678342
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "arena-6x10",
+      "theme": "arena",
+      "kind": "board",
+      "destination": "images/board_backgrounds/arena6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-61d85b3e-396a-45b4-8d6d-abec0e702588.png",
+      "source_sha256": "f4a9a06a1fb34c5f1a6a2afae7028e4e42259a3669e1d863228bd556e23e4e99",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 559661,
+      "sha256": "78aa9cf7f8f93ccf9930803e5e3a6ae70907d597ed9558a74407f74d6f8a3e83",
+      "resampled": true,
+      "x_centers": [
+        199.996,
+        399.975,
+        599.981,
+        800.018,
+        999.977
+      ],
+      "y_centers": [
+        200.023,
+        399.992,
+        599.971,
+        799.981,
+        999.978,
+        1200.017,
+        1399.971,
+        1599.978,
+        1799.955
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.0577,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          200.36761861088263,
+          399.4629836574162,
+          599.8140800384846,
+          800.1771262226783,
+          998.6671589392363
+        ],
+        "y": [
+          200.1711703740144,
+          399.4372154463014,
+          599.5960569634229,
+          799.5375361387144,
+          999.5856853459054,
+          1200.0501415100557,
+          1399.7372738839815,
+          1599.6363402061372,
+          1799.7364770603808
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "volcano-background",
+      "theme": "volcano",
+      "kind": "background",
+      "destination": "images/battle_backgrounds/volcano.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2181a6a7-0627-4a10-b729-599d877da8be.png",
+      "source_sha256": "1c78cc495218f1536ea7ef67cc28c3f38e4da9b8accda68d2c29cc8d1f6021f4",
+      "native_render_size": [
+        841,
+        1870
+      ],
+      "width": 1440,
+      "height": 3200,
+      "format": "JPEG",
+      "bytes": 616256,
+      "sha256": "a2e5d87ca67ac5cf3fa9b640728bb2a2ceccbf0a209810e93de117b042d47381",
+      "resampled": true,
+      "phone_cover_checks": [
+        {
+          "viewport": [
+            320,
+            568
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 322.0
+        },
+        {
+          "viewport": [
+            390,
+            844
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 41.846
+        },
+        {
+          "viewport": [
+            360,
+            800
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 0.0
+        },
+        {
+          "viewport": [
+            430,
+            932
+          ],
+          "horizontal_crop_px": 0.0,
+          "vertical_crop_each_edge_px": 39.442
+        }
+      ]
+    },
+    {
+      "id": "volcano-5x8",
+      "theme": "volcano",
+      "kind": "board",
+      "destination": "images/board_backgrounds/volcano5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-aef4960a-d15a-4dac-b1d8-4d84adf90359.png",
+      "source_sha256": "0ded24a4612b25e5a405e7e7f32d97e3447250ba9b7ab53e0b3dccb30a477d2d",
+      "native_render_size": [
+        992,
+        1586
+      ],
+      "width": 1000,
+      "height": 1600,
+      "format": "JPEG",
+      "bytes": 403518,
+      "sha256": "39fb1e55e1d916c3c7a57d0cd36311961368390a9d7fff3febb7548ee62d8373",
+      "resampled": true,
+      "x_centers": [
+        200.009,
+        399.986,
+        599.962,
+        799.992
+      ],
+      "y_centers": [
+        200.009,
+        400.004,
+        600.006,
+        800.01,
+        999.997,
+        1200.006,
+        1399.998
+      ],
+      "checked_cross_sections": 201,
+      "max_center_error_px": 0.0753,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          199.99061032049576,
+          399.90483930519514,
+          599.7611735867063,
+          799.40427546569
+        ],
+        "y": [
+          200.2539483930393,
+          400.29780844376893,
+          600.0751009330849,
+          800.2740194199827,
+          999.9433650329516,
+          1199.9364396512178,
+          1399.7825027917968
+        ]
+      },
+      "geometric_correction_passes": 1
+    },
+    {
+      "id": "volcano-6x10",
+      "theme": "volcano",
+      "kind": "board",
+      "destination": "images/board_backgrounds/volcano6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-77677ca8-1add-4827-93e4-beba339f063c.png",
+      "source_sha256": "7587058b8e421ae31dbcfbb9ca01189f6874c2f5511b5b862fed55df52fe34e4",
+      "native_render_size": [
+        971,
+        1619
+      ],
+      "width": 1200,
+      "height": 2000,
+      "format": "JPEG",
+      "bytes": 556641,
+      "sha256": "936d461ca234755986d1f5ae48e8feafa7d7cbded7a4a7674eb933c731427b44",
+      "resampled": true,
+      "x_centers": [
+        200.0,
+        400.048,
+        599.98,
+        800.001,
+        1000.014
+      ],
+      "y_centers": [
+        199.986,
+        399.992,
+        599.999,
+        799.994,
+        999.993,
+        1199.994,
+        1399.985,
+        1599.994,
+        1799.986
+      ],
+      "checked_cross_sections": 312,
+      "max_center_error_px": 0.068,
+      "purple_divider_y": null,
+      "initial_centers": {
+        "x": [
+          201.06039695997242,
+          403.2083309162978,
+          600.7097996529501,
+          800.3258294057127,
+          1000.5039902597902
+        ],
+        "y": [
+          199.59860538174496,
+          399.81841349168144,
+          599.9910228820532,
+          800.4395759151428,
+          1000.3184609600388,
+          1200.0165736603474,
+          1400.3711055583628,
+          1600.5477817712563,
+          1800.3027105931994
+        ]
+      },
+      "geometric_correction_passes": 1
+    }
+  ]
+}

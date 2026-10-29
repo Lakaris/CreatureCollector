@@ -1,0 +1,248 @@
+{
+  "timingAndPoseKeysUnchanged": true,
+  "pixelsComparedOutsideBellyAndRearLeg": 5298404,
+  "changedPixelsOutsideBellyAndRearLeg": 0,
+  "finalPawSoles": {
+    "rearY": 492,
+    "frontY": 492,
+    "differencePixels": 0
+  },
+  "all24FramesVisuallyReviewed": true,
+  "changes": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 2,
+      "changedPixels": 1254,
+      "bounds": [
+        177,
+        395,
+        390,
+        420
+      ]
+    },
+    {
+      "frame": 3,
+      "changedPixels": 1254,
+      "bounds": [
+        177,
+        395,
+        390,
+        420
+      ]
+    },
+    {
+      "frame": 4,
+      "changedPixels": 1254,
+      "bounds": [
+        177,
+        395,
+        390,
+        420
+      ]
+    },
+    {
+      "frame": 5,
+      "changedPixels": 1254,
+      "bounds": [
+        177,
+        395,
+        390,
+        420
+      ]
+    },
+    {
+      "frame": 6,
+      "changedPixels": 4926,
+      "bounds": [
+        110,
+        396,
+        390,
+        460
+      ]
+    },
+    {
+      "frame": 7,
+      "changedPixels": 5267,
+      "bounds": [
+        108,
+        398,
+        390,
+        462
+      ]
+    },
+    {
+      "frame": 8,
+      "changedPixels": 6326,
+      "bounds": [
+        101,
+        382,
+        390,
+        468
+      ]
+    },
+    {
+      "frame": 9,
+      "changedPixels": 7231,
+      "bounds": [
+        94,
+        406,
+        389,
+        473
+      ]
+    },
+    {
+      "frame": 10,
+      "changedPixels": 8091,
+      "bounds": [
+        87,
+        408,
+        313,
+        478
+      ]
+    },
+    {
+      "frame": 11,
+      "changedPixels": 9417,
+      "bounds": [
+        74,
+        419,
+        339,
+        488
+      ]
+    },
+    {
+      "frame": 12,
+      "changedPixels": 9787,
+      "bounds": [
+        68,
+        422,
+        353,
+        493
+      ]
+    },
+    {
+      "frame": 13,
+      "changedPixels": 10005,
+      "bounds": [
+        68,
+        420,
+        352,
+        493
+      ]
+    },
+    {
+      "frame": 14,
+      "changedPixels": 10019,
+      "bounds": [
+        68,
+        420,
+        350,
+        493
+      ]
+    },
+    {
+      "frame": 15,
+      "changedPixels": 9991,
+      "bounds": [
+        68,
+        419,
+        352,
+        493
+      ]
+    },
+    {
+      "frame": 16,
+      "changedPixels": 9993,
+      "bounds": [
+        68,
+        420,
+        352,
+        493
+      ]
+    },
+    {
+      "frame": 17,
+      "changedPixels": 9878,
+      "bounds": [
+        68,
+        421,
+        353,
+        493
+      ]
+    },
+    {
+      "frame": 18,
+      "changedPixels": 9896,
+      "bounds": [
+        68,
+        420,
+        351,
+        493
+      ]
+    },
+    {
+      "frame": 19,
+      "changedPixels": 10005,
+      "bounds": [
+        68,
+        420,
+        352,
+        493
+      ]
+    },
+    {
+      "frame": 20,
+      "changedPixels": 9997,
+      "bounds": [
+        68,
+        420,
+        352,
+        493
+      ]
+    },
+    {
+      "frame": 21,
+      "changedPixels": 9917,
+      "bounds": [
+        68,
+        421,
+        351,
+        493
+      ]
+    },
+    {
+      "frame": 22,
+      "changedPixels": 9917,
+      "bounds": [
+        68,
+        421,
+        351,
+        493
+      ]
+    },
+    {
+      "frame": 23,
+      "changedPixels": 9917,
+      "bounds": [
+        68,
+        421,
+        351,
+        493
+      ]
+    },
+    {
+      "frame": 24,
+      "changedPixels": 9917,
+      "bounds": [
+        68,
+        421,
+        351,
+        493
+      ]
+    }
+  ]
+}

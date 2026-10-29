@@ -1,0 +1,54 @@
+{
+  "id": "nature-dungeon-5x8",
+  "theme": "nature-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/nature-dungeon5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-4bda071c-24eb-4b58-9b9f-bfe18f1c8850.png",
+  "source_sha256": "543aa5f9edfed104f140a9a76bb6a892f163181ec67fe90c8966c686baf16cc7",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 389782,
+  "sha256": "a0625a9b813f09f5aa46442194c3b338ba4c115b874283c06ea80b9a254d7738",
+  "resampled": true,
+  "x_centers": [
+    200.008,
+    399.972,
+    599.963,
+    800.001
+  ],
+  "y_centers": [
+    199.995,
+    400.008,
+    600.0,
+    800.023,
+    999.985,
+    1199.998,
+    1399.996
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.0612,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      200.02002103478517,
+      399.92331085271906,
+      599.8138709082581,
+      799.2555080563504
+    ],
+    "y": [
+      200.00827037612572,
+      400.28194546721284,
+      599.9954810849628,
+      800.2563338190157,
+      999.7517762771328,
+      1199.8749084007009,
+      1399.7118887763065
+    ]
+  },
+  "geometric_correction_passes": 1
+}

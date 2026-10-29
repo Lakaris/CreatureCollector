@@ -67,38 +67,62 @@
 .creature-list{scrollbar-width:none;-ms-overflow-style:none;}
 .creature-list::-webkit-scrollbar{display:none;}
 
-/* Planning-phase info column (beside the board). The board itself never
-   scrolls -- it shrinks to fit (see ui/hooks/useFitTile.js) -- but ability
-   text is as long as it is, so this column keeps its own quiet scroll rather
-   than cutting a passive off mid-sentence. Scrollbar hidden: the cards are
-   collapsible and the column is narrow, so a gutter would cost more than it
-   tells you. */
-.plan-side-panel{overflow-x:hidden;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;}
-.plan-side-panel::-webkit-scrollbar{display:none;}
+/* Planning-phase header: back | title | actions. Three columns with equal
+   outer tracks, so the title sits on the screen's centre line -- the same line
+   as the board below it -- however wide the buttons on either side are. (As a
+   flex row the title centred in the leftover space, which the wide Fight
+   button pushed ~30px left.) If the actions outgrow their track (the dev Win
+   button on a narrow phone), the title gives way -- off-centre, wrapping if
+   it must -- rather than pushing Fight off the screen. That relies on the
+   actions refusing to wrap: nowrap makes their min-content their real width,
+   which is what the grid reserves for them. */
+.plan-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.plan-header>:first-child{justify-self:start}
+.plan-header>:last-child{justify-self:end;white-space:nowrap}
 
-/* Battle screens (Arena/Dungeon/Labyrinth/Daily Boss): the damage chart and
-   creature/boss info panel sit beside the grid on wide screens. Below the
-   breakpoint there's no room for three columns, so the grid wraps onto its
-   own full-width line and the two side panels wrap onto the line under it,
-   side by side rather than each getting its own row (which pushed the info
-   panel below the fold).
+/* Info popups (planning sheet: ui/components/PlanInfoSheet.js; fight card:
+   UnitInfoPopup in ui/components/UnitInfoPanel.js) slide up into place. */
+@keyframes infoPopupUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.plan-info-sheet,.unit-info-popup{animation:infoPopupUp .18s ease-out}
 
-   Keyed off data-app-narrow rather than a `max-width` media query: the app is
-   laid out in design pixels and scaled as a whole (src/ui/uiScale.js), so the
-   raw viewport width a media query sees is not the width these layouts
-   actually have to fit into. uiScale.js publishes the flag. */
-:root[data-app-narrow="1"] .battle-row{flex-direction:column !important;align-items:center !important;overflow-x:visible !important;}
-:root[data-app-narrow="1"] .battle-grid{order:1;}
-:root[data-app-narrow="1"] .battle-side-panel{order:2;}
+/* Fight screens (Arena/Dungeon/Labyrinth/Test Battle): the damage chart always
+   sits beside the grid. Where there's room, an empty column the chart's width
+   on the other side keeps the grid centred. As the row narrows, that spacer
+   gives up its width first (its shrink weight dwarfs the chart's), then the
+   chart narrows into whatever is left beside the board -- down to ~70px next
+   to a six-column board on a phone (see DamageChart.js for how it reads at
+   that size). The board never shrinks. */
+.battle-side-panel{flex:0 1 150px;min-width:0}
+.battle-row::after{content:"";flex:0 1000 150px;min-width:0}
+/* Narrow app (uiScale.js publishes the flag in design pixels): a tighter gap,
+   so the chart keeps every pixel it can. */
+:root[data-app-narrow="1"] .battle-row{gap:6px !important}
 
-/* Daily Boss planning phase: the boss's info card doesn't fit next to the grid
-   at all times when the app is narrow, so it starts hidden there --
-   press-and-hold the boss on the grid shows it in the side panel, the same
-   place a held creature's card goes (see bossPanelOpen in DailyBossScreen.js,
-   which reads the same breakpoint through isAppNarrow so the two can never
-   disagree). */
-:root[data-app-narrow="1"] .daily-boss-panel{display:none;}
-:root[data-app-narrow="1"] .daily-boss-panel.open{display:block;}
+/* Damage chart (ui/components/DamageChart.js): in a narrow slot, icons for
+   names, initials for the legend, "12.3k" for long totals, tighter padding.
+   Both forms are in the DOM; this picks one by the chart's own width. */
+.damage-chart{container-type:inline-size}
+.damage-chart .dc-short{display:none}
+@container (max-width:100px){
+  .damage-chart .dc-long{display:none}
+  .damage-chart .dc-short{display:inline-flex}
+  .damage-chart .dc-body{padding:6px !important}
+}
+
+/* Dev pause (src/ui/hooks/useBattlePause.js): freeze attack/ability effects. */
+.battle-paused *{animation-play-state:paused !important}
+/* ...except the unit info popup's own slide-in, which would otherwise freeze
+   on its first, invisible frame -- inspecting units is what the pause is for. */
+.battle-paused .unit-info-popup{animation-play-state:running !important}
+
+/* Board art (see src/ui/boardArt.js): the picture draws the tile lines,
+   frame and divider, so the cells drop their own lines and zone tints. Only
+   background-color is cleared -- range previews paint background-image. */
+.board-art .board-cell{border:0 !important;background-color:transparent !important}
+/* The divider isn't in the art: drawn centred on the line between the halves,
+   over the art's own tile line there. */
+.board-art .board-divider{position:relative}
+.board-art .board-divider::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;transform:translateY(-50%);background:#534AB7;pointer-events:none;z-index:1}
 
 /* Filters */
 .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}

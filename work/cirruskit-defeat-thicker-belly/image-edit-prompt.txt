@@ -1,0 +1,7 @@
+Use case: precise-object-edit
+Asset type: Expression master for a transparent 2D game animation.
+Input image 1 is the edit target and the exact Cirruskit character design.
+Change only the two eyes and mouth. Replace both oval eyes completely with clear dark-plum X-shaped eyes, using two simple rounded thick strokes for each X. Keep each X centred where the corresponding original eye was; the farther right eye remains slightly smaller. Remove the original eye outlines, irises and highlights, filling their former area with the same existing grey face colour and shading.
+Change the smiling mouth into a small slack defeated mouth with a tiny pink tongue peeking downward. Keep the original brown nose and whiskers unchanged. Expression is cute, cartoony and knocked out, with no injuries.
+Keep the standing pose, proportions, exact framing, head and ear shapes, original grey shading, white forehead swirls, cream cloud mane with every swirl, blue-and-cream tail pattern, paws, original thick dark-plum outlines and all colours unchanged. Do not redraw the rest of the character or alter the lighting. No new effects, props, shadows, stars, text, borders or additional characters.
+Output one complete character in exactly the same square composition as the reference, on a genuinely transparent background. Crisp clean edges; no blur or glow.

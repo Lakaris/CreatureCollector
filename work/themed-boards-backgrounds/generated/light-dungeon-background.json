@@ -1,0 +1,15 @@
+{
+  "id": "light-dungeon-background",
+  "theme": "light-dungeon",
+  "name": "Light Dungeon",
+  "kind": "background",
+  "width": 1440,
+  "height": 3200,
+  "destination": "images/battle_backgrounds/light-dungeon.jpg",
+  "references": [
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+  ],
+  "prompt": "Use case: stylized-concept. Create one NEW Light Dungeon mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm ivory, pale champagne, muted gold and lavender-gray.\nSCENE: A calm radiant stone sanctuary with broad ivory arches or column fragments at asymmetric far edges, soft muted gold trims and a quiet pale warm distant wall. Broad pale limestone floor. Diffuse gentle light only, no beam through the center, no altar, halo, sun disk or bright white focal point. Simple low-contrast welcoming atmosphere.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale warm ivory limestone with faint champagne and lavender-gray mottling, a few very small flat gold-toned mineral flecks; no glow, emblems, marble veins or decorative medallions. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-6fe0ecf7-c98e-4ef9-a1d4-4fa7a2a36bd3.png"
+}

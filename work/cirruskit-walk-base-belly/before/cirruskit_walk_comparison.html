@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cirruskit · walking and base comparison</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;background:#efedf3;color:#2d2536;font:16px system-ui;text-align:center}h1{font-size:25px;margin:0 0 8px}.summary{color:#655e6d;margin:0 0 20px}.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;max-width:1124px;margin:auto}.view{background:#faf9fc;border:1px solid #ded9e6;padding:18px;border-radius:18px}h2{font-size:17px;margin:0 0 14px}.stage{width:100%;aspect-ratio:1;background:repeating-conic-gradient(#fff 0 25%,#eae7ef 0 50%) 0/20px 20px;border-radius:10px;display:grid;place-items:center}.art{width:100%;height:auto;aspect-ratio:1;display:block}.sprite{background-image:url('cirruskit_move.png?comparison=20261028');background-size:600% 500%;background-repeat:no-repeat}.controls{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:20px 0 12px}button{padding:9px 16px;border:1px solid #c9c0d4;border-radius:10px;background:#fff;color:#2d2536;font:inherit;cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #8967a8;outline-offset:3px}input{width:min(440px,85vw);accent-color:#695378}.caption{font-size:13px;color:#655e6d}.dark .stage{background:#302c38}.game-size .art{width:min(130px,100%)}@media(max-width:600px){body{padding:14px}.views{gap:10px}.view{padding:8px;border-radius:12px}h2{font-size:15px}}
+</style>
+<h1>Cirruskit · walking and base</h1>
+<p class="summary">Same scale and alignment for a direct comparison</p>
+<div class="views">
+ <section class="view"><h2>Walking animation</h2><div class="stage"><div class="art sprite" role="img" aria-label="Cirruskit walking in place"></div></div></section>
+ <section class="view"><h2>Base image</h2><div class="stage"><img class="art" src="cirruskit_base.png" alt="Cirruskit original standing pose" width="512" height="512"></div></section>
+</div>
+<div class="controls">
+ <button id="toggle" type="button">Pause</button><button id="previous" type="button">Previous frame</button><button id="next" type="button">Next frame</button><button id="size" type="button">View at game size</button><button id="background" type="button">Dark background</button>
+</div>
+<label for="scrub" id="frameLabel">Frame 1 of 30</label>
+<div><input id="scrub" type="range" min="0" max="29" value="0" aria-label="Walking animation frame"></div>
+<p class="caption">30 frames · 1.5-second walking loop</p>
+<script>
+const count=30,columns=6,rows=5,duration=50,total=count*duration;
+const sprite=document.querySelector('.sprite'),toggle=document.getElementById('toggle'),scrub=document.getElementById('scrub'),label=document.getElementById('frameLabel');
+let paused=false,elapsed=0,last=performance.now(),frame=-1;
+function paint(n){if(frame===n)return;frame=n;sprite.style.backgroundPosition=(n%columns/(columns-1)*100)+'% '+(Math.floor(n/columns)/(rows-1)*100)+'%';label.textContent='Frame '+(n+1)+' of '+count;scrub.value=n;}
+function seek(n){paused=true;toggle.textContent='Play';n=(n+count)%count;elapsed=n*duration;paint(n);}
+toggle.addEventListener('click',()=>{paused=!paused;last=performance.now();toggle.textContent=paused?'Play':'Pause';});
+document.getElementById('previous').addEventListener('click',()=>seek(frame-1));
+document.getElementById('next').addEventListener('click',()=>seek(frame+1));
+scrub.addEventListener('input',()=>seek(Number(scrub.value)));
+document.getElementById('background').addEventListener('click',event=>{const dark=document.body.classList.toggle('dark');event.target.textContent=dark?'Checkerboard background':'Dark background';});
+document.getElementById('size').addEventListener('click',event=>{const small=document.body.classList.toggle('game-size');event.target.textContent=small?'View at full size':'View at game size';});
+function tick(now){if(!paused){elapsed=(elapsed+now-last)%total;paint(Math.floor(elapsed/duration));}last=now;requestAnimationFrame(tick);}
+paint(0);requestAnimationFrame(tick);
+</script>
+</html>

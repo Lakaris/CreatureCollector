@@ -1,0 +1,356 @@
+{
+  "sheet": [
+    3072,
+    2048
+  ],
+  "cell": [
+    512,
+    512
+  ],
+  "frameCount": 24,
+  "totalDurationMs": 720,
+  "loop": false,
+  "holdLastFrame": true,
+  "firstFrameMatchesBase": true,
+  "finalFourFramesIdentical": true,
+  "protectedAssetsUnchanged": 24,
+  "apngDecodedFramesMatch": true,
+  "previewHoldsFinalFrame": true,
+  "gameRegistrationMatches": true,
+  "frames": [
+    {
+      "frame": 1,
+      "bounds": [
+        16,
+        42,
+        504,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": []
+    },
+    {
+      "frame": 2,
+      "bounds": [
+        16,
+        43,
+        504,
+        462
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3670
+      ]
+    },
+    {
+      "frame": 3,
+      "bounds": [
+        16,
+        41,
+        504,
+        462
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3560
+      ]
+    },
+    {
+      "frame": 4,
+      "bounds": [
+        16,
+        40,
+        503,
+        462
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3514
+      ]
+    },
+    {
+      "frame": 5,
+      "bounds": [
+        16,
+        40,
+        503,
+        462
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3466
+      ]
+    },
+    {
+      "frame": 6,
+      "bounds": [
+        15,
+        48,
+        503,
+        464
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3495
+      ]
+    },
+    {
+      "frame": 7,
+      "bounds": [
+        15,
+        51,
+        502,
+        465
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3510
+      ]
+    },
+    {
+      "frame": 8,
+      "bounds": [
+        15,
+        60,
+        499,
+        469
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3247
+      ]
+    },
+    {
+      "frame": 9,
+      "bounds": [
+        15,
+        69,
+        495,
+        473
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2997
+      ]
+    },
+    {
+      "frame": 10,
+      "bounds": [
+        15,
+        77,
+        492,
+        477
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2754
+      ]
+    },
+    {
+      "frame": 11,
+      "bounds": [
+        14,
+        92,
+        486,
+        485
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2389
+      ]
+    },
+    {
+      "frame": 12,
+      "bounds": [
+        14,
+        99,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2221
+      ]
+    },
+    {
+      "frame": 13,
+      "bounds": [
+        14,
+        97,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2121
+      ]
+    },
+    {
+      "frame": 14,
+      "bounds": [
+        14,
+        94,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2036
+      ]
+    },
+    {
+      "frame": 15,
+      "bounds": [
+        14,
+        95,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2065
+      ]
+    },
+    {
+      "frame": 16,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2135
+      ]
+    },
+    {
+      "frame": 17,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2167
+      ]
+    },
+    {
+      "frame": 18,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2170
+      ]
+    },
+    {
+      "frame": 19,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2152
+      ]
+    },
+    {
+      "frame": 20,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2124
+      ]
+    },
+    {
+      "frame": 21,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 22,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 23,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 24,
+      "bounds": [
+        14,
+        96,
+        483,
+        488
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    }
+  ]
+}

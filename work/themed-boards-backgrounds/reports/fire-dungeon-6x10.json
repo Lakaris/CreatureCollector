@@ -1,0 +1,60 @@
+{
+  "id": "fire-dungeon-6x10",
+  "theme": "fire-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/fire-dungeon6x10.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-0c087cea-a219-4bc5-a915-3c39d6b332c3.png",
+  "source_sha256": "50c83a15a7523af82af368af87c46bc4dd85591fb23d1b319ccd0e9d546d796f",
+  "native_render_size": [
+    972,
+    1619
+  ],
+  "width": 1200,
+  "height": 2000,
+  "format": "JPEG",
+  "bytes": 580110,
+  "sha256": "80b8a8a9903d9574a83057dab411f5939e396f2da14b8b659baa3e0fcafa0811",
+  "resampled": true,
+  "x_centers": [
+    199.971,
+    400.006,
+    599.986,
+    799.991,
+    1000.017
+  ],
+  "y_centers": [
+    199.993,
+    399.99,
+    600.0,
+    800.001,
+    1000.002,
+    1199.991,
+    1399.993,
+    1599.999,
+    1799.99
+  ],
+  "checked_cross_sections": 312,
+  "max_center_error_px": 0.048,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      198.5329972495055,
+      399.5207030168122,
+      599.4719085380874,
+      799.6274801992016,
+      1000.4875911398076
+    ],
+    "y": [
+      199.8101562886101,
+      399.77064657905186,
+      600.0427469744867,
+      800.2864556356681,
+      999.9842545583978,
+      1199.6071111495112,
+      1399.4880757444873,
+      1599.6957187651285,
+      1799.5346954262475
+    ]
+  },
+  "geometric_correction_passes": 1
+}

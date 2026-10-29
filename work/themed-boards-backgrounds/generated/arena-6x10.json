@@ -1,0 +1,16 @@
+{
+  "id": "arena-6x10",
+  "theme": "arena",
+  "name": "Arena",
+  "kind": "board",
+  "cols": 6,
+  "rows": 10,
+  "width": 1200,
+  "height": 2000,
+  "destination": "images/board_backgrounds/arena6x10.jpg",
+  "references": [
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg"
+  ],
+  "prompt": "Use case: precise-object-edit / themed variant. Create a Arena board variant from this existing 6-column by 10-row game board. Preserve the exact same front-on rectangular layout, line count and full-bleed framing. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: warm sandy beige, muted limestone, dusty burgundy and soft slate blue.\nChange ONLY the floor material and its colors to: light warm beige packed arena sand with faint irregular dusty tan patches and a few very subtle flat scuffs; no circles, tracks, footprints, symbols, stonework or props. It must remain very flat, quiet, low-detail and low-contrast so tiny creatures and colored gameplay highlights are easy to see. Sparse small details only, no detail sitting on a grid line. Every cell is one continuous unobstructed flat floor. No perspective.\nGRID IS MANDATORY: EXACTLY 6 columns and 10 rows, evenly spaced SQUARE cells. Output canvas 1200 x 2000 pixels (6:10 aspect). Internal vertical line centers at x=200, 400, 600, 800, 1000; horizontal centers at y=200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800. All internal lines straight and equal muted gray-plum thickness, approximately 6 pixels wide at final resolution. Outer frame a simple dark-plum 14px outline with gently rounded small corners like reference. Outer frame touches all canvas edges, no outside padding. Keep line contrast subordinate to game icons. No purple or colored team-divider line anywhere; all rows identical line treatment. No extra floor seams or false lines that look like another grid. No creatures, text, labels, symbols, glowing marks, circles, props, plants, raised rocks, pits, water, lava, scenery or background beyond the frame. Output one complete board image only.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-61d85b3e-396a-45b4-8d6d-abec0e702588.png"
+}

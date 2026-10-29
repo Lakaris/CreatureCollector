@@ -1,0 +1,1 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');(async()=>{await sharp('work/cirruskit-walk-base-belly/frames/frame-0.png').extract({left:200,top:370,width:90,height:80}).resize(540,480,{kernel:'nearest'}).flatten({background:'#eee'}).toFile('work/cirruskit-walk-base-belly/review/current.png');})();

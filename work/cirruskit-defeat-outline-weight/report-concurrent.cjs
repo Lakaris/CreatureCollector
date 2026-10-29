@@ -1,0 +1,1 @@
+const fs=require('fs'),p='work/cirruskit-defeat-outline-weight/audit.cjs';let s=fs.readFileSync(p,'utf8').replace('protectedAssetsUnchanged:Object.keys(hashes).length,','protectedAssetsUnchanged:Object.keys(hashes).length-concurrentChanges.length,concurrentExternalChanges:concurrentChanges,');fs.writeFileSync(p,s);

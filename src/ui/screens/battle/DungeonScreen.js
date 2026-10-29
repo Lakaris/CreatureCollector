@@ -10,7 +10,10 @@ import { isExclusive, exclusivityChip } from "../../../core/equipment.js";
 import { TYPE_EMOJI, TYPE_STRONG_AGAINST, TYPE_ORDER } from "../../../data/types.js";
 import { getBossStats, DUNGEON_BOSSES } from "../../../data/bosses.js";
 import { rollDungeonRewards } from "../../../core/gacha.js";
-import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED, DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
+import { DUNGEON_GRID_COLS, DUNGEON_GRID_ROWS, DUNGEON_PLAYER_START_ROW, DUNGEON_TILE, DUNGEON_MAX_DEPLOYED, DUNGEON_PASS_DAILY_CAP, DUNGEON_PASS_DAILY_CAP_BONUS } from "../../../battle/constants.js";
+import { boardArt, boardCellClass, BATTLE_BACKDROP } from "../../boardArt.js";
+import useBattlePause, { BATTLE_PAUSED_CLASS, DEV_PAUSE_BTN } from "../../hooks/useBattlePause.js";
+import { DEV_MODE } from "../../../config.js";
 import { aEase } from "../../../battle/geometry.js";
 import { getBossModule, getHighlightTiles } from "../../../battle/bosses/registry.js";
 import { makeBossContext, makePlanGeometry } from "../../../battle/bosses/context.js";
@@ -22,13 +25,15 @@ import GearPreviewPopup from "../../../ui/components/GearPreviewPopup.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
-import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
-import { getAbilityTags } from "../../../core/abilityText.js";
-import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
+import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { PlanInfoSheet, SheetHeader, SheetAbilityRow, CreatureSheetBody, allyDesc } from "../../../ui/components/PlanInfoSheet.js";
+import { AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import { nextEasternNoon } from "../../../core/dates.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
+
+const dBoardArt=boardArt(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS);
 
 // Shared empty grid so a boss with no deployment yields a stable identity
 // instead of a fresh {} every render.
@@ -83,33 +88,12 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   }
   // battle state
   const [dPlanning,setDPlanning]=useState(false);
+  // The boss ability whose tiles are lit on the planning board (tap a row in
+  // the boss sheet to toggle it).
   const [dPlanHighlight,setDPlanHighlight]=useState(null);
-  const [dBossMinimized,setDBossMinimized]=useState(false);
-  const [dCreatureMinimized,setDCreatureMinimized]=useState(false);
-  // Indices of the EXPANDED minion cards -- a set rather than a boolean, since
-  // a boss may bring any number of them and each folds on its own.
-  //
-  // Tracking which are open (rather than which are closed) is what makes them
-  // start closed: the boss is the headline of this column and the minions are
-  // a footnote to it, so they arrive as collapsed headers and cost nothing
-  // until asked for. An empty set is "all closed" whatever the boss brings,
-  // with no need to seed one entry per minion each time the boss changes.
-  const [dMinionExpanded,setDMinionExpanded]=useState(()=>new Set());
-  // A different boss is a fresh column: the boss card open, its minions closed.
-  // Without this, collapsing the boss card to make room for a minion here would
-  // follow you to the next boss, which has nothing to do with that decision.
-  React.useEffect(()=>{
-    setDMinionExpanded(new Set());
-    setDBossMinimized(false);
-    setDCreatureMinimized(false);
-  },[selected]);
-  function toggleDMinion(i){
-    setDMinionExpanded(p=>{
-      const n=new Set(p);
-      if(n.has(i))n.delete(i);else{n.add(i);expandDPanel("minion");}
-      return n;
-    });
-  }
+  // The planning info sheet shows one card at a time: "boss", a minion's
+  // index, or (dGridInfoCreature, below) a pressed creature.
+  const [dInfoSheet,setDInfoSheet]=useState(null);
   const [dAbilityTagPopup,setDAbilityTagPopup]=useState(null);
   const [dBattling,setDBattling]=useState(false);
   const [dBattleOutcome,setDBattleOutcome]=useState(null);
@@ -131,40 +115,13 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   const [dHoldId,setDHoldId]=useState(null);
   const [dHoldPct,setDHoldPct]=useState(0);
   const [dGridInfoCreature,setDGridInfoCreature]=useState(null);
-  const dRightPanelRef=React.useRef(null);
-  React.useLayoutEffect(()=>{
-    if(!dRightPanelRef.current)return;
-    if(dGridInfoCreature){
-      // The creature the player just asked to see wins the column; the boss
-      // card, then the minion cards, fold up to pay for it -- in that order,
-      // because the boss card is the longest.
-      setDCreatureMinimized(false);
-      const el=dRightPanelRef.current;
-      if(el.scrollHeight>el.clientHeight+4)setDBossMinimized(true);
-      requestAnimationFrame(()=>{
-        const e2=dRightPanelRef.current;if(!e2)return;
-        if(e2.scrollHeight>e2.clientHeight+4)minimizeAllMinions();
-      });
-    } else {
-      setDBossMinimized(false);
-      setDCreatureMinimized(false);
-      minimizeAllMinions();
-    }
-  },[dGridInfoCreature]);
-  function minimizeAllMinions(){
-    setDMinionExpanded(new Set());
-  }
-  // Whichever panel the player just expanded wins the space; if the cards
-  // together don't fit, the OTHERS auto-minimize to make room.
-  function expandDPanel(which){
-    requestAnimationFrame(()=>{
-      const el=dRightPanelRef.current;if(!el)return;
-      if(el.scrollHeight<=el.clientHeight+4)return;
-      if(which==="boss"){setDCreatureMinimized(true);minimizeAllMinions();}
-      else if(which==="minion"){setDBossMinimized(true);setDCreatureMinimized(true);}
-      else {setDBossMinimized(true);minimizeAllMinions();}
-    });
-  }
+  // Lit tiles belong to the boss sheet that toggled them, so they go out
+  // whenever that sheet does.
+  function openDSheet(which){setDInfoSheet(which);setDGridInfoCreature(null);if(which!=="boss")setDPlanHighlight(null);}
+  function openDCreatureSheet(id){setDInfoSheet(null);setDPlanHighlight(null);setDGridInfoCreature(id);}
+  function closeDSheet(){setDInfoSheet(null);setDGridInfoCreature(null);setDPlanHighlight(null);}
+  // A different boss, or leaving planning, starts with no sheet open.
+  React.useEffect(()=>{closeDSheet();},[selected,dPlanning]);
   const dhs=React.useRef({delay:null,raf:null,id:null,fired:false});
   const dCreatureListRef=React.useRef(null);
   const dDragScroll=React.useRef({armed:false,on:false,x:0,y:0,sl:0,intentScroll:false});
@@ -173,6 +130,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   const dPlacedIds=new Set(Object.values(dPlanGrid));
   function stopDLoops(){if(dTickRef.current){clearInterval(dTickRef.current);dTickRef.current=null;}if(dRafRef.current){cancelAnimationFrame(dRafRef.current);dRafRef.current=null;}}
   React.useEffect(()=>()=>stopDLoops(),[]);
+  const dPause=useBattlePause({tickRef:dTickRef,startRef:dBattleStartRef,startTicking:()=>{dTickRef.current=setInterval(runDTick,Math.round(500/dSpeedRef.current));}});
   function startDRenderLoop(){
     if(dRafRef.current)cancelAnimationFrame(dRafRef.current);
     function frame(){
@@ -242,12 +200,16 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     }
   }
   function dRestartFight(){
-    stopDLoops();
+    // Ignored once the fight is decided (loop stopped, not just paused): the
+    // reward is already granted and the outcome overlay is on a timer, which
+    // would otherwise pop up over the planning screen.
+    if(!dTickRef.current&&!dPause.paused)return;
+    stopDLoops();dPause.reset();
     setDBattling(false);setDBattleOutcome(null);setDBSnap(null);setDAtkFx([]);setDBattleSelected(null);
     setDPlanning(true);
   }
   function dFight(){
-    stopDLoops();
+    stopDLoops();dPause.reset();
     const boss=DUNGEON_BOSSES.find(b=>b.key===selected);
     const bossLevel=dungeonBossLevels?.[selected]||1;
     const enemyGrid={}; // dungeon boss fights have no regular minions (nature spawns vines separately)
@@ -312,8 +274,8 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
   // Attack-range preview: while a creature is being dragged over the grid, tint
   // every tile it would be able to reach from the cell under the pointer.
   const dRangePreview=useRangePreview(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS);
-  // Planning board shrinks to its column rather than making it scroll.
-  const [dPlanAreaRef,dPlanTile,dPlanClamped]=useFitTile(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_TILE,{reserveW:PLAN_PANEL_MIN_W});
+  // Planning board shrinks to its area rather than making it scroll.
+  const [dPlanAreaRef,dPlanTile,dPlanClamped]=useFitTile(DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_TILE);
   /** The creature a drag is carrying, from either origin (tray or grid cell). */
   function dDraggedCreature(){return dDragId||(dDragCell?dPlanGrid[dDragCell]:null);}
   function dPreviewAt(cid,r,c){if(!cid){dRangePreview.clear();return;}dRangePreview.show(cid,r,c,owned&&owned[cid]);}
@@ -421,7 +383,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     const snapBoss=snap.boss;
     const selectedUnit=dBattleSelected?.type==="unit"?allUnits.find(u=>u.uid===dBattleSelected.uid):null;
     const selectedBoss=dBattleSelected?.type==="boss"?snapBoss:null;
-    return React.createElement("div",{key:"sfv352",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv352",className:"screen-fade"+(dPause.paused?" "+BATTLE_PAUSED_CLASS:""),style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
@@ -432,6 +394,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             )
           )
         ),
+        DEV_MODE&&React.createElement("button",{onClick:dPause.toggle,style:{...DEV_PAUSE_BTN,background:dPause.paused?"#16a34a":"#b45309"}},dPause.paused?"▶ Resume":"⏸ Pause"),
         React.createElement("button",{onClick:dRestartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
         React.createElement("button",{onClick:cycleDSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},dSpeed+"x ⚡")
       ),
@@ -439,11 +402,11 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:dTimeLeft<=10?"#ef4444":"#534AB7"}},iconText(dTimeLeft+"s ⏱")),
         React.createElement("div",{className:"battle-row",style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
         React.createElement("div",{className:"battle-side-panel"},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
-        React.createElement("div",{className:"battle-grid",style:{width:DUNGEON_GRID_COLS*DUNGEON_TILE,height:DUNGEON_GRID_ROWS*DUNGEON_TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+        React.createElement("div",{className:"battle-grid "+dBoardArt.className,style:{width:DUNGEON_GRID_COLS*DUNGEON_TILE,height:DUNGEON_GRID_ROWS*DUNGEON_TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0,...dBoardArt.style}},
           React.createElement("div",{style:{position:"absolute",top:0,left:0,display:"grid",gridTemplateColumns:`repeat(${DUNGEON_GRID_COLS},${DUNGEON_TILE}px)`,gridTemplateRows:`repeat(${DUNGEON_GRID_ROWS},${DUNGEON_TILE}px)`,gap:0}},
             Array.from({length:DUNGEON_GRID_ROWS},(_,r)=>Array.from({length:DUNGEON_GRID_COLS},(_,c)=>{
               const BORDER="1px solid #bbb";
-              return React.createElement("div",{key:r+","+c,style:{width:DUNGEON_TILE,height:DUNGEON_TILE,boxSizing:"border-box",background:"#fff",borderTop:r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0"}});
+              return React.createElement("div",{key:r+","+c,className:boardCellClass(r),style:{width:DUNGEON_TILE,height:DUNGEON_TILE,boxSizing:"border-box",background:"#fff",borderTop:r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0"}});
             })).flat()
           ),
           snapBoss&&snapBoss.hp>0&&React.createElement("div",{
@@ -515,7 +478,7 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
             )
           );})
         ),
-        React.createElement("div",{className:"battle-side-panel"},selectedUnit?React.createElement(UnitInfoPanel,{
+        selectedUnit?React.createElement(UnitInfoPopup,{
           def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:selectedUnit.creatureId==="__vine_minion"?"🌱":"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||(selectedUnit.creatureId==="__vine_minion"?"Vine":selectedUnit.creatureId),
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
@@ -524,14 +487,14 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setDBattleSelected(null)
-        }):selectedBoss?React.createElement(UnitInfoPanel,{
+        }):selectedBoss&&React.createElement(UnitInfoPopup,{
           emoji:TYPE_EMOJI[boss?.type]||"👾",
           name:boss?.name||"Boss",
           subtitle:"Boss",
           hp:selectedBoss.hp,maxHp:selectedBoss.maxHp,shield:selectedBoss.shield,
           debuffs:debuffsFor(selectedBoss),
           onClose:()=>setDBattleSelected(null)
-        }):React.createElement("div",{style:{width:150,flexShrink:0}}))
+        })
         )
       )
     );
@@ -547,159 +510,55 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
     // the real hit area cannot drift apart the way the old duplicated copies did.
     const planGeo=makePlanGeometry(PLAN_BOSS_ROW,PLAN_BOSS_COL,DUNGEON_GRID_ROWS,DUNGEON_GRID_COLS,DUNGEON_PLAYER_START_ROW);
     const highlightCells=getHighlightTiles(boss.key,dPlanHighlight,planGeo);
-    return React.createElement("div",{key:"sfv472",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv472",className:"screen-fade",style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
       dAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:dAbilityTagPopup,onClose:()=>setDAbilityTagPopup(null)}),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
+      React.createElement("div",{className:"plan-header",style:{padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
         React.createElement("button",{onClick:()=>{setDPlanning(false);},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},React.createElement("i",{className:"ti ti-arrow-left"})),
-        React.createElement("div",{style:{flex:1,textAlign:"center"}},
+        React.createElement("div",{style:{textAlign:"center"}},
           React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
         ),
         React.createElement("button",{onClick:deployedCount>0?dFight:undefined,style:{background:deployedCount>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:deployedCount>0?"pointer":"default"}},"Fight →")
       ),
       // Never scrolls -- dPlanTile shrinks the board to whatever height this
       // row ends up with (see useFitTile).
-      React.createElement("div",{ref:dPlanAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:dPlanClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
-        React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+      React.createElement("div",{ref:dPlanAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:dPlanClamped?"auto":"hidden",display:"flex",justifyContent:"center",alignItems:"flex-start",padding:16}},
+        React.createElement("div",{className:dBoardArt.className,style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0,...dBoardArt.style}},
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:`repeat(${DUNGEON_GRID_COLS},${dPlanTile}px)`,gridTemplateRows:`repeat(${DUNGEON_GRID_ROWS},${dPlanTile}px)`,gap:0}},
             Array.from({length:DUNGEON_GRID_ROWS},(_,r)=>Array.from({length:DUNGEON_GRID_COLS},(_,c)=>{
               const isPlayerZone=r>=DUNGEON_PLAYER_START_ROW;const key=r+","+c;
               const creatureId=dPlanGrid[key];const def=creatureId?CREATURE_MAP[creatureId]:null;
               const enemyDef=!isPlayerZone?enemyGrid[key]:null;
               const isDivider=r===DUNGEON_PLAYER_START_ROW;const BORDER="1px solid #bbb";
-              const onHS=isPlayerZone&&creatureId?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;setDGridInfoCreature(creatureId);},180);}):enemyDef?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;setDGridInfoCreature(enemyDef.id);},180);}):undefined;
+              const onHS=isPlayerZone&&creatureId?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;openDCreatureSheet(creatureId);},180);}):enemyDef?(()=>{dhs.current.fired=false;dhs.current.timer=setTimeout(()=>{dhs.current.fired=true;openDCreatureSheet(enemyDef.id);},180);}):undefined;
               const onHE=isPlayerZone&&creatureId?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}if(!dhs.current.fired&&!dTouchDrag.dragRef.current.active){setDPlanGrid(p=>{const n={...p};delete n[key];return n;});}dEndHold();}):enemyDef?(()=>{if(dhs.current.timer){clearTimeout(dhs.current.timer);dhs.current.timer=null;}}):undefined;
-              return React.createElement("div",{key,"data-cell":key,draggable:!!(isPlayerZone&&creatureId),
+              return React.createElement("div",{key,"data-cell":key,className:boardCellClass(r,DUNGEON_PLAYER_START_ROW),draggable:!!(isPlayerZone&&creatureId),
                 onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDDragCell(key);setDDragId(null);}:undefined,
                 onDragEnd:isPlayerZone&&creatureId?()=>dRangePreview.clear():undefined,
                 onDragOver:isPlayerZone?(e)=>{e.preventDefault();dPreviewAt(dDraggedCreature(),r,c);}:()=>dRangePreview.clear(),
                 onDrop:isPlayerZone?(e)=>{e.preventDefault();dRangePreview.clear();handleDCellDrop(r,c);}:undefined,
                 onMouseDown:onHS,onMouseUp:onHE,
                 onTouchStart:onHS?(e)=>{e.preventDefault();onHS();if(isPlayerZone&&creatureId)dTouchDrag.start(e,{fromCell:key,cellId:creatureId});}:undefined,onTouchEnd:onHE,
-                style:{width:dPlanTile,height:dPlanTile,background:highlightCells.has(key)?"rgba(239,68,68,0.18)":isPlayerZone?"#f0f0f0":"#fdf7f7",borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none",...(dRangePreview.cellStyle(key)||{})}
+                style:{width:dPlanTile,height:dPlanTile,background:isPlayerZone?"#f0f0f0":"#fdf7f7",
+                // An image, not a colour, so it still shows over board art (which clears cell colours).
+                ...(highlightCells.has(key)?{backgroundImage:"linear-gradient(rgba(239,68,68,0.18),rgba(239,68,68,0.18))"}:null),borderTop:isDivider?"2.5px solid #534AB7":r===0?"0":BORDER,borderLeft:c===0?"0":BORDER,borderRight:"0",borderBottom:"0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,cursor:isPlayerZone?(creatureId?"grab":"default"):enemyDef?"pointer":"default",boxSizing:"border-box",userSelect:"none",...(dRangePreview.cellStyle(key)||{})}
               },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},typeIcon(d.type)),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},rangeIcon(d.attackType === "Ranged" ? "Ranged" : "Melee")),React.createElement(CreatureIcon,{def:d,size:dPlanTile,contain:true}));})());
             })).flat()
           ),
-          React.createElement("div",{style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*dPlanTile,top:(boss?.spawnRow??1)*dPlanTile,width:2*dPlanTile,height:2*dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,pointerEvents:"none",zIndex:10}},
+          // Boss and minion markers: tap one for its info sheet.
+          React.createElement("div",{onClick:()=>openDSheet("boss"),style:{position:"absolute",left:Math.floor((DUNGEON_GRID_COLS-2)/2)*dPlanTile,top:(boss?.spawnRow??1)*dPlanTile,width:2*dPlanTile,height:2*dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(239,68,68,0.08)",border:"2px solid rgba(239,68,68,0.4)",borderRadius:6,cursor:"pointer",userSelect:"none",zIndex:10}},
             React.createElement("div",{style:{fontSize:Math.round(dPlanTile*0.78),lineHeight:1}},TYPE_EMOJI[boss?.type]||"👾"),
             React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#ef4444",marginTop:2}},boss?.name)
           ),
           boss?.minions&&boss.minions.map((m,i)=>
-            React.createElement("div",{key:"minion"+i,style:{position:"absolute",left:m.col*dPlanTile,top:m.row*dPlanTile,width:dPlanTile,height:dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.10)",border:"2px solid rgba(34,197,94,0.5)",borderRadius:6,pointerEvents:"none",zIndex:10}},
+            React.createElement("div",{key:"minion"+i,onClick:()=>openDSheet(i),style:{position:"absolute",left:m.col*dPlanTile,top:m.row*dPlanTile,width:dPlanTile,height:dPlanTile,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.10)",border:"2px solid rgba(34,197,94,0.5)",borderRadius:6,cursor:"pointer",userSelect:"none",zIndex:10}},
               React.createElement("div",{style:{fontSize:Math.round(dPlanTile*0.48),lineHeight:1}},m.emoji),
               React.createElement("div",{style:{fontSize:8,fontWeight:800,color:"#16a34a",marginTop:1}},m.name)
             )
           )
-        ),
-        React.createElement("div",{ref:dRightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
-          React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-            React.createElement("button",{onClick:()=>setDBossMinimized(p=>{const next=!p;if(!next)expandDPanel("boss");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dBossMinimized?"＋":"－"),
-            // Emoji, level, then name on one row -- same header shape as the
-            // minion cards below, so the column reads as one kind of card.
-            // When the column is too narrow for the whole name, the row wraps
-            // and the name drops whole onto the next line rather than being
-            // cut short ("Lv. 1 F..."); it only truncates if it can't fit even
-            // a full line on its own.
-            React.createElement("div",{style:{display:"flex",flexWrap:"wrap",alignItems:"center",columnGap:8,rowGap:4,marginBottom:dBossMinimized?0:12,paddingRight:24}},
-              React.createElement("div",{style:{fontSize:24,lineHeight:1,flexShrink:0}},TYPE_EMOJI[boss?.type]||"👾"),
-              React.createElement("div",{style:{fontSize:11,color:"#534AB7",fontWeight:700,flexShrink:0}},"Lv. "+bossLevel),
-              React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111",maxWidth:"100%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},boss?.name)
-            ),
-            !dBossMinimized&&boss?.abilities&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
-              [["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>{
-                if(!ab)return null;
-                // A row is only interactive when tapping it would actually show
-                // something: the boss modules define tiles for their basic and
-                // special, never for a passive like Burning Touch, so those rows
-                // used to offer a pointer and a highlight that did nothing.
-                // Asking the same registry the highlight itself uses means a
-                // module that later gains passive tiles turns its row on with no
-                // change here.
-                const canHighlight=getHighlightTiles(boss.key,key,planGeo).size>0;
-                const on=canHighlight&&dPlanHighlight===key;
-                // The border stays 1.5px in both states and only changes colour.
-                // It used to be 1px when unselected, so selecting a row grew its
-                // border by half a pixel on every side and nudged the name and
-                // description as the highlight came and went.
-                return React.createElement("div",{key:label,onClick:canHighlight?()=>setDPlanHighlight(p=>p===key?null:key):undefined,style:{background:on?"rgba(239,68,68,0.10)":"transparent",borderRadius:8,padding:"8px 10px",margin:"0 -10px",border:"1.5px solid "+(on?"rgba(239,68,68,0.5)":"transparent"),cursor:canHighlight?"pointer":"default"}},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},label),
-                    // Boss ability tags come from data/bosses.js; creature ones
-                    // are derived per creature by getAbilityTags.
-                    ab.tags&&ab.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                      React.createElement(AbilityTagPills,{tags:ab.tags,onOpen:setDAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},ab.name),
-                  React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},ab.description)
-                );
-              })
-            )
-          ),
-          // One card per minion, not one per KIND -- each is its own creature
-          // with its own kit, so two Vines with different abilities would read
-          // correctly without any change here.
-          //
-          // Same shape as the boss card above, minus the tile-highlight rows:
-          // the Vines walk at you from the moment the fight starts, so any
-          // "these tiles" preview would stop being true after their first step.
-          // Where each one SPROUTS is already on the board as a marker.
-          ...(boss?.minions||[]).map((m,i)=>
-            React.createElement("div",{key:"minioncard"+i,style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative",flexShrink:0}},
-              React.createElement("button",{onClick:()=>toggleDMinion(i),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dMinionExpanded.has(i)?"－":"＋"),
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:dMinionExpanded.has(i)?12:0}},
-                React.createElement("div",{style:{fontSize:24,lineHeight:1}},m.emoji),
-                React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},m.name)
-              ),
-              dMinionExpanded.has(i)&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
-                [["basic","Basic",m.abilities.basic],["special","Special",m.abilities.special],["unique","Passive",m.abilities.unique]].map(([key,label,ab])=>ab&&
-                  React.createElement("div",{key:label},
-                    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                      React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},label),
-                      ab.tags&&ab.tags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                        React.createElement(AbilityTagPills,{tags:ab.tags,onOpen:setDAbilityTagPopup,compact:true})
-                      )
-                    ),
-                    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},ab.name),
-                    React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},ab.description)
-                  )
-                )
-              )
-            )
-          ),
-          dGridInfoCreature&&(()=>{
-            const def=CREATURE_MAP[dGridInfoCreature];
-            const oc=owned&&owned[dGridInfoCreature];
-            if(!def)return null;
-            const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
-            return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-              React.createElement("button",{onClick:()=>setDCreatureMinimized(p=>{const next=!p;if(!next)expandDPanel("creature");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},dCreatureMinimized?"＋":"－"),
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:dCreatureMinimized?0:12}},
-                React.createElement("div",null,
-                  React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},def.name),
-                  React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))
-                )
-              ),
-              !dCreatureMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
-                if(!abl)return null;
-                const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
-                const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
-                const abilityTags=getAbilityTags(def.id,k);
-                return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setDAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-                  desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
-                );
-              })
-            );
-          })()
         )
       ),
-      React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
+      // The info sheet takes the tray's place while open.
+      React.createElement("div",{style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0,...(dInfoSheet!==null||dGridInfoCreature?{display:"none"}:null)},
         onDragOver:e=>{e.preventDefault();dRangePreview.clear();},
         onDrop:e=>{e.preventDefault();dRangePreview.clear();if(dDragCell){setDPlanGrid(p=>{const n={...p};delete n[dDragCell];return n;});}setDDragId(null);setDDragCell(null);}
       },
@@ -759,6 +618,43 @@ function DungeonScreen({onBack,onClear,onAutoFight,onViewCreature}){
           })
         )
       ),
+      // info sheet: the boss, one of its minions, or a pressed creature
+      dInfoSheet==="boss"&&boss&&React.createElement(PlanInfoSheet,{onClose:closeDSheet},
+        React.createElement(SheetHeader,{icon:TYPE_EMOJI[boss.type]||"👾",title:boss.name,subtitle:"Lv. "+bossLevel}),
+        boss.abilities&&[["basic","Basic",boss.abilities.basic],["special","Special",boss.abilities.special],["unique","Passive",boss.abilities.unique]].map(([key,label,ab])=>{
+          if(!ab)return null;
+          // A row is only a toggle when it would actually light something: the
+          // boss modules define tiles for their basic and special, never for a
+          // passive like Burning Touch. Asking the same registry the highlight
+          // itself uses means a module that later gains passive tiles turns
+          // its row on with no change here.
+          const canHighlight=getHighlightTiles(boss.key,key,planGeo).size>0;
+          // Boss ability tags come from data/bosses.js; creature ones are
+          // derived per creature by getAbilityTags.
+          return React.createElement(SheetAbilityRow,{key:label,label,tags:ab.tags,name:ab.name,desc:ab.description,onTag:setDAbilityTagPopup,
+            onClick:canHighlight?()=>setDPlanHighlight(p=>p===key?null:key):undefined,active:canHighlight&&dPlanHighlight===key});
+        })
+      ),
+      // One sheet per minion, not one per KIND -- each is its own creature with
+      // its own kit, so two Vines with different abilities read correctly with
+      // no change here. No tile-highlight rows: the Vines walk at you from the
+      // moment the fight starts, so any "these tiles" preview would stop being
+      // true after their first step. Where each one SPROUTS is its marker.
+      typeof dInfoSheet==="number"&&boss?.minions?.[dInfoSheet]&&(()=>{
+        const m=boss.minions[dInfoSheet];
+        return React.createElement(PlanInfoSheet,{onClose:closeDSheet},
+          React.createElement(SheetHeader,{icon:m.emoji,title:m.name}),
+          [["basic","Basic",m.abilities.basic],["special","Special",m.abilities.special],["unique","Passive",m.abilities.unique]].map(([key,label,ab])=>ab&&
+            React.createElement(SheetAbilityRow,{key:label,label,tags:ab.tags,name:ab.name,desc:ab.description,onTag:setDAbilityTagPopup}))
+        );
+      })(),
+      dGridInfoCreature&&CREATURE_MAP[dGridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeDSheet},
+        React.createElement(CreatureSheetBody,{
+          def:CREATURE_MAP[dGridInfoCreature],
+          subtitle:CREATURE_MAP[dGridInfoCreature].type+" · "+(CREATURE_MAP[dGridInfoCreature].attackType||"Melee")+(owned?.[dGridInfoCreature]?" · Lv."+owned[dGridInfoCreature].level:""),
+          descFor:allyDesc(owned?.[dGridInfoCreature]),
+          onTag:setDAbilityTagPopup,
+        })),
       dTouchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[dTouchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:dTouchDrag.ghost.x-26,top:dTouchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})()
     );
   }

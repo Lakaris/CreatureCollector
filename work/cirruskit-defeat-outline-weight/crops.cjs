@@ -1,0 +1,2 @@
+const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp'),root='work/cirruskit-defeat-outline-weight';
+(async()=>{for(const n of [0,1,5,8,11,23])await sharp(`${root}/frames/frame-${n}.png`).extract({left:80,top:355,width:400,height:140}).resize(1200,420,{kernel:'nearest'}).flatten({background:'#eee'}).png().toFile(`${root}/review/lower-${n+1}.png`);})();

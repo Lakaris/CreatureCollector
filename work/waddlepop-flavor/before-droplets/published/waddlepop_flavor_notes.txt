@@ -1,0 +1,11 @@
+Waddlepop flavor: stumble, fumble, catch.
+30 frames, 6 columns x 5 rows, 512 x 512 per frame.
+Read left to right, top to bottom.
+Play once: 300 ms opening hold, 28 frames at 60 ms, 360 ms closing hold; 2340 ms total.
+Both endpoints are exact copies of waddlepop_idle.png.
+Transparent PNG with separate JSON timing data. Preview repeats for inspection.
+Frames 8-22 add a flustered > o < expression: partial eyelids lead into squeezed chevrons, and the beak opens/closes in two small beats before returning to normal.
+Only the eye and beak artwork changes. The face silhouette, cheek contours, flippers, body and bomb poses, transparency, and timing are identical to the preceding version.
+The head moves as one rigid shape; flipper motion stops outside the cheek contours. No face stretching or cross-fades.
+Flippers follow the body sway with only a slight independent reach: at most 0.78px horizontally and 1.44px vertically on the 512px art.
+Expression artwork was made with the built-in image tool and transferred only into the original eye/beak regions.

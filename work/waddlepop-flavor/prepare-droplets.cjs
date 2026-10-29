@@ -1,0 +1,5 @@
+const fs=require('fs'),sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
+const {PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
+const dir='work/waddlepop-flavor/droplets',source='C:/Users/Annie/.codex/generated_images/01a17e8f-4dcd-7fb2-bf5e-79c211523db9/exec-44b11556-6dfe-4854-aa0c-0b6c8ee56ff0.png';
+const atomicWrite=(p,data)=>{const temp=p+'.building-'+process.pid;fs.writeFileSync(temp,data);fs.renameSync(temp,p);};
+(async()=>{const im=PNG.sync.read(fs.readFileSync(source));let left=im.width,top=im.height,right=0,bottom=0;for(let y=0;y<im.height;y++)for(let x=0;x<im.width;x++)if(im.data[(y*im.width+x)*4+3]>20){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);}const rect={left:left-2,top:top-2,width:right-left+5,height:bottom-top+5};atomicWrite(dir+'/generated-source.png',fs.readFileSync(source));const sprite=await sharp(source).extract(rect).resize({width:164}).png().toBuffer();atomicWrite(dir+'/burst.png',sprite);console.log(await sharp(sprite).metadata());})();

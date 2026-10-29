@@ -1,0 +1,54 @@
+{
+  "id": "wind-dungeon-5x8",
+  "theme": "wind-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/wind-dungeon5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1adbb545-4184-4834-9fea-95abfac6629e.png",
+  "source_sha256": "a1b8593bc4e894d1186f72e0f6742a719bdd60da511ec1ddb5b377784a3597b4",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 407388,
+  "sha256": "d0f03f9a66ad36828316f83c720c68be82f97859d94043dad9e16c02708a8503",
+  "resampled": true,
+  "x_centers": [
+    199.996,
+    400.02,
+    599.972,
+    799.993
+  ],
+  "y_centers": [
+    199.996,
+    400.003,
+    599.997,
+    800.001,
+    1000.001,
+    1200.005,
+    1399.988
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.042,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      199.9822353034019,
+      400.07958243242297,
+      599.8212576112297,
+      799.4007868676424
+    ],
+    "y": [
+      199.8146855672686,
+      399.81978691505446,
+      599.50306688998,
+      799.5121016035638,
+      999.3696425184904,
+      1199.5735251689425,
+      1399.3918848203728
+    ]
+  },
+  "geometric_correction_passes": 1
+}

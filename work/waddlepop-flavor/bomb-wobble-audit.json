@@ -1,0 +1,606 @@
+{
+  "angularGain": 1.6,
+  "horizontalGain": 1.25,
+  "bodySourceAndMotionUnchanged": true,
+  "flipperTargetsUseOriginalBombPoses": true,
+  "expressionsAndDropletsUnchanged": true,
+  "penguinCorePixelsIdenticalToPrevious": true,
+  "frames": [
+    {
+      "frame": 1,
+      "endpointExact": true
+    },
+    {
+      "frame": 2,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58659,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -0.40052968627325913,
+        "x": -1.401853901956407,
+        "y": 1.401853901956407,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -0.6408474980372146,
+        "x": -1.7523173774455088,
+        "y": 1.401853901956407,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 3,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58583,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -1.222469753364829,
+        "x": -4.278644136776902,
+        "y": 4.278644136776902,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -1.9559516053837265,
+        "x": -5.348305170971127,
+        "y": 4.278644136776902,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 4,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58531,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -1.896346713682398,
+        "x": -6.637213497888393,
+        "y": 6.637213497888393,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -3.034154741891837,
+        "x": -8.296516872360492,
+        "y": 6.637213497888393,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 5,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58534,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -1.6849265434986163,
+        "x": -5.964758642924025,
+        "y": 7.270062962715472,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -2.695882469597786,
+        "x": -7.455948303655031,
+        "y": 7.270062962715472,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 6,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58573,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 0.2087843214697842,
+        "x": 0.2574341991150044,
+        "y": 8.893243704116959,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 0.33405491435165474,
+        "x": 0.32179274889375553,
+        "y": 8.893243704116959,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 7,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58601,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 2.7426298741235797,
+        "x": 8.58292672926319,
+        "y": 11.065111320677353,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 4.388207798597728,
+        "x": 10.728658411578989,
+        "y": 11.065111320677353,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 8,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58368,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 4.661444060177681,
+        "x": 14.887601912012379,
+        "y": 12.709809194438012,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 7.45831049628429,
+        "x": 18.60950239001547,
+        "y": 12.709809194438012,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 9,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59048,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 5.123091599474031,
+        "x": 16.328244265264082,
+        "y": 13.287213732106071,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 8.19694655915845,
+        "x": 20.410305331580105,
+        "y": 13.287213732106071,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 10,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59151,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 6.0013015224541135,
+        "x": 18.670137393210968,
+        "y": 15.336370219059598,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 9.602082435926583,
+        "x": 23.33767174151371,
+        "y": 15.336370219059598,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 11,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59254,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 7.16505172487511,
+        "x": 21.77347126633363,
+        "y": 18.051787358041924,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 11.464082759800178,
+        "x": 27.216839082917037,
+        "y": 18.051787358041924,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 12,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59499,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 7.942482725699575,
+        "x": 23.84662060186553,
+        "y": 19.86579302663234,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 12.707972361119321,
+        "x": 29.808275752331916,
+        "y": 19.86579302663234,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 13,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59592,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 6.571055803845997,
+        "x": 20.999217188076596,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 10.513689286153596,
+        "x": 26.249021485095746,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 14,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59260,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 1.7699569478043369,
+        "x": 10.916909590389109,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 2.831931116486939,
+        "x": 13.646136987986386,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 15,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58252,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -1.8502816843659033,
+        "x": 3.314408462831601,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -2.9604506949854454,
+        "x": 4.143010578539501,
+        "y": 20,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 16,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59126,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -3.2753759481733606,
+        "x": -2.1015037926934435,
+        "y": 22.368555332321957,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -5.240601517077377,
+        "x": -2.626879740866804,
+        "y": 22.368555332321957,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 17,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59359,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -6.708472836114643,
+        "x": -15.833891344458571,
+        "y": 28.74430669564148,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -10.733556537783429,
+        "x": -19.792364180573216,
+        "y": 28.74430669564148,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 18,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59574,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -8.970550002050103,
+        "x": -24.882200008200417,
+        "y": 32.945307146664476,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -14.352880003280166,
+        "x": -31.10275001025052,
+        "y": 32.945307146664476,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 19,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59450,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -7.685665797080649,
+        "x": -21.714164492701624,
+        "y": 32.67141644927016,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -12.29706527532904,
+        "x": -27.14270561587703,
+        "y": 32.67141644927016,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 20,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 59203,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -5.36129569170528,
+        "x": -15.903239229263198,
+        "y": 32.090323922926316,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -8.578073106728448,
+        "x": -19.879049036578998,
+        "y": 32.090323922926316,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 21,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58957,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -4.325013287172762,
+        "x": -12.975039861518287,
+        "y": 30.396906557035308,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -6.92002125947642,
+        "x": -16.218799826897857,
+        "y": 30.396906557035308,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 22,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58187,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -1.0940361857778598,
+        "x": -3.2821085573335793,
+        "y": 22.723335941222416,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -1.7504578972445757,
+        "x": -4.102635696666974,
+        "y": 22.723335941222416,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 23,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58353,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 2.2108740626162575,
+        "x": 6.632622187848774,
+        "y": 14.874174101286389,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 3.537398500186012,
+        "x": 8.290777734810968,
+        "y": 14.874174101286389,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 24,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58592,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 2.8673324191385614,
+        "x": 8.601997257415684,
+        "y": 12.767831733492482,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 4.587731870621698,
+        "x": 10.752496571769605,
+        "y": 12.767831733492482,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 25,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58562,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": 1.61183320349338,
+        "x": 4.83549961048014,
+        "y": 10.570708106113415,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": 2.5789331255894083,
+        "x": 6.044374513100175,
+        "y": 10.570708106113415,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 26,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58553,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -0.053686923218265736,
+        "x": -0.16106076965479765,
+        "y": 7.656047884368035,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -0.08589907714922518,
+        "x": -0.20132596206849707,
+        "y": 7.656047884368035,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 27,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58519,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -0.9902809858117583,
+        "x": -2.9708429574352753,
+        "y": 6.017008274829423,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -1.5844495772988134,
+        "x": -3.713553696794094,
+        "y": 6.017008274829423,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 28,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58582,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -0.7708393128049535,
+        "x": -2.312517938414861,
+        "y": 4.625035876829722,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -1.2333429004879257,
+        "x": -2.890647423018576,
+        "y": 4.625035876829722,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 29,
+      "priorFrameReconstructedExactly": true,
+      "sameForegroundSampleForBothBombs": true,
+      "lockedCharacterAndDropletPixels": 58671,
+      "changedPixelsBelowBomb": 0,
+      "originalBomb": {
+        "a": -0.2747140104145307,
+        "x": -0.8241420312435919,
+        "y": 1.6482840624871837,
+        "cx": 250,
+        "cy": 143
+      },
+      "renderedBomb": {
+        "a": -0.4395424166632491,
+        "x": -1.0301775390544898,
+        "y": 1.6482840624871837,
+        "cx": 250,
+        "cy": 143
+      }
+    },
+    {
+      "frame": 30,
+      "endpointExact": true
+    }
+  ]
+}

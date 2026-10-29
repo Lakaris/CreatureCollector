@@ -1,6 +1,6 @@
 // Creature detail screen: stats, levelling, evolution, equipment, and the skin/flair tabs.
 
-import React, { useState, useEffect, useRef } from "../../../react.js";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "../../../react.js";
 import { iconText, currencyIcon, uiIcon, shardIcon, gearIcon, typeIcon, roleIcon, rangeIcon, restrictionIcon, GEAR_CARD_ICON_PX as CARD_ICON_PX } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURE_MAP } from "../../../data/creatures.js";
@@ -31,6 +31,11 @@ import { formatNum } from "../../../core/format.js";
 const TUTORIAL_ITEM_ID="com_hp_atk";
 // Marker beside the rarity label in the header -- a climbing ladder of stones.
 const RARITY_GEM={common:uiIcon("rarities/common","Common"),epic:uiIcon("rarities/epic","Epic"),legendary:uiIcon("rarities/legendary","Legendary")};
+// Portrait stage height cap (see stageCapPx): never shorter than this, so the
+// creature and the level/stars above it always fit, and with this much room
+// left between the stat strip and the nav bar.
+const STAGE_MIN_PX=240;
+const STAGE_BOTTOM_GAP_PX=8;
 // The level-up detour only requires a single level-up before advancing --
 // the guided harvest's fixed food amount isn't guaranteed to afford more
 // than that (it doesn't scale with the food-cost curve in core/creatures.js),
@@ -137,6 +142,37 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const [equipDetailPage,setEquipDetailPage]=useState(null);
   const [equipSortFavorites,setEquipSortFavorites]=useState(new Set());
   useEffect(()=>{if(showEquipPage)setEquipSortFavorites(new Set(equipFavorites));},[showEquipPage]);
+  // The portrait stage is a square (the background art's shape), which on a
+  // wide or short screen runs past the bottom of the first screenful and
+  // pushes the stats -- and part of the creature -- out of view. Cap its
+  // height so the stat strip fits above the nav bar on entry; the backdrop
+  // is bottom-anchored "cover", so a capped stage just crops the sky. Never
+  // below STAGE_MIN_PX, which keeps the creature itself clear of the top.
+  const stageRef=useRef(null);
+  const statsRef=useRef(null);
+  const [stageCapPx,setStageCapPx]=useState(null);
+  useLayoutEffect(()=>{
+    const stage=stageRef.current,stats=statsRef.current;
+    if(!stage||!stats)return;
+    const measure=()=>{
+      // Rects are in screen px; styles are in the app's unscaled px.
+      const scale=stage.getBoundingClientRect().width/(stage.offsetWidth||1)||1;
+      let scroller=stage.parentElement;
+      while(scroller&&!/(auto|scroll)/.test(getComputedStyle(scroller).overflowY))scroller=scroller.parentElement;
+      const top=scroller?scroller.getBoundingClientRect().top-scroller.scrollTop:0;
+      const nav=document.querySelector(".nav");
+      const bottom=nav?nav.getBoundingClientRect().top:window.innerHeight;
+      const stageRect=stage.getBoundingClientRect(),statsRect=stats.getBoundingClientRect();
+      const stageTop=stageRect.top-top;
+      const below=statsRect.bottom-stageRect.bottom;   // gap + stat strip
+      const fit=(bottom-top-stageTop-below-STAGE_BOTTOM_GAP_PX*scale)/scale;
+      const cap=fit<stage.offsetWidth?Math.max(STAGE_MIN_PX,Math.floor(fit)):null;
+      setStageCapPx(prev=>prev===cap?prev:cap);
+    };
+    measure();
+    window.addEventListener("resize",measure);
+    return ()=>window.removeEventListener("resize",measure);
+  },[showEquipPage,equipDetailPage]);
   function toggleEquipFavorite(id,e){e.stopPropagation();setEquipFavorites(prev=>{const n=new Set(prev);n.has(id)?n.delete(id):n.add(id);return n;});}
   const [equipFiltersOpen,setEquipFiltersOpen]=useState(false);
   const [equipFilterRarities,setEquipFilterRarities]=useState(new Set());
@@ -908,7 +944,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         // from its bottom -- scaled with the drawn art, so it's on the same
         // spot of the art as on the Flair stage -- leaving the room above for
         // effects.
-        React.createElement("div",{style:{position:"relative",aspectRatio:"1 / 1",...PORTRAIT_STAGE_STYLE,borderRadius:0,...backdrop}},
+        // Square unless stageCapPx shortens it to keep the stats on screen.
+        React.createElement("div",{ref:stageRef,style:{position:"relative",...(stageCapPx?{height:stageCapPx}:{aspectRatio:"1 / 1"}),...PORTRAIT_STAGE_STYLE,borderRadius:0,...backdrop}},
           React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:PORTRAIT_CREATURE_PX,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
         ),
         // Top-right: level, with the ascension stars tucked under it. Same
@@ -922,7 +959,8 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
           React.createElement(CreatureAscStars,{asc:ownedData.ascensions,size:11})
         )
       ),
-      React.createElement(StatStrip,{values:statsWithEquip,onClick:setStatInfoPopup,isHighlighted:s=>lastLeveledStat===s})
+      React.createElement("div",{ref:statsRef},
+        React.createElement(StatStrip,{values:statsWithEquip,onClick:setStatInfoPopup,isHighlighted:s=>lastLeveledStat===s}))
     ),
     showFlairEffects&&(()=>{
       const totals=Object.fromEntries(Object.keys(BUFF_STAT_LABEL).map(s=>[s,0]));

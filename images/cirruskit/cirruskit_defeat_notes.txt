@@ -6,11 +6,11 @@ Plays once; keep the final defeated frame displayed.
 The HTML preview holds the last frame until Replay is pressed.
 The first frame exactly matches cirruskit_base.png.
 
-Line cleanup revision: removed the shifted nose remnant and cheek dot, cleaned the nose-to-mouth connection, restored the complete hip swirl, removed tail-edge bleed and extraction specks, and repaired the mane/front-leg overlap. Checked the annotated areas across all 24 frames. The small far hind leg remains hidden from frame 10 onward. Pose keys, timing, first base frame and final hold are unchanged.
+Belly-outline revision: the abdomen contour is now approximately ten pixels thick, matching the bolder limb outlines. Added ink grows inward so the silhouette, belly curve, and restored slanted rear leg stay in place. Reviewed all 24 frames; the first frame remains the exact base image. Other outlines and artwork are retained. Earlier muzzle, hip swirl, tail and mane-join cleanup is retained. The small far hind leg remains hidden from frame 10 onward. Pose keys, timing, first base frame and final hold are unchanged.
 Expression artwork reused from the prior defeat animation: built-in image_gen tool, edit mode, transparent output.
 Only the new eye and mouth regions were incorporated into the original art.
 The original mane pattern, tail pattern, colours, paws and other details supply the animation layers.
-Final prompt: ../../../work/cirruskit-defeat-line-audit/image-edit-prompt.txt
+Final prompt: ../../../work/cirruskit-defeat-thicker-belly/image-edit-prompt.txt
 
 Use case: precise-object-edit
 Asset type: Expression master for a transparent 2D game animation.

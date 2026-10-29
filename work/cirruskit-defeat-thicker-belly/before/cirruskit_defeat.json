@@ -1,0 +1,229 @@
+{
+  "image": "cirruskit_defeat.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 6,
+  "rows": 4,
+  "loop": false,
+  "holdLastFrame": true,
+  "totalDurationMs": 720,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "dazed"
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "dazed"
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "dazed"
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "dazed"
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "dazed"
+    },
+    {
+      "index": 5,
+      "x": 2560,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 9,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 10,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 11,
+      "x": 2560,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "flop"
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 13,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 14,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 15,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 16,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 17,
+      "x": 2560,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 18,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 19,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "settle"
+    },
+    {
+      "index": 20,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "defeated"
+    },
+    {
+      "index": 21,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "defeated"
+    },
+    {
+      "index": 22,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "defeated"
+    },
+    {
+      "index": 23,
+      "x": 2560,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 30,
+      "phase": "defeated"
+    }
+  ],
+  "notes": "Simple defeat in place: X eyes, slack tongue-out mouth, stretched flop with staggered legs; the small far hind leg is hidden behind the tail from frame 10 onward, followed by a small settling bounce. Starts on the exact base frame and ends in a held defeated pose. Read left to right, top to bottom. Existing head, mane, tail and body artwork reused; no frame crossfades. 24 frames at 30ms. Rear-leg slant revision angles the lower back leg backward and tilts its paw during the flop, keeping the hip attachment fixed and the shallow belly curve intact. Earlier muzzle, hip marking and tail cleanup is retained."
+}

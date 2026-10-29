@@ -1,0 +1,54 @@
+{
+  "id": "volcano-5x8",
+  "theme": "volcano",
+  "kind": "board",
+  "destination": "images/board_backgrounds/volcano5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-aef4960a-d15a-4dac-b1d8-4d84adf90359.png",
+  "source_sha256": "0ded24a4612b25e5a405e7e7f32d97e3447250ba9b7ab53e0b3dccb30a477d2d",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 403518,
+  "sha256": "39fb1e55e1d916c3c7a57d0cd36311961368390a9d7fff3febb7548ee62d8373",
+  "resampled": true,
+  "x_centers": [
+    200.009,
+    399.986,
+    599.962,
+    799.992
+  ],
+  "y_centers": [
+    200.009,
+    400.004,
+    600.006,
+    800.01,
+    999.997,
+    1200.006,
+    1399.998
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.0753,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      199.99061032049576,
+      399.90483930519514,
+      599.7611735867063,
+      799.40427546569
+    ],
+    "y": [
+      200.2539483930393,
+      400.29780844376893,
+      600.0751009330849,
+      800.2740194199827,
+      999.9433650329516,
+      1199.9364396512178,
+      1399.7825027917968
+    ]
+  },
+  "geometric_correction_passes": 1
+}

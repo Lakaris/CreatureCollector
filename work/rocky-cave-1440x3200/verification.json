@@ -1,0 +1,73 @@
+{
+  "destination": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+  "original_sha256": "e211e79a357bcf478c68fc714cbd8d78d8aa2f54096c7d25df63122347e4e819",
+  "output_sha256": "3fa170b7bee2759f9a0665e338886956aff32a48497fefb5dcb8c06cee0be591",
+  "width": 1440,
+  "height": 3200,
+  "aspect_ratio": "9:20",
+  "format": "JPEG",
+  "bytes": 592026,
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "export_method": "Lanczos resampling; no new native detail claimed",
+  "checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "source_crop": [
+        0.0,
+        322.0,
+        1440.0,
+        2878.0
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "source_crop": [
+        0.0,
+        41.85,
+        1440.0,
+        3158.15
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "source_crop": [
+        0.0,
+        0.0,
+        1440.0,
+        3200.0
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "source_crop": [
+        0.0,
+        39.44,
+        1440.0,
+        3160.56
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

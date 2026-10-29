@@ -1,32 +1,35 @@
 // Arena: symmetric minion-vs-minion stages, no boss unit.
 
 import React, { useState, useEffect } from "../../../react.js";
-import { iconText, currencyIcon, gearIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
+import { iconText, currencyIcon, typeIcon, rangeIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
 import { ARENA_TABS, ARENA_TAB_TYPE, ARENA_TAB_ENEMY_TYPES } from "../../../data/bosses.js";
 import { REWARD_DESC } from "../../../data/quests.js";
 import { applyRewards } from "../../../core/rewards.js";
-import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
+import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED } from "../../../battle/constants.js";
+import { boardArt, boardCellClass, BATTLE_BACKDROP } from "../../boardArt.js";
+import useBattlePause, { BATTLE_PAUSED_CLASS, DEV_PAUSE_BTN } from "../../hooks/useBattlePause.js";
 import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
-import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { PlanInfoSheet, CreatureSheetBody, allyDesc } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
-import { getAbilityTags } from "../../../core/abilityText.js";
 import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
-import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
+import { AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
 import { DEV_MODE } from "../../../config.js";
 import { TRIALS_ID, TRIALS_TAB, trialsGearFor, trialsItemLevel } from "../../../core/trials.js";
-import { EQUIPMENT_MAP, EQUIP_RARITY_CONFIG } from "../../../data/equipment.js";
 import TrialsHome, { TrialsEnemyHeader, TrialsEnemyBody } from "./TrialsHome.js";
+
+const arenaBoardArt=boardArt(ARENA_GRID_ROWS,ARENA_GRID_COLS);
 
 const ARENA_UNLOCK_COUNT=6;
 const ARENA_MAX_LEVEL=50;
@@ -129,34 +132,16 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   const [planning,setPlanning]=useState(false);
   const [dragId,setDragId]=useState(null);
   const [dragCell,setDragCell]=useState(null);
+  // The planning info sheet shows one card at a time: a pressed enemy (its
+  // layout entry) or a pressed ally (its creature id).
   const [arenaEnemyInfo,setArenaEnemyInfo]=useState(null);
-  const [arenaEnemyMinimized,setArenaEnemyMinimized]=useState(false);
   const [gridInfoCreature,setGridInfoCreature]=useState(null);
-  const [arenaAllyMinimized,setArenaAllyMinimized]=useState(false);
-  // Planning board shrinks to its column rather than making it scroll.
-  const [planAreaRef,planTile,planClamped]=useFitTile(ARENA_GRID_ROWS,ARENA_GRID_COLS,ARENA_TILE,{reserveW:PLAN_PANEL_MIN_W});
-  const arenaRightPanelRef=React.useRef(null);
-  React.useLayoutEffect(()=>{
-    if(!arenaRightPanelRef.current)return;
-    if(gridInfoCreature){
-      setArenaAllyMinimized(false);
-      const el=arenaRightPanelRef.current;
-      if(el.scrollHeight>el.clientHeight+4)setArenaEnemyMinimized(true);
-    } else {
-      setArenaEnemyMinimized(false);
-      setArenaAllyMinimized(false);
-    }
-  },[gridInfoCreature]);
-  // Whichever panel the player just expanded wins the space; if the two together
-  // don't fit, the OTHER panel (not the one they just asked to see) auto-minimizes.
-  function expandArenaPanel(which){
-    requestAnimationFrame(()=>{
-      const el=arenaRightPanelRef.current;if(!el)return;
-      if(el.scrollHeight>el.clientHeight+4){
-        if(which==="enemy")setArenaAllyMinimized(true);else setArenaEnemyMinimized(true);
-      }
-    });
-  }
+  function closeArenaSheet(){setArenaEnemyInfo(null);setGridInfoCreature(null);}
+  // Leaving planning (to fight, or back out) closes it, so it never greets you
+  // on the way back in.
+  useEffect(()=>{if(!planning)closeArenaSheet();},[planning]);
+  // Planning board shrinks to its area rather than making it scroll.
+  const [planAreaRef,planTile,planClamped]=useFitTile(ARENA_GRID_ROWS,ARENA_GRID_COLS,ARENA_TILE);
   const [holdId,setHoldId]=useState(null);
   const [holdPct,setHoldPct]=useState(0);
   const hs=React.useRef({delay:null,raf:null,id:null,fired:false});
@@ -371,12 +356,16 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     setTimeout(()=>setBattleOutcome("won"),overlayDelayMs);
   }
   function restartFight(){
-    stopArenaLoops();
+    // Ignored once the fight is decided (loop stopped, not just paused): the
+    // reward is already granted and the outcome overlay is on a timer, which
+    // would otherwise pop up over the planning screen.
+    if(!arenaTickRef.current&&!arenaPause.paused)return;
+    stopArenaLoops();arenaPause.reset();
     setBattling(false);setBattleOutcome(null);setArenaBSnap(null);setArenaAtkEffects([]);setBattleSelectedUid(null);
     setPlanning(true);
   }
   function fight(){
-    stopArenaLoops();
+    stopArenaLoops();arenaPause.reset();
     savedPlanGridRef.current={...planGrid};
     const enemyGrid=getEnemyLayout(arenaTab,stage,level);
     setPlanning(false);
@@ -397,6 +386,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     if(arenaTickRef.current){clearInterval(arenaTickRef.current);arenaTickRef.current=setInterval(runArenaTick,Math.round(500/next));}
   }
   React.useEffect(()=>()=>stopArenaLoops(),[]);
+  const arenaPause=useBattlePause({tickRef:arenaTickRef,startRef:arenaBattleStartRef,startTicking:()=>{arenaTickRef.current=setInterval(runArenaTick,Math.round(500/aSpeedRef.current));}});
 
   // Enemies come from the tab's enemy pool (ARENA_TAB_ENEMY_TYPES), which is
   // separate from the type the player must deploy (ARENA_TAB_TYPE).
@@ -464,12 +454,13 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     const snap=arenaBSnap||{playerUnits:[],enemyUnits:[],damageDealt:{}};
     const allUnits=[...snap.playerUnits,...snap.enemyUnits];
     const selectedUnit=battleSelectedUid?allUnits.find(u=>u.uid===battleSelectedUid):null;
-    return React.createElement("div",{key:"sfv388",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv388",className:"screen-fade"+(arenaPause.paused?" "+BATTLE_PAUSED_CLASS:""),style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},arenaTabIcon(tabDef)," "+arenaTitle(tabDef)+" — Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
         ),
         DEV_MODE&&React.createElement("button",{onClick:()=>winStage(),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏆 Win (Dev)"),
+        DEV_MODE&&React.createElement("button",{onClick:arenaPause.toggle,style:{...DEV_PAUSE_BTN,background:arenaPause.paused?"#16a34a":"#b45309"}},arenaPause.paused?"▶ Resume":"⏸ Pause"),
         React.createElement("button",{onClick:restartFight,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#eee",color:"#555",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"↺ Restart"),
         React.createElement("button",{onClick:cycleArenaSpeed,style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#534AB7",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},arenaBattleSpeed+"x ⚡")
       ),
@@ -477,11 +468,11 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:arenaTimeLeft<=10?"#ef4444":"#534AB7"}},iconText(arenaTimeLeft+"s ⏱")),
         React.createElement("div",{className:"battle-row",style:{display:"flex",flexDirection:"row",alignItems:"flex-start",justifyContent:"center",gap:10,width:"100%",maxWidth:"100%",overflowX:"auto",boxSizing:"border-box"}},
         React.createElement("div",{className:"battle-side-panel"},React.createElement(DamageChart,{damageDealt:snap.damageDealt})),
-        React.createElement("div",{className:"battle-grid",style:{width:ARENA_GRID_COLS*ARENA_TILE,height:ARENA_GRID_ROWS*ARENA_TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+        React.createElement("div",{className:"battle-grid "+arenaBoardArt.className,style:{width:ARENA_GRID_COLS*ARENA_TILE,height:ARENA_GRID_ROWS*ARENA_TILE,borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0,...arenaBoardArt.style}},
           React.createElement("div",{style:{position:"absolute",top:0,left:0,display:"grid",gridTemplateColumns:`repeat(${ARENA_GRID_COLS},${ARENA_TILE}px)`,gridTemplateRows:`repeat(${ARENA_GRID_ROWS},${ARENA_TILE}px)`,gap:0}},
             Array.from({length:ARENA_GRID_ROWS},(_,r)=>Array.from({length:ARENA_GRID_COLS},(_,c)=>{
               const BORDER="1px solid #bbb";
-              return React.createElement("div",{key:r+","+c,style:{
+              return React.createElement("div",{key:r+","+c,className:boardCellClass(r),style:{
                 width:ARENA_TILE,height:ARENA_TILE,boxSizing:"border-box",
                 background:"#fff",
                 borderTop:r===0?"0":BORDER,
@@ -546,7 +537,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
             )
           ))
         ),
-        React.createElement("div",{className:"battle-side-panel"},selectedUnit?React.createElement(UnitInfoPanel,{
+        selectedUnit&&React.createElement(UnitInfoPopup,{
           def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name:CREATURE_MAP[selectedUnit.creatureId]?.name||selectedUnit.creatureId,
           subtitle:selectedUnit.uid[0]==="e"?"Enemy":"Ally",
@@ -555,7 +546,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
           abilCharge:selectedUnit.abilCharge,abilChargeMax:selectedUnit.abilChargeMax,abilFlashTicks:selectedUnit.abilFlashTicks,
           debuffs:debuffsFor(selectedUnit),
           onClose:()=>setBattleSelectedUid(null)
-        }):React.createElement("div",{style:{width:150,flexShrink:0}}))
+        })
         )
       )
     );
@@ -563,28 +554,29 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   if(planning){
     const deployedCount=Object.keys(planGrid).length;
     const enemyGrid=getEnemyLayout(arenaTab,stage,level);
-    const abilityLabels={basic:"Basic",special:"Special",unique:"Passive"};
-    return React.createElement("div",{key:"sfv483",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv483",className:"screen-fade",style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
       arenaAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:arenaAbilityTagPopup,onClose:()=>setArenaAbilityTagPopup(null)}),
       // header
-      React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
-        React.createElement("button",{onClick:()=>{setPlanning(false);setGridInfoCreature(null);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
+      React.createElement("div",{className:"plan-header",style:{padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
+        React.createElement("button",{onClick:()=>{setPlanning(false);endHold();},style:{background:"none",border:"none",cursor:"pointer",fontSize:20,color:"#555",padding:0,lineHeight:1}},
           React.createElement("i",{className:"ti ti-arrow-left"})
         ),
-        React.createElement("div",{style:{flex:1,textAlign:"center"}},
+        React.createElement("div",{style:{textAlign:"center"}},
           React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},"Planning Phase")
         ),
-        DEV_MODE&&React.createElement("button",{onClick:()=>winStage(),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0,marginRight:8}},"🏆 Win (Dev)"),
-        React.createElement("button",{
-          onClick:deployedCount>0?fight:undefined,
-          style:{background:deployedCount>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:deployedCount>0?"pointer":"default"}
-        },"Fight →")
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+          DEV_MODE&&React.createElement("button",{onClick:()=>winStage(),style:{padding:"6px 12px",fontSize:12,fontWeight:700,background:"#1e1e2e",color:"#4ade80",border:"none",borderRadius:8,cursor:"pointer",flexShrink:0}},"🏆 Win (Dev)"),
+          React.createElement("button",{
+            onClick:deployedCount>0?fight:undefined,
+            style:{background:deployedCount>0?"#534AB7":"#ccc",border:"none",borderRadius:10,padding:"6px 14px",color:"#fff",fontSize:13,fontWeight:700,cursor:deployedCount>0?"pointer":"default"}
+          },"Fight →")
+        )
       ),
-      // grid + info panel row. Never scrolls -- planTile shrinks the board to
-      // whatever height this row ends up with (see useFitTile).
-      React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"flex-start",alignItems:"flex-start",padding:"16px 0 16px 16px",gap:12}},
+      // The board, centred. Never scrolls -- planTile shrinks the board to
+      // whatever room this area ends up with (see useFitTile).
+      React.createElement("div",{ref:planAreaRef,style:{flex:1,minHeight:0,overflowX:"hidden",overflowY:planClamped?"auto":"hidden",display:"flex",justifyContent:"center",alignItems:"flex-start",padding:16}},
         // grid
-        React.createElement("div",{style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0}},
+        React.createElement("div",{className:arenaBoardArt.className,style:{borderRadius:12,overflow:"hidden",boxShadow:"0 2px 12px rgba(0,0,0,0.08)",border:"1px solid #bbb",position:"relative",flexShrink:0,...arenaBoardArt.style}},
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:`repeat(${ARENA_GRID_COLS},${planTile}px)`,gridTemplateRows:`repeat(${ARENA_GRID_ROWS},${planTile}px)`,gap:0}},
             Array.from({length:ARENA_GRID_ROWS},(_,r)=>Array.from({length:ARENA_GRID_COLS},(_,c)=>{
               const isPlayerZone=r>=ARENA_PLAYER_START_ROW;
@@ -595,9 +587,9 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
               const isDivider=r===ARENA_PLAYER_START_ROW;
               const BORDER="1px solid #bbb";
               const onHoldStart=isPlayerZone&&creatureId
-                ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(creatureId);},180);})
+                ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyInfo(null);setGridInfoCreature(creatureId);},180);})
                 :enemyDef
-                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyMinimized(false);setArenaEnemyInfo(enemyDef);expandArenaPanel("enemy");},180);})
+                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(null);setArenaEnemyInfo(enemyDef);},180);})
                   :undefined;
               const onHoldEnd=isPlayerZone&&creatureId
                 ?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!arenaTouchDrag.dragRef.current.active){setPlanGrid(p=>{const n={...p};delete n[key];return n;});}})
@@ -605,7 +597,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
                   ?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}})
                   :undefined;
               return React.createElement("div",{
-                key,"data-cell":key,
+                key,"data-cell":key,className:boardCellClass(r,ARENA_PLAYER_START_ROW),
                 draggable:!!(isPlayerZone&&creatureId),
                 onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
                 onDragEnd:isPlayerZone&&creatureId?()=>rangePreview.clear():undefined,
@@ -629,92 +621,11 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
               },(()=>{const d=def||enemyDef;if(!d)return"";return React.createElement("div",{style:{position:"relative",width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("span",{style:{position:"absolute",top:1,left:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},typeIcon(d.type)),React.createElement("span",{style:{position:"absolute",top:1,right:2,fontSize:8,lineHeight:1,pointerEvents:"none"}},rangeIcon(d.attackType === "Ranged" ? "Ranged" : "Melee")),React.createElement(CreatureIcon,{def:d,size:planTile,contain:true}));})());
             })).flat()
           )
-        ),
-        // right info panels
-        React.createElement("div",{ref:arenaRightPanelRef,className:"plan-side-panel",style:{flex:1,alignSelf:"stretch",padding:"0 12px 0 0",minWidth:0,display:"flex",flexDirection:"column",gap:8}},
-          // enemy panel
-          arenaEnemyInfo&&(()=>{
-            const def=CREATURE_MAP[arenaEnemyInfo.id];
-            // Trials enemies wear equipment: listed under the header.
-            const gear=(arenaEnemyInfo.__equipped||[]).map(id=>EQUIPMENT_MAP[id]).filter(Boolean);
-            if(!def)return null;
-            const enemyMinBtn=React.createElement("button",{onClick:()=>setArenaEnemyMinimized(p=>{const next=!p;if(!next)expandArenaPanel("enemy");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},arenaEnemyMinimized?"＋":"－");
-            // Trials: the same header, gear and ability cards as the Trials screen's
-            // creature popup (TrialsHome.js), sized for this narrower column.
-            if(isTrials)return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-              enemyMinBtn,
-              React.createElement(TrialsEnemyHeader,{enemy:arenaEnemyInfo,enemyLevel:arenaEnemyLevel(level,stage),compact:true}),
-              !arenaEnemyMinimized&&React.createElement("div",{style:{marginTop:12}},React.createElement(TrialsEnemyBody,{enemy:arenaEnemyInfo,onTag:setArenaAbilityTagPopup,compact:true}))
-            );
-            return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-              enemyMinBtn,
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:arenaEnemyMinimized?0:12}},
-                React.createElement("div",null,
-                  React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
-                  React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+" · Lv."+arenaEnemyLevel(level,stage)+" · Enemy")
-                )
-              ),
-              !arenaEnemyMinimized&&gear.length>0&&React.createElement("div",{style:{marginBottom:10}},
-                React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}},"Equipment · Lv."+(arenaEnemyInfo.__equipLevel||1)),
-                gear.map(e=>React.createElement("div",{key:e.id,style:{marginBottom:4}},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:11,fontWeight:700,color:EQUIP_RARITY_CONFIG[e.rarity]?.color||"#333"}},React.createElement("span",null,gearIcon(e)),e.name),
-                  e.effect&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:1}},e.effect)
-                ))
-              ),
-              !arenaEnemyMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
-                if(!abl)return null;
-                const abilityTags=getAbilityTags(def.id,k);
-                return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setArenaAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-                  // Enemies fight with a maxed kit (see makeArenaBattle), so
-                  // show the last upgrade tier rather than the base one.
-                  React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},abl.upgrades?abl.upgrades[Math.min(MAX_ABILITY_LEVEL,abl.upgrades.length-1)]:"")
-                );
-              })
-            );
-          })(),
-          // ally creature panel
-          gridInfoCreature&&(()=>{
-            const def=CREATURE_MAP[gridInfoCreature];
-            const oc=owned&&owned[gridInfoCreature];
-            if(!def)return null;
-            return React.createElement("div",{style:{background:"#fff",borderRadius:14,padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.10)",position:"relative"}},
-              React.createElement("button",{onClick:()=>setArenaAllyMinimized(p=>{const next=!p;if(!next)expandArenaPanel("ally");return next;}),style:{position:"absolute",top:8,right:8,width:20,height:20,borderRadius:"50%",background:"#f0f0f0",border:"none",cursor:"pointer",fontSize:14,fontWeight:700,color:"#888",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1}},arenaAllyMinimized?"＋":"－"),
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:arenaAllyMinimized?0:12}},
-                React.createElement("div",null,
-                  React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#111"}},def.name),
-                  React.createElement("div",{style:{fontSize:11,color:"#666",fontWeight:600}},def.type+" · "+(def.attackType||"Melee")+(oc?" · Lv."+oc.level:""))
-                )
-              ),
-              !arenaAllyMinimized&&def.abilities&&Object.entries(def.abilities).map(([k,abl])=>{
-                if(!abl)return null;
-                const lvl=oc&&oc.abilityLevels?oc.abilityLevels[k]||0:0;
-                const desc=abl.upgrades?abl.upgrades[Math.min(lvl,abl.upgrades.length-1)]:"";
-                const abilityTags=getAbilityTags(def.id,k);
-                return React.createElement("div",{key:k,style:{marginBottom:10}},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginBottom:2}},
-                    React.createElement("div",{style:{fontSize:9,fontWeight:800,color:"#888",textTransform:"uppercase",letterSpacing:0.5}},abilityLabels[k]||k),
-                    abilityTags.length>0&&React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}},
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setArenaAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#111"}},abl.name),
-                  desc&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},desc)
-                );
-              })
-            );
-          })()
         )
       ),
-      // creature list
+      // creature list -- the info sheet takes its place while open
       React.createElement("div",{
-        style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
+        style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0,...(arenaEnemyInfo||gridInfoCreature?{display:"none"}:null)},
         onDragOver:e=>{e.preventDefault();rangePreview.clear();},
         onDrop:e=>{e.preventDefault();rangePreview.clear();if(dragCell){setPlanGrid(p=>{const n={...p};delete n[dragCell];return n;});}setDragId(null);setDragCell(null);}
       },
@@ -779,6 +690,29 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
           })
         )
       ),
+      // info sheet: the pressed enemy or ally
+      arenaEnemyInfo&&CREATURE_MAP[arenaEnemyInfo.id]&&React.createElement(PlanInfoSheet,{onClose:closeArenaSheet},
+        // Trials: the same header, gear and ability cards as the Trials
+        // screen's creature popup (TrialsHome.js).
+        isTrials
+          ?React.createElement(React.Fragment,null,
+            React.createElement(TrialsEnemyHeader,{enemy:arenaEnemyInfo,enemyLevel:arenaEnemyLevel(level,stage)}),
+            React.createElement("div",{style:{marginTop:12}},React.createElement(TrialsEnemyBody,{enemy:arenaEnemyInfo,onTag:setArenaAbilityTagPopup})))
+          :React.createElement(CreatureSheetBody,{
+            def:CREATURE_MAP[arenaEnemyInfo.id],
+            subtitle:arenaEnemyInfo.type+" · "+(arenaEnemyInfo.attackType||"Melee")+" · Lv."+arenaEnemyLevel(level,stage)+" · Enemy",
+            // Enemies fight with a maxed kit (see makeArenaBattle), so show
+            // the last upgrade tier rather than the base one.
+            descFor:(k,abl)=>abl.upgrades?abl.upgrades[Math.min(MAX_ABILITY_LEVEL,abl.upgrades.length-1)]:"",
+            onTag:setArenaAbilityTagPopup,
+          })),
+      gridInfoCreature&&CREATURE_MAP[gridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeArenaSheet},
+        React.createElement(CreatureSheetBody,{
+          def:CREATURE_MAP[gridInfoCreature],
+          subtitle:CREATURE_MAP[gridInfoCreature].type+" · "+(CREATURE_MAP[gridInfoCreature].attackType||"Melee")+(owned?.[gridInfoCreature]?" · Lv."+owned[gridInfoCreature].level:""),
+          descFor:allyDesc(owned?.[gridInfoCreature]),
+          onTag:setArenaAbilityTagPopup,
+        })),
       arenaTouchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[arenaTouchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:arenaTouchDrag.ghost.x-26,top:arenaTouchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})()
     );
   }

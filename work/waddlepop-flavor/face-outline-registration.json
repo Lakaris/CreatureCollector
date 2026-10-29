@@ -1,0 +1,16 @@
+{
+  "transform": [
+    0.99,
+    0.989,
+    2.96,
+    3.65
+  ],
+  "changedPixels": 673,
+  "bounds": [
+    169,
+    273,
+    205,
+    371
+  ],
+  "preservesOriginalOutsideContour": true
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "filename": "GlassBeach.jpg",
+    "path": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\flair\\backgrounds\\GlassBeach.jpg",
+    "width": 1536,
+    "height": 1536,
+    "format": "JPEG",
+    "bytes": 227626,
+    "beforeSha256": "7AA05268A182B9CAEF8A2C3B9F2C4FAB691AACF9E00607BA3B5F4DF6808CB603",
+    "afterSha256": "366483D5C0F24A3DE51204D77A57F48DE33AD8D6210720CEE5B55F2FB4C68867"
+  },
+  {
+    "filename": "VolcanicRidge.jpg",
+    "path": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\flair\\backgrounds\\VolcanicRidge.jpg",
+    "width": 1536,
+    "height": 1536,
+    "format": "JPEG",
+    "bytes": 194235,
+    "beforeSha256": "2CBCD26AB53C20A2821B96A8612BE905D9E943805D5B578E6DBDD0B72B217052",
+    "afterSha256": "1F1C8E1D90BA8880CA8A2C83A03EFAA39124E3916CCC196854B6F9703CC89A94"
+  },
+  {
+    "filename": "SnowGhostRidge.jpg",
+    "path": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\flair\\backgrounds\\SnowGhostRidge.jpg",
+    "width": 1536,
+    "height": 1536,
+    "format": "JPEG",
+    "bytes": 225690,
+    "beforeSha256": "B9865F16C819CD82A0C7B36B5F745E65BBFCE9732E6DC79B062D4B0A0B5AB603",
+    "afterSha256": "0AAD228EDEAA538565559B58DE91F5D2A9D3A597E8C7372D70CA9796D77F3F9D"
+  },
+  {
+    "filename": "OpenPlains.jpg",
+    "path": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\flair\\backgrounds\\OpenPlains.jpg",
+    "width": 1536,
+    "height": 1536,
+    "format": "JPEG",
+    "bytes": 232486,
+    "beforeSha256": "AD5DF20482238CA006C1A5B69E124FBC1022440163F51C63930DF4F3886E99BC",
+    "afterSha256": "DD0935421094ECF778E642169F5E7DE491AC77BB74838D3F06D752B19B8AF07A"
+  }
+]

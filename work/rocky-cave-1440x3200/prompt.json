@@ -1,0 +1,16 @@
+{
+  "tool": "Built-in ImageGen",
+  "mode": "edit / canvas extension",
+  "prompt": "Use case: precise-object-edit — canvas extension / outpainting.\nInput image 1 is the EXACT approved cave background to preserve, not loose inspiration.\nTask: adapt this existing 3:4 cave illustration to a high-resolution 9:20 portrait canvas, EXACTLY 1440 x 3200 pixels, without redesigning the cave.\nPRESERVATION: Keep the same muted mauve-gray / taupe palette, subdued plum-gray outlines, simple broad polygonal cel shading, very low-contrast distant wall, the existing left/right boulder silhouettes, the existing few ceiling stalactites, and the open quiet floor. Retain each distinctive rock shape and its asymmetry. No change of style or lighting, no new props, no sharpened black outlines, no added small cracks or texture. No lake, water, roots, moss, plants, crystals, creatures, grid, board, text or UI.\nGEOMETRY: make a taller canvas by extending the EXISTING artwork ABOVE and BELOW, not by squeezing it horizontally or stretching rocks vertically. Imagine the full original image uniformly scaled to 1440 x 1920, centered at y=640..2560 on the final 1440 x 3200 canvas. Preserve that central original section as faithfully as possible, retaining its FULL WIDTH including both side walls; do not crop or recompose its sides. Seamlessly continue the existing ceiling and rock walls upward into the extra 640px above, and continue the same quiet flat-patterned stone floor downward into the extra 640px below. Extend existing contours naturally where needed; no duplicated rocks, mirrored repeats or visible seams. The original hanging stalactites remain attached through the extended ceiling. The original foreground left boulder remains at its existing scaled relative position in the central original section. Do not invent more boulders in the added floor.\nThe final composition must read as exactly the same familiar cave with extra breathing room above and below. Preserve the quiet center where game panels sit, side walls remain visible within a narrow phone portrait, floor stays soft and simple. Full bleed opaque image.\nRESOLUTION: deliver a genuinely high-resolution 1440 x 3200 final render with clean smooth existing-style edges. Do not deliver a small preview or a collage. No border, no labels, no comparison panel. Output only the extended cave artwork.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-baf881b2-d2dc-4164-a625-c5c44e7ccab6.png",
+  "reference": "images/battle_backgrounds/rocky.jpg",
+  "destination": "images/battle_backgrounds/rocky.jpg",
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "export_note": "High-quality resampling to requested size; not a native 1440 x 3200 render. Ceiling and floor were extended while preserving the cave's visual design."
+}

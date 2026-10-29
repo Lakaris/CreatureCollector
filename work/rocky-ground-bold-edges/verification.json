@@ -1,0 +1,14 @@
+{
+  "destination": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+  "original_sha256": "3a964cc120f920763d7ad74b4ea0e5b3319abf14cfd335ae7b3074b19ebad3b4",
+  "width": 1536,
+  "height": 2048,
+  "format": "JPEG",
+  "mean_rgb": [
+    198.17,
+    186.15,
+    180.56
+  ],
+  "bytes": 483364,
+  "note": "Standalone overhead ground background; the grid and existing board art remain separate assets."
+}

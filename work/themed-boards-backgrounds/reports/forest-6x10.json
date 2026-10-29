@@ -1,0 +1,60 @@
+{
+  "id": "forest-6x10",
+  "theme": "forest",
+  "kind": "board",
+  "destination": "images/board_backgrounds/forest6x10.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-47450c54-a25b-4879-9462-087fc800960c.png",
+  "source_sha256": "997891e0a14c8cfe5e79d13befaf2fffb314ad11084393c52d5501f4eb007c27",
+  "native_render_size": [
+    971,
+    1619
+  ],
+  "width": 1200,
+  "height": 2000,
+  "format": "JPEG",
+  "bytes": 545379,
+  "sha256": "1b781cdd1f8f77d4d43e45e409a7afdbb1bc7ec1cc36b2df1061fe9067ad2deb",
+  "resampled": true,
+  "x_centers": [
+    199.969,
+    400.014,
+    599.992,
+    799.995,
+    1000.036
+  ],
+  "y_centers": [
+    199.981,
+    399.994,
+    599.996,
+    799.985,
+    999.982,
+    1199.981,
+    1399.988,
+    1599.997,
+    1799.974
+  ],
+  "checked_cross_sections": 312,
+  "max_center_error_px": 0.0664,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      198.12155528550994,
+      400.2260823217978,
+      600.5089975186995,
+      801.3630624019388,
+      1002.4831332237899
+    ],
+    "y": [
+      198.75297136418513,
+      398.7526852615756,
+      598.8913264934063,
+      799.3621301061596,
+      999.3699112959438,
+      1199.3222232854791,
+      1399.633404481754,
+      1599.8378584863085,
+      1799.7641051793792
+    ]
+  },
+  "geometric_correction_passes": 1
+}

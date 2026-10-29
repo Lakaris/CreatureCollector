@@ -1,0 +1,204 @@
+{
+  "image": "waddlepop_move.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 6,
+  "rows": 4,
+  "loop": true,
+  "totalDurationMs": 1200,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 5,
+      "x": 2560,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 9,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 10,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 11,
+      "x": 2560,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 13,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 14,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 15,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 16,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 17,
+      "x": 2560,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 18,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 19,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 20,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 21,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 22,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    },
+    {
+      "index": 23,
+      "x": 2560,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 50
+    }
+  ],
+  "notes": "Gentle walk in place: feet alternate lifting and planting, with a small body sway. The bomb lightly bounces between the raised flippers and the fuse sparks continuously. Face, body and foot artwork retain their proportions. Each foot has a complete 6.25 px dark contour. Frame 1 uses the base pose with corrected foot outlines; the loop approaches it continuously without a duplicated final frame."
+}

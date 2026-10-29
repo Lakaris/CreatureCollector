@@ -1,0 +1,177 @@
+{
+  "headMotion": "rotation and translation only",
+  "flipperDeformationOnFace": false,
+  "headSilhouettePreserved": true,
+  "facialFeaturesAnimated": true,
+  "reference": "Per-frame expression artwork; original face outside eyes and beak",
+  "frames": [
+    {
+      "frame": 2,
+      "expression": "base",
+      "pixelsChecked": 16632,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 3,
+      "expression": "base",
+      "pixelsChecked": 16628,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 4,
+      "expression": "base",
+      "pixelsChecked": 16638,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 5,
+      "expression": "base",
+      "pixelsChecked": 16630,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 6,
+      "expression": "base",
+      "pixelsChecked": 16636,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 7,
+      "expression": "base",
+      "pixelsChecked": 16634,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 8,
+      "expression": "half",
+      "pixelsChecked": 16629,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 9,
+      "expression": "squeezed-small",
+      "pixelsChecked": 16632,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 10,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16630,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 11,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16627,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 12,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16634,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 13,
+      "expression": "squeezed-small",
+      "pixelsChecked": 16637,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 14,
+      "expression": "squeezed-small",
+      "pixelsChecked": 16631,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 15,
+      "expression": "squeezed-closed",
+      "pixelsChecked": 16628,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 16,
+      "expression": "squeezed-small",
+      "pixelsChecked": 16628,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 17,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16631,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 18,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16631,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 19,
+      "expression": "squeezed-open",
+      "pixelsChecked": 16631,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 20,
+      "expression": "squeezed-small",
+      "pixelsChecked": 16635,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 21,
+      "expression": "squeezed-closed",
+      "pixelsChecked": 16633,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 22,
+      "expression": "half",
+      "pixelsChecked": 16631,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 23,
+      "expression": "base",
+      "pixelsChecked": 16634,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 24,
+      "expression": "base",
+      "pixelsChecked": 16622,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 25,
+      "expression": "base",
+      "pixelsChecked": 16625,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 26,
+      "expression": "base",
+      "pixelsChecked": 16628,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 27,
+      "expression": "base",
+      "pixelsChecked": 16629,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 28,
+      "expression": "base",
+      "pixelsChecked": 16633,
+      "maxColorChannelError": 0
+    },
+    {
+      "frame": 29,
+      "expression": "base",
+      "pixelsChecked": 16643,
+      "maxColorChannelError": 0
+    }
+  ]
+}

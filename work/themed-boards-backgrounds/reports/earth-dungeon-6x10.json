@@ -1,0 +1,60 @@
+{
+  "id": "earth-dungeon-6x10",
+  "theme": "earth-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/earth-dungeon6x10.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-8e432b66-a856-4280-b29a-7f3decc7997f.png",
+  "source_sha256": "976b78f1d04dde1afb826b57298480652d6238bf73ede441ebf7d4a8a2638b2a",
+  "native_render_size": [
+    972,
+    1619
+  ],
+  "width": 1200,
+  "height": 2000,
+  "format": "JPEG",
+  "bytes": 586109,
+  "sha256": "7e70bbaa54b5482d73eea1a817f7d7f2f7aa80a9d9a70268c21d61a874f06471",
+  "resampled": true,
+  "x_centers": [
+    199.967,
+    400.011,
+    599.994,
+    799.996,
+    1000.01
+  ],
+  "y_centers": [
+    199.99,
+    399.995,
+    599.988,
+    799.995,
+    999.986,
+    1199.976,
+    1399.98,
+    1600.002,
+    1799.982
+  ],
+  "checked_cross_sections": 312,
+  "max_center_error_px": 0.0505,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      197.88897899759556,
+      399.4270661050421,
+      599.6268730389077,
+      799.9386050700359,
+      1000.6115064452704
+    ],
+    "y": [
+      198.83551815869976,
+      398.4069364023468,
+      598.6837747374104,
+      798.9702688385405,
+      999.5490564106149,
+      1199.5743281221676,
+      1399.8189614208143,
+      1600.0022601215626,
+      1799.7980724944462
+    ]
+  },
+  "geometric_correction_passes": 1
+}

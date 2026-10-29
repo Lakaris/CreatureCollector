@@ -1,0 +1,52 @@
+{
+  "id": "fire-dungeon-background",
+  "theme": "fire-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/fire-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-06d0ba47-2f44-4b64-8af1-299a23750592.png",
+  "source_sha256": "7147c3c360e5f0c5d5941d431b8b73ff418bddd8066ea11cbe0f56da19b78a40",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 660568,
+  "sha256": "d5cff8da1000c096eca35d480444a5c3fc86a5baa3fa0bd3ea4e7f65678dfb91",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

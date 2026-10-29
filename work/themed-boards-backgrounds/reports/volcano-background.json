@@ -1,0 +1,52 @@
+{
+  "id": "volcano-background",
+  "theme": "volcano",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/volcano.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2181a6a7-0627-4a10-b729-599d877da8be.png",
+  "source_sha256": "1c78cc495218f1536ea7ef67cc28c3f38e4da9b8accda68d2c29cc8d1f6021f4",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 616256,
+  "sha256": "a2e5d87ca67ac5cf3fa9b640728bb2a2ceccbf0a209810e93de117b042d47381",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

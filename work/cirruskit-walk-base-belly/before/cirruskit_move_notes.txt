@@ -1,0 +1,13 @@
+Cirruskit walk — separate stationary belly and moving legs
+
+30 transparent 512 x 512 frames in a 6 x 5 grid. Each frame lasts 50 ms; the loop lasts 1500 ms. Read left to right, top to bottom. No duplicate final frame.
+
+The front belly curve now belongs to a separate stationary torso layer. The upper leg moves behind that curve, using the existing clean leg backing. The original lower-paw texture and outer leg artwork are retained. The near-front shoulder attachment stays with the body and blends into the lower leg movement. The gait parameters, diagonal pairs, pivots, body bob, tail sway and timing are unchanged.
+
+The stationary contour was rebuilt as a continuous curve, removing the second belly stroke carried by the old leg cutout. Small contact-edge sampling holes were closed in frames 1, 2, 4 and 22. The normal space between the crossing legs in frame 23 remains transparent.
+
+Checked all 30 frames, with particular attention to frames 22 and 23. 10,410 comparisons, including 5,610 dark-outline pixels, confirm that the visible belly stays in the same body-relative position. There are no isolated dark marks in the front-leg inspection area. 3,840,000 comparisons confirm that the rear half, including the previous tail/rear-leg correction, is unchanged. The source lower-paw pixels are unchanged. Face and mane color checks, connected-silhouette checks, loop continuity, and game/preview timing checks passed. Idle and flavor assets are unchanged. See cirruskit_move_audit.json for the complete results.
+
+Current rebuild: ../../work/cirruskit-walk-belly-separation/rebuild.cjs. The previous delivered spritesheet and metadata are backed up in its before/ folder. This revision changes the animation layer structure, contour and attachment weights using the existing source artwork and code-generated masks. No new image generation was used.
+
+The HTML preview provides synchronized reference timing, full-size and 130 px views, and frame inspection controls. Reload an already-open tab to load the updated sheet.

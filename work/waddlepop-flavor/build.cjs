@@ -2,10 +2,24 @@ const fs=require('fs'),crypto=require('crypto');
 const sharp=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp');
 const {PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs');
 const root='work/waddlepop-flavor',S=512,N=30;
-const read=p=>PNG.sync.read(fs.readFileSync(p)),save=(p,im)=>fs.writeFileSync(p,PNG.sync.write(im));
+// Most of the gesture comes from the body and bomb. Keep the local arm reach
+// below 1.5px so the source flipper silhouettes and white tips stay consistent.
+const ARM_FOLLOW=.06;
+// Increase only the rendered bomb motion. The original bomb pose below still
+// drives the already-approved hands, so their animation cannot change.
+const BOMB_ROLL_GAIN=1.6,BOMB_SWAY_GAIN=1.25;
+const read=p=>PNG.sync.read(fs.readFileSync(p)),save=(p,im)=>{const temp=p+'.building-'+process.pid;fs.writeFileSync(temp,PNG.sync.write(im));fs.renameSync(temp,p);};
 const base=read(root+'/base.png');
+const expressions=require('./expressions.cjs');
+const droplets=require('./droplets.cjs');
+const subtleHands=require('./subtle-hands.cjs');
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const sm=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+// The entire head has one rigid transform. These bounds include both cheek
+// contours and the tuft; flipper motion falls to zero before reaching them.
+const headBounds=[[190,218,307],[215,211,304],[240,205,315],[260,195,328],[275,181,337],[290,175,342],[310,169,348],[330,168,353],[350,173,353],[365,184,343],[378,212,317],[390,215,315]];
+function cheekBounds(y){let j=0;while(j<headBounds.length-2&&y>headBounds[j+1][0])j++;const u=clamp((y-headBounds[j][0])/(headBounds[j+1][0]-headBounds[j][0]),0,1);return[1,2].map(i=>headBounds[j][i]+(headBounds[j+1][i]-headBounds[j][i])*u);}
+function rigidHead(x,y){const [left,right]=cheekBounds(y);return y>=190&&y<=388&&x>=left-7&&x<=right+7;}
 function sample(im,x,y){const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy;let o=[0,0,0,0];for(let j=0;j<2;j++)for(let i=0;i<2;i++){const xx=ix+i,yy=iy+j;if(xx<0||yy<0||xx>=S||yy>=S)continue;const k=(yy*S+xx)*4,a=im.data[k+3]/255,w=(i?fx:1-fx)*(j?fy:1-fy);for(let c=0;c<3;c++)o[c]+=im.data[k+c]*a*w;o[3]+=a*w;}return o;}
 function over(out,k,p){const a=p[3];if(a<.001)return;const da=out.data[k+3]/255,oa=a+da*(1-a);for(let c=0;c<3;c++)out.data[k+c]=Math.round((p[c]+out.data[k+c]*da*(1-a))/oa);out.data[k+3]=Math.round(oa*255);}
 function rot(x,y,p){const a=p.a*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return[p.cx+c*(x-p.cx)-s*(y-p.cy)+p.x,p.cy+s*(x-p.cx)+c*(y-p.cy)+p.y];}
@@ -31,27 +45,70 @@ for(let y=0;y<192;y++)for(let x=0;x<S;x++){const k=(y*S+x)*4,w=sm(178,192,y);for
 // Use the clean reconstructed exterior only; retain original interior artwork.
 const isolated=PNG.sync.read(await sharp('work/waddlepop-flavor/character-isolated-source.png').resize(S,S).png().toBuffer());
 for(let y=0;y<S;y++)for(let x=0;x<S;x++){const k=(y*S+x)*4;if(y>=300){base.data.copy(character.data,k,k,k+4);continue;}let interior=isolated.data[k+3]>240&&isolated.data[k]>70;for(let dy=-4;dy<=4&&interior;dy++)for(let dx=-4;dx<=4;dx++){const xx=x+dx,yy=y+dy;if(xx<0||xx>=S||yy<0||yy>=S||isolated.data[(yy*S+xx)*4+3]<240){interior=false;break;}}for(let c=0;c<3;c++)character.data[k+c]=interior?base.data[k+c]:isolated.data[k+c];character.data[k+3]=isolated.data[k+3];if(!character.data[k+3])character.data.fill(0,k,k+4);}
+// The face itself comes directly from the corrected base, including the added
+// left contour. Its original colors and eye/beak spacing are never re-painted.
+for(let y=270;y<=388;y++)for(let x=155;x<365;x++)if(rigidHead(x,y)){const k=(y*S+x)*4;base.data.copy(character.data,k,k,k+4);}
 save(root+'/character.png',character);save(root+'/bomb.png',bomb);
-const poses=[],frames=[];
+const expressionCharacters=expressions.characters(character);
+const poses=[],bombPoses=[],frames=[],headAudit=[],wobbleAudit=[],handAudit=[],dropletReport=Array.from({length:N},(_,n)=>({frame:n+1,visible:false}));
 for(let n=0;n<N;n++){
  const t=n/(N-1),p=pose(t);poses.push(p);
- if(n===0||n===N-1){frames.push(PNG.sync.read(PNG.sync.write(base)));continue;}
- const out=new PNG({width:S,height:S});
+ if(n===0||n===N-1){frames.push(PNG.sync.read(PNG.sync.write(base)));bombPoses.push({...p.bomb});wobbleAudit.push({frame:n+1,endpointExact:true});handAudit.push({frame:n+1,endpointExact:true,changedPixels:0});continue;}
+ const expression=expressions.states[n],frameCharacter=expressionCharacters[expression],frameFace=expressions.faces[expression];
+ const out=new PNG({width:S,height:S}),reference=new PNG({width:S,height:S}),foreground=new PNG({width:S,height:S});
  // Preserve the complete spark inside the frame even at the largest wobble.
  let minY=S;for(let y=0;y<290;y++)for(let x=90;x<440;x++)if(bomb.data[(y*S+x)*4+3]>16)minY=Math.min(minY,rot(x,y,p.bomb)[1]);if(minY<3)p.bomb.y+=3-minY;
- for(let y=0;y<S;y++)for(let x=0;x<S;x++){const q=inv(x,y,p.bomb);over(out,(y*S+x)*4,sample(bomb,...q));}
- const targets=[[153,243],[357,249]],deltas=targets.map((v,i)=>{const b=rot(...v,p.body),q=rot(...v,p.bomb),r=i?p.releaseR:p.releaseL;return[clamp(q[0]-b[0]+(i?1:-1)*r*.6,-13,13),clamp(q[1]-b[1]+r,-20,24)];});
+ const renderBomb={...p.bomb,a:p.bomb.a*BOMB_ROLL_GAIN,x:p.bomb.x*BOMB_SWAY_GAIN};
+ let renderMinY=S;for(let y=0;y<290;y++)for(let x=90;x<440;x++)if(bomb.data[(y*S+x)*4+3]>16)renderMinY=Math.min(renderMinY,rot(x,y,renderBomb)[1]);if(renderMinY<3)renderBomb.y+=3-renderMinY;
+ bombPoses.push(renderBomb);
+ for(let y=0;y<S;y++)for(let x=0;x<S;x++){
+  over(out,(y*S+x)*4,sample(bomb,...inv(x,y,renderBomb)));
+  over(reference,(y*S+x)*4,sample(bomb,...inv(x,y,p.bomb)));
+ }
+ const targets=[[153,243],[357,249]],deltas=targets.map((v,i)=>{const b=rot(...v,p.body),q=rot(...v,p.bomb),r=i?p.releaseR:p.releaseL;return[clamp(q[0]-b[0]+(i?1:-1)*r*.6,-13,13)*ARM_FOLLOW,clamp(q[1]-b[1]+r,-20,24)*ARM_FOLLOW];});
  const kick=Math.sin(t*Math.PI*5)*Math.sin(t*Math.PI),feet=[[-3*kick,-Math.max(0,kick)*5],[3*kick,-Math.max(0,-kick)*5]];
- function map(x,y){const b=rot(x,y,p.body);const wl=(1-sm(177,207,x))*(1-sm(265,390,y)),rightStart=309+30*sm(275,325,y),wr=sm(rightStart,rightStart+28,x)*(1-sm(275,390,y));let dx=wl*deltas[0][0]+wr*deltas[1][0],dy=wl*deltas[0][1]+wr*deltas[1][1];const fw=sm(427,465,y),side=sm(230,290,x);dx+=fw*((1-side)*feet[0][0]+side*feet[1][0]);dy+=fw*((1-side)*feet[0][1]+side*feet[1][1]);return[b[0]+dx,b[1]+dy];}
+ function map(x,y){const b=rot(x,y,p.body);if(rigidHead(x,y))return b;const [left,right]=cheekBounds(y);const wl=sm(10,55,left-x)*(1-sm(265,390,y)),wr=sm(10,55,x-right)*(1-sm(275,390,y));let dx=wl*deltas[0][0]+wr*deltas[1][0],dy=wl*deltas[0][1]+wr*deltas[1][1];const fw=sm(427,465,y),side=sm(230,290,x);dx+=fw*((1-side)*feet[0][0]+side*feet[1][0]);dy+=fw*((1-side)*feet[0][1]+side*feet[1][1]);return[b[0]+dx,b[1]+dy];}
+ let facePixels=0,faceError=0;
  for(let y=180;y<S;y++)for(let x=75;x<440;x++){
- let [sx,sy]=inv(x,y,p.body);for(let pass=0;pass<14;pass++){const q=map(sx,sy);const a=p.body.a*Math.PI/180,ex=x-q[0],ey=y-q[1];sx+=(Math.cos(a)*ex+Math.sin(a)*ey)*.7;sy+=(-Math.sin(a)*ex+Math.cos(a)*ey)*.7;}over(out,(y*S+x)*4,sample(character,sx,sy));}
+ let [sx,sy]=inv(x,y,p.body);const pinned=rigidHead(sx,sy);if(!pinned)for(let pass=0;pass<20;pass++){const q=map(sx,sy);const a=p.body.a*Math.PI/180,ex=x-q[0],ey=y-q[1];sx+=(Math.cos(a)*ex+Math.sin(a)*ey)*.7;sy+=(-Math.sin(a)*ex+Math.cos(a)*ey)*.7;}const k=(y*S+x)*4,under=[...out.data.subarray(k,k+4)],characterPixel=sample(frameCharacter,sx,sy);over(out,k,characterPixel);over(reference,k,characterPixel);over(foreground,k,characterPixel);
+ // Independently compare the rendered face to the corrected base under a
+ // single rotation/translation, with no flipper deformation or cross-fade.
+ if(pinned&&sy>=280&&sy<=377){const [l,r]=cheekBounds(sy);if(sx>=l-3&&sx<=r-2){const expected=sample(frameFace,sx,sy);if(expected[3]>.98){facePixels++;const da=under[3]/255,ea=expected[3]+da*(1-expected[3]);for(let c=0;c<3;c++){const color=Math.round((expected[c]+under[c]*da*(1-expected[3]))/ea);faceError=Math.max(faceError,Math.abs(out.data[k+c]-color));}}}}
+ }
+ if(facePixels<10000||faceError!==0)throw new Error('Face preservation check failed in frame '+(n+1)+': '+facePixels+' checked, '+faceError+' error');headAudit.push({frame:n+1,expression,pixelsChecked:facePixels,maxColorChannelError:faceError});
+ dropletReport[n]=droplets.paint(out,n,p.body);
+ droplets.paint(reference,n,p.body);
+ droplets.paint(foreground,n,p.body);
+ const previous=read(`${root}/before-bomb-wobble/frames/frame-${String(n+1).padStart(2,'0')}.png`);
+ if(!reference.data.equals(previous.data))throw Error('Original penguin rendering changed in pose '+(n+1));
+ let lockedPixels=0,changedBelowBomb=0;
+ // The source art has a few nearly opaque interior pixels. Freeze those
+ // displayed colors too, so a different background never tints the penguin.
+ for(let y=0;y<S;y++)for(let x=0;x<S;x++){
+  const k=(y*S+x)*4;
+  if(foreground.data[k+3]>=250){reference.data.copy(out.data,k,k,k+4);lockedPixels++;}
+  if(y>=340&&!reference.data.subarray(k,k+4).equals(out.data.subarray(k,k+4)))changedBelowBomb++;
+ }
+ if(changedBelowBomb)throw Error('Unexpected change below bomb in pose '+(n+1));
+ wobbleAudit.push({frame:n+1,priorFrameReconstructedExactly:true,sameForegroundSampleForBothBombs:true,lockedCharacterAndDropletPixels:lockedPixels,changedPixelsBelowBomb:changedBelowBomb,originalBomb:p.bomb,renderedBomb:renderBomb});
+ handAudit.push(subtleHands.adjust(out,{n,p,frameCharacter,bomb,renderBomb,map,rot,inv,sample,over,sm,cheekBounds,rigidHead}));
  frames.push(out);
 }
 const sheet=new PNG({width:3072,height:2560});for(let n=0;n<N;n++){save(`${root}/frames/frame-${String(n+1).padStart(2,'0')}.png`,frames[n]);PNG.bitblt(frames[n],sheet,0,0,S,S,n%6*S,Math.floor(n/6)*S);}
 save(root+'/waddlepop_flavor.png',sheet);fs.writeFileSync(root+'/poses.json',JSON.stringify(poses,null,2));
+fs.writeFileSync(root+'/bomb-poses.json',JSON.stringify(bombPoses,null,2));
+fs.writeFileSync(root+'/hand-motion-audit.json',JSON.stringify({method:'Small flipper rotations around fixed shoulders, with a taper away from the protected face; sampled directly from existing artwork',faceAndBodyIdenticalToPrior:true,maximumAddedMovementPx:Math.max(...handAudit.map(f=>f.maximumAddedMovementPx||0)),frames:handAudit},null,2));
+fs.writeFileSync(root+'/bomb-wobble-audit.json',JSON.stringify({angularGain:BOMB_ROLL_GAIN,horizontalGain:BOMB_SWAY_GAIN,bodySourceAndMotionUnchanged:true,flipperTargetsUseOriginalBombPoses:true,expressionsAndDropletsUnchanged:true,penguinCorePixelsIdenticalToPrevious:true,frames:wobbleAudit},null,2));
+fs.writeFileSync(root+'/droplets/timeline.json',JSON.stringify(dropletReport,null,2));
+fs.writeFileSync(root+'/rigid-face-audit.json',JSON.stringify({headMotion:'rotation and translation only',flipperDeformationOnFace:false,headSilhouettePreserved:true,facialFeaturesAnimated:true,reference:'Per-frame expression artwork; original face outside eyes and beak',frames:headAudit},null,2));
 const durations=Array(N).fill(60);durations[0]=300;durations[N-1]=360;
-const meta={image:'waddlepop_flavor.png',frameWidth:S,frameHeight:S,columns:6,rows:5,loop:false,totalDurationMs:durations.reduce((a,b)=>a+b),frames:durations.map((durationMs,index)=>({index,x:index%6*S,y:Math.floor(index/6)*S,width:S,height:S,durationMs})),notes:'Stumble, fumble the snow bomb left and right, catch and settle. First and last frames are pixel-identical to waddlepop_idle.png. Original artwork supplies the character interiors. Reconstructed exterior edges and bomb underside allow independent movement without leftover fragments.'};fs.writeFileSync(root+'/waddlepop_flavor.json',JSON.stringify(meta,null,2));
+const meta={image:'waddlepop_flavor.png',frameWidth:S,frameHeight:S,columns:6,rows:5,loop:false,totalDurationMs:durations.reduce((a,b)=>a+b),frames:durations.map((durationMs,index)=>({index,x:index%6*S,y:Math.floor(index/6)*S,width:S,height:S,durationMs})),expressions:expressions.states,effects:{detachedNervousDroplets:{side:'viewer-left',count:3,frameRanges:[[9,14],[16,21]],style:'Bold dark outlines, slightly larger, closer to the flipper; remain detached'}},notes:'Stumble, fumble the snow bomb left and right, catch and settle. First and last frames are pixel-identical to waddlepop_idle.png. During the fumble, eyes squeeze to > < while the beak opens into an O and closes in two little beats. Three bold cyan nervous droplets pop outward on the left in two small bursts, disappearing before recovery. The enlarged droplets sit closer to the flipper and stay readable at the end of each burst. Head silhouette, cheek contours, flipper shapes, body motion, bomb motion and timing are preserved.'};fs.writeFileSync(root+'/waddlepop_flavor.json',JSON.stringify(meta,null,2));
+fs.writeFileSync(root+'/body-sequence.json',JSON.stringify(meta,null,2));
 const tiles=[];for(let n=0;n<N;n++)tiles.push({input:await sharp(PNG.sync.write(frames[n])).resize(256,256).flatten({background:n%2?'#322b39':'#e7e3ed'}).png().toBuffer(),left:n%6*256,top:Math.floor(n/6)*280});
-await sharp({create:{width:1536,height:1400,channels:4,background:'#eceaf0'}}).composite(tiles).png().toFile(root+'/contact.png');
+// Keep inspected contact sheets immutable because desktop image viewers may
+// hold their files open on Windows. A changed sheet gets a fresh review file.
+const contactPath=root+'/contact-'+crypto.createHash('sha256').update(sheet.data).digest('hex').slice(0,12)+'.png';
+if(!fs.existsSync(contactPath))fs.writeFileSync(contactPath,await sharp({create:{width:1536,height:1400,channels:4,background:'#eceaf0'}}).composite(tiles).png().toBuffer());
+fs.writeFileSync(root+'/latest-contact.json',JSON.stringify({path:contactPath}));
 console.log(JSON.stringify({frames:N,duration:meta.totalDurationMs,endpointsExact:frames[0].data.equals(base.data)&&frames[N-1].data.equals(base.data),baseSha:crypto.createHash('sha256').update(fs.readFileSync(root+'/base.png')).digest('hex')}));
 })();

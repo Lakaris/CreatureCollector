@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cirruskit · defeated animation</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:28px 20px;background:#efedf5;color:#282131;font-family:system-ui,sans-serif;text-align:center}h1{font-size:24px;margin:0 0 8px}p{color:#665c70;margin:8px 0 20px}.views{display:flex;justify-content:center;align-items:flex-start;gap:28px;flex-wrap:wrap}.card{padding:18px;background:#faf9fd;border:1px solid #e3deed;border-radius:18px}.card h2{font-size:16px;margin:0 0 14px}.checker{display:grid;place-items:center;border-radius:14px;background:conic-gradient(#e9e5ef 25%,white 0 50%,#e9e5ef 0 75%,white 0) 0 0/20px 20px;overflow:hidden}.small{width:250px;height:250px}.large{width:min(512px,calc(100vw - 80px));aspect-ratio:1}.sprite{background-image:url('cirruskit_defeat.png?revision=f02c0c07e847');background-size:600% 400%;background-repeat:no-repeat;flex:none}.small .sprite{width:130px;height:130px}.large .sprite{width:100%;height:100%}.dark .checker{background:#302b3b}.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:20px 0 12px}button,select{font:inherit;color:inherit;border:1px solid #d8cfe5;border-radius:9px;background:white;padding:10px 14px;cursor:pointer}button:hover{background:#f5f0fc}input{width:min(440px,90vw);accent-color:#6e537f}#status{margin:0 0 4px}#phase{margin:14px 0}footer{font-size:13px;color:#746b7e}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9475b0;outline-offset:2px}
+.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:1140px;margin:0 auto;gap:24px}.card{min-width:0;padding:min(18px,2vw)}.large{width:100%;max-width:512px;margin:0 auto}.base-image{display:block;width:100%;height:100%;object-fit:contain}.game-preview{width:max-content;max-width:100%;margin:24px auto 0}@media(max-width:600px){body{padding:20px 10px}.views{gap:10px}.card h2{font-size:13px}}
+</style>
+</head>
+<body>
+<h1>Cirruskit · defeated animation</h1>
+<p>Stretched flop · rear paw hidden behind the tail · holds the defeated pose</p>
+<div class="views">
+ <section class="card"><h2>Base image · 512 × 512</h2><div class="checker large"><img class="base-image" src="cirruskit_base.png" width="512" height="512" alt="Cirruskit original base pose"></div></section>
+ <section class="card"><h2>Animation · 512 × 512</h2><div class="checker large"><div class="sprite" role="img" aria-label="Cirruskit defeated animation enlarged"></div></div></section>
+</div>
+<div class="controls"><button id="toggle">Pause</button><button id="replay">Replay defeat</button><button id="previous">Previous frame</button><button id="next">Next frame</button><select id="speed" aria-label="Playback speed"><option value="1">Normal speed</option><option value="0.5">Half speed</option><option value="0.25">Quarter speed</option></select><button id="background">Dark background</button></div>
+<div id="status">Frame 1 of 24</div><input id="scrubber" type="range" min="0" max="23" value="0" step="1" aria-label="Animation frame"><p id="phase">Dazed</p>
+<footer>24 frames · 0.72 seconds · 6 × 4 sheet · plays once and holds</footer>
+<section class="card game-preview"><h2>Game size · 130 × 130</h2><div class="checker small"><div class="sprite" role="img" aria-label="Cirruskit defeated animation at game size"></div></div></section>
+<script>
+const sprites=[...document.querySelectorAll('.sprite')],toggle=document.getElementById('toggle'),slider=document.getElementById('scrubber'),status=document.getElementById('status'),phase=document.getElementById('phase'),speed=document.getElementById('speed');
+const frameMs=30,frameCount=24,totalMs=720;
+let elapsed=0,frame=0,playing=true,last=performance.now();
+function paint(n){frame=Math.max(0,Math.min(frameCount-1,n));const x=(frame%6)/5*100,y=Math.floor(frame/6)/3*100;sprites.forEach(s=>s.style.backgroundPosition=`${x}% ${y}%`);slider.value=frame;status.textContent=`Frame ${frame+1} of ${frameCount}`;phase.textContent=frame<5?'Dazed':frame<12?'Flop down':frame<20?'Settling':'Defeated · held pose';}
+function pause(){playing=false;toggle.textContent=elapsed>=totalMs?'Replay':'Play';}
+function replay(){elapsed=0;last=performance.now();playing=true;toggle.textContent='Pause';paint(0);}
+toggle.onclick=()=>{if(playing)pause();else if(elapsed>=totalMs)replay();else{playing=true;last=performance.now();toggle.textContent='Pause';}};
+document.getElementById('replay').onclick=replay;
+function seek(n){elapsed=Math.max(0,Math.min(frameCount-1,n))*frameMs;pause();paint(Math.floor(elapsed/frameMs));}
+document.getElementById('previous').onclick=()=>seek(frame-1);document.getElementById('next').onclick=()=>seek(frame+1);slider.oninput=()=>seek(Number(slider.value));
+speed.onchange=()=>{last=performance.now();};
+document.getElementById('background').onclick=event=>{const dark=document.body.classList.toggle('dark');event.target.textContent=dark?'Light background':'Dark background';};
+function tick(now){if(playing){elapsed=Math.min(totalMs,elapsed+(now-last)*Number(speed.value));paint(Math.min(frameCount-1,Math.floor(elapsed/frameMs)));if(elapsed>=totalMs)pause();}last=now;requestAnimationFrame(tick);}
+paint(0);requestAnimationFrame(tick);
+</script>
+</body></html>

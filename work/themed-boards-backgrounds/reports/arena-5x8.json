@@ -1,0 +1,54 @@
+{
+  "id": "arena-5x8",
+  "theme": "arena",
+  "kind": "board",
+  "destination": "images/board_backgrounds/arena5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-5d890522-4417-4fff-985e-dad085d3b4e2.png",
+  "source_sha256": "dadb4e99a49e4664759774c06f2351b864b238e3352d61baac897812eb64aef5",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 364749,
+  "sha256": "bc5577c74583172cf6deabe88e4d10491e9825a526e0a2e79d84bffb96d23e7e",
+  "resampled": true,
+  "x_centers": [
+    199.995,
+    399.988,
+    599.995,
+    799.994
+  ],
+  "y_centers": [
+    199.989,
+    400.009,
+    599.996,
+    800.004,
+    1000.0,
+    1200.004,
+    1399.992
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.0301,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      199.74661915493016,
+      399.69272319701645,
+      599.5141551530379,
+      799.4056372357479
+    ],
+    "y": [
+      199.50106858096967,
+      399.698072086961,
+      599.4802965000512,
+      799.5922253741178,
+      999.3902816982306,
+      1199.4680749932772,
+      1399.439371678342
+    ]
+  },
+  "geometric_correction_passes": 1
+}

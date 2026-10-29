@@ -1,0 +1,9 @@
+Waddlepop flavor: stumble, fumble, catch.
+30 frames, 6 columns x 5 rows, 512 x 512 per frame.
+Read left to right, top to bottom.
+Play once: 300 ms opening hold, 28 frames at 60 ms, 360 ms closing hold; 2340 ms total.
+Both endpoints are exact copies of the corrected waddlepop_idle.png.
+Transparent PNG with separate JSON timing data. Preview repeats for inspection.
+The head moves as one rigid shape; flipper motion stops outside the cheek contours. No face stretching or cross-fades.
+The missing left cheek outline was added to the base with the built-in image tool; only the contour was transferred to preserve all other original pixels.
+The body and bomb poses and animation timing are unchanged.

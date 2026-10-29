@@ -1,0 +1,83 @@
+{
+  "source": "full-arms-source.png",
+  "originalTipsAndOuterContoursPreserved": true,
+  "armsAreCompleteRigidSprites": true,
+  "arms": [
+    {
+      "side": "left",
+      "originalVisibleArea": 8053.031372549056,
+      "completeArmArea": 11354.94901960793,
+      "areaGain": 1.410021704164019,
+      "widths": [
+        {
+          "y": 280,
+          "oldWidth": 54,
+          "fullWidth": 66
+        },
+        {
+          "y": 295,
+          "oldWidth": 50,
+          "fullWidth": 70
+        },
+        {
+          "y": 310,
+          "oldWidth": 45,
+          "fullWidth": 72
+        },
+        {
+          "y": 325,
+          "oldWidth": 41,
+          "fullWidth": 74
+        },
+        {
+          "y": 340,
+          "oldWidth": 37,
+          "fullWidth": 76
+        },
+        {
+          "y": 355,
+          "oldWidth": 36,
+          "fullWidth": 78
+        }
+      ]
+    },
+    {
+      "side": "right",
+      "originalVisibleArea": 6791.513725490224,
+      "completeArmArea": 10573.109803921649,
+      "areaGain": 1.5568119614097462,
+      "widths": [
+        {
+          "y": 280,
+          "oldWidth": 56,
+          "fullWidth": 64
+        },
+        {
+          "y": 295,
+          "oldWidth": 52,
+          "fullWidth": 68
+        },
+        {
+          "y": 310,
+          "oldWidth": 46,
+          "fullWidth": 70
+        },
+        {
+          "y": 325,
+          "oldWidth": 39,
+          "fullWidth": 72
+        },
+        {
+          "y": 340,
+          "oldWidth": 32,
+          "fullWidth": 74
+        },
+        {
+          "y": 355,
+          "oldWidth": 28,
+          "fullWidth": 75
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "prompt": "Use case: precise-object-edit.\nInput image is the exact background to edit. Output the same 1536 x 2048 portrait JPG-ready opaque artwork. Add a SMALL amount of flavor ONLY along the LEFT AND RIGHT SIDE EDGES. Preserve the existing overhead rocky ground, palette, brightness, stone pattern scale, flat lighting, and especially the central 70 percent of the image. The middle remains clear for the battle board and panels.\nAdd four small, irregularly spaced decorative clusters, about two along each side, within the outer 12–15 percent of the width. Use a few broad, low, flat stone slabs viewed DIRECTLY FROM ABOVE, with 2–4 small companion pebbles. Some slabs can be naturally cropped off by the canvas edges. A couple of tiny patches of subdued gray-olive moss hugging the side stones can add restrained color. Use simple chunky cartoon silhouettes, muted plum-gray outlines, and just two or three soft flat color tones. Grounded shallow shapes, very subtle contact shading, no tall rocks or strong cast shadows. Keep all decoration understated, sparse and clearly secondary to the board. No continuous rock wall or enclosing frame; leave large open gaps along both sides. Put at least one understated cluster near the middle height of each side so the flavor survives a landscape cover crop. Make the groups asymmetrical and organic, not a repeated border motif.\nThe whole image must remain a continuous flat walkable ground surface seen from a 90-degree bird's-eye view. No horizon, cave ceiling, back wall, perspective view, cliff, pit, raised platform, dramatic lighting, glowing crystals, flowers, loot, creatures, text, board, grid lines, purple divider or dark vignette. Do not change the established pale warm-gray / taupe / faint lavender floor colors or enlarge its surface marks. This is a restrained edge-detail edit, not a redesign. The central ground must visually match the original.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9062c7c3-9d48-4eef-b3c1-46f8baa41ba3.png",
+  "references": [
+    "images/battle_backgrounds/rocky.jpg"
+  ],
+  "destination": "images/battle_backgrounds/rocky.jpg",
+  "width": 1536,
+  "height": 2048,
+  "format": "JPEG"
+}

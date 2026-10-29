@@ -1,0 +1,354 @@
+{
+  "frames": 30,
+  "uniqueFrames": 29,
+  "grid": [
+    6,
+    5
+  ],
+  "cell": [
+    512,
+    512
+  ],
+  "sheet": [
+    3072,
+    2560
+  ],
+  "totalDurationMs": 2340,
+  "firstAndLastMatchBaseExactly": true,
+  "baseCorrection": "Added missing viewer-left cheek contour",
+  "basePixelsChanged": 673,
+  "baseTransparencyUnchanged": true,
+  "baseUnchangedOutsideLeftCheek": true,
+  "bodyAndBombPosesUnchanged": true,
+  "timingUnchanged": true,
+  "facePreservation": {
+    "headMotion": "rotation and translation only",
+    "flipperDeformationOnFace": false,
+    "baseFacePixelsPreserved": true,
+    "frames": [
+      {
+        "frame": 2,
+        "pixelsChecked": 16632,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 3,
+        "pixelsChecked": 16628,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 4,
+        "pixelsChecked": 16638,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 5,
+        "pixelsChecked": 16630,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 6,
+        "pixelsChecked": 16636,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 7,
+        "pixelsChecked": 16634,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 8,
+        "pixelsChecked": 16629,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 9,
+        "pixelsChecked": 16632,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 10,
+        "pixelsChecked": 16630,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 11,
+        "pixelsChecked": 16627,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 12,
+        "pixelsChecked": 16634,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 13,
+        "pixelsChecked": 16637,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 14,
+        "pixelsChecked": 16631,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 15,
+        "pixelsChecked": 16628,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 16,
+        "pixelsChecked": 16628,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 17,
+        "pixelsChecked": 16631,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 18,
+        "pixelsChecked": 16631,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 19,
+        "pixelsChecked": 16631,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 20,
+        "pixelsChecked": 16635,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 21,
+        "pixelsChecked": 16633,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 22,
+        "pixelsChecked": 16631,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 23,
+        "pixelsChecked": 16634,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 24,
+        "pixelsChecked": 16622,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 25,
+        "pixelsChecked": 16625,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 26,
+        "pixelsChecked": 16628,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 27,
+        "pixelsChecked": 16629,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 28,
+        "pixelsChecked": 16633,
+        "maxColorChannelError": 0
+      },
+      {
+        "frame": 29,
+        "pixelsChecked": 16643,
+        "maxColorChannelError": 0
+      }
+    ]
+  },
+  "clippedFrames": 0,
+  "frameBounds": [
+    [
+      114,
+      4,
+      421,
+      491
+    ],
+    [
+      112,
+      4,
+      419,
+      492
+    ],
+    [
+      110,
+      5,
+      415,
+      494
+    ],
+    [
+      107,
+      6,
+      411,
+      495
+    ],
+    [
+      108,
+      7,
+      412,
+      495
+    ],
+    [
+      114,
+      13,
+      422,
+      494
+    ],
+    [
+      120,
+      21,
+      435,
+      497
+    ],
+    [
+      122,
+      28,
+      445,
+      498
+    ],
+    [
+      122,
+      28,
+      448,
+      497
+    ],
+    [
+      122,
+      30,
+      451,
+      496
+    ],
+    [
+      121,
+      33,
+      457,
+      496
+    ],
+    [
+      121,
+      35,
+      460,
+      497
+    ],
+    [
+      121,
+      35,
+      455,
+      498
+    ],
+    [
+      120,
+      28,
+      436,
+      496
+    ],
+    [
+      114,
+      19,
+      421,
+      497
+    ],
+    [
+      112,
+      18,
+      413,
+      498
+    ],
+    [
+      99,
+      17,
+      393,
+      501
+    ],
+    [
+      90,
+      16,
+      387,
+      505
+    ],
+    [
+      93,
+      19,
+      390,
+      506
+    ],
+    [
+      99,
+      23,
+      395,
+      506
+    ],
+    [
+      102,
+      24,
+      400,
+      505
+    ],
+    [
+      111,
+      24,
+      416,
+      500
+    ],
+    [
+      119,
+      24,
+      432,
+      497
+    ],
+    [
+      119,
+      23,
+      436,
+      498
+    ],
+    [
+      118,
+      18,
+      429,
+      496
+    ],
+    [
+      114,
+      11,
+      421,
+      494
+    ],
+    [
+      111,
+      7,
+      417,
+      493
+    ],
+    [
+      112,
+      6,
+      418,
+      493
+    ],
+    [
+      113,
+      5,
+      420,
+      492
+    ],
+    [
+      114,
+      4,
+      421,
+      491
+    ]
+  ]
+}

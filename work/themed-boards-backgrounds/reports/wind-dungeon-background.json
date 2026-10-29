@@ -1,0 +1,52 @@
+{
+  "id": "wind-dungeon-background",
+  "theme": "wind-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/wind-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a2e0e1bd-166a-4b99-be47-ab4b99314d65.png",
+  "source_sha256": "b74311b6adf6334af6a36588df661cd5ced64043917fa122b33a18bc57230028",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 640220,
+  "sha256": "abba841bad57c499d64b74954adac551b7814e66c0aae25e949324b2c0890f9f",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

@@ -1,0 +1,581 @@
+{
+  "sheet": [
+    3072,
+    2048
+  ],
+  "cell": [
+    512,
+    512
+  ],
+  "frameCount": 24,
+  "totalDurationMs": 720,
+  "loop": false,
+  "holdLastFrame": true,
+  "firstFrameMatchesBase": true,
+  "finalFourFramesIdentical": true,
+  "protectedAssetsUnchanged": 25,
+  "concurrentExternalChanges": [],
+  "apngDecodedFramesMatch": true,
+  "previewHoldsFinalFrame": true,
+  "gameRegistrationMatches": true,
+  "frames": [
+    {
+      "frame": 1,
+      "bounds": [
+        16,
+        42,
+        504,
+        506
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": []
+    },
+    {
+      "frame": 2,
+      "bounds": [
+        16,
+        43,
+        504,
+        466
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3670
+      ]
+    },
+    {
+      "frame": 3,
+      "bounds": [
+        16,
+        41,
+        504,
+        466
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3560
+      ]
+    },
+    {
+      "frame": 4,
+      "bounds": [
+        16,
+        40,
+        503,
+        466
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3514
+      ]
+    },
+    {
+      "frame": 5,
+      "bounds": [
+        16,
+        40,
+        503,
+        466
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3466
+      ]
+    },
+    {
+      "frame": 6,
+      "bounds": [
+        15,
+        48,
+        503,
+        467
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3495
+      ]
+    },
+    {
+      "frame": 7,
+      "bounds": [
+        15,
+        51,
+        502,
+        468
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3510
+      ]
+    },
+    {
+      "frame": 8,
+      "bounds": [
+        15,
+        60,
+        499,
+        473
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        3247
+      ]
+    },
+    {
+      "frame": 9,
+      "bounds": [
+        15,
+        69,
+        495,
+        477
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2997
+      ]
+    },
+    {
+      "frame": 10,
+      "bounds": [
+        15,
+        77,
+        492,
+        482
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2754
+      ]
+    },
+    {
+      "frame": 11,
+      "bounds": [
+        14,
+        92,
+        486,
+        494
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2389
+      ]
+    },
+    {
+      "frame": 12,
+      "bounds": [
+        14,
+        99,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2221
+      ]
+    },
+    {
+      "frame": 13,
+      "bounds": [
+        14,
+        97,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2121
+      ]
+    },
+    {
+      "frame": 14,
+      "bounds": [
+        14,
+        94,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2036
+      ]
+    },
+    {
+      "frame": 15,
+      "bounds": [
+        14,
+        95,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2065
+      ]
+    },
+    {
+      "frame": 16,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2135
+      ]
+    },
+    {
+      "frame": 17,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2167
+      ]
+    },
+    {
+      "frame": 18,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2170
+      ]
+    },
+    {
+      "frame": 19,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2152
+      ]
+    },
+    {
+      "frame": 20,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2124
+      ]
+    },
+    {
+      "frame": 21,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 22,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 23,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    },
+    {
+      "frame": 24,
+      "bounds": [
+        14,
+        96,
+        487,
+        501
+      ],
+      "opaqueComponents": 1,
+      "detachedSizes": [],
+      "enclosedTransparentAreas": [
+        2119
+      ]
+    }
+  ],
+  "rearLegSlant": {
+    "timingAndPoseKeysUnchanged": true,
+    "originalLayerArtworkUnchanged": true,
+    "firstFiveFramesUnchanged": true,
+    "pixelsOutsideRearLegUnchanged": 5439706,
+    "all24FramesVisuallyReviewed": true,
+    "changes": [
+      {
+        "frame": 1,
+        "changedPixels": 0,
+        "bounds": null
+      },
+      {
+        "frame": 2,
+        "changedPixels": 0,
+        "bounds": null
+      },
+      {
+        "frame": 3,
+        "changedPixels": 0,
+        "bounds": null
+      },
+      {
+        "frame": 4,
+        "changedPixels": 0,
+        "bounds": null
+      },
+      {
+        "frame": 5,
+        "changedPixels": 0,
+        "bounds": null
+      },
+      {
+        "frame": 6,
+        "changedPixels": 2972,
+        "bounds": [
+          110,
+          396,
+          221,
+          460
+        ]
+      },
+      {
+        "frame": 7,
+        "changedPixels": 3296,
+        "bounds": [
+          108,
+          399,
+          220,
+          462
+        ]
+      },
+      {
+        "frame": 8,
+        "changedPixels": 3886,
+        "bounds": [
+          99,
+          406,
+          217,
+          468
+        ]
+      },
+      {
+        "frame": 9,
+        "changedPixels": 4325,
+        "bounds": [
+          91,
+          412,
+          215,
+          475
+        ]
+      },
+      {
+        "frame": 10,
+        "changedPixels": 4739,
+        "bounds": [
+          83,
+          417,
+          211,
+          482
+        ]
+      },
+      {
+        "frame": 11,
+        "changedPixels": 5476,
+        "bounds": [
+          68,
+          427,
+          206,
+          494
+        ]
+      },
+      {
+        "frame": 12,
+        "changedPixels": 5878,
+        "bounds": [
+          59,
+          432,
+          202,
+          501
+        ]
+      },
+      {
+        "frame": 13,
+        "changedPixels": 6012,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 14,
+        "changedPixels": 6123,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 15,
+        "changedPixels": 6058,
+        "bounds": [
+          59,
+          431,
+          202,
+          501
+        ]
+      },
+      {
+        "frame": 16,
+        "changedPixels": 6021,
+        "bounds": [
+          59,
+          432,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 17,
+        "changedPixels": 5963,
+        "bounds": [
+          59,
+          430,
+          202,
+          501
+        ]
+      },
+      {
+        "frame": 18,
+        "changedPixels": 5974,
+        "bounds": [
+          59,
+          430,
+          202,
+          501
+        ]
+      },
+      {
+        "frame": 19,
+        "changedPixels": 6012,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 20,
+        "changedPixels": 6024,
+        "bounds": [
+          59,
+          432,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 21,
+        "changedPixels": 6014,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 22,
+        "changedPixels": 6014,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 23,
+        "changedPixels": 6014,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      },
+      {
+        "frame": 24,
+        "changedPixels": 6014,
+        "bounds": [
+          59,
+          430,
+          203,
+          501
+        ]
+      }
+    ]
+  }
+}

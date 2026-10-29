@@ -1,6 +1,7 @@
-// Info panel shown when a deployed creature or boss is tapped during any
-// battle phase. Reads plain display data derived fresh from the current tick
-// snapshot each render, so HP/debuffs stay live while it's open.
+// Info card shown when a creature or boss is tapped during a fight. Reads
+// plain display data derived fresh from the current tick snapshot each render,
+// so HP/debuffs stay live while it's open. Screens render it through
+// UnitInfoPopup, which floats it over the bottom of the screen.
 
 import React from "../../react.js";
 import { statModStacks, overTimeStacks, exactStatModPct } from "../../battle/status.js";
@@ -93,14 +94,14 @@ export function debuffsFor(u) {
   return rows;
 }
 
-// The panel deliberately shows no creature art: it sits beside the grid where
-// the creature is already on screen, and the space is worth more to the live
-// HP, charge, and debuff rows. Callers still pass `def`; it is ignored here.
+// The card deliberately shows no creature art: the creature is already on the
+// board above it, and the space is worth more to the live HP, charge, and
+// debuff rows. Callers still pass `def`; it is ignored here.
 function UnitInfoPanel({ name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   const chargePct = abilChargeMax > 0 ? Math.max(0, Math.min(100, ((abilCharge || 0) / abilChargeMax) * 100)) : 0;
   return React.createElement("div", {
-    style: { width: 150, flexShrink: 0, background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", boxSizing: "border-box" },
+    style: { width: 180, maxHeight: "calc(40 * var(--vh))", overflowY: "auto", background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 4px 16px rgba(0,0,0,0.25)", boxSizing: "border-box" },
   },
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
       React.createElement("div", { style: { flex: 1, minWidth: 0 } },
@@ -152,4 +153,10 @@ function UnitInfoPanel({ name, subtitle, hp, maxHp, shield, abilityName, abilCha
   );
 }
 
-export default UnitInfoPanel;
+/** The card as a popup: floating, centred over the bottom of the fight
+ * screen, so opening it never shifts the board. Takes UnitInfoPanel's props. */
+export function UnitInfoPopup(props) {
+  return React.createElement("div", { style: { position: "fixed", left: 0, right: 0, bottom: 16, display: "flex", justifyContent: "center", zIndex: 50, pointerEvents: "none" } },
+    React.createElement("div", { className: "unit-info-popup", style: { pointerEvents: "auto" } }, React.createElement(UnitInfoPanel, props))
+  );
+}

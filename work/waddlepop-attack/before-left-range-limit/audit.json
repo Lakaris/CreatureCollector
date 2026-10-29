@@ -1,0 +1,1048 @@
+{
+  "frames": 30,
+  "endpointsExact": true,
+  "feetPlantedEveryFrame": true,
+  "faceStructurePreserved": true,
+  "protectedHashes": {
+    "images/waddlepop/waddlepop_idle.png": "4cd698e211a02adc3985bf10927a2956f393c98ba591ccc080c5371ee6f1e7fa",
+    "images/waddlepop/waddlepop_move.png": "2c0a91232018061176b05e1914eb26ae156a46006cce920e87ef66736aa12f4b",
+    "images/waddlepop/waddlepop_flavor.png": "e061479db1cd009e3b82d422fbf0b1e30bb7692586a1b188e7af40a7c0e8f672"
+  },
+  "records": [
+    {
+      "frame": 1,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        4,
+        421,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 563
+    },
+    {
+      "frame": 2,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        7,
+        422,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 423
+    },
+    {
+      "frame": 3,
+      "bombVisible": true,
+      "bombPose": {
+        "a": -1,
+        "x": -2,
+        "y": 2,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -1,
+        -1
+      ],
+      "expression": "base",
+      "bounds": [
+        112,
+        4,
+        419,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 516
+    },
+    {
+      "frame": 4,
+      "bombVisible": true,
+      "bombPose": {
+        "a": -2,
+        "x": -5,
+        "y": 4,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -2,
+        -2
+      ],
+      "expression": "base",
+      "bounds": [
+        109,
+        7,
+        415,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 402
+    },
+    {
+      "frame": 5,
+      "bombVisible": true,
+      "bombPose": {
+        "a": -3,
+        "x": -8,
+        "y": 6,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -4,
+        -4
+      ],
+      "expression": "base",
+      "bounds": [
+        106,
+        2,
+        411,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 541
+    },
+    {
+      "frame": 6,
+      "bombVisible": true,
+      "bombPose": {
+        "a": -3,
+        "x": -8,
+        "y": 6,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -4,
+        -4
+      ],
+      "expression": "base",
+      "bounds": [
+        106,
+        5,
+        412,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 444
+    },
+    {
+      "frame": 7,
+      "bombVisible": true,
+      "bombPose": {
+        "a": -1,
+        "x": -2,
+        "y": 3,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -1,
+        -1
+      ],
+      "expression": "half",
+      "bounds": [
+        112,
+        5,
+        423,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 498
+    },
+    {
+      "frame": 8,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 2,
+        "x": 14,
+        "y": 2,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        6,
+        6
+      ],
+      "expression": "squeezed-closed",
+      "bounds": [
+        126,
+        14,
+        446,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 414
+    },
+    {
+      "frame": 9,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 6,
+        "x": 28,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        12,
+        12
+      ],
+      "expression": "squeezed-small",
+      "bounds": [
+        135,
+        15,
+        461,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 568
+    },
+    {
+      "frame": 10,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 10,
+        "x": 46,
+        "y": -5,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        12,
+        18
+      ],
+      "expression": "squeezed-open",
+      "bounds": [
+        135,
+        11,
+        486,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 426
+    },
+    {
+      "frame": 11,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 12,
+        "x": 62,
+        "y": -10,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        12,
+        22
+      ],
+      "expression": "squeezed-small",
+      "bounds": [
+        135,
+        6,
+        506,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 516
+    },
+    {
+      "frame": 12,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        12,
+        21.5
+      ],
+      "expression": "squeezed-closed",
+      "bounds": [
+        135,
+        198,
+        431,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 13,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        10,
+        20.5
+      ],
+      "expression": "half",
+      "bounds": [
+        132,
+        198,
+        429,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 14,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        5,
+        19
+      ],
+      "expression": "base",
+      "bounds": [
+        124,
+        198,
+        426,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 15,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -2,
+        17.5
+      ],
+      "expression": "base",
+      "bounds": [
+        113,
+        198,
+        424,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 16,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -9,
+        16
+      ],
+      "expression": "base",
+      "bounds": [
+        102,
+        198,
+        421,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 17,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -16,
+        14
+      ],
+      "expression": "base",
+      "bounds": [
+        90,
+        198,
+        418,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 18,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -20,
+        12
+      ],
+      "expression": "base",
+      "bounds": [
+        83,
+        198,
+        415,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 19,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -18,
+        9.5
+      ],
+      "expression": "base",
+      "bounds": [
+        86,
+        198,
+        411,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 20,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -13,
+        6.5
+      ],
+      "expression": "base",
+      "bounds": [
+        95,
+        198,
+        406,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 21,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -7,
+        3.5
+      ],
+      "expression": "base",
+      "bounds": [
+        105,
+        198,
+        401,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 22,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        -2,
+        1
+      ],
+      "expression": "base",
+      "bounds": [
+        113,
+        198,
+        397,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 23,
+      "bombVisible": false,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        117,
+        199,
+        395,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 0
+    },
+    {
+      "frame": 24,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        7,
+        428,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 417
+    },
+    {
+      "frame": 25,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 4,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        8,
+        421,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 563
+    },
+    {
+      "frame": 26,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 2,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        9,
+        422,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 423
+    },
+    {
+      "frame": 27,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        4,
+        423,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 511
+    },
+    {
+      "frame": 28,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        8,
+        424,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 397
+    },
+    {
+      "frame": 29,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        4,
+        425,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 536
+    },
+    {
+      "frame": 30,
+      "bombVisible": true,
+      "bombPose": {
+        "a": 0,
+        "x": 0,
+        "y": 0,
+        "cx": 250,
+        "cy": 143
+      },
+      "armAngles": [
+        0,
+        0
+      ],
+      "expression": "base",
+      "bounds": [
+        114,
+        4,
+        421,
+        491
+      ],
+      "footPixelsChanged": 0,
+      "faceError": 0,
+      "sparkPixels": 563
+    }
+  ],
+  "firstAndLastPixelIdenticalToBase": true,
+  "allHandsConnected": true,
+  "noStrayComponents": true,
+  "completeBombRemovalDuringRecovery": true,
+  "componentChecks": [
+    {
+      "frame": 1,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 2,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 3,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 4,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 5,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 6,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 7,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 8,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 9,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 10,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 11,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 12,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 13,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 14,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 15,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 16,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 17,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 18,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 19,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 20,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 21,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 22,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 23,
+      "visibleComponents": 1,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": true
+    },
+    {
+      "frame": 24,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 25,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 26,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 27,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 28,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 29,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    },
+    {
+      "frame": 30,
+      "visibleComponents": 3,
+      "bothHandsAttached": true,
+      "bombHiddenCleanly": false
+    }
+  ],
+  "fullArmAudit": {
+    "completeHiddenSurfaces": true,
+    "rigidRotationOnly": true,
+    "noScaling": true,
+    "throwMotionUnchanged": false,
+    "changedPixels": 130748,
+    "changedPixelsOutsideFlippers": 0,
+    "armMeasurements": [
+      {
+        "side": "left",
+        "originalVisibleArea": 8053.031372549056,
+        "completeArmArea": 11354.94901960793,
+        "areaGain": 1.410021704164019,
+        "widths": [
+          {
+            "y": 280,
+            "oldWidth": 54,
+            "fullWidth": 66
+          },
+          {
+            "y": 295,
+            "oldWidth": 50,
+            "fullWidth": 70
+          },
+          {
+            "y": 310,
+            "oldWidth": 45,
+            "fullWidth": 72
+          },
+          {
+            "y": 325,
+            "oldWidth": 41,
+            "fullWidth": 74
+          },
+          {
+            "y": 340,
+            "oldWidth": 37,
+            "fullWidth": 76
+          },
+          {
+            "y": 355,
+            "oldWidth": 36,
+            "fullWidth": 78
+          }
+        ]
+      },
+      {
+        "side": "right",
+        "originalVisibleArea": 6791.513725490224,
+        "completeArmArea": 10573.109803921649,
+        "areaGain": 1.5568119614097462,
+        "widths": [
+          {
+            "y": 280,
+            "oldWidth": 56,
+            "fullWidth": 64
+          },
+          {
+            "y": 295,
+            "oldWidth": 52,
+            "fullWidth": 68
+          },
+          {
+            "y": 310,
+            "oldWidth": 46,
+            "fullWidth": 70
+          },
+          {
+            "y": 325,
+            "oldWidth": 39,
+            "fullWidth": 72
+          },
+          {
+            "y": 340,
+            "oldWidth": 32,
+            "fullWidth": 74
+          },
+          {
+            "y": 355,
+            "oldWidth": 28,
+            "fullWidth": 75
+          }
+        ]
+      }
+    ]
+  },
+  "leftArmHoldAudit": {
+    "holdFrames": [
+      9,
+      12
+    ],
+    "holdDurationMs": 240,
+    "addedHoldMs": 180,
+    "maximumRecoveryStepDeg": 7,
+    "unchangedArmArtwork": true,
+    "changedPixels": 130748,
+    "changedPixelsOutsideLeftArm": 0,
+    "bombAndRightArmMotionUnchanged": true
+  }
+}

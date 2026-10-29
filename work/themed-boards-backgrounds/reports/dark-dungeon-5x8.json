@@ -1,0 +1,54 @@
+{
+  "id": "dark-dungeon-5x8",
+  "theme": "dark-dungeon",
+  "kind": "board",
+  "destination": "images/board_backgrounds/dark-dungeon5x8.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-17c31e4f-fd0d-4717-b45c-c440d75d1859.png",
+  "source_sha256": "942ed85e4071ccbdaed3ca054059fdcff839321efcbbb97be352f5234a83028a",
+  "native_render_size": [
+    992,
+    1586
+  ],
+  "width": 1000,
+  "height": 1600,
+  "format": "JPEG",
+  "bytes": 349002,
+  "sha256": "3efd8cb22c2644268aa50682200fe052481f2cc6700ce0bc0430ee9dc2bd1315",
+  "resampled": true,
+  "x_centers": [
+    199.993,
+    399.987,
+    599.97,
+    799.989
+  ],
+  "y_centers": [
+    200.001,
+    400.002,
+    599.991,
+    800.003,
+    999.992,
+    1200.003,
+    1399.988
+  ],
+  "checked_cross_sections": 201,
+  "max_center_error_px": 0.042,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      199.72958625374858,
+      399.50621834310846,
+      599.6619181639483,
+      799.3074091019805
+    ],
+    "y": [
+      199.75171593890587,
+      399.863490148284,
+      599.5892175477397,
+      799.73541531947,
+      999.4305815612124,
+      1199.717736377679,
+      1399.4433901052275
+    ]
+  },
+  "geometric_correction_passes": 1
+}

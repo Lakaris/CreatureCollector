@@ -10,21 +10,26 @@ import { useGame } from "../../../state/GameContext.js";
 import { CREATURES, CREATURE_MAP } from "../../../data/creatures.js";
 import { TYPE_EMOJI } from "../../../data/types.js";
 import { applyRewards } from "../../../core/rewards.js";
-import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED, PLAN_PANEL_MIN_W } from "../../../battle/constants.js";
+import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED } from "../../../battle/constants.js";
+import { boardArt, boardCellClass, BATTLE_BACKDROP } from "../../boardArt.js";
+import useBattlePause, { BATTLE_PAUSED_CLASS, DEV_PAUSE_BTN } from "../../hooks/useBattlePause.js";
+import { DEV_MODE } from "../../../config.js";
 import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
-import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { PlanInfoSheet, CreatureSheetBody, allyDesc } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
 import { LABYRINTH_REWARD_DISPLAY as REWARD_DISPLAY, getDepthReward, MAX_LABYRINTH_DEPTH, getEnemyLevelForDepth, getEnemyEvolutionMixForDepth, getDifficultyMultipliers } from "../../../core/labyrinth.js";
 import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
-import { getAbilityTags } from "../../../core/abilityText.js";
-import { AbilityTagPills, AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
+import { AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
+
+const labBoardArt = boardArt(ARENA_GRID_ROWS, ARENA_GRID_COLS);
 import useFitTile from "../../../ui/hooks/useFitTile.js";
 
 function seedFor(depth) {
@@ -165,8 +170,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const { equipmentLevels, equipmentAscensions, labyrinthDepth, setLabyrinthDepth, setLabyrinthBestDepth, labyrinthFloor10WarningSeen, setLabyrinthFloor10WarningSeen, setCurrencies, owned, tutorialRestricted, tutorialStep, setTutorialRestricted, setTutorialStep, setPostTutorialPopupPending, setTab, labyrinthPlanGrid: planGrid, setLabyrinthPlanGrid: setPlanGrid } = useGame();
   const depth = Math.min(labyrinthDepth || 1, MAX_LABYRINTH_DEPTH);
   const level = getEnemyLevelForDepth(depth);
-  // Enemies always fight with a maxed kit (see makeArenaBattle), so the panel
-  // shows the last upgrade tier.
+  // Enemies always fight with a maxed kit (see makeArenaBattle), so the info
+  // sheet shows the last upgrade tier.
   const enemyAbilityLevel = MAX_ABILITY_LEVEL;
   const [battling, setBattling] = useState(false);
   const [battleOutcome, setBattleOutcome] = useState(null); // null|"won"|"lost"
@@ -188,37 +193,18 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const continueTimerRef = React.useRef(null);
   const [dragId, setDragId] = useState(null);
   const [dragCell, setDragCell] = useState(null);
-  // Planning board shrinks to its column rather than making it scroll.
-  const [planAreaRef, planTile, planClamped] = useFitTile(ARENA_GRID_ROWS, ARENA_GRID_COLS, ARENA_TILE, { reserveW: PLAN_PANEL_MIN_W });
+  // Planning board shrinks to its area rather than making it scroll.
+  const [planAreaRef, planTile, planClamped] = useFitTile(ARENA_GRID_ROWS, ARENA_GRID_COLS, ARENA_TILE);
+  // The planning info sheet shows one card at a time: a pressed enemy or a
+  // pressed ally (its creature id).
   const [enemyInfo, setEnemyInfo] = useState(null); // { id, boss } | null
+  const [gridInfoCreature, setGridInfoCreature] = useState(null);
+  function closeSheet() { setEnemyInfo(null); setGridInfoCreature(null); }
+  // Starting a fight closes it, so it never greets you back in planning.
+  React.useEffect(() => { if (battling) closeSheet(); }, [battling]);
   const [bossInfoOpen, setBossInfoOpen] = useState(false);
   const [floor10Warning, setFloor10Warning] = useState(false);
   const [labAbilityTagPopup, setLabAbilityTagPopup] = useState(null);
-  const [enemyMinimized, setEnemyMinimized] = useState(false);
-  const [gridInfoCreature, setGridInfoCreature] = useState(null);
-  const [allyMinimized, setAllyMinimized] = useState(false);
-  const rightPanelRef = React.useRef(null);
-  React.useLayoutEffect(() => {
-    if (!rightPanelRef.current) return;
-    if (gridInfoCreature) {
-      setAllyMinimized(false);
-      const el = rightPanelRef.current;
-      if (el.scrollHeight > el.clientHeight + 4) setEnemyMinimized(true);
-    } else {
-      setEnemyMinimized(false);
-      setAllyMinimized(false);
-    }
-  }, [gridInfoCreature]);
-  // Whichever panel the player just expanded wins the space; if the two together
-  // don't fit, the OTHER panel auto-minimizes to make room.
-  function expandPanel(which) {
-    requestAnimationFrame(() => {
-      const el = rightPanelRef.current; if (!el) return;
-      if (el.scrollHeight > el.clientHeight + 4) {
-        if (which === "enemy") setAllyMinimized(true); else setEnemyMinimized(true);
-      }
-    });
-  }
   const [holdId, setHoldId] = useState(null);
   const [holdPct, setHoldPct] = useState(0);
   const hs = React.useRef({ delay: null, raf: null, id: null, fired: false });
@@ -321,6 +307,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = null; }
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
   }
+  const pause = useBattlePause({ tickRef, startRef: battleStartRef, startTicking: () => { tickRef.current = setInterval(runTick, Math.round(500 / speedRef.current)); } });
   function initBattle(playerGrid, enemyGrid) {
     return makeArenaBattle(playerGrid, enemyGrid, owned, level, moveAnimRef.current, equipmentLevels, equipmentAscensions, getDifficultyMultipliers(depth));
   }
@@ -411,7 +398,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   function fight() {
     if (depth >= MAX_LABYRINTH_DEPTH) return;
     if (floor10Warning) dismissFloor10Warning();
-    stopLoops();
+    stopLoops(); pause.reset();
     const enemyGrid = getEnemyLayoutForDepth(depth);
     setBattling(true);
     setBattleOutcome(null);
@@ -443,10 +430,23 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   }
   function exitToPlanning() {
     clearContinueTimer();
+    // Stop the fight itself too, not just its screen: Restart used to leave
+    // the tick loop running on the hidden battle, which then won (granting the
+    // reward and the next floor) while the player was back in planning.
+    stopLoops(); bRef.current = null; pause.reset();
     // Deliberately NOT clearing planGrid: the last team stays on the grid as
     // the default for the next floor (it's part of the autosave, so it also
     // survives closing the app). "Clear All" is the explicit way to empty it.
     setBattling(false); setBattleOutcome(null); setBSnap(null); setAtkEffects([]); setBattleSelectedUid(null);
+  }
+  /** The fight header's Restart. Ignored once the fight is decided (its loop
+   * has stopped and isn't merely paused): the reward is already granted at
+   * that point and the outcome is on its way, so bailing out then would show
+   * the result over the planning screen -- or grant the reward without the
+   * floor. */
+  function restartFight() {
+    if (!tickRef.current && !pause.paused) return;
+    exitToPlanning();
   }
   React.useEffect(() => {
     // Floor 1's victory screen is exit-only (see the render below) -- no
@@ -467,8 +467,6 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     return clearContinueTimer;
   }, [battleOutcome]);
   React.useEffect(() => () => { stopLoops(); clearContinueTimer(); }, []);
-
-  const abilityLabels = { basic: "Basic", special: "Special", unique:"Passive" };
 
   if (battleOutcome) {
     const won = battleOutcome === "won";
@@ -507,25 +505,26 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
     const snap = bSnap || { playerUnits: [], enemyUnits: [], damageDealt: {} };
     const allUnits = [...snap.playerUnits, ...snap.enemyUnits];
     const selectedUnit = battleSelectedUid ? allUnits.find((u) => u.uid === battleSelectedUid) : null;
-    return React.createElement("div", { key: "sfv455", className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
+    return React.createElement("div", { key: "sfv455", className: "screen-fade" + (pause.paused ? " " + BATTLE_PAUSED_CLASS : ""), style: { position: "fixed", inset: 0, ...BATTLE_BACKDROP, display: "flex", flexDirection: "column" } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 10, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)", flexShrink: 0 } },
         React.createElement("div", { style: { flex: 1 } },
           React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111" } }, "🌀 Labyrinth — Floor " + depth)
         ),
         // Floor 1's fight is the guaranteed-safe tutorial encounter -- no
         // need for a bail-out button there.
-        depth !== 1 && React.createElement("button", { onClick: exitToPlanning, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#eee", color: "#555", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, "↺ Restart"),
+        DEV_MODE && React.createElement("button", { onClick: pause.toggle, style: { ...DEV_PAUSE_BTN, background: pause.paused ? "#16a34a" : "#b45309" } }, pause.paused ? "▶ Resume" : "⏸ Pause"),
+        depth !== 1 && React.createElement("button", { onClick: restartFight, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#eee", color: "#555", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, "↺ Restart"),
         React.createElement("button", { onClick: cycleSpeed, style: { padding: "6px 12px", fontSize: 12, fontWeight: 700, background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", flexShrink: 0 } }, battleSpeed + "x ⚡")
       ),
       React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", padding: "12px", overflow: "hidden", gap: 6 } },
         React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: timeLeft <= 10 ? "#ef4444" : "#534AB7" } }, iconText(timeLeft + "s ⏱")),
         React.createElement("div", { className: "battle-row", style: { display: "flex", flexDirection: "row", alignItems: "flex-start", justifyContent: "center", gap: 10, width: "100%", maxWidth: "100%", overflowX: "auto", boxSizing: "border-box" } },
         React.createElement("div", { className: "battle-side-panel" }, React.createElement(DamageChart, { damageDealt: snap.damageDealt })),
-        React.createElement("div", { className: "battle-grid", style: { width: ARENA_GRID_COLS*ARENA_TILE, height: ARENA_GRID_ROWS*ARENA_TILE, borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0 } },
+        React.createElement("div", { className: "battle-grid " + labBoardArt.className, style: { width: ARENA_GRID_COLS*ARENA_TILE, height: ARENA_GRID_ROWS*ARENA_TILE, borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0, ...labBoardArt.style } },
           React.createElement("div", { style: { position: "absolute", top: 0, left: 0, display: "grid", gridTemplateColumns: `repeat(${ARENA_GRID_COLS},${ARENA_TILE}px)`, gridTemplateRows: `repeat(${ARENA_GRID_ROWS},${ARENA_TILE}px)`, gap: 0 } },
             Array.from({ length: ARENA_GRID_ROWS }, (_, r) => Array.from({ length: ARENA_GRID_COLS }, (_, c) => {
               const BORDER = "1px solid #bbb";
-              return React.createElement("div", { key: r + "," + c, style: {
+              return React.createElement("div", { key: r + "," + c, className: boardCellClass(r), style: {
                 width: ARENA_TILE, height: ARENA_TILE, boxSizing: "border-box",
                 background: "#fff",
                 borderTop: r === 0 ? "0" : BORDER,
@@ -592,7 +591,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
             )
           )),
         ),
-        React.createElement("div", { className: "battle-side-panel" }, selectedUnit ? React.createElement(UnitInfoPanel, {
+        selectedUnit && React.createElement(UnitInfoPopup, {
           def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
           name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
           subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? level : (owned?.[selectedUnit.creatureId]?.level || 1)),
@@ -601,14 +600,14 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           abilCharge: selectedUnit.abilCharge, abilChargeMax: selectedUnit.abilChargeMax, abilFlashTicks: selectedUnit.abilFlashTicks,
           debuffs: debuffsFor(selectedUnit),
           onClose: () => setBattleSelectedUid(null),
-        }) : React.createElement("div", { style: { width: 150, flexShrink: 0 } }))
+        })
         )
       )
     );
   }
   const deployedCount = Object.keys(planGrid).length;
   const enemyGrid = withBossFootprint(getEnemyLayoutForDepth(depth));
-  return React.createElement("div", { key: "sfv551", className: "screen-fade", style: { position: "fixed", inset: 0, background: "#f5f5f5", display: "flex", flexDirection: "column" } },
+  return React.createElement("div", { key: "sfv551", className: "screen-fade", style: { position: "fixed", inset: 0, ...BATTLE_BACKDROP, display: "flex", flexDirection: "column" } },
       labAbilityTagPopup && React.createElement(AbilityTagPopup, { popup: labAbilityTagPopup, onClose: () => setLabAbilityTagPopup(null) }),
       // What the crown beside a Boss's name means. Same shape as
       // AbilityTagPopup so every definition popup reads the same.
@@ -622,13 +621,13 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           React.createElement("button", { onClick: () => setBossInfoOpen(false), style: { width: "100%", padding: "9px 0", background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "Close")
         )
       ),
-      React.createElement("div", { style: { display: "flex", alignItems: "center", padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
+      React.createElement("div", { className: "plan-header", style: { padding: "16px 16px 12px", gap: 12, flexShrink: 0, background: "var(--bar-bg)", borderBottom: "1px solid var(--bar-line)" } },
         // Locked during the first-ever Descend (tutorialStep "labyrinth") --
         // the player's meant to fight the floor, not back out of it.
-        React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; setGridInfoCreature(null); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },
+        React.createElement("button", { disabled: tutorialRestricted && tutorialStep === "labyrinth", onClick: () => { if (tutorialRestricted && tutorialStep === "labyrinth") return; closeSheet(); endHold(); onBack && onBack(); setTab("home"); }, style: { background: "none", border: "none", cursor: (tutorialRestricted && tutorialStep === "labyrinth") ? "not-allowed" : "pointer", fontSize: 20, color: (tutorialRestricted && tutorialStep === "labyrinth") ? "#ccc" : "#555", padding: 0, lineHeight: 1 } },
           React.createElement("i", { className: "ti ti-arrow-left" })
         ),
-        React.createElement("div", { style: { flex: 1, textAlign: "center", minWidth: 0 } },
+        React.createElement("div", { style: { textAlign: "center", minWidth: 0 } },
           React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, "Planning Phase"),
           React.createElement("div", { style: { fontSize: 11, fontWeight: 600, color: "#888" } }, "Floor " + depth + (depth >= MAX_LABYRINTH_DEPTH ? " (Max)" : ""))
         ),
@@ -639,8 +638,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       ),
       // Never scrolls -- planTile shrinks the board to whatever height this
       // row ends up with (see useFitTile).
-      React.createElement("div", { ref: planAreaRef, style: { flex: 1, minHeight: 0, overflowX: "hidden", overflowY: planClamped ? "auto" : "hidden", display: "flex", justifyContent: "flex-start", alignItems: "flex-start", padding: "16px 0 16px 16px", gap: 12 } },
-        React.createElement("div", { style: { borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0 } },
+      React.createElement("div", { ref: planAreaRef, style: { flex: 1, minHeight: 0, overflowX: "hidden", overflowY: planClamped ? "auto" : "hidden", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: 16 } },
+        React.createElement("div", { className: labBoardArt.className, style: { borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: "1px solid #bbb", position: "relative", flexShrink: 0, ...labBoardArt.style } },
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: `repeat(${ARENA_GRID_COLS},${planTile}px)`, gridTemplateRows: `repeat(${ARENA_GRID_ROWS},${planTile}px)`, gap: 0 } },
             Array.from({ length: ARENA_GRID_ROWS }, (_, r) => Array.from({ length: ARENA_GRID_COLS }, (_, c) => {
               const isPlayerZone = r >= ARENA_PLAYER_START_ROW;
@@ -651,9 +650,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               const isDivider = r === ARENA_PLAYER_START_ROW;
               const BORDER = "1px solid #bbb";
               const onHoldStart = isPlayerZone && creatureId
-                ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setGridInfoCreature(creatureId); }, 180); })
+                ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setEnemyInfo(null); setGridInfoCreature(creatureId); }, 180); })
                 : enemyDef
-                  ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setEnemyMinimized(false); setEnemyInfo({ id: enemyDef.id, boss: !!enemyDef.__giant }); expandPanel("enemy"); }, 180); })
+                  ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setGridInfoCreature(null); setEnemyInfo({ id: enemyDef.id, boss: !!enemyDef.__giant }); }, 180); })
                   : undefined;
               const onHoldEnd = isPlayerZone && creatureId
                 ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } if (!ghs.current.fired && !touchDrag.dragRef.current.active) { setPlanGrid((p) => { const n = { ...p }; delete n[key]; return n; }); } })
@@ -661,7 +660,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
                   ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } })
                   : undefined;
               return React.createElement("div", {
-                key, "data-cell": key,
+                key, "data-cell": key, className: boardCellClass(r, ARENA_PLAYER_START_ROW),
                 draggable: !!(isPlayerZone && creatureId),
                 onDragStart: isPlayerZone && creatureId ? (e) => { e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
                 onDragEnd: isPlayerZone && creatureId ? () => rangePreview.clear() : undefined,
@@ -702,73 +701,6 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               })());
             })).flat()
           )
-        ),
-        React.createElement("div", { ref: rightPanelRef, className: "plan-side-panel", style: { flex: 1, alignSelf: "stretch", padding: "0 12px 0 0", minWidth: 0, display: "flex", flexDirection: "column", gap: 8 } },
-          enemyInfo && (() => {
-            const def = CREATURE_MAP[enemyInfo.id];
-            if (!def) return null;
-            return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
-              React.createElement("button", { onClick: () => setEnemyMinimized((p) => { const next = !p; if (!next) expandPanel("enemy"); return next; }), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, enemyMinimized ? "＋" : "－"),
-              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: enemyMinimized ? 0 : 12 } },
-                React.createElement("div", null,
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111", display: "flex", alignItems: "center", gap: 5 } },
-                    def.name,
-                    // Boss marker: tapping the crown explains what being a Boss
-                    // is worth (the +25% in makeArenaBattle's __giant handling).
-                    enemyInfo.boss && React.createElement("button", {
-                      onClick: (e) => { e.stopPropagation(); setBossInfoOpen(true); },
-                      style: { background: "none", border: "none", padding: 0, fontSize: 14, lineHeight: 1, cursor: "pointer" },
-                    }, "👑")
-                  ),
-                  React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, def.type + " · " + (def.attackType || "Melee") + " · Lv." + level + " · Enemy")
-                )
-              ),
-              !enemyMinimized && def.abilities && Object.entries(def.abilities).map(([k, abl]) => {
-                if (!abl) return null;
-                const abilityTags = getAbilityTags(def.id, k);
-                return React.createElement("div", { key: k, style: { marginBottom: 10 } },
-                  React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 } },
-                    React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 } }, abilityLabels[k] || k),
-                    abilityTags.length > 0 && React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" } },
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
-                  React.createElement("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, abl.upgrades ? abl.upgrades[Math.min(enemyAbilityLevel, abl.upgrades.length - 1)] : "")
-                );
-              })
-            );
-          })(),
-          gridInfoCreature && (() => {
-            const def = CREATURE_MAP[gridInfoCreature];
-            const oc = owned && owned[gridInfoCreature];
-            if (!def) return null;
-            return React.createElement("div", { style: { background: "#fff", borderRadius: 14, padding: "14px", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", position: "relative" } },
-              React.createElement("button", { onClick: () => setAllyMinimized((p) => { const next = !p; if (!next) expandPanel("ally"); return next; }), style: { position: "absolute", top: 8, right: 8, width: 20, height: 20, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, lineHeight: 1 } }, allyMinimized ? "＋" : "－"),
-              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: allyMinimized ? 0 : 12 } },
-                React.createElement("div", null,
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: "#111" } }, def.name),
-                  React.createElement("div", { style: { fontSize: 11, color: "#666", fontWeight: 600 } }, def.type + " · " + (def.attackType || "Melee") + (oc ? " · Lv." + oc.level : ""))
-                )
-              ),
-              !allyMinimized && def.abilities && Object.entries(def.abilities).map(([k, abl]) => {
-                if (!abl) return null;
-                const lvl = oc && oc.abilityLevels ? oc.abilityLevels[k] || 0 : 0;
-                const desc = abl.upgrades ? abl.upgrades[Math.min(lvl, abl.upgrades.length - 1)] : "";
-                const abilityTags = getAbilityTags(def.id, k);
-                return React.createElement("div", { key: k, style: { marginBottom: 10 } },
-                  React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 } },
-                    React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 } }, abilityLabels[k] || k),
-                    abilityTags.length > 0 && React.createElement("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" } },
-                      React.createElement(AbilityTagPills,{tags:abilityTags,onOpen:setLabAbilityTagPopup,compact:true})
-                    )
-                  ),
-                  React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
-                  desc && React.createElement("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, desc)
-                );
-              })
-            );
-          })()
         )
       ),
       tutorialRestricted && tutorialStep === "labyrinth" && React.createElement("div", { style: { margin: "0 16px 12px", background: "#fff", border: "2px solid #534AB7", borderRadius: 16, padding: "14px 16px", fontSize: 14, color: "#333", lineHeight: 1.4, boxShadow: "0 4px 16px rgba(0,0,0,0.14)", flexShrink: 0 } },
@@ -787,7 +719,8 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         React.createElement("div", { style: { fontSize: 11, color: "#aaa", textAlign: "right", marginTop: 8 } }, "Tap to continue")
       ),
       React.createElement("div", {
-        style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },
+        // The info sheet takes the tray's place while open.
+        style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0, ...(enemyInfo || gridInfoCreature ? { display: "none" } : null) },
         onDragOver: (e) => { e.preventDefault(); rangePreview.clear(); },
         onDrop: (e) => { e.preventDefault(); rangePreview.clear(); if (dragCell) { setPlanGrid((p) => { const n = { ...p }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
       },
@@ -850,6 +783,27 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
           })
         )
       ),
+      // info sheet: the pressed enemy or ally
+      enemyInfo && CREATURE_MAP[enemyInfo.id] && React.createElement(PlanInfoSheet, { onClose: closeSheet },
+        React.createElement(CreatureSheetBody, {
+          def: CREATURE_MAP[enemyInfo.id],
+          subtitle: CREATURE_MAP[enemyInfo.id].type + " · " + (CREATURE_MAP[enemyInfo.id].attackType || "Melee") + " · Lv." + level + " · Enemy",
+          // Boss marker: tapping the crown explains what being a Boss is worth
+          // (the +25% in makeArenaBattle's __giant handling).
+          titleExtra: enemyInfo.boss && React.createElement("button", {
+            onClick: (e) => { e.stopPropagation(); setBossInfoOpen(true); },
+            style: { background: "none", border: "none", padding: 0, fontSize: 16, lineHeight: 1, cursor: "pointer" },
+          }, "👑"),
+          descFor: (k, abl) => abl.upgrades ? abl.upgrades[Math.min(enemyAbilityLevel, abl.upgrades.length - 1)] : "",
+          onTag: setLabAbilityTagPopup,
+        })),
+      gridInfoCreature && CREATURE_MAP[gridInfoCreature] && React.createElement(PlanInfoSheet, { onClose: closeSheet },
+        React.createElement(CreatureSheetBody, {
+          def: CREATURE_MAP[gridInfoCreature],
+          subtitle: CREATURE_MAP[gridInfoCreature].type + " · " + (CREATURE_MAP[gridInfoCreature].attackType || "Melee") + (owned?.[gridInfoCreature] ? " · Lv." + owned[gridInfoCreature].level : ""),
+          descFor: allyDesc(owned?.[gridInfoCreature]),
+          onTag: setLabAbilityTagPopup,
+        })),
       touchDrag.ghost && (() => { const gdef = CREATURE_MAP[touchDrag.ghost.id]; if (!gdef) return null; return React.createElement("div", { style: { position: "fixed", left: touchDrag.ghost.x - 26, top: touchDrag.ghost.y - 29, width: 52, height: 52, pointerEvents: "none", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.85, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))" } }, React.createElement(CreatureIcon, { def: gdef, size: 36 })); })()
     );
 }

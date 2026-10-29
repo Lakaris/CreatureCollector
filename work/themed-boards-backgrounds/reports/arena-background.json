@@ -1,0 +1,52 @@
+{
+  "id": "arena-background",
+  "theme": "arena",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/arena.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-e7bf5c62-6204-4e00-a559-9b14f9303013.png",
+  "source_sha256": "8d4978eaf110b4a11fdae22d3ab6e20edf339bcec67481434098958bcbbd4511",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 619375,
+  "sha256": "fddfe71559205f86dd7614d230f341b5e2191dcd6d8ede540cb5dda74aa2b4e3",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

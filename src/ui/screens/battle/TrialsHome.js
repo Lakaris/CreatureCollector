@@ -51,9 +51,9 @@ const MAX_TIER = 4;
  * worn items appear; a tile keeps a quarter of the row, so one item looks the
  * same size as four.
  */
-function GearSlots({ gear, onOpen, perRow = 4 }) {
-  // `perRow`: 4 in the popup; the planning side panel is narrower and uses 2.
-  const basis = "calc(" + 100 / perRow + "% - " + (6 * (perRow - 1)) / perRow + "px)";
+function GearSlots({ gear, onOpen }) {
+  // Four to a row: each tile is a quarter of it, less its share of the gaps.
+  const basis = "calc(25% - 4.5px)";
   return h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
     gear.slice(0, EQUIP_SLOTS).map((item) => h("div", {
       key: item.id,
@@ -102,20 +102,11 @@ function TraitEmojis({ def }) {
 /** An enemy's skills and equipment. */
 /**
  * A Trials enemy's header -- picture, "Lv. N Name", type/range/role emojis.
- * Shared by the popup below and the planning phase's side panel (ArenaScreen),
- * so the two always read the same. `compact` is the narrower panel's size.
+ * Shared by the popup below and the planning phase's info sheet (ArenaScreen),
+ * so the two always read the same.
  */
-export function TrialsEnemyHeader({ enemy, enemyLevel, compact = false }) {
+export function TrialsEnemyHeader({ enemy, enemyLevel }) {
   const def = CREATURE_MAP[enemy.id];
-  // Compact: picture and name on one line, the emojis on their own beneath,
-  // so nothing runs past a narrow column's edge.
-  if (compact) {
-    return h("div", { style: { paddingRight: 22, flexShrink: 0 } },
-      h("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
-        h(CreatureIcon, { def, size: 32, contain: true }),
-        h("div", { style: { fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.2, minWidth: 0, overflowWrap: "anywhere" } }, "Lv. " + enemyLevel + " " + def.name)),
-      h(TraitEmojis, { def }));
-  }
   return h("div", { style: { display: "flex", alignItems: "center", gap: 12, paddingRight: 28, flexShrink: 0 } },
     h(CreatureIcon, { def, size: 56, contain: true }),
     h("div", { style: { minWidth: 0 } },
@@ -125,10 +116,9 @@ export function TrialsEnemyHeader({ enemy, enemyLevel, compact = false }) {
 
 /**
  * A Trials enemy's gear (tap an item for its info) and its abilities, worded
- * as the creature page words them. Shared like TrialsEnemyHeader; the panel
- * passes `compact` for two gear tiles per row.
+ * as the creature page words them. Shared like TrialsEnemyHeader.
  */
-export function TrialsEnemyBody({ enemy, onTag, compact = false }) {
+export function TrialsEnemyBody({ enemy, onTag }) {
   const def = CREATURE_MAP[enemy.id];
   const gear = (enemy.__equipped || []).map((id) => EQUIPMENT_MAP[id]).filter(Boolean);
   const gearLevel = enemy.__equipLevel || 1;
@@ -137,8 +127,8 @@ export function TrialsEnemyBody({ enemy, onTag, compact = false }) {
     itemOpen && h(ItemInfo, { item: itemOpen, level: gearLevel, onClose: () => setItemOpen(null) }),
     gear.length > 0 && h("div", { style: { marginBottom: 14 } },
       label("Gear"),
-      h(GearSlots, { gear, onOpen: setItemOpen, perRow: compact ? 2 : 4 })),
-    ...["basic", "special", "unique"].map((k) => def.abilities?.[k] && (compact ? h(AbilityRow, { key: k, def, k, onTag }) : h(AbilityCard, { key: k, def, k, onTag }))));
+      h(GearSlots, { gear, onOpen: setItemOpen })),
+    ...["basic", "special", "unique"].map((k) => def.abilities?.[k] && h(AbilityCard, { key: k, def, k, onTag })));
 }
 
 function EnemyDetail({ enemy, enemyLevel, onClose, onTag }) {
@@ -161,7 +151,7 @@ const ABILITY_COLORS = { basic: { bg: "#EAF3DE", color: "#173404" }, special: { 
  */
 /**
  * An ability's max-tier wording as the creature page shows it: its sentence
- * plus the DMG / HEAL / SHIELD amounts. Shared by both ability layouts below.
+ * plus the DMG / HEAL / SHIELD amounts.
  */
 function abilityText(def, k) {
   const abl = def.abilities[k];
@@ -188,31 +178,12 @@ function amountBadges(t) {
 }
 
 /** The Special's energy cost pill (none for a chargeless Special). */
-function chargePill(def, k, onTag, small = false) {
+function chargePill(def, k, onTag) {
   if (k !== "special" || def.abilities.special.charge == null) return null;
   return h("button", {
     onClick: (e) => { e.stopPropagation(); onTag("energy"); },
-    style: { fontSize: small ? 8 : 9, fontWeight: 800, color: "#2563eb", background: "#DBEAFE", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 10, padding: small ? "0 6px" : "1px 8px", cursor: "pointer", lineHeight: 1.5, flexShrink: 0, whiteSpace: "nowrap" },
+    style: { fontSize: 9, fontWeight: 800, color: "#2563eb", background: "#DBEAFE", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 10, padding: "1px 8px", cursor: "pointer", lineHeight: 1.5, flexShrink: 0, whiteSpace: "nowrap" },
   }, "⚡ " + getSpecialChargeAt(def, MAX_TIER));
-}
-
-/**
- * The planning side panel's ability row -- its original compact look (small
- * label with the tags beside it, the name, a line of text), now carrying the
- * creature page's wording and numbers.
- */
-function AbilityRow({ def, k, onTag }) {
-  const abl = def.abilities[k];
-  const t = abilityText(def, k);
-  return h("div", { style: { marginBottom: 10 } },
-    h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 } },
-      label(ABILITY_LABELS[k]),
-      h("div", { style: { display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "center" } },
-        chargePill(def, k, onTag, true),
-        h(AbilityTagPills, { tags: getAbilityTags(def.id, k, MAX_TIER), onOpen: onTag, compact: true }))),
-    h("div", { style: { fontSize: 12, fontWeight: 700, color: "#111" } }, abl.name),
-    h("div", { style: { fontSize: 10, color: "#555", marginTop: 2 } }, t.sentence),
-    h("div", { style: { display: "flex", flexWrap: "wrap", gap: "0 8px", fontSize: 10, marginTop: 1 } }, ...amountBadges(t)));
 }
 
 function AbilityCard({ def, k, onTag }) {

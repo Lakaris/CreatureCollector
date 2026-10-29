@@ -1,7 +1,8 @@
 Waddlepop flavor: stumble, fumble, catch.
-30 frames, 6 columns x 5 rows, 512 x 512 per frame.
-Read left to right, top to bottom.
-Play once: 300 ms opening hold, 28 frames at 60 ms, 360 ms closing hold; 2340 ms total.
-Both endpoints are exact copies of the current waddlepop_idle.png.
-Transparent PNG with separate JSON timing data. Preview repeats for inspection.
-The base interior art is moved directly; isolated exterior edges and the hidden bomb underside were reconstructed using built-in image generation.
+39 frames, 6 columns x 7 rows, 512 x 512 per frame; last three cells unused.
+Read left to right, top to bottom. Every frame is 60 ms; total 2340 ms.
+Frames 1-5 retain the opening hold and frames 34-39 retain the closing hold, with the fuse sparking throughout. First and last frames match waddlepop_idle.png exactly.
+Hands make small alternating regrips during the fumble. Maximum added rotation: 1.2 degrees; maximum added movement: 3.54 px. Existing artwork is sampled directly, with the shoulder movement tapering away from the face.
+Face shape, expressions, body movement, feet, bomb wobble, nervous droplets, timing and base image are unchanged.
+The three detached nervous droplets remain at least 5 px from the character.
+Transparent PNG; JSON contains frame timing. Preview repeats for inspection.

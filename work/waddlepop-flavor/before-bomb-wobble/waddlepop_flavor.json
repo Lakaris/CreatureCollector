@@ -1,0 +1,427 @@
+{
+  "image": "waddlepop_flavor.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 6,
+  "rows": 7,
+  "loop": false,
+  "totalDurationMs": 2340,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 0
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 0
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 0
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 0
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 0
+    },
+    {
+      "index": 5,
+      "x": 2560,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 1
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 2
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 3
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 4
+    },
+    {
+      "index": 9,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 5
+    },
+    {
+      "index": 10,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 6
+    },
+    {
+      "index": 11,
+      "x": 2560,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 7
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 8
+    },
+    {
+      "index": 13,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 9
+    },
+    {
+      "index": 14,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 10
+    },
+    {
+      "index": 15,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 11
+    },
+    {
+      "index": 16,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 12
+    },
+    {
+      "index": 17,
+      "x": 2560,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 13
+    },
+    {
+      "index": 18,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 14
+    },
+    {
+      "index": 19,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 15
+    },
+    {
+      "index": 20,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 16
+    },
+    {
+      "index": 21,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 17
+    },
+    {
+      "index": 22,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 18
+    },
+    {
+      "index": 23,
+      "x": 2560,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 19
+    },
+    {
+      "index": 24,
+      "x": 0,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 20
+    },
+    {
+      "index": 25,
+      "x": 512,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 21
+    },
+    {
+      "index": 26,
+      "x": 1024,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 22
+    },
+    {
+      "index": 27,
+      "x": 1536,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 23
+    },
+    {
+      "index": 28,
+      "x": 2048,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 24
+    },
+    {
+      "index": 29,
+      "x": 2560,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 25
+    },
+    {
+      "index": 30,
+      "x": 0,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 26
+    },
+    {
+      "index": 31,
+      "x": 512,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 27
+    },
+    {
+      "index": 32,
+      "x": 1024,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 28
+    },
+    {
+      "index": 33,
+      "x": 1536,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 34,
+      "x": 2048,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 35,
+      "x": 2560,
+      "y": 2560,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 36,
+      "x": 0,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 37,
+      "x": 512,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    },
+    {
+      "index": 38,
+      "x": 1024,
+      "y": 3072,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60,
+      "sourcePoseIndex": 29
+    }
+  ],
+  "expressions": [
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "half",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-small",
+    "squeezed-closed",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-closed",
+    "half",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base"
+  ],
+  "effects": {
+    "detachedNervousDroplets": {
+      "side": "viewer-left",
+      "count": 3,
+      "frameRanges": [
+        [
+          13,
+          18
+        ],
+        [
+          20,
+          25
+        ]
+      ],
+      "style": "Bold dark outlines, slightly larger, closer to the flipper; remain detached"
+    },
+    "fuseSpark": {
+      "alwaysVisible": true,
+      "animatedThroughout": true,
+      "frameIntervalMs": 60,
+      "fuseLengthPreserved": true
+    }
+  },
+  "notes": "39 frames at 60 ms, 2340 ms total. The original 30 body poses and their exact display timing are preserved; opening and ending holds are subdivided into spark-only frames. The spark pulses and two embers flick outward throughout. First and last frames match waddlepop_idle.png exactly. Existing face, flippers, nervous droplets and fumble motion are unchanged."
+}

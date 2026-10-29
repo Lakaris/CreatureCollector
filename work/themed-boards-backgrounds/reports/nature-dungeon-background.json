@@ -1,0 +1,52 @@
+{
+  "id": "nature-dungeon-background",
+  "theme": "nature-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/nature-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ac413880-5ab5-4e32-b042-d1f7e9ffed52.png",
+  "source_sha256": "0af14fe9bb478aa29c31b39ddaaac4863ef4a560e971be0e08e84045dbe8eeee",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 683676,
+  "sha256": "14885cfdb9f1e04bcdf9d2ec85fbd60a959ace8acc1e1aa3ab5d589850b8e4e0",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

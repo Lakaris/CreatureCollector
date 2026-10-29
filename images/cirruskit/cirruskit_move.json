@@ -248,5 +248,5 @@
       "durationMs": 50
     }
   ],
-  "notes": "Thirty frames at 50ms, with the same diagonal gait, pivots and trajectory parameters. A separate stationary torso layer owns the front belly curve. Clean upper-leg backing moves underneath it; the original lower paw texture is retained. Front shoulder attachment blends into the lower leg motion. Rear and tail corrections are retained. Read left to right, top to bottom. No duplicate final frame."
+  "notes": "Thirty frames at 50ms, with the same diagonal gait, pivots and trajectory parameters. A separate stationary torso layer owns the front belly curve. Clean upper-leg backing moves underneath it; the original lower paw texture is retained. Front shoulder attachment blends into the lower leg motion. Rear and tail corrections are retained. Read left to right, top to bottom. No duplicate final frame. Belly-only revision: the belly between the near rear and front legs uses the base image contour and outline thickness. Existing leg occlusion and body bob are retained. All pixels outside the local belly repair area are unchanged."
 }

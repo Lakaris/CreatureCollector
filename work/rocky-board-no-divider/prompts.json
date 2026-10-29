@@ -1,0 +1,28 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "format": "JPEG",
+  "items": [
+    {
+      "name": "6 × 10, no purple divider",
+      "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10outlined.jpg",
+      "width": 1200,
+      "height": 2000,
+      "columns": 6,
+      "rows": 10,
+      "destination": "images/board_backgrounds/rocky6x10outlinednodivider.jpg",
+      "prompt": "Use case: precise-object-edit. The reference is the exact edit target. Make just ONE localized change: replace the single vivid PURPLE HORIZONTAL DIVIDER across the board with a NORMAL thin muted plum-gray horizontal grid line exactly matching all the other horizontal grid lines in color, thickness, antialiasing and stroke style. Restore the tiny strip of stone floor occupied by the excess thickness of the purple divider. There must be NO purple accent stripe left. Keep ALL other pixels, colors, low-detail cartoon stone patches, small pebble markings, outer rounded dark plum border, framing, grid positions and cell sizes visually unchanged. Do not redesign or repaint the board. Preserve exactly 6 columns and 10 rows, portrait 1200 × 2000, 3:5 aspect ratio; the edited line is after row 6. Keep the continuous grid: do not merge or remove any rows. No new marks, no text, no margins. Output just this same single complete board with the purple line replaced by an ordinary grid line.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-752bface-8afc-4f65-8312-22703a7afee5.png"
+    },
+    {
+      "name": "5 × 8, no purple divider",
+      "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8outlined.jpg",
+      "width": 1000,
+      "height": 1600,
+      "columns": 5,
+      "rows": 8,
+      "destination": "images/board_backgrounds/rocky5x8outlinednodivider.jpg",
+      "prompt": "Use case: precise-object-edit. The reference is the exact edit target. Make just ONE localized change: replace the single vivid PURPLE HORIZONTAL DIVIDER across the board with a NORMAL thin muted plum-gray horizontal grid line exactly matching all the other horizontal grid lines in color, thickness, antialiasing and stroke style. Restore the tiny strip of stone floor occupied by the excess thickness of the purple divider. There must be NO purple accent stripe left. Keep ALL other pixels, colors, low-detail cartoon stone patches, small pebble markings, outer rounded dark plum border, framing, grid positions and cell sizes visually unchanged. Do not redesign or repaint the board. Preserve exactly 5 columns and 8 rows, portrait 1000 × 1600, 5:8 aspect ratio; the edited line is after row 5. Keep the continuous grid: do not merge or remove any rows. No new marks, no text, no margins. Output just this same single complete board with the purple line replaced by an ordinary grid line.",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7583f700-4e8f-497b-8d3e-2238f75b5641.png"
+    }
+  ]
+}

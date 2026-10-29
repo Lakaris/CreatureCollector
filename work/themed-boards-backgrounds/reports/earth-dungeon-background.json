@@ -1,0 +1,52 @@
+{
+  "id": "earth-dungeon-background",
+  "theme": "earth-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/earth-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-d03fc628-4def-4ce4-a59c-b91efdf04834.png",
+  "source_sha256": "e7212c3ff35f081778057865a611b56a7493fe1b6c8378d52c1e86c67694fc74",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 647287,
+  "sha256": "a1d74c23ac30cc0f9a7a4294ce7ca1a6e52693db6bbc8641167652ab2ae1e212",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

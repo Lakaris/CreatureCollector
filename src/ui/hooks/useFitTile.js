@@ -44,18 +44,9 @@ import React from "../../react.js";
  *   does not, and cut-off rows read as "the board ends here" rather than as
  *   something to scroll for. Realistic phones (>=568px tall) never come near
  *   this -- they land at 26px or above.
- * @param {number} [opts.reserveW] Width to hold back for whatever shares the
- *   row with the board -- the planning screens' info column.
- *
- *   Without it the board takes every pixel of width it can use, and on a TALL
- *   screen it can use all of them: height never binds, so the tile runs up to
- *   its ceiling and the column beside it gets whatever is left. On a 420x900
- *   phone that left the info column 70px wide, too narrow even for its own
- *   Effects pill, while the board sat at full size. Width is shared, so the
- *   board's share has to be asked for rather than assumed.
  */
 export default function useFitTile(rows, cols, baseTile, opts) {
-  const { minTile = 12, reserveW = 0 } = opts || {};
+  const { minTile = 12 } = opts || {};
   // The node lives in state, not a ref, because a planning grid mounts on a
   // later render than the component (screens render a battle view first). A
   // callback ref re-runs the effect when the node actually appears; a plain
@@ -68,12 +59,8 @@ export default function useFitTile(rows, cols, baseTile, opts) {
     const measure = () => {
       const cs = getComputedStyle(node);
       const availH = node.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-      const fullW = node.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      if (!(availH > 0) || !(fullW > 0)) return; // hidden/unlaid-out: keep the last good size
-      // Never hand the whole row to the reserve: on a board narrow enough that
-      // the two can't both be comfortable, they share what there is rather than
-      // the board collapsing to its floor.
-      const availW = Math.max(fullW / 2, fullW - reserveW);
+      const availW = node.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (!(availH > 0) || !(availW > 0)) return; // hidden/unlaid-out: keep the last good size
       const ideal = Math.min(baseTile, Math.floor(availH / rows), Math.floor(availW / cols));
       const tile = Math.max(minTile, ideal);
       const clamped = ideal < minTile;
@@ -83,7 +70,7 @@ export default function useFitTile(rows, cols, baseTile, opts) {
     const ro = new ResizeObserver(measure);
     ro.observe(node);
     return () => ro.disconnect();
-  }, [node, rows, cols, baseTile, minTile, reserveW]);
+  }, [node, rows, cols, baseTile, minTile]);
 
   return [setNode, state.tile, state.clamped];
 }

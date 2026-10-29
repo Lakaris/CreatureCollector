@@ -38,7 +38,7 @@ const MAX_SCALE = 1.5;
 
 /**
  * Below this many DESIGN pixels of width, layouts that need three columns drop
- * to a stacked arrangement (the battle rows, the Daily Boss's info panel).
+ * to a stacked arrangement (the fight screens' board-and-damage-chart rows).
  *
  * This used to be a plain `@media (max-width:700px)`, which stopped meaning
  * what it said the moment the app started scaling: a media query measures the
@@ -70,16 +70,6 @@ export function getUiScale() {
 /** The app's width in DESIGN pixels -- what its own layout is measured in. */
 export function appWidth() {
   return window.innerWidth / current;
-}
-
-/**
- * True when the app is too narrow for a side-by-side layout. Screens that
- * branch in JS (the Daily Boss's press-and-hold info popup, which stands in for
- * the panel the stylesheet hides) read this, so the two can't disagree and
- * leave a player with neither.
- */
-export function isAppNarrow() {
-  return appWidth() <= NARROW_APP_WIDTH;
 }
 
 /**

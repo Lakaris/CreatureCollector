@@ -1,0 +1,32 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "format": "JPEG",
+  "items": [
+    {
+      "name": "Rocky outlined board 6 x 10",
+      "filename": "rocky6x10outlined.jpg",
+      "width": 1200,
+      "height": 2000,
+      "columns": 6,
+      "rows": 10,
+      "dividerY": 1200,
+      "sourceTarget": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky6x10.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ccee394b-e40c-4e11-9c26-f423b126da21.png",
+      "destination": "images/board_backgrounds/rocky6x10outlined.jpg",
+      "prompt": "Use case: precise-object-edit. Redesign the supplied rocky board background into a clean CARTOON game board with explicit tile lines and outer border. Image1 is the rocky-floor edit target; image2 is a STYLE REFERENCE ONLY for the game's smooth dark plum contours and simple cel-shaded stone colors. Do not copy the dungeon gate or any object from image2. The current mottled realistic stone should become much simpler: very light warm-gray stone with a faint lavender cast, mostly solid color, only a handful of broad muted flat shadow patches and tiny flat chip marks. No photographic grain or noisy mottling. All tile interiors must be quiet and low-contrast so small40px creatures remain readable. Direct orthographic overhead view, no perspective, no depth/extrusion. No creatures, rocks, boulders, holes, obstacles, props, writing, UI controls, labels, numbers or gameplay targeting boxes. Use clean consistent rounded dark-plum cartoon outlines, with a stronger outer contour and clear finer interior tile lines. No loose debris outside the board. Full-bleed artwork, no white margin or exterior scene. Keep the whole rectangular board flush to all four image edges, with a subtly rounded outer contour but no padding. Grid cells are perfect equal squares; absolutely no staggered pavers, irregular tiles or additional seams.\nCANVAS AND EXACT GRID: portrait 1200x2000 pixels. EXACTLY 6 columns and 10 rows, 60 equal square cells. Cell pitch is200px, measured from canvas edges: vertical interior grid lines at x=200,400,600,800,1000; horizontal lines at y=200,400,600,800,1000,1200,1400,1600,1800. No margin around the grid. Interior lines are muted dark plum-gray #776a73, about5px thick at target resolution. The outer contour is deep plum #36212d, about12px thick drawn inside canvas edges. REPLACE the horizontal grid line at y=1200 with a clean purple #6050b8 divider about10px thick spanning the entire board. This leaves 6 full rows above the purple line and 4 rows below it. All rows retain exactly the same height; no extra divider row, band, gap or padding. The purple divider is the only saturated feature. Output only this single board."
+    },
+    {
+      "name": "Rocky outlined board 5 x 8",
+      "filename": "rocky5x8outlined.jpg",
+      "width": 1000,
+      "height": 1600,
+      "columns": 5,
+      "rows": 8,
+      "dividerY": 1000,
+      "sourceTarget": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\board_backgrounds\\rocky5x8.jpg",
+      "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-3c1efbab-09fc-4078-80c2-53a8944e187b.png",
+      "destination": "images/board_backgrounds/rocky5x8outlined.jpg",
+      "prompt": "Use case: precise-object-edit. Redesign the supplied rocky board background into a clean CARTOON game board with explicit tile lines and outer border. Image1 is the rocky-floor edit target; image2 is a STYLE REFERENCE ONLY for the game's smooth dark plum contours and simple cel-shaded stone colors. Do not copy the dungeon gate or any object from image2. The current mottled realistic stone should become much simpler: very light warm-gray stone with a faint lavender cast, mostly solid color, only a handful of broad muted flat shadow patches and tiny flat chip marks. No photographic grain or noisy mottling. All tile interiors must be quiet and low-contrast so small40px creatures remain readable. Direct orthographic overhead view, no perspective, no depth/extrusion. No creatures, rocks, boulders, holes, obstacles, props, writing, UI controls, labels, numbers or gameplay targeting boxes. Use clean consistent rounded dark-plum cartoon outlines, with a stronger outer contour and clear finer interior tile lines. No loose debris outside the board. Full-bleed artwork, no white margin or exterior scene. Keep the whole rectangular board flush to all four image edges, with a subtly rounded outer contour but no padding. Grid cells are perfect equal squares; absolutely no staggered pavers, irregular tiles or additional seams.\nCANVAS AND EXACT GRID: portrait 1000x1600 pixels. EXACTLY 5 columns and 8 rows, 40 equal square cells. Cell pitch is200px, measured from canvas edges: vertical interior grid lines at x=200,400,600,800; horizontal lines at y=200,400,600,800,1000,1200,1400. No margin around the grid. Interior lines are muted dark plum-gray #776a73, about5px thick at target resolution. The outer contour is deep plum #36212d, about12px thick drawn inside canvas edges. REPLACE the horizontal grid line at y=1000 with a clean purple #6050b8 divider about10px thick spanning the entire board. This leaves 5 full rows above the purple line and 3 rows below it. All rows retain exactly the same height; no extra divider row, band, gap or padding. The purple divider is the only saturated feature. Output only this single board."
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+const fs=require('fs'),{PNG}=require('C:/Users/Annie/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs'),read=p=>PNG.sync.read(fs.readFileSync(p));
+const test=(p,x,y)=>{const i=(y*512+x)*4;return p.data[i+3]>=128&&p.data[i]<65&&p.data[i+1]<45;};for(const [name,path]of [['base','images/cirruskit/cirruskit_base.png'],['frame2','work/cirruskit-defeat-outline-weight/frames/frame-1.png']]){const p=read(path),result={};for(const [label,x,y0,y1]of [['rear paw',158,410,465],['front paw',310,425,480],['far front paw',422,420,470],['far rear paw',248,418,450],['belly',240,392,424]]){let bot=-1;for(let y=y0;y<y1;y++)if(test(p,x,y))bot=y;let n=0;for(let y=bot;y>=y0&&test(p,x,y);y--)n++;result[label]={bottom:bot,width:n};}console.log(name,result);}
+

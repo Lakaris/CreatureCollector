@@ -1,0 +1,149 @@
+{
+  "destination": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+  "original_sha256": "ad2c43d8b82827ee523162b541c5cadc5f293b317336b8a65bb9da2a91dde401",
+  "width": 1080,
+  "height": 2400,
+  "aspect_ratio": "9:20",
+  "format": "JPEG",
+  "bytes": 479411,
+  "accent_bounds": [
+    [
+      147,
+      1348,
+      415,
+      1521
+    ],
+    [
+      282,
+      1591,
+      510,
+      1770
+    ]
+  ],
+  "crop_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "source_crop": [
+        0.0,
+        241.5,
+        1080.0,
+        2158.5
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        62,
+        67,
+        257,
+        379
+      ],
+      "tray_top": 395,
+      "accents": [
+        {
+          "bounds": [
+            43.56,
+            327.85,
+            122.96,
+            379.11
+          ],
+          "fully_visible_between_board_and_tray": false
+        },
+        {
+          "bounds": [
+            83.56,
+            399.85,
+            151.11,
+            452.89
+          ],
+          "fully_visible_between_board_and_tray": false
+        }
+      ],
+      "lake_pixels_in_exposed_band": 1638
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "source_crop": [
+        0.0,
+        31.38,
+        1080.0,
+        2368.62
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        76,
+        83,
+        314,
+        464
+      ],
+      "tray_top": 631,
+      "accents": [
+        {
+          "bounds": [
+            53.08,
+            475.44,
+            149.86,
+            537.92
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            101.83,
+            563.19,
+            184.17,
+            627.83
+          ],
+          "fully_visible_between_board_and_tray": true
+        }
+      ],
+      "lake_pixels_in_exposed_band": 16800
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "source_crop": [
+        0.0,
+        0.0,
+        1080.0,
+        2400.0
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        70,
+        76,
+        290,
+        428
+      ],
+      "tray_top": 604,
+      "accents": [
+        {
+          "bounds": [
+            49.0,
+            449.33,
+            138.33,
+            507.0
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            94.0,
+            530.33,
+            170.0,
+            590.0
+          ],
+          "fully_visible_between_board_and_tray": true
+        }
+      ],
+      "lake_pixels_in_exposed_band": 16077
+    }
+  ],
+  "validation": "Centered cover geometry with board and tray bounds approximated from user screenshots. Separate stone and root remain fully visible on both tall-phone layouts; the large lake reaches the visible lower band and continues beyond the right and bottom canvas edges. Short-phone UI obscures much of the center, as in the supplied screenshot."
+}

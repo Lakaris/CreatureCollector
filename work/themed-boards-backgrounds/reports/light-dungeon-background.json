@@ -1,0 +1,52 @@
+{
+  "id": "light-dungeon-background",
+  "theme": "light-dungeon",
+  "kind": "background",
+  "destination": "images/battle_backgrounds/light-dungeon.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-6fe0ecf7-c98e-4ef9-a1d4-4fa7a2a36bd3.png",
+  "source_sha256": "6448773a289243fb7b28f8c159789f7ebd1bca9096b990c127659e2c8b1660b3",
+  "native_render_size": [
+    841,
+    1870
+  ],
+  "width": 1440,
+  "height": 3200,
+  "format": "JPEG",
+  "bytes": 615423,
+  "sha256": "ab5f7ee1b7a4d79774a8aa7b9988c32b8de36689f2f1e040a057ad4f1a49463a",
+  "resampled": true,
+  "phone_cover_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 322.0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 41.846
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 0.0
+    },
+    {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontal_crop_px": 0.0,
+      "vertical_crop_each_edge_px": 39.442
+    }
+  ]
+}

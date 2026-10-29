@@ -19,7 +19,7 @@ import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
-import UnitInfoPanel, { debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
+import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
@@ -520,7 +520,7 @@ function TestBattleScreen({ onBack }) {
               )
             ))
           ),
-          React.createElement("div", { className: "battle-side-panel" }, selectedUnit ? React.createElement(UnitInfoPanel, {
+          selectedUnit && React.createElement(UnitInfoPopup, {
             def:CREATURE_MAP[selectedUnit.creatureId]||{emoji:"❓"},
             name: CREATURE_MAP[selectedUnit.creatureId]?.name || selectedUnit.creatureId,
             subtitle: (selectedUnit.uid[0] === "e" ? "Enemy" : "Ally") + " · Lv. " + (selectedUnit.uid[0] === "e" ? enemyLevel : (owned?.[selectedUnit.creatureId]?.level || 1)),
@@ -529,7 +529,7 @@ function TestBattleScreen({ onBack }) {
             abilCharge: selectedUnit.abilCharge, abilChargeMax: selectedUnit.abilChargeMax, abilFlashTicks: selectedUnit.abilFlashTicks,
             debuffs: debuffsFor(selectedUnit),
             onClose: () => setBattleSelectedUid(null),
-          }) : React.createElement("div", { style: { width: 150, flexShrink: 0 } }))
+          })
         )
       ),
       outcome && React.createElement("div", { style: { position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.92)", zIndex: 210, gap: 14 } },

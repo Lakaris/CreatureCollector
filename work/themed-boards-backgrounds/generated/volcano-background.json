@@ -1,0 +1,15 @@
+{
+  "id": "volcano-background",
+  "theme": "volcano",
+  "name": "Volcano",
+  "kind": "background",
+  "width": 1440,
+  "height": 3200,
+  "destination": "images/battle_backgrounds/volcano.jpg",
+  "references": [
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+    "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_icons\\quests\\dungeon.png"
+  ],
+  "prompt": "Use case: stylized-concept. Create one NEW Volcano mobile battle-page background in this exact game's illustrated style. Input 1 is the approved cave background: match its quiet composition, large simple forms, soft contrast and outline treatment. Input 2 is a style reference for the game's chunky clean silhouettes; do not copy its gate. STYLE: Match the supplied game art: clean chunky cartoon illustration, simple broad 2-3 tone cel-shaded shapes, confident muted dark-plum contours on edge objects, no photorealism, fine texture, tiny cracks, grain, 3D rendering, excessive gradients or intricate details. Theme palette: muted basalt mauve-gray, ash beige, smoky plum and subdued burnt orange.\nSCENE: An outdoor volcanic caldera with broad low-detail basalt ridges at the outer edges, distant muted volcanic silhouettes high in the background and a soft smoky mauve sky. A very restrained burnt-orange lava glow may sit in distant far-edge fissures, never the central floor. A broad safe dry ash-stone clearing remains open through the middle and foreground. No eruption plume or huge central volcano focal point. Clearly outdoors, distinct from the Fire Dungeon.\nCOMPOSITION: 9:20 portrait, 1440 x 3200. The board and UI cover most of the central upper area. Keep the central 76% of the width quiet and mostly featureless; put the theme's bold recognizable details at asymmetric extreme sides and corners, with varied shape, height and spacing. Avoid matching rows or repetitive paired clusters. Keep a broad low-contrast floor in the lower half, which matches this board material: pale ash-gray volcanic stone with soft dusty mauve and subdued warm charcoal patches, a few tiny flat rust-colored mineral flecks; no lava, glowing cracks, vents, craters, embers or rocks. Board and panels must read clearly. No high-contrast rocks, liquid, branches or objects crossing the central clearing. Keep details visible close enough to the sides for a narrow phone composition, but modest in size. Restrained gentle dark-plum outline weights like input 1; clean bold outer contours on side objects. No board, grid lines, purple divider, baked frame, rounded-corner mask, icons, characters, text or labels. Full bleed opaque image. Output only ONE finished background, no collage or comparison.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-2181a6a7-0627-4a10-b729-599d877da8be.png"
+}

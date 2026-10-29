@@ -96,7 +96,10 @@ function CollectionScreen({onBananaUsed,onCandyUsed,deepLinkId,onDeepLinkConsume
     onClear:()=>setActiveEffects(new Set()),onBack:()=>setEffectsOpen(false)
   });
 
-  if(selected&&owned[selected])return React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
+  // Keyed so React mounts a fresh scroller each time a creature is opened.
+  // Unkeyed, it reused the grid's root div -- the same DOM node across
+  // close/reopen -- and the page came back at its old scroll position.
+  if(selected&&owned[selected])return React.createElement("div",{key:"creatureDetail",className:"screen-fade",style:{position:"fixed",inset:0,background:"#f5f5f5",overflowY:"auto",overflowX:"hidden",overscrollBehavior:"none",zIndex:50,padding:"0 16px 80px"}},
     pendingEvo&&React.createElement("div",{className:"modal-overlay"},
       React.createElement("div",{className:"modal-box"},
         // The new form as the player will see it -- an equipped skin shows in

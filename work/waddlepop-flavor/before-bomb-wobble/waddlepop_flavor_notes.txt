@@ -1,0 +1,13 @@
+Waddlepop flavor: stumble, fumble, catch.
+39 frames, 6 columns x 7 rows, 512 x 512 per frame. Last three cells are unused.
+Read left to right, top to bottom.
+Play once: every frame is 60 ms; 2340 ms total.
+Frames 1-5 preserve the original 300 ms opening body hold. Frames 34-39 preserve the original 360 ms closing body hold. Only the spark and embers move during these holds.
+Both endpoints are exact copies of waddlepop_idle.png.
+Transparent PNG with separate JSON timing data. Preview repeats for inspection.
+The fuse spark pulses and two embers flick outward throughout. The fuse remains attached and does not shorten.
+Frames 12-26 have the flustered > o < expression and two little mouth-opening beats.
+Three detached cyan nervous droplets appear in two short bursts at frames 13-18 and 20-25, only on the viewer-left. They remain separated from the character and disappear before recovery.
+Every pixel outside the fuse effect is identical to the corresponding prior body pose. Body-pose durations and all prior motion are unchanged.
+The head moves as one rigid shape. Flippers follow the body sway with at most 0.78px horizontal and 1.44px vertical independent reach.
+Expression, droplet, and hidden fuse-tip artwork were made with the built-in image tool. The original star and embers are animated as separate layers.

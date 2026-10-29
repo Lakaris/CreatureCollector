@@ -1,0 +1,60 @@
+{
+  "id": "arena-6x10",
+  "theme": "arena",
+  "kind": "board",
+  "destination": "images/board_backgrounds/arena6x10.jpg",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-61d85b3e-396a-45b4-8d6d-abec0e702588.png",
+  "source_sha256": "f4a9a06a1fb34c5f1a6a2afae7028e4e42259a3669e1d863228bd556e23e4e99",
+  "native_render_size": [
+    971,
+    1619
+  ],
+  "width": 1200,
+  "height": 2000,
+  "format": "JPEG",
+  "bytes": 559661,
+  "sha256": "78aa9cf7f8f93ccf9930803e5e3a6ae70907d597ed9558a74407f74d6f8a3e83",
+  "resampled": true,
+  "x_centers": [
+    199.996,
+    399.975,
+    599.981,
+    800.018,
+    999.977
+  ],
+  "y_centers": [
+    200.023,
+    399.992,
+    599.971,
+    799.981,
+    999.978,
+    1200.017,
+    1399.971,
+    1599.978,
+    1799.955
+  ],
+  "checked_cross_sections": 312,
+  "max_center_error_px": 0.0577,
+  "purple_divider_y": null,
+  "initial_centers": {
+    "x": [
+      200.36761861088263,
+      399.4629836574162,
+      599.8140800384846,
+      800.1771262226783,
+      998.6671589392363
+    ],
+    "y": [
+      200.1711703740144,
+      399.4372154463014,
+      599.5960569634229,
+      799.5375361387144,
+      999.5856853459054,
+      1200.0501415100557,
+      1399.7372738839815,
+      1599.6363402061372,
+      1799.7364770603808
+    ]
+  },
+  "geometric_correction_passes": 1
+}

@@ -1,0 +1,179 @@
+{
+  "destination": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\battle_backgrounds\\rocky.jpg",
+  "original_sha256": "c9846f9fd04e2e9fee266e69506dae922201581e193bd571aa216e71b73fbeb6",
+  "width": 1080,
+  "height": 2400,
+  "aspect_ratio": "9:20",
+  "format": "JPEG",
+  "bytes": 515151,
+  "accent_bounds": [
+    [
+      363,
+      1384,
+      582,
+      1522
+    ],
+    [
+      402,
+      1544,
+      604,
+      1644
+    ],
+    [
+      385,
+      1619,
+      571,
+      1727
+    ]
+  ],
+  "crop_checks": [
+    {
+      "viewport": [
+        320,
+        568
+      ],
+      "source_crop": [
+        0.0,
+        241.5,
+        1080.0,
+        2158.5
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        62,
+        67,
+        257,
+        379
+      ],
+      "tray_top": 395,
+      "accents": [
+        {
+          "bounds": [
+            107.56,
+            338.52,
+            172.44,
+            379.41
+          ],
+          "fully_visible_between_board_and_tray": false
+        },
+        {
+          "bounds": [
+            119.11,
+            385.93,
+            178.96,
+            415.56
+          ],
+          "fully_visible_between_board_and_tray": false
+        },
+        {
+          "bounds": [
+            114.07,
+            408.15,
+            169.19,
+            440.15
+          ],
+          "fully_visible_between_board_and_tray": false
+        }
+      ]
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "source_crop": [
+        0.0,
+        31.38,
+        1080.0,
+        2368.62
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        76,
+        83,
+        314,
+        464
+      ],
+      "tray_top": 631,
+      "accents": [
+        {
+          "bounds": [
+            131.08,
+            488.44,
+            210.17,
+            538.28
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            145.17,
+            546.22,
+            218.11,
+            582.33
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            139.03,
+            573.31,
+            206.19,
+            612.31
+          ],
+          "fully_visible_between_board_and_tray": true
+        }
+      ]
+    },
+    {
+      "viewport": [
+        360,
+        800
+      ],
+      "source_crop": [
+        0.0,
+        0.0,
+        1080.0,
+        2400.0
+      ],
+      "horizontal_crop_px": 0.0,
+      "board_bounds": [
+        70,
+        76,
+        290,
+        428
+      ],
+      "tray_top": 604,
+      "accents": [
+        {
+          "bounds": [
+            121.0,
+            461.33,
+            194.0,
+            507.33
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            134.0,
+            514.67,
+            201.33,
+            548.0
+          ],
+          "fully_visible_between_board_and_tray": true
+        },
+        {
+          "bounds": [
+            128.33,
+            539.67,
+            190.33,
+            575.67
+          ],
+          "fully_visible_between_board_and_tray": true
+        }
+      ]
+    }
+  ],
+  "validation": "Exact centered cover geometry; board and tray bounds approximated from user screenshots. Three main accents remain fully visible in the exposed band on both tall-phone layouts. Short-phone UI covers this band, as in the supplied screenshot."
+}

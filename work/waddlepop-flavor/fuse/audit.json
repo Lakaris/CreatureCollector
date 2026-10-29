@@ -1,0 +1,565 @@
+{
+  "frames": 39,
+  "sourceBodyPoses": 30,
+  "grid": [
+    6,
+    7
+  ],
+  "totalDurationMs": 2340,
+  "bodyPoseDurationsUnchanged": true,
+  "allPixelsOutsideFuseIdentical": true,
+  "baseUnchanged": true,
+  "firstAndLastMatchBaseExactly": true,
+  "noConsecutiveStaticFrames": true,
+  "sparkVisibleEveryFrame": true,
+  "originalSparkColorsPreserved": true,
+  "clippedFrames": 0,
+  "framesChecked": [
+    {
+      "frame": 1,
+      "sourcePose": 1,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 554,
+      "bounds": [
+        114,
+        4,
+        421,
+        491
+      ]
+    },
+    {
+      "frame": 2,
+      "sourcePose": 1,
+      "phase": 1,
+      "changedPixels": 1556,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 414,
+      "bounds": [
+        114,
+        7,
+        422,
+        491
+      ]
+    },
+    {
+      "frame": 3,
+      "sourcePose": 1,
+      "phase": 2,
+      "changedPixels": 1640,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 502,
+      "bounds": [
+        114,
+        4,
+        423,
+        491
+      ]
+    },
+    {
+      "frame": 4,
+      "sourcePose": 1,
+      "phase": 3,
+      "changedPixels": 1573,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 388,
+      "bounds": [
+        114,
+        8,
+        424,
+        491
+      ]
+    },
+    {
+      "frame": 5,
+      "sourcePose": 1,
+      "phase": 4,
+      "changedPixels": 1684,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 527,
+      "bounds": [
+        114,
+        4,
+        425,
+        491
+      ]
+    },
+    {
+      "frame": 6,
+      "sourcePose": 2,
+      "phase": 5,
+      "changedPixels": 1746,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 437,
+      "bounds": [
+        112,
+        6,
+        423,
+        492
+      ]
+    },
+    {
+      "frame": 7,
+      "sourcePose": 3,
+      "phase": 6,
+      "changedPixels": 1783,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 483,
+      "bounds": [
+        109,
+        4,
+        417,
+        494
+      ]
+    },
+    {
+      "frame": 8,
+      "sourcePose": 4,
+      "phase": 7,
+      "changedPixels": 1779,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 404,
+      "bounds": [
+        106,
+        6,
+        413,
+        495
+      ]
+    },
+    {
+      "frame": 9,
+      "sourcePose": 5,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 542,
+      "bounds": [
+        106,
+        4,
+        409,
+        495
+      ]
+    },
+    {
+      "frame": 10,
+      "sourcePose": 6,
+      "phase": 1,
+      "changedPixels": 1657,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 425,
+      "bounds": [
+        114,
+        17,
+        423,
+        494
+      ]
+    },
+    {
+      "frame": 11,
+      "sourcePose": 7,
+      "phase": 2,
+      "changedPixels": 1693,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 510,
+      "bounds": [
+        123,
+        26,
+        443,
+        497
+      ]
+    },
+    {
+      "frame": 12,
+      "sourcePose": 8,
+      "phase": 3,
+      "changedPixels": 1721,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 388,
+      "bounds": [
+        131,
+        28,
+        457,
+        498
+      ]
+    },
+    {
+      "frame": 13,
+      "sourcePose": 9,
+      "phase": 4,
+      "changedPixels": 1728,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 523,
+      "bounds": [
+        89,
+        29,
+        461,
+        497
+      ]
+    },
+    {
+      "frame": 14,
+      "sourcePose": 10,
+      "phase": 5,
+      "changedPixels": 1752,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 437,
+      "bounds": [
+        85,
+        31,
+        467,
+        496
+      ]
+    },
+    {
+      "frame": 15,
+      "sourcePose": 11,
+      "phase": 6,
+      "changedPixels": 1767,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 485,
+      "bounds": [
+        82,
+        34,
+        475,
+        496
+      ]
+    },
+    {
+      "frame": 16,
+      "sourcePose": 12,
+      "phase": 7,
+      "changedPixels": 1797,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 411,
+      "bounds": [
+        81,
+        36,
+        480,
+        497
+      ]
+    },
+    {
+      "frame": 17,
+      "sourcePose": 13,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 538,
+      "bounds": [
+        77,
+        36,
+        466,
+        498
+      ]
+    },
+    {
+      "frame": 18,
+      "sourcePose": 14,
+      "phase": 1,
+      "changedPixels": 1671,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 417,
+      "bounds": [
+        68,
+        34,
+        442,
+        496
+      ]
+    },
+    {
+      "frame": 19,
+      "sourcePose": 15,
+      "phase": 2,
+      "changedPixels": 1696,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 518,
+      "bounds": [
+        104,
+        17,
+        422,
+        497
+      ]
+    },
+    {
+      "frame": 20,
+      "sourcePose": 16,
+      "phase": 3,
+      "changedPixels": 1706,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 392,
+      "bounds": [
+        60,
+        18,
+        411,
+        498
+      ]
+    },
+    {
+      "frame": 21,
+      "sourcePose": 17,
+      "phase": 4,
+      "changedPixels": 1744,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 531,
+      "bounds": [
+        56,
+        8,
+        383,
+        501
+      ]
+    },
+    {
+      "frame": 22,
+      "sourcePose": 18,
+      "phase": 5,
+      "changedPixels": 1704,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 443,
+      "bounds": [
+        54,
+        8,
+        374,
+        505
+      ]
+    },
+    {
+      "frame": 23,
+      "sourcePose": 19,
+      "phase": 6,
+      "changedPixels": 1777,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 485,
+      "bounds": [
+        55,
+        10,
+        377,
+        506
+      ]
+    },
+    {
+      "frame": 24,
+      "sourcePose": 20,
+      "phase": 7,
+      "changedPixels": 1788,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 407,
+      "bounds": [
+        59,
+        19,
+        390,
+        506
+      ]
+    },
+    {
+      "frame": 25,
+      "sourcePose": 21,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 548,
+      "bounds": [
+        62,
+        18,
+        392,
+        505
+      ]
+    },
+    {
+      "frame": 26,
+      "sourcePose": 22,
+      "phase": 1,
+      "changedPixels": 1665,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 424,
+      "bounds": [
+        110,
+        25,
+        415,
+        500
+      ]
+    },
+    {
+      "frame": 27,
+      "sourcePose": 23,
+      "phase": 2,
+      "changedPixels": 1699,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 510,
+      "bounds": [
+        121,
+        28,
+        439,
+        497
+      ]
+    },
+    {
+      "frame": 28,
+      "sourcePose": 24,
+      "phase": 3,
+      "changedPixels": 1710,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 387,
+      "bounds": [
+        124,
+        28,
+        444,
+        498
+      ]
+    },
+    {
+      "frame": 29,
+      "sourcePose": 25,
+      "phase": 4,
+      "changedPixels": 1752,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 527,
+      "bounds": [
+        119,
+        21,
+        436,
+        496
+      ]
+    },
+    {
+      "frame": 30,
+      "sourcePose": 26,
+      "phase": 5,
+      "changedPixels": 1772,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 435,
+      "bounds": [
+        114,
+        13,
+        426,
+        494
+      ]
+    },
+    {
+      "frame": 31,
+      "sourcePose": 27,
+      "phase": 6,
+      "changedPixels": 1776,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 489,
+      "bounds": [
+        110,
+        7,
+        420,
+        493
+      ]
+    },
+    {
+      "frame": 32,
+      "sourcePose": 28,
+      "phase": 7,
+      "changedPixels": 1784,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 407,
+      "bounds": [
+        111,
+        8,
+        422,
+        493
+      ]
+    },
+    {
+      "frame": 33,
+      "sourcePose": 29,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 548,
+      "bounds": [
+        113,
+        4,
+        420,
+        492
+      ]
+    },
+    {
+      "frame": 34,
+      "sourcePose": 30,
+      "phase": 1,
+      "changedPixels": 1556,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 414,
+      "bounds": [
+        114,
+        7,
+        422,
+        491
+      ]
+    },
+    {
+      "frame": 35,
+      "sourcePose": 30,
+      "phase": 2,
+      "changedPixels": 1640,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 502,
+      "bounds": [
+        114,
+        4,
+        423,
+        491
+      ]
+    },
+    {
+      "frame": 36,
+      "sourcePose": 30,
+      "phase": 3,
+      "changedPixels": 1573,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 388,
+      "bounds": [
+        114,
+        8,
+        424,
+        491
+      ]
+    },
+    {
+      "frame": 37,
+      "sourcePose": 30,
+      "phase": 4,
+      "changedPixels": 1684,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 527,
+      "bounds": [
+        114,
+        4,
+        425,
+        491
+      ]
+    },
+    {
+      "frame": 38,
+      "sourcePose": 30,
+      "phase": 5,
+      "changedPixels": 1627,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 438,
+      "bounds": [
+        114,
+        6,
+        426,
+        491
+      ]
+    },
+    {
+      "frame": 39,
+      "sourcePose": 30,
+      "phase": 0,
+      "changedPixels": 0,
+      "changedPixelsOutsideFuse": 0,
+      "visibleWarmSparkPixels": 554,
+      "bounds": [
+        114,
+        4,
+        421,
+        491
+      ]
+    }
+  ]
+}

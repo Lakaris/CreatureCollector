@@ -1,0 +1,9 @@
+Waddlepop attack: a quick overhead throw, followed by recovery and a new bomb appearing in its raised hands.
+30 transparent 512 x 512 px frames. 6 columns x 5 rows, read left to right then top to bottom.
+60 ms per frame; 1.8 seconds total. Play once; loop=false.
+First and last frames are pixel-identical to waddlepop_idle.png. Feet stay in exactly the same place throughout.
+Frame 10 (540 ms): release event for the game projectile. The short on-tile bomb motion ends before frame 12 (660 ms).
+Frames 12–23: bomb absent. Frame 24 (1380 ms): bomb reappears in the raised hands, then settles.
+The fuse sparks whenever the bomb is visible. A brief squeezed-eye expression accompanies the throw.
+Original face, feet and bomb artwork reused; complete full-sized flippers rotate as rigid pieces without scaling. Generated art reconstructs the missing hidden flipper surfaces and shoulder outlines. Original visible flipper tips, outer contours and colors are retained.
+All 30 frames visually reviewed and checked for connected hands, stray components, clipping, face integrity, stationary feet and matching endpoints.

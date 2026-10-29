@@ -1,0 +1,300 @@
+{
+  "image": "waddlepop_flavor.png",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "columns": 6,
+  "rows": 5,
+  "loop": false,
+  "totalDurationMs": 2340,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 300
+    },
+    {
+      "index": 1,
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 2,
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 3,
+      "x": 1536,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 4,
+      "x": 2048,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 5,
+      "x": 2560,
+      "y": 0,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 7,
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 8,
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 9,
+      "x": 1536,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 10,
+      "x": 2048,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 11,
+      "x": 2560,
+      "y": 512,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 13,
+      "x": 512,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 14,
+      "x": 1024,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 15,
+      "x": 1536,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 16,
+      "x": 2048,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 17,
+      "x": 2560,
+      "y": 1024,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 18,
+      "x": 0,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 19,
+      "x": 512,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 20,
+      "x": 1024,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 21,
+      "x": 1536,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 22,
+      "x": 2048,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 23,
+      "x": 2560,
+      "y": 1536,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 24,
+      "x": 0,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 25,
+      "x": 512,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 26,
+      "x": 1024,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 27,
+      "x": 1536,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 28,
+      "x": 2048,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 60
+    },
+    {
+      "index": 29,
+      "x": 2560,
+      "y": 2048,
+      "width": 512,
+      "height": 512,
+      "durationMs": 360
+    }
+  ],
+  "expressions": [
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "half",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-small",
+    "squeezed-closed",
+    "squeezed-small",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-open",
+    "squeezed-small",
+    "squeezed-closed",
+    "half",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base",
+    "base"
+  ],
+  "effects": {
+    "detachedNervousDroplets": {
+      "side": "viewer-left",
+      "count": 3,
+      "frameRanges": [
+        [
+          9,
+          14
+        ],
+        [
+          16,
+          21
+        ]
+      ]
+    }
+  },
+  "notes": "Stumble, fumble the snow bomb left and right, catch and settle. First and last frames are pixel-identical to waddlepop_idle.png. During the fumble, eyes squeeze to > < while the beak opens into an O and closes in two little beats. Three detached cyan nervous droplets pop outward on the left in two small bursts, disappearing before recovery. Head silhouette, cheek contours, flipper shapes, body motion, bomb motion and timing are preserved."
+}

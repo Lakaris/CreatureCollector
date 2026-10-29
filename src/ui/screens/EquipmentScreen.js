@@ -137,7 +137,7 @@ function EquipmentScreen() {
 
   return React.createElement("div", null,
     ascendAllResult && React.createElement("div", { className: "modal-overlay", onClick: () => setAscendAllResult(null) },
-      React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 20, padding: "24px 20px", width: "100%", maxWidth: 340, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.18)" } },
+      React.createElement("div", { className:"ui-panel",onClick: (e) => e.stopPropagation(), style: { padding: "8px 4px", width: "100%", maxWidth: 340, textAlign: "center" } },
         React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 4 } }, iconText("✦ Equipment Ascended")),
         ascendAllResult.length === 0
           ? React.createElement("div", { style: { fontSize: 13, color: "#666", padding: "12px 0" } }, "Nothing was ready to ascend.")
@@ -181,10 +181,12 @@ function EquipmentScreen() {
     React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 } },
       React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#666" } }, "All Gear"),
       !tutorialRestricted && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-        // Full / Compact view switch.
-        React.createElement("div", { style: { display: "flex", border: "1px solid #d0ccf7", borderRadius: 8, overflow: "hidden" } },
+        // Full / Compact view switch. One control, so the ink outline goes
+        // round the pair rather than each half (.no-ink).
+        React.createElement("div", { className: "ink-border", style: { display: "flex", borderRadius: 8, overflow: "hidden" } },
           [["Full", false], ["Compact", true]].map(([label, val]) => React.createElement("button", {
             key: label,
+            className: "no-ink",
             onClick: () => chooseCompact(val),
             style: { fontSize: 11, fontWeight: 600, padding: "3px 8px", border: "none", cursor: "pointer", background: compact === val ? "#534AB7" : "transparent", color: compact === val ? "#fff" : "#534AB7" },
           }, label))
@@ -253,6 +255,7 @@ function EquipmentScreen() {
             return React.createElement("div", {
               key: item.id,
               title: item.name,
+              className: "gear-card" + (isEquipped ? " equipped" : ""),
               onClick: () => setSelected(item.id),
               style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 8, padding: "16px 4px 5px", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", boxSizing: "border-box", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none", minWidth: 0 }
             },
@@ -281,6 +284,7 @@ function EquipmentScreen() {
             const showItemPointer = tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID;
             return React.createElement("div", {
               key: item.id,
+              className: "gear-card" + (isEquipped ? " equipped" : ""),
               onClick: () => { setSelected(item.id); if (tutorialStep === "equipItem" && item.id === TUTORIAL_ITEM_ID) setTutorialStep("upgradeItem"); },
               style: { position: "relative", background: rarCfg ? rarCfg.bg : "#fff", borderRadius: 10, padding: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", width: "calc(50% - 4px)", minHeight: 170, boxSizing: "border-box", textAlign: "center", border: "1.5px solid " + (isEquipped ? "#d0ccf7" : (rarCfg ? rarCfg.color + "44" : "#eee")), userSelect: "none" }
             },

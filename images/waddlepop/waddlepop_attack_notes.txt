@@ -7,3 +7,5 @@ Frames 12–23: bomb absent. Frame 24 (1380 ms): bomb reappears in the raised ha
 The fuse sparks whenever the bomb is visible. A brief squeezed-eye expression accompanies the throw.
 Original face, feet and bomb artwork reused; complete full-sized flippers rotate as rigid pieces without scaling. Generated art reconstructs the missing hidden flipper surfaces and shoulder outlines. Original visible flipper tips, outer contours and colors are retained.
 All 30 frames visually reviewed and checked for connected hands, stray components, clipping, face integrity, stationary feet and matching endpoints.
+Both arms and the upper body share the throw timing. Waddlepop leans back slightly during the wind-up, then heaves forward by 4 degrees, holds briefly, and eases back. The face and shoulders stay rigid, the lower torso bends into stationary hips, and both feet remain pixel-identical to the base. The held bomb follows the lean until release.
+Cheek contours use the base image stroke thickness. Overlapping arm strokes and covered shoulder seams are corrected in all affected frames. Motion, facial expressions, bomb timing, planted feet, and endpoint images are preserved.

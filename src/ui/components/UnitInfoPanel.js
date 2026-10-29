@@ -6,6 +6,7 @@
 import React from "../../react.js";
 import { statModStacks, overTimeStacks, exactStatModPct } from "../../battle/status.js";
 import { protectStacks } from "../../battle/hp.js";
+import { PopupClose } from "./PopupArt.js";
 
 /** The over-time debuffs (battle/status.js): one identical effect, two names,
  * each carrying its own independent stacks. Shown with a ×n stack count. */
@@ -100,19 +101,18 @@ export function debuffsFor(u) {
 function UnitInfoPanel({ name, subtitle, hp, maxHp, shield, abilityName, abilCharge, abilChargeMax, abilFlashTicks, debuffs, onClose }) {
   const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
   const chargePct = abilChargeMax > 0 ? Math.max(0, Math.min(100, ((abilCharge || 0) / abilChargeMax) * 100)) : 0;
+  // The popup art's frame (.ui-panel) is the border; 196 wide leaves the
+  // content about as wide as the old plain card's.
   return React.createElement("div", {
-    style: { width: 180, maxHeight: "calc(40 * var(--vh))", overflowY: "auto", background: "#fff", borderRadius: 10, padding: "10px", boxShadow: "0 4px 16px rgba(0,0,0,0.25)", boxSizing: "border-box" },
+    className: "ui-panel",
+    style: { width: 196, maxHeight: "calc(40 * var(--vh))", overflowY: "auto", padding: "2px 4px 4px" },
   },
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
       React.createElement("div", { style: { flex: 1, minWidth: 0 } },
         React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, name),
         subtitle && React.createElement("div", { style: { fontSize: 9, color: "#888", fontWeight: 600 } }, subtitle)
       ),
-      React.createElement("button", {
-        onClick: onClose,
-        title: "Close",
-        style: { background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#999", padding: 0, lineHeight: 1, flexShrink: 0 },
-      }, "×")
+      React.createElement(PopupClose, { onClick: onClose, size: 20 })
     ),
     React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: "#888", marginBottom: 2, display: "flex", justifyContent: "space-between" } },
       React.createElement("span", null, "HP"),

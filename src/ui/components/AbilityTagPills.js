@@ -38,13 +38,17 @@ export function AbilityTagPills({ tags, onOpen }) {
   if (!tags || !tags.length) return null;
   const { targeting, effects } = splitAbilityTags(tags);
   return React.createElement(React.Fragment, null,
+    // .tag-pill: labels you can tap, so they keep their own thin border
+    // rather than the buttons' ink outline (components.css).
     effects.length > 0 && React.createElement("button", {
       key: "effects",
+      className: "tag-pill",
       onClick: (e) => { e.stopPropagation(); onOpen({ effects }); },
       style: EFFECTS_PILL_STYLE,
     }, "Effects"),
     ...targeting.map((tag) => React.createElement("button", {
       key: tag,
+      className: "tag-pill",
       onClick: (e) => { e.stopPropagation(); onOpen(tag); },
       style: PILL_STYLE,
     }, ABILITY_TAG_DEFS[tag].label))
@@ -139,9 +143,11 @@ export function AbilityTagPopup({ popup, onClose }) {
     // popup rendered after this one in the tree can't cover the definition.
     style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 400 },
   },
+    // The popup art's frame (.ui-panel) is the card's border.
     React.createElement("div", {
+      className: "ui-panel",
       onClick: (e) => e.stopPropagation(),
-      style: { background: "#fff", borderRadius: 14, padding: "18px 20px", width: 280, maxWidth: "calc(85 * var(--vw))", maxHeight: "calc(70 * var(--vh))", overflowY: "auto", boxShadow: "0 8px 30px rgba(0,0,0,0.25)" },
+      style: { padding: "6px 8px 8px", width: 296, maxWidth: "calc(85 * var(--vw))", maxHeight: "calc(70 * var(--vh))", overflowY: "auto" },
     },
       isList
         ? React.createElement(React.Fragment, null,

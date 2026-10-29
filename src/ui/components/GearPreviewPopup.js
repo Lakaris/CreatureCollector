@@ -17,9 +17,11 @@ function GearPreviewPopup({ item, onClose, zIndex = 150 }) {
   const rarCfg = EQUIP_RARITY_CONFIG[item.rarity] || EQUIP_RARITY_CONFIG.common;
   const stats = Object.entries(item.stats || {}).map(([s, v]) => formatStatBonus(s, v)).join(" · ");
   return React.createElement("div", { onClick: onClose, style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px" } },
-    React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { position: "relative", background: "#fff", borderRadius: 20, padding: "24px 20px 20px", width: "100%", maxWidth: 320, boxSizing: "border-box" } },
-      React.createElement("div", { style: { position: "absolute", top: 12, left: 14, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
-      isExclusive(item) && React.createElement("div", { style: { position: "absolute", top: 36, left: 14, fontSize: 10, fontWeight: 700, color: "#7F77DD" } }, exclusivityCaption(item)),
+    React.createElement("div", { className:"ui-panel",onClick: (e) => e.stopPropagation(), style: { position: "relative", padding: "8px 4px 4px", width: "100%", maxWidth: 320, boxSizing: "border-box" } },
+      // Placed from the frame's inner edge (the card is a .ui-panel), not its
+      // outer one.
+      React.createElement("div", { style: { position: "absolute", top: 0, left: 2, fontSize: 10, fontWeight: 700, color: rarCfg.color, background: rarCfg.bg, borderRadius: 4, padding: "2px 7px" } }, rarCfg.label),
+      isExclusive(item) && React.createElement("div", { style: { position: "absolute", top: 22, left: 2, fontSize: 10, fontWeight: 700, color: "#7F77DD" } }, exclusivityCaption(item)),
       React.createElement("div", { style: { textAlign: "center", paddingTop: 12, marginBottom: 16 } },
         React.createElement("div", { style: { fontSize: 64, lineHeight: 1, marginBottom: 6 } }, gearIcon(item)),
         React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 4 } }, item.name),

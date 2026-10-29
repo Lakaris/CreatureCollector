@@ -9,27 +9,29 @@ import { ARENA_TABS, ARENA_TAB_TYPE, ARENA_TAB_ENEMY_TYPES } from "../../../data
 import { REWARD_DESC } from "../../../data/quests.js";
 import { applyRewards } from "../../../core/rewards.js";
 import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW, ARENA_TILE, ARENA_MAX_DEPLOYED } from "../../../battle/constants.js";
-import { boardArt, boardCellClass, BATTLE_BACKDROP } from "../../boardArt.js";
+import { boardArt, boardCellClass, battleBackdrop } from "../../boardArt.js";
 import useBattlePause, { BATTLE_PAUSED_CLASS, DEV_PAUSE_BTN } from "../../hooks/useBattlePause.js";
 import { aEase } from "../../../battle/geometry.js";
 import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
-import { PlanInfoSheet, CreatureSheetBody, allyDesc } from "../../../ui/components/PlanInfoSheet.js";
+import { PlanInfoSheet, CreatureSheetBody, AllySheetBody, PLAN_INFO_HOLD_MS } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
-import { MAX_ABILITY_LEVEL } from "../../../core/creatures.js";
 import { AbilityTagPopup } from "../../../ui/components/AbilityTagPills.js";
 import useTouchDragPlacement from "../../../ui/hooks/useTouchDragPlacement.js";
 import useRangePreview from "../../../ui/hooks/useRangePreview.js";
 import useFitTile from "../../../ui/hooks/useFitTile.js";
 import { DEV_MODE } from "../../../config.js";
 import { TRIALS_ID, TRIALS_TAB, trialsGearFor, trialsItemLevel } from "../../../core/trials.js";
-import TrialsHome, { TrialsEnemyHeader, TrialsEnemyBody } from "./TrialsHome.js";
+import TrialsHome, { trialsGear } from "./TrialsHome.js";
 
-const arenaBoardArt=boardArt(ARENA_GRID_ROWS,ARENA_GRID_COLS);
+// The Arena fights in its own scene; Trials has none drawn yet, so it keeps
+// the default.
+const ARENA_SCENE={art:boardArt(ARENA_GRID_ROWS,ARENA_GRID_COLS,"arena"),backdrop:battleBackdrop("arena")};
+const TRIALS_SCENE={art:boardArt(ARENA_GRID_ROWS,ARENA_GRID_COLS),backdrop:battleBackdrop()};
 
 const ARENA_UNLOCK_COUNT=6;
 const ARENA_MAX_LEVEL=50;
@@ -69,6 +71,7 @@ const EMPTY_GRID={};
 
 function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   const isTrials=mode===TRIALS_ID;
+  const {art:arenaBoardArt,backdrop:arenaBackdrop}=isTrials?TRIALS_SCENE:ARENA_SCENE;
   const { equipmentLevels, equipmentAscensions, arenaLevels, setArenaLevels, arenaProgress, setArenaProgress, currencies, setCurrencies, owned, unlockedSkins, skinShards, setSkinShards, arenaPlanGrid: planGrids, setArenaPlanGrid: setPlanGrids, arenaDeepLink, setArenaDeepLink } = trialsAware(useGame(),mode);
   const [arenaTab,setArenaTab]=useState(isTrials?TRIALS_ID:"all");
   // planGrids is arena tab id -> {"r,c": creatureId}; planGrid/setPlanGrid are
@@ -260,7 +263,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   const arenaTouchDrag=useTouchDragPlacement({
     cellSelector:"[data-cell]",
     applyDrop:arenaApplyDrop,
-    onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}},
+    onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}closeArenaSheet();},
     onCancelDrop:(fromCell)=>setPlanGrid(p=>{const n={...p};delete n[fromCell];return n;}),
     onDragOverCell:(cellKey,d)=>{
       const cid=d.id||d.cellId;
@@ -454,7 +457,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
     const snap=arenaBSnap||{playerUnits:[],enemyUnits:[],damageDealt:{}};
     const allUnits=[...snap.playerUnits,...snap.enemyUnits];
     const selectedUnit=battleSelectedUid?allUnits.find(u=>u.uid===battleSelectedUid):null;
-    return React.createElement("div",{key:"sfv388",className:"screen-fade"+(arenaPause.paused?" "+BATTLE_PAUSED_CLASS:""),style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv388",className:"screen-fade"+(arenaPause.paused?" "+BATTLE_PAUSED_CLASS:""),style:{position:"fixed",inset:0,...arenaBackdrop,display:"flex",flexDirection:"column"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"16px 16px 12px",gap:10,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)",flexShrink:0}},
         React.createElement("div",{style:{flex:1}},
           React.createElement("div",{style:{fontSize:13,fontWeight:800,color:"#111"}},arenaTabIcon(tabDef)," "+arenaTitle(tabDef)+" — Lv."+arenaEnemyLevel(level,stage)+(isBoss?" (Boss)":""))
@@ -554,7 +557,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   if(planning){
     const deployedCount=Object.keys(planGrid).length;
     const enemyGrid=getEnemyLayout(arenaTab,stage,level);
-    return React.createElement("div",{key:"sfv483",className:"screen-fade",style:{position:"fixed",inset:0,...BATTLE_BACKDROP,display:"flex",flexDirection:"column"}},
+    return React.createElement("div",{key:"sfv483",className:"screen-fade",style:{position:"fixed",inset:0,...arenaBackdrop,display:"flex",flexDirection:"column"}},
       arenaAbilityTagPopup&&React.createElement(AbilityTagPopup,{popup:arenaAbilityTagPopup,onClose:()=>setArenaAbilityTagPopup(null)}),
       // header
       React.createElement("div",{className:"plan-header",style:{padding:"16px 16px 12px",gap:12,flexShrink:0,background:"var(--bar-bg)",borderBottom:"1px solid var(--bar-line)"}},
@@ -587,9 +590,9 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
               const isDivider=r===ARENA_PLAYER_START_ROW;
               const BORDER="1px solid #bbb";
               const onHoldStart=isPlayerZone&&creatureId
-                ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyInfo(null);setGridInfoCreature(creatureId);},180);})
+                ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setArenaEnemyInfo(null);setGridInfoCreature(creatureId);},PLAN_INFO_HOLD_MS);})
                 :enemyDef
-                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(null);setArenaEnemyInfo(enemyDef);},180);})
+                  ?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setGridInfoCreature(null);setArenaEnemyInfo(enemyDef);},PLAN_INFO_HOLD_MS);})
                   :undefined;
               const onHoldEnd=isPlayerZone&&creatureId
                 ?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!arenaTouchDrag.dragRef.current.active){setPlanGrid(p=>{const n={...p};delete n[key];return n;});}})
@@ -599,7 +602,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
               return React.createElement("div",{
                 key,"data-cell":key,className:boardCellClass(r,ARENA_PLAYER_START_ROW),
                 draggable:!!(isPlayerZone&&creatureId),
-                onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
+                onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}closeArenaSheet();setDragCell(key);setDragId(null);}:undefined,
                 onDragEnd:isPlayerZone&&creatureId?()=>rangePreview.clear():undefined,
                 onDragOver:isPlayerZone?(e)=>{e.preventDefault();previewAt(draggedCreature(),r,c);}:(e)=>rangePreview.clear(),
                 onDrop:isPlayerZone?(e)=>{e.preventDefault();rangePreview.clear();handleArenaCellDrop(r,c);}:undefined,
@@ -623,9 +626,9 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
           )
         )
       ),
-      // creature list -- the info sheet takes its place while open
+      // creature list
       React.createElement("div",{
-        style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0,...(arenaEnemyInfo||gridInfoCreature?{display:"none"}:null)},
+        style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
         onDragOver:e=>{e.preventDefault();rangePreview.clear();},
         onDrop:e=>{e.preventDefault();rangePreview.clear();if(dragCell){setPlanGrid(p=>{const n={...p};delete n[dragCell];return n;});}setDragId(null);setDragCell(null);}
       },
@@ -691,28 +694,15 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
         )
       ),
       // info sheet: the pressed enemy or ally
+      // Enemies read at their maxed kit; only Trials ones wear gear.
       arenaEnemyInfo&&CREATURE_MAP[arenaEnemyInfo.id]&&React.createElement(PlanInfoSheet,{onClose:closeArenaSheet},
-        // Trials: the same header, gear and ability cards as the Trials
-        // screen's creature popup (TrialsHome.js).
-        isTrials
-          ?React.createElement(React.Fragment,null,
-            React.createElement(TrialsEnemyHeader,{enemy:arenaEnemyInfo,enemyLevel:arenaEnemyLevel(level,stage)}),
-            React.createElement("div",{style:{marginTop:12}},React.createElement(TrialsEnemyBody,{enemy:arenaEnemyInfo,onTag:setArenaAbilityTagPopup})))
-          :React.createElement(CreatureSheetBody,{
-            def:CREATURE_MAP[arenaEnemyInfo.id],
-            subtitle:arenaEnemyInfo.type+" · "+(arenaEnemyInfo.attackType||"Melee")+" · Lv."+arenaEnemyLevel(level,stage)+" · Enemy",
-            // Enemies fight with a maxed kit (see makeArenaBattle), so show
-            // the last upgrade tier rather than the base one.
-            descFor:(k,abl)=>abl.upgrades?abl.upgrades[Math.min(MAX_ABILITY_LEVEL,abl.upgrades.length-1)]:"",
-            onTag:setArenaAbilityTagPopup,
-          })),
-      gridInfoCreature&&CREATURE_MAP[gridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeArenaSheet},
         React.createElement(CreatureSheetBody,{
-          def:CREATURE_MAP[gridInfoCreature],
-          subtitle:CREATURE_MAP[gridInfoCreature].type+" · "+(CREATURE_MAP[gridInfoCreature].attackType||"Melee")+(owned?.[gridInfoCreature]?" · Lv."+owned[gridInfoCreature].level:""),
-          descFor:allyDesc(owned?.[gridInfoCreature]),
+          def:CREATURE_MAP[arenaEnemyInfo.id],level:arenaEnemyLevel(level,stage),
+          gear:isTrials?trialsGear(arenaEnemyInfo):undefined,
           onTag:setArenaAbilityTagPopup,
         })),
+      gridInfoCreature&&CREATURE_MAP[gridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeArenaSheet},
+        React.createElement(AllySheetBody,{id:gridInfoCreature,onTag:setArenaAbilityTagPopup})),
       arenaTouchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[arenaTouchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:arenaTouchDrag.ghost.x-26,top:arenaTouchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})()
     );
   }
@@ -739,7 +729,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
   }
   return React.createElement("div",{key:"sfv682",className:"screen-fade",style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#f5f5f5"}},
     rewardPopup!==null&&(()=>{const rd=ARENA_STAGE_REWARDS_DISPLAY[rewardPopup];return React.createElement("div",{onClick:()=>setRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
+      React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"12px 8px",width:"100%",maxWidth:320,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},currencyIcon(rd.key,rd.emoji)),
         React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:8}},rd.label),
         React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:4}},REWARD_DESC[rd.key]||""),
@@ -760,7 +750,7 @@ function ArenaScreen({onBack,onFight,onViewCreature,mode}){
         ARENA_TABS.map(t=>{
           const reqType=ARENA_TAB_TYPE[t.id];
           const isLocked=reqType&&(arenaTypeCounts[reqType]||0)<ARENA_UNLOCK_COUNT;
-          return React.createElement("button",{key:t.id,onClick:()=>{if(isLocked){showArenaLockToast(t);return;}setArenaTab(t.id);},style:{
+          return React.createElement("button",{key:t.id,className:"no-ink",onClick:()=>{if(isLocked){showArenaLockToast(t);return;}setArenaTab(t.id);},style:{
             display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,
             flex:1,padding:"4px",border:"none",
             borderRight:arenaTab===t.id?"3px solid #534AB7":"3px solid transparent",

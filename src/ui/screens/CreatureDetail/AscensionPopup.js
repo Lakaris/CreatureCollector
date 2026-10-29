@@ -17,8 +17,9 @@ function AscensionPopup({def,unlockedSkins,ascPopup,ownedData,onClose}){
     style:{position:"fixed",inset:0,zIndex:600,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center"}
   },
     React.createElement("div",{
+      className:"ui-panel",
       onClick:e=>e.stopPropagation(),
-      style:{background:"#fff",borderRadius:20,padding:"28px 24px",textAlign:"center",maxWidth:300,width:"90%",boxShadow:"0 8px 32px rgba(0,0,0,0.2)"}
+      style:{padding:"12px 8px",textAlign:"center",maxWidth:300,width:"90%"}
     },
       React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:60,style:{margin:"0 auto 6px"}}),
       React.createElement("div",{style:{fontSize:20,fontWeight:700,marginBottom:4}},def.name),

@@ -261,7 +261,7 @@ function DevPanel(){
     // widest label ("Labyrinth") at this size, so nothing is ever squeezed
     // narrower than its own text.
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(56px, 1fr))",gap:4,marginBottom:10,background:"#2a2a3e",borderRadius:8,padding:4}},
-      devTabs.map(t=>React.createElement("button",{key:t.id,onClick:()=>setDevTab(t.id),style:{
+      devTabs.map(t=>React.createElement("button",{key:t.id,className:"no-ink",onClick:()=>setDevTab(t.id),style:{
         padding:"5px 0",fontSize:11,fontWeight:700,border:"none",borderRadius:6,cursor:"pointer",
         background:devTab===t.id?"#534AB7":"transparent",color:devTab===t.id?"#fff":"#aaa"
       }},t.label))

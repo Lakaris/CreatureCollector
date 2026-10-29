@@ -1,0 +1,224 @@
+{
+  "change": "Retract exposed rear leg gradually, reaching 18px inward and 10px upward in the fallen pose; retain paw slant.",
+  "timingAndOtherPoseKeysUnchanged": true,
+  "firstFiveFramesUnchanged": true,
+  "changesConfinedToRearLeg": true,
+  "all24FramesVisuallyReviewed": true,
+  "frames": [
+    {
+      "frame": 1,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 2,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 3,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 4,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 5,
+      "changedPixels": 0,
+      "bounds": null
+    },
+    {
+      "frame": 6,
+      "changedPixels": 2842,
+      "bounds": [
+        110,
+        399,
+        220,
+        460
+      ]
+    },
+    {
+      "frame": 7,
+      "changedPixels": 3146,
+      "bounds": [
+        108,
+        402,
+        220,
+        462
+      ]
+    },
+    {
+      "frame": 8,
+      "changedPixels": 3874,
+      "bounds": [
+        99,
+        406,
+        217,
+        468
+      ]
+    },
+    {
+      "frame": 9,
+      "changedPixels": 4316,
+      "bounds": [
+        91,
+        414,
+        213,
+        475
+      ]
+    },
+    {
+      "frame": 10,
+      "changedPixels": 4806,
+      "bounds": [
+        83,
+        418,
+        210,
+        482
+      ]
+    },
+    {
+      "frame": 11,
+      "changedPixels": 5466,
+      "bounds": [
+        68,
+        427,
+        204,
+        494
+      ]
+    },
+    {
+      "frame": 12,
+      "changedPixels": 5911,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 13,
+      "changedPixels": 5968,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 14,
+      "changedPixels": 6064,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 15,
+      "changedPixels": 6020,
+      "bounds": [
+        59,
+        429,
+        199,
+        501
+      ]
+    },
+    {
+      "frame": 16,
+      "changedPixels": 5978,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 17,
+      "changedPixels": 5936,
+      "bounds": [
+        59,
+        428,
+        200,
+        501
+      ]
+    },
+    {
+      "frame": 18,
+      "changedPixels": 5961,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 19,
+      "changedPixels": 5968,
+      "bounds": [
+        59,
+        428,
+        201,
+        501
+      ]
+    },
+    {
+      "frame": 20,
+      "changedPixels": 5977,
+      "bounds": [
+        59,
+        428,
+        202,
+        501
+      ]
+    },
+    {
+      "frame": 21,
+      "changedPixels": 5970,
+      "bounds": [
+        59,
+        428,
+        202,
+        501
+      ]
+    },
+    {
+      "frame": 22,
+      "changedPixels": 5970,
+      "bounds": [
+        59,
+        428,
+        202,
+        501
+      ]
+    },
+    {
+      "frame": 23,
+      "changedPixels": 5970,
+      "bounds": [
+        59,
+        428,
+        202,
+        501
+      ]
+    },
+    {
+      "frame": 24,
+      "changedPixels": 5970,
+      "bounds": [
+        59,
+        428,
+        202,
+        501
+      ]
+    }
+  ]
+}

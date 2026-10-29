@@ -262,7 +262,7 @@
       "timeMs": 1380
     }
   },
-  "notes": "A short overhead throw to the right, performed in place. The feet remain planted, the flippers rotate without stretching, and the face briefly squeezes with effort. The bomb disappears after release, then reappears in the raised hands. Its fuse sparks whenever visible. First and last frames are pixel-identical to waddlepop_idle.png. All art remains within one 512px tile. Both full-sized flippers share one timing curve: they wind up, swing right, hold through frames 11–14 for 240 ms, and return to rest together by frame 23. The left and right arms retain their approved rotation limits. Neither arm reverses direction or pauses independently of the other.",
+  "notes": "A short overhead throw to the right, performed in place. The feet remain planted, the flippers rotate without stretching, and the face briefly squeezes with effort. The bomb disappears after release, then reappears in the raised hands. Its fuse sparks whenever visible. First and last frames are pixel-identical to waddlepop_idle.png. All art remains within one 512px tile. Both full-sized flippers share one timing curve: they wind up, swing right, hold through frames 11–14 for 240 ms, and return to rest together by frame 23. The left and right arms retain their approved rotation limits. Neither arm reverses direction or pauses independently of the other. A slight backward wind-up leads into a four-degree forward heave at the throw. The face and shoulders lean as a rigid unit, the belly bends gently into fixed hips, and the feet stay planted. The bomb follows the body while held, then follows its existing flight after release. The moving head reuses the base cheek contour and stroke width. Touching arm and cheek outlines share a single visible edge; covered shoulder strokes are concealed by the existing blue artwork.",
   "flippers": {
     "completeArmSprites": true,
     "motion": "rigid rotation",
@@ -277,6 +277,19 @@
       "lastFrame": 14,
       "durationMs": 240
     },
+    "returnCompleteFrame": 23
+  },
+  "bodyMotion": {
+    "maximumForwardLeanDeg": 4,
+    "maximumBackwardLeanDeg": 1.2,
+    "maximumForwardShiftPx": 2,
+    "feetPlanted": true,
+    "rigidHeadAndShoulders": true,
+    "hipsFixedFromY": 425,
+    "peakFrames": [
+      11,
+      14
+    ],
     "returnCompleteFrame": 23
   }
 }

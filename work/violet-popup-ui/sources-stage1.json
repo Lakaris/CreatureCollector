@@ -1,0 +1,61 @@
+[
+  {
+    "id": "popup-frame",
+    "width": 256,
+    "height": 256,
+    "prompt": "Use case: precise-object-edit. Image 1 is the ACTUAL popup-frame sprite to recolour. Make a colour-only edit. Preserve its exact square composition, proportions, rounded outer and inner contours, four small diagonal corner facets, thick dark plum outlines, plain edge strips, completely transparent central hole and transparent exterior. Do not add or remove any shapes, details, thickness, shadow or decoration.\nReplace the cream/ivory main border bands with a visibly coloured but calm muted blue-violet/periwinkle, approximately #8582B5. Replace the taupe bevel shading with slate violet #62618A, and use pale lavender #BBB9DA for the small existing corner highlights. This must clearly read as a blue-violet border, not beige, not near-white, and not saturated neon purple. Keep the dark plum outlines exactly as dark and thick as in the original.\nVery simple flat game-art colours. No new gradients or texture. Do not recolour transparency. The central hole stays entirely clear: alpha zero, not a lavender or cream fill.\nTechnical invariants: final canvas 256x256. 9-slice cuts remain x80/x176 and y80/y176. All corner transitions must remain confined to the 80x80 corner regions, every middle edge strip is plain and straight. No unique decorations on edge middles. No drop shadow, text, guide marks, extra objects or mockup background.\nOutput only the recoloured production frame PNG with genuine alpha transparency.",
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\popup-frame.png",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1f8ac206-5b1b-4eca-9c41-c52bfe9dd023.png"
+  },
+  {
+    "id": "panel-fill",
+    "width": 128,
+    "height": 128,
+    "copy": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\panel-fill.png"
+  },
+  {
+    "id": "close-button",
+    "width": 128,
+    "height": 128,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\close-button.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. Recolour only the existing stone rim and bevel to blue-violet. Keep the centre face light warm ivory, and keep the thick dark plum X exactly as-is. Do not fill the outside transparency. Intended final128x128. Return just this one close-button sprite.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-86103cb6-73f2-47a0-b109-28e62d724c37.png"
+  },
+  {
+    "id": "ability-icon-frame",
+    "width": 192,
+    "height": 192,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\ability-icon-frame.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. This is a192x192 square border overlay. Recolour its ivory stone band and bevel to blue-violet with pale lavender corner highlights. Keep the ENTIRE inner opening fully transparent so an ability icon beneath shows through. Outer background also transparent. Keep exactly the original proportions, no thicker band, no smaller hole. Return this one frame.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-5e1f10d3-ad0d-4e7b-bac0-7cff390273c2.png"
+  },
+  {
+    "id": "gear-slot",
+    "width": 96,
+    "height": 96,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\gear-slot.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. This is a96x96 gear-slot 9-slice sprite. Recolour its ivory/taupe border to blue-violet with pale lavender corner highlights. Keep exactly its existing proportions. BOTH outside and inside opening must stay transparent. Slice cuts remain x32/x64,y32/y64. Middle32px edge strips must stay plain and perfectly straight; corner details confined to32px corner regions. Return only this frame.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9e868412-4241-4d6a-830e-25d2de61bceb.png"
+  },
+  {
+    "id": "divider-left",
+    "width": 64,
+    "height": 32,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\divider-left.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. This is the64x32 LEFT divider cap. Recolour only the ivory diamond inset and narrow ivory horizontal bar centre to pale periwinkle/lavender. Preserve the original dark plum outline, exact diamond size, horizontal bar thickness and vertical position, 2:1 aspect ratio. The straight bar must end flush at the RIGHT canvas boundary, no padding there, so it joins the repeating middle. Keep all other areas truly transparent. Output only the left cap."
+  },
+  {
+    "id": "divider-middle",
+    "width": 64,
+    "height": 32,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\divider-middle.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. This is the64x32 repeating MIDDLE divider strip. Recolour ONLY the narrow ivory centre line to pale periwinkle/lavender. Keep dark plum outline, original bar thickness, vertical placement and all transparent rows. The straight uniform bar stretches from leftmost to rightmost canvas edge without any padding or vertical end outlines. Both endpoints must have identical colours and alpha for seamless repetition. No endcaps, diamonds or decoration. Same2:1 canvas. Output only the middle strip."
+  },
+  {
+    "id": "divider-right",
+    "width": 64,
+    "height": 32,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\divider-right.png",
+    "prompt": "Use case: precise-object-edit. Image1 is the actual sprite to recolour; image2 is the approved NEW blue-violet popup frame, supplied ONLY as a colour/style reference. Perform only a palette change on image1. Match image2's muted periwinkle bands (#8582B5), slate-violet bevels (#62618A), pale lavender highlights (#BBB9DA) and very thick dark plum outline. Keep the first image's exact shape, composition, outline thickness, corner details, simple flat style, alignment and transparent areas. No added decoration, texture, gems, shadow, text or glow. Genuine alpha transparency. This is the64x32 RIGHT divider cap. Recolour only the ivory diamond inset and narrow ivory horizontal bar centre to pale periwinkle/lavender. Preserve the original dark plum outline, exact diamond size, horizontal bar thickness and vertical position, 2:1 aspect ratio. The straight bar must start flush at the LEFT canvas boundary, no padding there, so it joins the repeating middle. Keep all other areas truly transparent. Output only the right cap."
+  }
+]

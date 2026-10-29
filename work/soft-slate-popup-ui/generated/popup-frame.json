@@ -1,0 +1,9 @@
+{
+  "id": "popup-frame",
+  "width": 256,
+  "height": 256,
+  "transparent": true,
+  "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\popup-frame.png",
+  "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is a256x256 popup9-slice frame. Preserve rounded corners, existing small diagonal corner accents, exact band thickness and hole size. BOTH exterior and inner opening must remain transparent. Slice cuts x80/x176 and y80/y176; all corner accents and transitions stay confined to80x80corner regions. Middle edge strips are perfectly straight, undecorated and uniform in thickness. The96x96centre slice is completely clear. The inner straight edges remain about54px from the canvas edge, so64px content inset stays clear. Do not fill the hole. Return only the coloured frame.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bf0b7904-265d-408e-8483-6ddd6830e2a7.png"
+}

@@ -30,9 +30,12 @@ import ArenaScreen from "./ui/screens/battle/ArenaScreen.js";
 import LabyrinthScreen from "./ui/screens/battle/LabyrinthScreen.js";
 import TestBattleScreen from "./ui/screens/battle/TestBattleScreen.js";
 
+// The Play menu's mode cards. They're tapped like buttons, so they wear the
+// buttons' ink outline (--ink / --ink-w, styles/components.css).
+const INK_BORDER = "var(--ink-w) solid var(--ink)";
 const CARD_BASE = {
   background: "#fff",
-  border: "2px solid #e0e0e0",
+  border: INK_BORDER,
   borderRadius: 12,
   padding: "22px 18px",
   cursor: "pointer",
@@ -68,7 +71,7 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
   if (locked)
     return React.createElement(
       "div",
-      { onClick: disabled ? undefined : onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", border: "2px solid #e0e0e0", cursor: disabled ? "default" : "pointer" } },
+      { onClick: disabled ? undefined : onLockedTap, style: { ...CARD_BASE, padding: "16px 18px", background: "#f5f5f5", cursor: disabled ? "default" : "pointer" } },
       React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: 0.5 } }, iconText("🔒")),
       React.createElement(
         "div",
@@ -95,7 +98,6 @@ function DailyBossCard({ locked, onLockedTap, disabled }) {
         ...CARD_BASE,
         padding: "16px 18px",
         background: delivered ? "#f5f5f5" : "linear-gradient(135deg,#f0effe,#e8e4ff)",
-        border: "2px solid " + (delivered ? "#e0e0e0" : "#a89cf7"),
         opacity: disabled ? 0.4 : 1,
         cursor: disabled ? "default" : "pointer",
       },
@@ -218,6 +220,10 @@ function App() {
   } = useGame();
 
   const contentRef = React.useRef(null);
+  // Counts taps on the Home tab -- including while already on Home, which
+  // doesn't remount it -- so Home can draw fresh Random flair (useShownFlair)
+  // every time it's opened.
+  const [homeVisit, setHomeVisit] = React.useState(0);
   const [playLockedMsg, setPlayLockedMsg] = React.useState(null);
   React.useEffect(() => {
     if (!playLockedMsg) return;
@@ -627,7 +633,7 @@ function App() {
                 setGameMode("treasure");
               },
               style: treasureUnlocked
-                ? { ...CARD_BASE, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", border: "2px solid #fbbf24", opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
+                ? { ...CARD_BASE, background: "linear-gradient(135deg,#fffbeb,#fef3c7)", opacity: dungeonPointActive ? 0.4 : 1, cursor: dungeonPointActive ? "default" : "pointer" }
                 : { ...CARD_BASE, background: "#f5f5f5" },
             },
             React.createElement("div", { style: { fontSize: 36, lineHeight: 1, opacity: treasureUnlocked ? 1 : 0.5 } }, treasureUnlocked ? "💰" : iconText("🔒")),
@@ -689,7 +695,7 @@ function App() {
     React.createElement(
       "div",
       { className: "app-content", ref: contentRef, style: tab === "home" || tab === "hatch" || (tab === "equipment" && equipmentDetailOpen) || effectFilterOpen ? { overflow: "hidden" } : undefined },
-      tab === "home" && React.createElement(HomeScreen),
+      tab === "home" && React.createElement(HomeScreen, { visit: homeVisit }),
       tab === "hatch" && React.createElement(GachaScreen, { onHatch: (n) => setEggsHatched((c) => c + n) }),
       tab === "collection" &&
         React.createElement(CollectionScreen, {
@@ -709,7 +715,10 @@ function App() {
     ),
     React.createElement(NavBar, {
       tab,
-      setTab,
+      setTab: (id) => {
+        if (id === "home") setHomeVisit((v) => v + 1);
+        setTab(id);
+      },
       onNavigate: () => {
         if (contentRef.current) contentRef.current.scrollTop = 0;
       },

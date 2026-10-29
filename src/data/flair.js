@@ -438,3 +438,38 @@ export const FLAIR_BANANAS=[
   {id:"ancientFlairBanana",  name:"Ancient Flair Banana", emoji:"🍌🏺", image:"images/item_icons/ancientflairbanana.png", weights:{common:0, rare:0, epic:90, legendary:10},  color:"#bf360c", bg:"#fbe9e7"},
 ];
 export const RARITY_COLORS_FLAIR={common:"#888",rare:"#283593",epic:"#6a1b9a",legendary:"#e65100"};
+
+// "Random": an `equipped*` field set to RANDOM_FLAIR shows a different one of
+// the creature's unlocked flair from that category each time the creature is
+// shown (see ui/hooks/useShownFlair.js). Cosmetic like any equip -- buffs come
+// from `unlockedFlair` regardless.
+export const RANDOM_FLAIR="random";
+/** Per flair tab: the owned-creature field it equips, and the lookup that says
+ * whether an unlocked key (a title's name, else an id) belongs to it. */
+export const FLAIR_SLOTS={
+  titles:{field:"equippedTitle",map:FLAIR_TITLE_MAP},
+  aura:{field:"equippedAura",map:FLAIR_AURA_MAP},
+  background:{field:"equippedBackground",map:FLAIR_BG_MAP},
+  item:{field:"equippedItem",map:FLAIR_ITEM_MAP},
+};
+/** The creature's unlocked keys in one flair tab -- what Random picks from. */
+export function ownedFlairKeys(ownedData,tab){
+  const {map}=FLAIR_SLOTS[tab];
+  return (ownedData?.unlockedFlair||[]).filter(k=>map[k]);
+}
+/** One fresh pick for every slot set to Random, as {field: key}. Slots that
+ * aren't Random are left out, so spreading the result over the owned data
+ * only replaces the Random ones. `avoid` ({field: key}) is the pick shown
+ * last time: it's skipped whenever there's anything else to choose, so two
+ * views in a row never show the same one. */
+export function rollRandomFlair(ownedData,avoid={}){
+  const picks={};
+  for(const tab in FLAIR_SLOTS){
+    const {field}=FLAIR_SLOTS[tab];
+    if(ownedData?.[field]!==RANDOM_FLAIR)continue;
+    const owned=ownedFlairKeys(ownedData,tab);
+    const keys=owned.length>1?owned.filter(k=>k!==avoid[field]):owned;
+    picks[field]=keys.length?keys[Math.floor(Math.random()*keys.length)]:null;
+  }
+  return picks;
+}

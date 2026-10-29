@@ -16,7 +16,7 @@ import { makeArenaBattle, makeBossUnit, addBossToBattle, bossOf } from "../../..
 import { aEase } from "../../../battle/geometry.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
-import { PlanInfoSheet, SheetHeader, SheetAbilityRow, CreatureSheetBody, allyDesc, ABILITY_LABELS } from "../../../ui/components/PlanInfoSheet.js";
+import { PlanInfoSheet, SheetHeader, SheetAbilityRow, AllySheetBody, PLAN_INFO_HOLD_MS } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import GearRewardGrid from "../../../ui/components/GearRewardGrid.js";
 import GearPreviewPopup from "../../../ui/components/GearPreviewPopup.js";
@@ -388,7 +388,7 @@ function DailyBossScreen({onBack,onViewCreature}){
   const touchDrag=useTouchDragPlacement({
     cellSelector:"[data-cell]",
     applyDrop,
-    onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}},
+    onCancelHold:()=>{endHold();if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}closeSheet();},
     onCancelDrop:(fromCell)=>removeFromGrid(fromCell),
     onDragOverCell:(cellKey,d)=>{
       const cid=d.id||d.cellId;
@@ -668,7 +668,7 @@ function DailyBossScreen({onBack,onViewCreature}){
         )
       ),
       confirmForfeitOpen&&React.createElement("div",{onClick:()=>setConfirmForfeitOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:320,textAlign:"center"}},
+        React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 4px",width:"100%",maxWidth:320,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:40,marginBottom:8}},iconText("🏳")),
           React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#111",marginBottom:6}},"Forfeit this fight?"),
           React.createElement("div",{style:{fontSize:13,color:"#888",lineHeight:1.5,marginBottom:18}},"This counts as a loss and uses one of today's attempts."),
@@ -722,13 +722,13 @@ function DailyBossScreen({onBack,onViewCreature}){
             return React.createElement("div",{
               key,"data-cell":key,className:boardCellClass(r,PLAYER_START_ROW),
               draggable:!!(isPlayerZone&&creatureId),
-              onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";setDragCell(key);setDragId(null);}:undefined,
+              onDragStart:isPlayerZone&&creatureId?(e)=>{e.dataTransfer.effectAllowed="move";if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}closeSheet();setDragCell(key);setDragId(null);}:undefined,
               onDragEnd:isPlayerZone&&creatureId?()=>rangePreview.clear():undefined,
               onDragOver:isPlayerZone?(e)=>{e.preventDefault();previewAt(draggedCreature(),r,c);}:()=>rangePreview.clear(),
               onDrop:isPlayerZone?(e)=>{e.preventDefault();rangePreview.clear();handleCellDrop(r,c);}:undefined,
-              onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},180);}):undefined,
+              onMouseDown:isPlayerZone&&creatureId?(()=>{ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},PLAN_INFO_HOLD_MS);}):undefined,
               onMouseUp:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
-              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},180);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
+              onTouchStart:isPlayerZone&&creatureId?((e)=>{e.preventDefault();ghs.current.fired=false;ghs.current.timer=setTimeout(()=>{ghs.current.fired=true;setBossSheetOpen(false);setGridInfoCreature(creatureId);},PLAN_INFO_HOLD_MS);touchDrag.start(e,{fromCell:key,cellId:creatureId});}):undefined,
               onTouchEnd:isPlayerZone&&creatureId?(()=>{if(ghs.current.timer){clearTimeout(ghs.current.timer);ghs.current.timer=null;}if(!ghs.current.fired&&!touchDrag.dragRef.current.active)removeFromGrid(key);}):undefined,
               style:{
                 width:planTile,height:planTile,
@@ -753,8 +753,7 @@ function DailyBossScreen({onBack,onViewCreature}){
     ),
     // creature list
     React.createElement("div",{
-      // The info sheet takes the tray's place while open.
-      style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0,...(bossSheetOpen||gridInfoCreature?{display:"none"}:null)},
+      style:{background:"#fff",borderTop:"1px solid #e0e0e0",padding:"10px 12px 24px",flexShrink:0},
       onDragOver:e=>{e.preventDefault();rangePreview.clear();},
       onDrop:e=>{
         e.preventDefault();
@@ -835,15 +834,10 @@ function DailyBossScreen({onBack,onViewCreature}){
     // info sheet: the boss or a pressed creature
     bossSheetOpen&&React.createElement(PlanInfoSheet,{onClose:closeSheet},
       React.createElement(SheetHeader,{icon:TYPE_EMOJI[boss.type]||"👾",title:boss.name,subtitle:boss.type+" · Lv."+level}),
-      Object.entries(dailyAbilitiesFor(boss.type)).map(([k,abl])=>React.createElement(SheetAbilityRow,{key:k,label:ABILITY_LABELS[k]||k,tags:abl.tags,name:abl.name,desc:abl.description,onTag:setDailyAbilityTagPopup}))
+      Object.entries(dailyAbilitiesFor(boss.type)).map(([k,abl])=>React.createElement(SheetAbilityRow,{key:k,kind:k,icon:abl.icon,tags:abl.tags,name:abl.name,desc:abl.description,onTag:setDailyAbilityTagPopup}))
     ),
     gridInfoCreature&&CREATURE_MAP[gridInfoCreature]&&React.createElement(PlanInfoSheet,{onClose:closeSheet},
-      React.createElement(CreatureSheetBody,{
-        def:CREATURE_MAP[gridInfoCreature],
-        subtitle:CREATURE_MAP[gridInfoCreature].type+" · "+(CREATURE_MAP[gridInfoCreature].attackType||"Melee")+(owned?.[gridInfoCreature]?" · Lv."+owned[gridInfoCreature].level:""),
-        descFor:allyDesc(owned?.[gridInfoCreature]),
-        onTag:setDailyAbilityTagPopup,
-      }))
+      React.createElement(AllySheetBody,{id:gridInfoCreature,onTag:setDailyAbilityTagPopup}))
   ),
   touchDrag.ghost&&(()=>{const gdef=CREATURE_MAP[touchDrag.ghost.id];if(!gdef)return null;return React.createElement("div",{style:{position:"fixed",left:touchDrag.ghost.x-26,top:touchDrag.ghost.y-29,width:52,height:52,pointerEvents:"none",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.85,filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.35))"}},React.createElement(CreatureIcon,{def:gdef,size:36}));})(),
   );

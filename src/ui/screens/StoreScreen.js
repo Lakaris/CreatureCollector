@@ -36,7 +36,7 @@ function StoreScreen(){
   return React.createElement("div",{style:{background:"#f8f8ff",minHeight:"100%"}},
     purchaseToast&&React.createElement("div",{style:{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.8)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,whiteSpace:"nowrap",zIndex:320,pointerEvents:"none",animation:"toastFade 2.2s ease-in-out"}},iconText("✅ "+purchaseToast)),
     confirmItem&&React.createElement("div",{onClick:()=>setConfirmItem(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
+      React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"12px 8px",width:"100%",maxWidth:320,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:48,marginBottom:8}},iconText(confirmItem.emoji||"💎")),
         React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#111",marginBottom:12}},
           confirmItem.name||(formatNum(confirmItem.gems)+" Gems"+(confirmItem.bonus>0?" +"+formatNum(confirmItem.bonus)+" bonus":""))

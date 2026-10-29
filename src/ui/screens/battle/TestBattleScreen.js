@@ -648,7 +648,7 @@ function TestBattleScreen({ onBack }) {
       const equipped = entry.equipped || [null, null, null, null];
       const items = EQUIPMENT_DEFS.filter((it) => !equipSearch || it.name.toLowerCase().includes(equipSearch.toLowerCase()));
       return React.createElement("div", { onClick: () => setEquipCell(null), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 400 } },
-        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 16, padding: "16px", width: "min(calc(92 * var(--vw)), 380px)", maxHeight: "calc(82 * var(--vh))", display: "flex", flexDirection: "column", gap: 10, boxShadow: "0 8px 40px rgba(0,0,0,0.25)" } },
+        React.createElement("div", { className:"ui-panel",onClick: (e) => e.stopPropagation(), style: { padding: "4px", width: "min(calc(92 * var(--vw)), 380px)", maxHeight: "calc(82 * var(--vh))", display: "flex", flexDirection: "column", gap: 10 } },
           React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
             React.createElement(CreatureIcon, { def, size: 26 }),
             React.createElement("div", { style: { flex: 1 } },

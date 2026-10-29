@@ -1,0 +1,174 @@
+{
+  "variant": "Soft slate",
+  "palette_targets": {
+    "border": "#716C86",
+    "centre": "#F5F3F8",
+    "outline": "#382C40",
+    "highlight": "#ADA8BD",
+    "bevel": "#565168"
+  },
+  "assets": [
+    {
+      "id": "popup-frame",
+      "path": "images/ui_panels/soft-slate/popup-frame.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "d821ac3e8f2f4abb5941b88f131fd5e80f2da0e785b6b3e72a2c9b10beed4a0b",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "safe_clear_inset_px": 56,
+      "inner_edge_insets_px": {
+        "left": 53,
+        "right": 53,
+        "top": 52,
+        "bottom": 53
+      },
+      "slice_px": 80,
+      "cuts_px": [
+        80,
+        176
+      ],
+      "content_inset_px": 64
+    },
+    {
+      "id": "panel-fill",
+      "path": "images/ui_panels/soft-slate/panel-fill.png",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "6339f13ea44f44c8f4cd70c8d3301696451a12065cc9078faea50fcc0b21c48f",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "repeat_rgb_step": 0,
+      "centre_rgb": [
+        243,
+        240,
+        246
+      ]
+    },
+    {
+      "id": "close-button",
+      "path": "images/ui_panels/soft-slate/close-button.png",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "c870c48293235ef6d0caade6553086150261b15d6dcc6a81e00ca990c72bf89b",
+      "alpha_min": 0,
+      "alpha_max": 254
+    },
+    {
+      "id": "ability-icon-frame",
+      "path": "images/ui_panels/soft-slate/ability-icon-frame.png",
+      "size": [
+        192,
+        192
+      ],
+      "sha256": "a1bb3e455ca0a4dd47a0677564c24099615669cf0d5a869931352c677f614ece",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "safe_clear_inset_px": 44,
+      "inner_edge_insets_px": {
+        "left": 42,
+        "right": 42,
+        "top": 42,
+        "bottom": 42
+      }
+    },
+    {
+      "id": "gear-slot",
+      "path": "images/ui_panels/soft-slate/gear-slot.png",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "ab8d616b33abef570aca89e2ef7b30e8237a1c3b04aaae80238614f431f31f19",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "safe_clear_inset_px": 24,
+      "inner_edge_insets_px": {
+        "left": 22,
+        "right": 22,
+        "top": 22,
+        "bottom": 22
+      },
+      "slice_px": 32,
+      "cuts_px": [
+        32,
+        64
+      ],
+      "content_inset_px": 28
+    },
+    {
+      "id": "divider-left",
+      "path": "images/ui_panels/soft-slate/divider-left.png",
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "3d45fc5d6f5b5efa67c5ddb7a2983b066a0f546e315507c73a16351b665fabd5",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "left_edge_alpha_rows": [],
+      "right_edge_alpha_rows": [
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "divider-middle",
+      "path": "images/ui_panels/soft-slate/divider-middle.png",
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "080ee2922d98b51ad6abcfa9382f9b6bb97796133a7ede4858415662871d799b",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "left_edge_alpha_rows": [
+        14,
+        15,
+        16,
+        17
+      ],
+      "right_edge_alpha_rows": [
+        14,
+        15,
+        16,
+        17
+      ],
+      "repeat_alpha_difference": 2
+    },
+    {
+      "id": "divider-right",
+      "path": "images/ui_panels/soft-slate/divider-right.png",
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "bc6d75cacdacf0bdef92fa525273c6c857fc035d4c03482c0c835887e92ab2c3",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "left_edge_alpha_rows": [
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "right_edge_alpha_rows": []
+    }
+  ],
+  "center_fill": "Cool off-white with a faint lavender-grey tint",
+  "popup_slice_px": 80,
+  "gear_slice_px": 32,
+  "popup_content_inset_px": 64,
+  "gear_content_inset_px": 28,
+  "generation": "Built-in ImageGen palette edits; final PNG export resizing and indexed encoding",
+  "checks": "Requested dimensions, transparent centre slices, safe content rectangles, divider alpha joins and repeat seam verified."
+}

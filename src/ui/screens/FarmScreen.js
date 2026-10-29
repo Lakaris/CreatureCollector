@@ -405,7 +405,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     )
     ),
     descPopup&&React.createElement("div",{onClick:()=>setDescPopup(null),style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:260,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 4px",width:260,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:40,marginBottom:8}},currencyIcon(descPopup.key,descPopup.emoji)),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:8,color:"#111"}},descPopup.label),
         React.createElement("div",{style:{fontSize:13,color:"#666",lineHeight:1.5}},descPopup.desc),
@@ -413,7 +413,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       )
     ),
     speedUpConfirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:270,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:270,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},"⚡"),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Speed Up?"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},iconText("This will use 💎 "+speedUpConfirm.cost+" Gems.")),
@@ -452,7 +452,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       )
     ),
     showFieldUpgrade&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:290,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:4}},iconText("⬆️ Upgrade Field")),
         React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:16}},"Level "+farmFieldLevel+" → "+(farmFieldLevel+1)),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginBottom:16,textAlign:"left"}},
@@ -492,7 +492,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       )
     ),
     cancelling!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:280,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:36,marginBottom:8}},iconText("⚠️")),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:8}},"Cancel Growth?"),
         React.createElement("div",{style:{fontSize:13,color:"#666",marginBottom:16}},"All progress on this crop will be lost."),
@@ -503,7 +503,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
       )
     ),
     picking!==null&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"14px 12px",width:300,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"4px 4px",width:300}},
         React.createElement("div",{style:{fontSize:14,fontWeight:700,marginBottom:2,textAlign:"center"}},"🌱 What to grow?"),
         React.createElement("div",{style:{fontSize:11,color:"#888",textAlign:"center",marginBottom:8}},"Time to grow: "+(PLOT_GROW_MS/3600000)+"h"),
         React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}},
@@ -526,7 +526,7 @@ function FarmScreen({onBack,onPlant,onGoToStore}){
     ),
     notify&&React.createElement("div",{style:{position:"absolute",top:70,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.75)",color:"#fff",borderRadius:10,padding:"8px 16px",fontSize:13,fontWeight:600,pointerEvents:"none",whiteSpace:"nowrap",zIndex:20,animation:"toastFade 2s ease-in-out"}},notify),
     confirm&&React.createElement("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:280,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:36,marginBottom:8}},iconText("🔓")),
         React.createElement("div",{style:{fontSize:16,fontWeight:700,marginBottom:16}},"Unlock Plot "+(farmPlots+1)+"?"),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},

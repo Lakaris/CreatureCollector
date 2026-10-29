@@ -14,7 +14,8 @@ for(let n=0;n<30;n++){
  const main=labels[420*512+256],expected=report.records[n].bombVisible?3:1;
  assert.equal(components.filter(c=>c.size>3).length,expected,'Stray or disconnected piece in frame '+(n+1)+' '+JSON.stringify(components));
  for(let side=0;side<2;side++){
-  const p=transform(side?357:153,245,report.records[n].armAngles[side],side?335:181,382);
+  let p=transform(side?357:153,245,report.records[n].armAngles[side],side?335:181,382);
+  const b=report.records[n].bodyPose;if(b){p=transform(...p,b.a,b.cx,b.cy);p[0]+=b.x;p[1]+=b.y;}
   assert.equal(labels[Math.round(p[1])*512+Math.round(p[0])],main,'Detached hand in frame '+(n+1));
  }
  if(!report.records[n].bombVisible)for(let y=0;y<190;y++)for(let x=0;x<512;x++)assert.equal(im.data[(y*512+x)*4+3],0,'Bomb residue in hidden frame '+(n+1));

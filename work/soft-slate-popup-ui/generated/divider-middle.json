@@ -1,0 +1,9 @@
+{
+  "id": "divider-middle",
+  "width": 64,
+  "height": 32,
+  "transparent": true,
+  "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\divider-middle.png",
+  "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is the64x32REPEATING MIDDLE divider strip. Keep it absolutely plain: identical horizontal cross-section from leftmost to rightmost canvas edges, no margins at either endpoint, no vertical end strokes, no caps or diamonds. Bar centred at y15.5 with6pixel total height (rows13to18) including thick charcoal-plum rails; narrow inner stripe #ADA8BD, bevel #716C86. Both ends must match exactly in colour and transparency so repeating is invisible. No gradient, no variation along length. Transparent above and below. Output only this2:1strip.",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b13545c1-1071-4d90-b67c-555e8ff431ef.png"
+}

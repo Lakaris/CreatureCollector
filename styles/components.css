@@ -1,5 +1,26 @@
 /* Reusable UI atoms: chips, cards, badges, buttons, grids, modals, gacha, dev panel, skins. */
 
+/* Ink outlines. The art is drawn with thick dark outlines, so buttons and
+   the collectable cards (Collection and Dex creatures, gear) wear one too,
+   all from these two values. !important because nearly every button and card
+   sets its own border inline; the line replaces it.
+
+   Every <button> gets it, except ones that aren't drawn as a button: the
+   bottom nav's icons, the popup art's close button (its own art), the ability
+   tag pills (.tag-pill -- labels you can tap, not buttons), and flat text or
+   icon buttons with no background of their own (a back arrow, an ⓘ). Clickable
+   cards that are divs rather than buttons opt in with .ink-border; buttons
+   that are halves of one control outlined as a whole (a segmented switch)
+   opt out with .no-ink. */
+:root{--ink:#16121c;--ink-w:2.5px}
+.creature-card,.gear-card,.ink-border,
+button:not(.nav-btn):not(.ui-close):not(.tag-pill):not(.no-ink):not([style*="background: none"]):not([style*="background: transparent"]):not([style*="background-color: transparent"]){
+  border:var(--ink-w) solid var(--ink) !important;
+}
+/* A gear card's border used to show that something wears it; with the border
+   now always ink, an inner ring does that instead. */
+.gear-card.equipped{box-shadow:inset 0 0 0 2px #a99ff0}
+
 /* Chips, cards, badges */
 .chip{display:flex;align-items:center;gap:4px;background:#e8e8e8;border-radius:20px;padding:3px 9px;font-size:12px;font-weight:500;color:#000}
 /* Header currency pills (Home, Hatch, Store): larger text and art than a plain
@@ -80,10 +101,71 @@
 .plan-header>:first-child{justify-self:start}
 .plan-header>:last-child{justify-self:end;white-space:nowrap}
 
-/* Info popups (planning sheet: ui/components/PlanInfoSheet.js; fight card:
-   UnitInfoPopup in ui/components/UnitInfoPanel.js) slide up into place. */
+/* Info popups (planning card: ui/components/PlanInfoSheet.js; fight card:
+   UnitInfoPopup in ui/components/UnitInfoPanel.js) slide up into place; the
+   planning card's dimmed backdrop fades in under it. */
 @keyframes infoPopupUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes infoBackdropIn{from{opacity:0}to{opacity:1}}
 .plan-info-sheet,.unit-info-popup{animation:infoPopupUp .18s ease-out}
+.plan-info-backdrop{animation:infoBackdropIn .18s ease-out}
+
+/* Popup art: the soft-slate set in images/ui_panels/soft-slate (slice notes
+   in work/soft-slate-popup-ui/README.txt). The violet and neutral sets share
+   its layout -- swapping the folder name in the url()s below switches sets,
+   though check each set's margins against the two outsets (noted at each).
+   Everything is drawn at 5 source px per
+   design px, so line weights match from piece to piece -- the frame's 80px
+   slices are 16px corners, the gear slot's 32px ones 6.4px.
+
+   .ui-panel: the 9-slice frame as the border, stretching to any size, with
+   the set's centre fill tiled underneath. The fill runs under the border too
+   (border-box) because the frame's slices are transparent between its inner
+   outline and the cut; the radius only clips the fill to the frame's rounded
+   outline. No shadow is painted into the art, so it's added here. Content
+   sits in the padding box, already clear of the frame -- callers add only a
+   few px of padding of their own.
+
+   The art's outline starts up to 6 source px in from the image edge (a
+   transparent margin -- 4-6px in slate, 5-6px in violet), so drawn flush the
+   fill showed as a 1px rim outside it. The 1.2px outset pushes the frame out
+   by that margin,
+   putting the outline on the box edge where the fill stops; it doesn't move
+   anything in the layout. */
+.ui-panel{
+  border:16px solid transparent;
+  border-image:url("../images/ui_panels/soft-slate/popup-frame.png") 80 / 16px / 1.2px stretch;
+  background:url("../images/ui_panels/soft-slate/panel-fill.png") 0 0 / 25.6px 25.6px repeat;
+  background-origin:border-box;background-clip:border-box;
+  border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.28);box-sizing:border-box;
+}
+/* The frame's close button (PopupClose in ui/components/PopupArt.js). */
+.ui-close{
+  padding:0;border:none;cursor:pointer;flex-shrink:0;
+  background:url("../images/ui_panels/soft-slate/close-button.png") center / 100% 100% no-repeat;
+}
+/* Three-piece divider: fixed end caps, the middle strip repeating between
+   them (clipped to the content box, so it never shows through the caps). */
+.ui-divider{
+  height:6.4px;padding:0 12.8px;box-sizing:border-box;
+  background:
+    url("../images/ui_panels/soft-slate/divider-left.png") left center / 12.8px 6.4px no-repeat,
+    url("../images/ui_panels/soft-slate/divider-right.png") right center / 12.8px 6.4px no-repeat,
+    url("../images/ui_panels/soft-slate/divider-middle.png") left center / 12.8px 6.4px repeat-x;
+  background-origin:border-box,border-box,content-box;
+  background-clip:border-box,border-box,content-box;
+}
+/* A gear tile: a small 9-slice, so it stretches with the row's width. Its
+   outline starts 6 source px in, hence the 1.2px outset (see .ui-panel) --
+   violet's starts 2px in and wants 0.4px. */
+.ui-slot{
+  border:6.4px solid transparent;
+  border-image:url("../images/ui_panels/soft-slate/gear-slot.png") 32 / 6.4px / 1.2px stretch;
+  background:url("../images/ui_panels/soft-slate/panel-fill.png") 0 0 / 25.6px 25.6px repeat;
+  background-origin:border-box;background-clip:border-box;border-radius:5px;box-sizing:border-box;
+}
+/* An ability's icon tile (AbilityIcon): unframed, the creature page's plain
+   40px rounded square. (The set's ability-icon-frame.png is unused.) */
+.ui-ability-icon{width:40px;height:40px;flex-shrink:0;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 
 /* Fight screens (Arena/Dungeon/Labyrinth/Test Battle): the damage chart always
    sits beside the grid. Where there's room, an empty column the chart's width

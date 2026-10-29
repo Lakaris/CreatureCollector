@@ -1,0 +1,73 @@
+[
+  {
+    "id": "popup-frame",
+    "width": 256,
+    "height": 256,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\popup-frame.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is a256x256 popup9-slice frame. Preserve rounded corners, existing small diagonal corner accents, exact band thickness and hole size. BOTH exterior and inner opening must remain transparent. Slice cuts x80/x176 and y80/y176; all corner accents and transitions stay confined to80x80corner regions. Middle edge strips are perfectly straight, undecorated and uniform in thickness. The96x96centre slice is completely clear. The inner straight edges remain about54px from the canvas edge, so64px content inset stays clear. Do not fill the hole. Return only the coloured frame.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-bf0b7904-265d-408e-8483-6ddd6830e2a7.png"
+  },
+  {
+    "id": "panel-fill",
+    "width": 128,
+    "height": 128,
+    "transparent": false,
+    "prompt": "Use case: stylized-concept. Actual plain tile for a game UI panel. Create ONE square image, completely filled edge-to-edge with ONE uniform flat colour: #F5F3F8, very light lavender-grey off-white. It must be noticeably less yellow than cream and very close to white, for dark-grey text to remain readable. Intended output128x128. Opaque throughout, every pixel identical, no gradient, no texture, no grain, no borders, no object, no lettering, no shadows, no transparency. This square will repeat seamlessly in both directions. Intentionally plain untextured solid colour.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-84160b00-a4ab-4fb6-ad84-aa303b7bd626.png"
+  },
+  {
+    "id": "close-button",
+    "width": 128,
+    "height": 128,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\close-button.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is the128x128close button. Recolour the existing rim and corner bevels to the soft-slate palette. Change the central light face from warm cream to very light lavender-grey off-white #F5F3F8. Change the existing thick X to charcoal-plum #382C40, retaining its exact size and rounded strokes. Keep exactly the existing rounded-square silhouette, original size/margins, all details and proportions. Outside is transparent. Return one button.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-c26b26b4-4249-4b04-87e9-6dc057f9c72c.png"
+  },
+  {
+    "id": "ability-icon-frame",
+    "width": 192,
+    "height": 192,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\ability-icon-frame.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is a192x192 square ability icon frame. Recolour its bands, corner highlights, bevels and thick outlines to the specified palette. Keep entire inner opening completely alpha-transparent, with no fill. Preserve outer and inner dimensions and simple corner accents. No perspective or shape changes. Transparent exterior as well. Only this frame.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-a75fe21f-e27a-4996-b7eb-64b05618c43e.png"
+  },
+  {
+    "id": "gear-slot",
+    "width": 96,
+    "height": 96,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\gear-slot.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is a96x96gear-slot9-slice. Recolour its band, bevels and thick outlines using the specified palette. BOTH centre opening and exterior remain fully transparent. Keep cuts x32/x64 and y32/y64: all corner details and rounded transitions within32x32corners, middle32pxlong strips completely straight and plain. Preserve all proportions and the clear middle. Return one square frame.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-e303a379-e8a5-4bfb-9629-9c8f0fe3bea7.png"
+  },
+  {
+    "id": "divider-left",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\divider-left.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is the64x32LEFT end cap of a horizontal ability divider. Keep its small diamond at the LEFT and the connected straight bar stretching FLUSH THROUGH the RIGHT canvas edge. The bar is centred at y15.5 with a6pixel total height (rows13to18), including charcoal-plum rails. Its simple narrow inner stripe is grey-lavender #ADA8BD, its bevel #716C86. No right-end vertical outline or padding. The left diamond is simple, just one light inset, no new jewel facets. Keep both top and bottom empty and transparent. Output2:1aspect ratio, just this left endcap.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-589320cf-9aec-47e0-b540-8c1731e42fe6.png"
+  },
+  {
+    "id": "divider-middle",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\divider-middle.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is the64x32REPEATING MIDDLE divider strip. Keep it absolutely plain: identical horizontal cross-section from leftmost to rightmost canvas edges, no margins at either endpoint, no vertical end strokes, no caps or diamonds. Bar centred at y15.5 with6pixel total height (rows13to18) including thick charcoal-plum rails; narrow inner stripe #ADA8BD, bevel #716C86. Both ends must match exactly in colour and transparency so repeating is invisible. No gradient, no variation along length. Transparent above and below. Output only this2:1strip.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-b13545c1-1071-4d90-b67c-555e8ff431ef.png"
+  },
+  {
+    "id": "divider-right",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\violet\\divider-right.png",
+    "prompt": "Use case: precise-object-edit. The reference is the ACTUAL game UI sprite to recolour, not a mood board. Make only a palette edit, preserving its exact silhouette, placement, thickness, simple chunky shapes and alpha transparency. New soft-slate palette: main border #716C86 (muted desaturated grey-purple); existing bevel shadow #565168; existing highlights #ADA8BD (soft grey-lavender); ALL dark contours #382C40 (charcoal-plum), replacing the old nearly-black wine/magenta. Make the palette calmer and less blue/saturated than the reference. Use just these restrained flat colours, no extra gradients or texture. Keep the bold thick outlines. No new decoration, no gems, no additional shapes, no shadows, no glow, no text or watermark. Keep transparent areas completely transparent with zero-alpha centres. This is the64x32RIGHT end cap of a horizontal ability divider. Keep its small diamond at the RIGHT and the connected straight bar starting FLUSH THROUGH the LEFT canvas edge. The bar is centred at y15.5 with6pixel total height (rows13to18), including charcoal-plum rails. Its narrow inner stripe is grey-lavender #ADA8BD, bevel #716C86. No left-end vertical outline or padding. Keep the right diamond very simple, just one light inset, no jewel highlights or extra facets. Keep both top and bottom empty and transparent. Output2:1aspect ratio, just this right endcap.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-80b9dd4c-97bd-4c96-8ccd-8c9f07558f9b.png"
+  }
+]

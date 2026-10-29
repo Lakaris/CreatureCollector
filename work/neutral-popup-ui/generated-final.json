@@ -1,0 +1,67 @@
+[
+  {
+    "id": "popup-frame",
+    "prompt": "Use case: stylized-concept. Asset type: actual 9-slice popup frame sprite for a friendly creature collecting game, not a mockup.\nCreate exactly ONE square frame on a genuinely transparent background. BOTH the exterior outside the rounded frame AND the entire central opening must have alpha transparency. No filled panel, no lettering, no guide lines, no drop shadow.\nReference images 1 and 2 are style references only: match their bold dark plum outlines, very simple chunky friendly shapes and two-tone flat cel shading. Neutral warm ivory and stone/taupe so it works over blue, green, orange, purple and sandy game backgrounds. Avoid saturated purple/gold/blue trim and avoid any theme-specific symbols.\nDesign: a rounded square picture-frame ring, thick dark plum outer contour, warm ivory stone band, single simple muted taupe bevel, thick dark plum inner contour. Only one small diagonal bevel accent at each corner. No gems, no studs, no scrollwork, no rivets, no decorative marks anywhere along straight edges. No grain, noise or textures. Simple and bold.\nPRECISE GEOMETRY, expressed on the intended 256 by 256 final canvas (scale these values proportionally if generating larger): outer frame extents x=4..252, y=4..252; rounded outer corners radius 28. The transparent inner opening has straight boundaries x=56, x=200, y=56, y=200, small rounded inside corners radius 12. Outer outline about 8 pixels thick, inner outline about 6 pixels thick. All ornamentation and corner transitions must be confined strictly to the four 80x80 corner regions. The slice cuts will be x=80 and176, y=80 and176. The four middle edge strips must be perfectly straight, constant thickness, completely untextured and uniform from end to end, so repeating or stretching them creates no seam. The 96x96 central slice must be COMPLETELY transparent. Top and bottom must be parallel and perfectly horizontal, left and right perfectly vertical. Orthographic front view, no perspective, no tilt.\nThere is no scene, no presentation sheet, no label, no second object. Output just this simple clean production-ready frame PNG.",
+    "width": 256,
+    "height": 256,
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-cf5c44cf-ffcd-4980-987c-4eca17644ea9.png"
+  },
+  {
+    "id": "panel-fill",
+    "width": 128,
+    "height": 128,
+    "transparent": false,
+    "prompt": "Use case: stylized-concept. Asset: plain light UI panel centre tile, intended 128x128 pixels, repeating seamlessly horizontally and vertically behind dark grey text. Generate one single square image filled edge to edge with ONE absolutely uniform flat warm ivory colour #F5EFE5. Completely opaque. No texture, grain, gradient, shading, patterns, markings, borders, vignettes, light direction, objects, text or transparency. Every pixel should be the same light warm ivory colour. This intentionally plain untextured fill matches the inside of a simple neutral cartoon game panel.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-f8443ac2-225b-453f-bd14-848073cd768b.png"
+  },
+  {
+    "id": "close-button",
+    "width": 128,
+    "height": 128,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create one centred neutral close button, 128x128 intended canvas, transparent outside. A simple rounded ivory stone square from (8,8) to (120,120), rounded corners radius24, outlined in dark plum about8px thick; a single narrow taupe lower bevel inside the silhouette. In the centre, a bold dark plum X composed of two straight thick rounded strokes, x44..84,y44..84, stroke12px. Big readable X, no tiny ornaments. The X is the only symbol. Orthographic front view. Keep outer transparency, no cast shadow.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-cda5d91e-ac93-4147-ac44-500cee5b31aa.png"
+  },
+  {
+    "id": "divider-left",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create ONE LEFT END CAP for an ability divider, intended 64x32 landscape canvas (2:1). Truly transparent background. A simple small ivory diamond at centre (12,16), four vertices (12,7),(21,16),(12,25),(3,16), outlined dark plum about3px. From the diamond's right point a perfectly horizontal flat rectangular line continues ALL THE WAY to the RIGHT canvas edge, with no end outline at that canvas edge. The line is exactly y=12..20 on the final32px canvas, dark plum outer band #301426, warm taupe #D8CCBC flat centre y=15..17. The line's rightmost joining cross-section must be a pure horizontal constant profile suitable for joining the repeating middle. Plain straight bar, absolutely no taper, no dotted line, no other decorations, no disconnected elements. No transparent gutter at right edge; bar ends flush there.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7af1f789-cdab-431d-ab85-8695afb1e193.png",
+    "previous_source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-ec9d3706-27e8-496c-9612-70c0ca7c085c.png",
+    "refinement_prompt": "Use case: precise-object-edit. The attached image is an actual RIGHT divider cap sprite. Create its LEFT counterpart by mirroring the whole image horizontally, with no redesign. Keep exact same size, proportions, colours, bold outlines, diamond size, central bar thickness and vertical position. The existing small ivory diamond moves to the left, and its connected horizontal bar must continue absolutely flush through the RIGHT image boundary with no transparent padding there, just as the original bar enters flush from the left. Match every visual detail. Genuine alpha transparency outside the shape. No shadow, no text, no extra objects. A 2:1 landscape image. Do not make the diamond bigger, do not change the bar width."
+  },
+  {
+    "id": "divider-middle",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create ONE REPEATING MIDDLE strip for an ability divider, intended64x32 landscape canvas(2:1). Transparent background. Only a perfectly straight horizontal bar from the VERY LEFT image edge to the VERY RIGHT image edge. Profile on the final32px high canvas: rows0..11 transparent; rows12..20 dark plum #301426; rows15..17 inside that band warm taupe #D8CCBC; rows21..31 transparent. Identical flat pixel colours along its whole width. No left or right endcap, no vertical outline at either end, no diamonds or motifs, no taper or rounding, no gutter at ends. Both horizontal ends are identical and flush to the image boundaries so it repeats invisibly. No texture, gradient, variation or antialiasing along length. A very plain thick line.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9bdb77aa-e4b2-4361-8462-57ea6ccb133c.png"
+  },
+  {
+    "id": "divider-right",
+    "width": 64,
+    "height": 32,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create ONE RIGHT END CAP for an ability divider, intended64x32 landscape canvas(2:1). Truly transparent background. A simple small ivory diamond at centre (52,16), four vertices (52,7),(61,16),(52,25),(43,16), outlined dark plum about3px. From the LEFT edge of the canvas a perfectly horizontal flat rectangular line continues to the diamond's left point, with no end outline at the left canvas edge. The line is exactly y=12..20 on the final32px canvas, dark plum outer band #301426, warm taupe #D8CCBC flat centre y=15..17. The line's leftmost joining cross-section must be a pure horizontal constant profile suitable for joining the repeating middle. Plain straight bar, absolutely no taper, no dotted line, no other decorations, no disconnected elements. No transparent gutter at left edge; bar starts flush there.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-7a5f4fd7-e702-485b-9bb6-5504051ea515.png"
+  },
+  {
+    "id": "ability-icon-frame",
+    "width": 192,
+    "height": 192,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create ONE very simple square border overlay for an ability icon,192x192 intended canvas. BOTH outside and the complete middle opening are truly transparent, so an icon under it is visible. Frame outer edges (5,5) to(187,187), corner radius24px. Interior transparent opening from(27,27) to(165,165), inner corner radius12px. Very thick dark plum outside contour7px and inner contour5px, ivory band with single narrow taupe bevel. Just one tiny diagonal bevel cut at each corner, no gems, notches, studs or extra ornament. Straight uniform undecorated edge middles. Orthographic square. No filled centre, no shadow.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-321d981a-71ad-4e29-873c-78ef0cd4264b.png"
+  },
+  {
+    "id": "gear-slot",
+    "width": 96,
+    "height": 96,
+    "transparent": true,
+    "prompt": "Use case: stylized-concept. Actual production UI sprite for the same friendly creature-collecting game. Style references only: the generated neutral popup frame and the existing settings icon. Match simple chunky cartoon shapes, very thick smooth dark-plum outlines, warm ivory, muted warm taupe and at most one flat highlight. Neutral across all game modes. Simple flat colours, no grain, no noise, no busy detail, no lettering, no shadows, no glow, no scene, no mockup sheet, no additional objects. Create ONE neutral simple square gear slot 9-slice sprite,96x96 intended canvas. Outer square from(2,2) to(94,94), rounded corner radius12px, thick smooth plum outside line4px. Warm taupe stone band with single ivory highlight, inner plum line3px. Fully transparent square centre opening from(15,15) to(81,81), inside corner radius6px. BOTH outside and central opening transparent. Slice cuts will be x32,x64,y32,y64: all corner transitions and any small diagonal bevel accents must fit within32x32corners, all four32px-longmiddleedge strips must be exactly straight,uniform thickness and untextured so stretching works. No icon, no question mark, no plus sign, no gear symbol, no centre colour, no text, no cast shadow. Keep it exceptionally simple and thick-lined.",
+    "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-9234578e-815f-401c-bcf5-5a4dfc4f0a82.png"
+  }
+]

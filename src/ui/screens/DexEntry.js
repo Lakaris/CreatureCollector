@@ -144,9 +144,11 @@ function DexEntry({def,onBack,onNavigate,navList}){
       )
     ),
 
-    React.createElement("div",{style:{display:"flex",gap:4,marginBottom:12,background:"#ebebeb",borderRadius:10,padding:4}},
+    // One segmented control, outlined as a whole (.no-ink on its tabs).
+    React.createElement("div",{className:"ink-border",style:{display:"flex",gap:4,marginBottom:12,background:"#ebebeb",borderRadius:10,padding:4}},
       [{id:"abilities",label:"Abilities"},{id:"skins",label:"Skins"}].map(t=>React.createElement("button",{
         key:t.id,
+        className:"no-ink",
         onClick:()=>setTab(t.id),
         style:{flex:1,padding:"7px 0",fontSize:13,fontWeight:600,border:"none",borderRadius:7,cursor:"pointer",
           background:tab===t.id?"#fff":"transparent",
@@ -180,6 +182,7 @@ function DexEntry({def,onBack,onNavigate,navList}){
                 // Specials without a charge cost (e.g. Overload Sting, gated
                 // purely by Restrained stacks) show no energy pill.
                 k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{
+                  className:"tag-pill",
                   onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                   style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
                 // The dex shows the whole kit, so a cost that drops at the

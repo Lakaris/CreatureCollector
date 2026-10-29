@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from "../../react.js";
 import { typeIcon, roleIcon, rangeIcon, iconText } from "./IconText.js";
 import { useGame } from "../../state/GameContext.js";
 import { CREATURE_MAP } from "../../data/creatures.js";
-import { makeOwnedCreature, getChain, MAX_ABILITY_LEVEL } from "../../core/creatures.js";
+import { makeOwnedCreature, getChain } from "../../core/creatures.js";
 import { TYPE_EMOJI, ROLE_CONFIG, ATTACK_TYPE_CONFIG } from "../../data/types.js";
 import { makeArenaBattle } from "../../battle/state.js";
 import { mitigatedDamage } from "../../battle/damage.js";
@@ -15,7 +15,8 @@ import { EQUIPMENT_MAP } from "../../data/equipment.js";
 import { equipBonus, equipBonusStr } from "../../core/equipment.js";
 import CreatureAbilitySummary from "./CreatureAbilitySummary.js";
 import CreatureIcon from "./CreatureIcon.js";
-import { PlanInfoSheet, SheetHeader, SheetAbilityRow, ABILITY_LABELS } from "./PlanInfoSheet.js";
+import { PlanInfoSheet, CreatureSheetBody } from "./PlanInfoSheet.js";
+import { AbilityTagPopup } from "./AbilityTagPills.js";
 
 const TUTORIAL_LINES = [
   "You wake up on the shore of a deserted looking island with no memory of how you got there.",
@@ -83,6 +84,8 @@ function TutorialOverlay() {
   const [selectedEgg, setSelectedEgg] = useState(null);
   // Which info sheet is showing: null | { type: "enemy" | "player" }
   const [sidePanel, setSidePanel] = useState(null);
+  // The info sheet's tag pills open their explanation here.
+  const [tagPopup, setTagPopup] = useState(null);
   // Some browsers still fire a trailing click on the drag source right after
   // a completed drop; without this guard that click immediately un-places
   // the creature that the drop just placed, making rearrange look broken.
@@ -770,8 +773,7 @@ function TutorialOverlay() {
             "div",
             {
               ref: trayRef,
-              // The info sheet takes the tray's place while open.
-              style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0, ...(sidePanel ? { display: "none" } : null) },
+              style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },
             },
             React.createElement(
               "div",
@@ -822,46 +824,27 @@ function TutorialOverlay() {
               )
             )
           ),
-          // Info sheet -- the same popup every planning screen uses
-          // (PlanInfoSheet): name/type/level header, then abilities. Shown for
-          // either the enemy (tap) or the player's creature (press-and-hold),
-          // one at a time.
+          // Info sheet -- the same creature card every planning screen uses
+          // (PlanInfoSheet). Shown for either the enemy (tap) or the player's
+          // creature (press-and-hold), one at a time.
           sidePanel &&
-            (() => {
-              const panelDef = sidePanel.type === "enemy" ? enemyDef : pickedDef;
-              const subtitle =
-                panelDef.type + " · " + (panelDef.attackType || "Melee") + " · Lv." +
-                (sidePanel.type === "enemy" ? TUTORIAL_ENEMY_LEVEL : 1) +
-                " · " + (sidePanel.type === "enemy" ? "Enemy" : "Ally");
-              return React.createElement(
-                PlanInfoSheet,
-                { onClose: () => setSidePanel(null) },
-                React.createElement(SheetHeader, { icon: React.createElement(CreatureIcon, { def: panelDef, size: 28 }), title: panelDef.name, subtitle }),
-                React.createElement(
-                  "div",
-                  { style: { fontSize: 10, fontWeight: 700, color: "#888", marginBottom: 2, display: "flex", justifyContent: "space-between" } },
-                  React.createElement("span", null, "HP"),
-                  React.createElement("span", null, panelDef.stats.hp)
-                ),
-                React.createElement(
-                  "div",
-                  { style: { height: 6, background: "#eee", borderRadius: 3, overflow: "hidden", marginBottom: 12 } },
-                  React.createElement("div", { style: { height: "100%", width: "100%", background: "#22c55e", borderRadius: 3 } })
-                ),
-                Object.entries(panelDef.abilities).map(([k, abl]) =>
-                  abl &&
-                  React.createElement(SheetAbilityRow, {
-                    key: k,
-                    label: ABILITY_LABELS[k] || k,
-                    name: abl.name,
-                    // The enemy fights with a maxed kit like every other enemy
-                    // (see makeArenaBattle); the player's starter is level 1,
-                    // so it shows the base tier.
-                    desc: abl.upgrades ? abl.upgrades[sidePanel.type === "enemy" ? Math.min(MAX_ABILITY_LEVEL, abl.upgrades.length - 1) : 0] : "",
-                  })
-                )
-              );
-            })(),
+            React.createElement(
+              PlanInfoSheet,
+              { onClose: () => setSidePanel(null) },
+              sidePanel.type === "enemy"
+                // The enemy fights with a maxed kit like every other enemy
+                // (see makeArenaBattle) -- the card's default tier.
+                ? React.createElement(CreatureSheetBody, { def: enemyDef, level: TUTORIAL_ENEMY_LEVEL, onTag: setTagPopup })
+                // The player's starter is level 1, so it reads at the base tier.
+                : React.createElement(CreatureSheetBody, { def: pickedDef, level: 1, tierFor: () => 0, onTag: setTagPopup })
+            ),
+          // Kept off the overlay's root, which listens for clicks.
+          tagPopup &&
+            React.createElement(
+              "div",
+              { onClick: (e) => e.stopPropagation() },
+              React.createElement(AbilityTagPopup, { popup: tagPopup, onClose: () => setTagPopup(null) })
+            ),
           // Ghost that follows the pointer during a custom drag.
           isDragging &&
             React.createElement(

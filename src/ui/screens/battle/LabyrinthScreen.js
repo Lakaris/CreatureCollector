@@ -19,7 +19,7 @@ import { makeArenaBattle } from "../../../battle/state.js";
 import { runBattleTick } from "../../../battle/tick.js";
 import DamageChart from "../../../ui/components/DamageChart.js";
 import { UnitInfoPopup, debuffsFor } from "../../../ui/components/UnitInfoPanel.js";
-import { PlanInfoSheet, CreatureSheetBody, allyDesc } from "../../../ui/components/PlanInfoSheet.js";
+import { PlanInfoSheet, CreatureSheetBody, AllySheetBody, PLAN_INFO_HOLD_MS } from "../../../ui/components/PlanInfoSheet.js";
 import CreatureIcon from "../../../ui/components/CreatureIcon.js";
 import { battleArtState, battleUnitOpacity, stampVictors, VICTORY_LINGER_MS } from "../../../ui/components/battleArtState.js";
 import { renderTileFx, renderHazardField } from "../../../ui/components/battleTileFx.js";
@@ -292,7 +292,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
   const touchDrag = useTouchDragPlacement({
     cellSelector: "[data-cell]",
     applyDrop,
-    onCancelHold: () => { endHold(); if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } },
+    onCancelHold: () => { endHold(); if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } closeSheet(); },
     onCancelDrop: (fromCell) => setPlanGrid((p) => { const n = { ...p }; delete n[fromCell]; return n; }),
     onDragOverCell: (cellKey, d) => {
       const cid = d.id || d.cellId;
@@ -615,7 +615,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         onClick: () => setBossInfoOpen(false),
         style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300 },
       },
-        React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 14, padding: "18px 20px", width: 280, maxWidth: "calc(85 * var(--vw))", boxShadow: "0 8px 30px rgba(0,0,0,0.25)" } },
+        React.createElement("div", { className: "ui-panel", onClick: (e) => e.stopPropagation(), style: { padding: "6px 8px 8px", width: 296, maxWidth: "calc(85 * var(--vw))" } },
           React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 8 } }, "👑 Boss"),
           React.createElement("div", { style: { fontSize: 13, color: "#555", lineHeight: 1.4, marginBottom: 16 } }, "+25% to all stats"),
           React.createElement("button", { onClick: () => setBossInfoOpen(false), style: { width: "100%", padding: "9px 0", background: "#534AB7", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: "pointer" } }, "Close")
@@ -650,9 +650,9 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               const isDivider = r === ARENA_PLAYER_START_ROW;
               const BORDER = "1px solid #bbb";
               const onHoldStart = isPlayerZone && creatureId
-                ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setEnemyInfo(null); setGridInfoCreature(creatureId); }, 180); })
+                ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setEnemyInfo(null); setGridInfoCreature(creatureId); }, PLAN_INFO_HOLD_MS); })
                 : enemyDef
-                  ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setGridInfoCreature(null); setEnemyInfo({ id: enemyDef.id, boss: !!enemyDef.__giant }); }, 180); })
+                  ? (() => { ghs.current.fired = false; ghs.current.timer = setTimeout(() => { ghs.current.fired = true; setGridInfoCreature(null); setEnemyInfo({ id: enemyDef.id, boss: !!enemyDef.__giant }); }, PLAN_INFO_HOLD_MS); })
                   : undefined;
               const onHoldEnd = isPlayerZone && creatureId
                 ? (() => { if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } if (!ghs.current.fired && !touchDrag.dragRef.current.active) { setPlanGrid((p) => { const n = { ...p }; delete n[key]; return n; }); } })
@@ -662,7 +662,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
               return React.createElement("div", {
                 key, "data-cell": key, className: boardCellClass(r, ARENA_PLAYER_START_ROW),
                 draggable: !!(isPlayerZone && creatureId),
-                onDragStart: isPlayerZone && creatureId ? (e) => { e.dataTransfer.effectAllowed = "move"; setDragCell(key); setDragId(null); } : undefined,
+                onDragStart: isPlayerZone && creatureId ? (e) => { e.dataTransfer.effectAllowed = "move"; if (ghs.current.timer) { clearTimeout(ghs.current.timer); ghs.current.timer = null; } closeSheet(); setDragCell(key); setDragId(null); } : undefined,
                 onDragEnd: isPlayerZone && creatureId ? () => rangePreview.clear() : undefined,
                 onDragOver: isPlayerZone ? (e) => { e.preventDefault(); previewAt(draggedCreature(), r, c); } : () => rangePreview.clear(),
                 onDrop: isPlayerZone ? (e) => { e.preventDefault(); rangePreview.clear(); handleCellDrop(r, c); } : undefined,
@@ -719,8 +719,7 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
         React.createElement("div", { style: { fontSize: 11, color: "#aaa", textAlign: "right", marginTop: 8 } }, "Tap to continue")
       ),
       React.createElement("div", {
-        // The info sheet takes the tray's place while open.
-        style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0, ...(enemyInfo || gridInfoCreature ? { display: "none" } : null) },
+        style: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 12px 24px", flexShrink: 0 },
         onDragOver: (e) => { e.preventDefault(); rangePreview.clear(); },
         onDrop: (e) => { e.preventDefault(); rangePreview.clear(); if (dragCell) { setPlanGrid((p) => { const n = { ...p }; delete n[dragCell]; return n; }); } setDragId(null); setDragCell(null); },
       },
@@ -787,23 +786,18 @@ function LabyrinthScreen({ onBack, onFight, onViewCreature }) {
       enemyInfo && CREATURE_MAP[enemyInfo.id] && React.createElement(PlanInfoSheet, { onClose: closeSheet },
         React.createElement(CreatureSheetBody, {
           def: CREATURE_MAP[enemyInfo.id],
-          subtitle: CREATURE_MAP[enemyInfo.id].type + " · " + (CREATURE_MAP[enemyInfo.id].attackType || "Melee") + " · Lv." + level + " · Enemy",
+          level,
+          tierFor: () => enemyAbilityLevel,
           // Boss marker: tapping the crown explains what being a Boss is worth
           // (the +25% in makeArenaBattle's __giant handling).
           titleExtra: enemyInfo.boss && React.createElement("button", {
             onClick: (e) => { e.stopPropagation(); setBossInfoOpen(true); },
             style: { background: "none", border: "none", padding: 0, fontSize: 16, lineHeight: 1, cursor: "pointer" },
           }, "👑"),
-          descFor: (k, abl) => abl.upgrades ? abl.upgrades[Math.min(enemyAbilityLevel, abl.upgrades.length - 1)] : "",
           onTag: setLabAbilityTagPopup,
         })),
       gridInfoCreature && CREATURE_MAP[gridInfoCreature] && React.createElement(PlanInfoSheet, { onClose: closeSheet },
-        React.createElement(CreatureSheetBody, {
-          def: CREATURE_MAP[gridInfoCreature],
-          subtitle: CREATURE_MAP[gridInfoCreature].type + " · " + (CREATURE_MAP[gridInfoCreature].attackType || "Melee") + (owned?.[gridInfoCreature] ? " · Lv." + owned[gridInfoCreature].level : ""),
-          descFor: allyDesc(owned?.[gridInfoCreature]),
-          onTag: setLabAbilityTagPopup,
-        })),
+        React.createElement(AllySheetBody, { id: gridInfoCreature, onTag: setLabAbilityTagPopup })),
       touchDrag.ghost && (() => { const gdef = CREATURE_MAP[touchDrag.ghost.id]; if (!gdef) return null; return React.createElement("div", { style: { position: "fixed", left: touchDrag.ghost.x - 26, top: touchDrag.ghost.y - 29, width: 52, height: 52, pointerEvents: "none", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.85, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))" } }, React.createElement(CreatureIcon, { def: gdef, size: 36 })); })()
     );
 }

@@ -17,7 +17,17 @@ html,body,#root{height:100%;overflow:hidden;overscroll-behavior:none}
    along with the scale instead of anchoring them to the raw viewport. */
 #root{width:calc(100% / var(--ui-scale,1));height:calc(100% / var(--ui-scale,1));transform:scale(var(--ui-scale,1));transform-origin:top left}
 html{touch-action:pan-x pan-y}
-body{font-family:system-ui,sans-serif;background:#f5f5f5;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-x pan-y}
+
+/* The game's one font: Nunito, a bundled variable font (fonts/, SIL OFL --
+   licence beside it), so one file covers every weight from 200 to 1000 --
+   the UI's 800s included. font-display:block keeps text from flashing in the
+   fallback font for the moment the file takes to load. Emoji aren't in it,
+   so they keep coming from the system's. */
+@font-face{font-family:"Nunito";src:url("../fonts/Nunito-Variable.ttf") format("truetype");font-weight:200 1000;font-display:block}
+:root{--ui-font:"Nunito",system-ui,sans-serif}
+/* Form controls don't inherit the page font by default. */
+button,input,textarea,select{font-family:inherit}
+body{font-family:var(--ui-font);background:#f5f5f5;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-x pan-y}
 input,textarea{-webkit-user-select:text;user-select:text}
 .app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:0}
 .app-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px;min-height:0;overscroll-behavior:none}

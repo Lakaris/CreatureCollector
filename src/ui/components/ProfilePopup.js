@@ -64,10 +64,11 @@ function ProfilePopup({ onClose }) {
     onClick: onClose,
   },
     React.createElement("div", {
-      style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: 360, height: "min(560px, calc(85 * var(--vh)))", display: "flex", flexDirection: "column", overflow: "hidden" },
+      className: "ui-panel",
+      style: { width: "100%", maxWidth: 360, height: "min(560px, calc(85 * var(--vh)))", display: "flex", flexDirection: "column", overflow: "hidden" },
       onClick: (e) => e.stopPropagation(),
     },
-      React.createElement("div", { style: { padding: "20px 20px 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, borderBottom: "1px solid #f0f0f0" } },
+      React.createElement("div", { style: { padding: "4px 4px 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, borderBottom: "1px solid #f0f0f0" } },
         React.createElement("div", {
           style: { width: 84, height: 84, borderRadius: "50%", background: "#EEEDFE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, border: frame.border, borderImage: frame.borderImage || "none", boxShadow: frame.shadow }
         }, profileEmoji),
@@ -96,7 +97,7 @@ function ProfilePopup({ onClose }) {
           }, t.label)
         )
       ),
-      React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: 16 } },
+      React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: "12px 4px" } },
         tab === "avatar" && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 } },
           avatarOptions.map((opt) =>
             React.createElement("button", {
@@ -142,7 +143,7 @@ function ProfilePopup({ onClose }) {
           })
         )
       ),
-      React.createElement("div", { style: { padding: 14, borderTop: "1px solid #f0f0f0" } },
+      React.createElement("div", { style: { padding: "10px 4px 4px", borderTop: "1px solid #f0f0f0" } },
         React.createElement("button", {
           onClick: onClose,
           style: { width: "100%", padding: "10px 0", borderRadius: 12, border: "none", background: "#7c4dff", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }

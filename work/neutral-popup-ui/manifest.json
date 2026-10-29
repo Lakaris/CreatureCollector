@@ -1,0 +1,166 @@
+{
+  "style": "Neutral ivory and stone, dark plum outline",
+  "assets": [
+    {
+      "id": "popup-frame",
+      "path": "images/ui_panels/neutral/popup-frame.png",
+      "size": [
+        256,
+        256
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "sha256": "7875e31905de8b965e11c6b83f178b72f97b443d9561a4a3b1d0b743a172d15c",
+      "fully_clear_symmetric_inset_px": 57,
+      "slice_inset_px": [
+        80,
+        80,
+        80,
+        80
+      ],
+      "slice_coordinates_px": [
+        80,
+        176
+      ],
+      "center_slice_size": [
+        96,
+        96
+      ],
+      "straight_inner_edge_inset_px": {
+        "left": 54,
+        "top": 54,
+        "right": 53,
+        "bottom": 54
+      },
+      "recommended_content_inset_source_px": 64,
+      "edge_mode": "stretch",
+      "corner_render_size_points": 16,
+      "recommended_content_inset_points_at_16pt_corners": 12.8
+    },
+    {
+      "id": "panel-fill",
+      "path": "images/ui_panels/neutral/panel-fill.png",
+      "size": [
+        128,
+        128
+      ],
+      "format": "PNG",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "sha256": "ceef17f59b12294da546a4815e416e38886fdae826ec4de2b8f7d85eb13a3615",
+      "repeat": "both",
+      "maximum_rgb_seam_difference_0_to_255": 0
+    },
+    {
+      "id": "close-button",
+      "path": "images/ui_panels/neutral/close-button.png",
+      "size": [
+        128,
+        128
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "sha256": "104a38be38218d5278adca86dc0c4a25d7864ddf9c9af14c6b98974ca0b7bd00"
+    },
+    {
+      "id": "divider-left",
+      "path": "images/ui_panels/neutral/divider-left.png",
+      "size": [
+        64,
+        32
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "sha256": "89b0fc63489abb4a3342f58214938246eef7679bee619c247575bd915ce8b1ed"
+    },
+    {
+      "id": "divider-middle",
+      "path": "images/ui_panels/neutral/divider-middle.png",
+      "size": [
+        64,
+        32
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "sha256": "9d58d9b5d2cc0abc587342ccd1f95e6dc1ff883edbda1c2c8a245b429655f526",
+      "repeat": "horizontal",
+      "alpha_seam_max_difference": 0
+    },
+    {
+      "id": "divider-right",
+      "path": "images/ui_panels/neutral/divider-right.png",
+      "size": [
+        64,
+        32
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "sha256": "c32f58bb023b69e0975eea7fcf92ef4af4bd450293c1401150237c4e59a22905"
+    },
+    {
+      "id": "ability-icon-frame",
+      "path": "images/ui_panels/neutral/ability-icon-frame.png",
+      "size": [
+        192,
+        192
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "sha256": "d0937ab167a15fdcedc5fd322ebad4f91dd709f1e78ef10ffa775e153fdd986a",
+      "fully_clear_symmetric_inset_px": 41
+    },
+    {
+      "id": "gear-slot",
+      "path": "images/ui_panels/neutral/gear-slot.png",
+      "size": [
+        96,
+        96
+      ],
+      "format": "PNG",
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "sha256": "26f4fa1457b25c110924b4745038b51b28dd20f8eadf2a5e4e16f59db25821fe",
+      "fully_clear_symmetric_inset_px": 23,
+      "slice_inset_px": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "slice_coordinates_px": [
+        32,
+        64
+      ],
+      "center_slice_size": [
+        32,
+        32
+      ],
+      "recommended_content_inset_source_px": 28,
+      "edge_mode": "stretch"
+    }
+  ],
+  "frame_rendering": {
+    "corner_size_points": 16,
+    "source_to_point_scale": 0.2,
+    "content_inset_points": 12.8,
+    "border_visible_thickness_points_approx": 9.6,
+    "center_fill": "panel-fill.png",
+    "painted_drop_shadow": false
+  },
+  "generation": "Built-in ImageGen; downscaled to requested dimensions and encoded as optimized indexed PNGs with transparency. No game integration changed.",
+  "validation": {
+    "assets": 8,
+    "required_dimensions_pass": true,
+    "transparent_frame_centres_pass": true,
+    "divider_joins_have_no_alpha_gaps": true,
+    "divider_repeat_alpha_seam_pass": true,
+    "fill_repeat_max_rgb_step": 0,
+    "small_panel_preview": "small-panel-check.png"
+  }
+}

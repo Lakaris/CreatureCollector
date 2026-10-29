@@ -7,6 +7,7 @@ import { CREATURE_MAP } from "../../data/creatures.js";
 import { FLAIR_AURA_MAP, backdropImage, PORTRAIT_CREATURE_PX } from "../../data/flair.js";
 import { QUEST_DEFS } from "../../data/quests.js";
 import CreatureIcon from "../../ui/components/CreatureIcon.js";
+import useShownFlair from "../../ui/hooks/useShownFlair.js";
 import BattlepassScreen from "../../ui/screens/BattlepassScreen.js";
 import QuestsScreen from "../../ui/screens/QuestsScreen.js";
 import DailyScreen, { dailyRewardWaiting } from "../../ui/screens/DailyScreen.js";
@@ -40,7 +41,7 @@ const HOME_ART_BOTTOM = "min(100cqw + 32px, 100cqh + 32px - " + HOME_PANEL_MIN +
 // the art's side up from its bottom, as on the creature and Flair pages.
 const HOME_FEET_TOP = "calc(" + HOME_ART_BOTTOM + " - 0.07 * " + HOME_ART_SIDE + ")";
 
-function HomeScreen(){
+function HomeScreen({visit=0}={}){
   const { owned, unlockedSkins, featuredCreatureId, setFeaturedCreatureId, questState, questBatchIdx, setQuestBatchIdx, setCurrencies, claimedQuests, setClaimedQuests, dailyDay, setDailyDay, dailyLastClaimed, setDailyLastClaimed, dailyClaimed, newPlayerGiftDay, setNewPlayerGiftDay, newPlayerGiftLastClaimed, setNewPlayerGiftLastClaimed, newPlayerGiftEndsAt, currencies, battlepassLastReset, setBattlepassLastReset, battlepassClaimed, setBattlepassClaimed, battlepassPaidClaimed, setBattlepassPaidClaimed, battlepassPremium, setBattlepassPremium, battlepassPoints, setBattlepassPoints, dailyMissionsDate, setDailyMissionsDate, dailyMissionsSnapshot, setDailyMissionsSnapshot, dailyMissionsDone, setDailyMissionsDone, dailyCompletionClaimed, setDailyCompletionClaimed, dailySelectedMissions, setDailySelectedMissions, setSettingsOpen, setTab, setGameMode, labyrinthDepth, tutorialRestricted, setTutorialRestricted, tutorialStep, setTutorialStep, postTutorialPopupPending, setPostTutorialPopupPending, showQuestsArrow, setShowQuestsArrow, pendingDungeonReveal, setPendingDungeonReveal } = useGame();
   const [showQuests,setShowQuests]=React.useState(false);
   const [showDaily,setShowDaily]=React.useState(false);
@@ -70,8 +71,14 @@ function HomeScreen(){
   const ownedList=Object.values(owned);
   const ownedData=(featuredCreatureId&&owned[featuredCreatureId])||ownedList[0];
   const def=ownedData?CREATURE_MAP[ownedData.id]:null;
-  const auraDef=ownedData&&ownedData.equippedAura?FLAIR_AURA_MAP[ownedData.equippedAura]:null;
-  const homeBackdrop=backdropImage(ownedData);
+  // Random flair slots get a new pick every time Home is opened
+  // (useShownFlair): a tap on the Home tab, even from Home itself (`visit`),
+  // and coming back from Quests, Daily, the Welcome Gift or the Battle Pass,
+  // which open in Home's place without remounting it.
+  const homeCovered=showQuests||showDaily||showNewPlayerGift||showBattlepass;
+  const shownFlair=useShownFlair(ownedData,visit+(homeCovered?":covered":""));
+  const auraDef=shownFlair&&shownFlair.equippedAura?FLAIR_AURA_MAP[shownFlair.equippedAura]:null;
+  const homeBackdrop=backdropImage(shownFlair);
   // One tile in Home's menu row: the icon on its own (no badge behind it),
   // its label below, a red notification badge on the corner when something
   // is waiting, and room for an extra overlay (the Quests pointer). Dimmed
@@ -81,7 +88,7 @@ function HomeScreen(){
   const homeTile=(icon,label,dot,onClick,extra,{sub=null,active=!tutorialRestricted}={})=>React.createElement("button",{
     key:label,
     onClick:()=>{if(!active)return;onClick();},
-    style:{position:"relative",flex:1,maxWidth:86,minHeight:96,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",gap:5,padding:"10px 4px 10px",border:"none",borderRadius:18,background:"#fff",boxShadow:"0 2px 10px rgba(83,74,183,0.10)",fontFamily:"inherit",cursor:active?"pointer":"not-allowed",opacity:active?1:0.4}
+    style:{position:"relative",flex:1,maxWidth:86,minHeight:96,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",gap:5,padding:"7.5px 1.5px 7.5px",border:"none",borderRadius:18,background:"#fff",boxShadow:"0 2px 10px rgba(83,74,183,0.10)",fontFamily:"inherit",cursor:active?"pointer":"not-allowed",opacity:active?1:0.4}
   },
     // 48px box; the icon is 1.15em of the font size, so 42 fills it.
     React.createElement("span",{style:{width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,lineHeight:1,flexShrink:0}},icon),

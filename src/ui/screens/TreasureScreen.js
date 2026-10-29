@@ -27,7 +27,7 @@ function TreasureScreen({onBack}){
     return()=>clearTimeout(t);
   },[openResults,multiVisible]);
   const treasurePopupEl=treasurePopup&&React.createElement("div",{onClick:()=>setTreasurePopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 32px"}},
-    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:20,padding:"28px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}},
+    React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"12px 8px",width:"100%",maxWidth:320,textAlign:"center"}},
       React.createElement("div",{style:{fontSize:52,lineHeight:1,marginBottom:12}},treasurePopup.emoji),
       React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#111",marginBottom:4}},treasurePopup.name),
       React.createElement("div",{style:{fontSize:12,fontWeight:700,color:TREASURE_RARITIES[treasurePopup.rarity].color,marginBottom:12,textTransform:"uppercase",letterSpacing:1}},TREASURE_RARITIES[treasurePopup.rarity].label),
@@ -35,7 +35,7 @@ function TreasureScreen({onBack}){
     )
   );
   const setCompletePopupEl=setCompletePopup&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:400,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-    React.createElement("div",{style:{background:"#fff",borderRadius:24,padding:"32px 24px 24px",width:"100%",maxWidth:320,textAlign:"center",boxShadow:"0 12px 48px rgba(0,0,0,0.22)",position:"relative",overflow:"hidden"}},
+    React.createElement("div",{className:"ui-panel",style:{padding:"16px 8px 8px",width:"100%",maxWidth:320,textAlign:"center",position:"relative",overflow:"hidden"}},
       React.createElement("div",{style:{fontSize:48,marginBottom:4}},"🎉"),
       React.createElement("div",{style:{fontSize:22,fontWeight:800,color:"#d97706",marginBottom:2}},setCompletePopup.name),
       React.createElement("div",{style:{fontSize:13,color:"#888",marginBottom:20,fontWeight:500}},"Set Complete!"),
@@ -167,7 +167,7 @@ function TreasureScreen({onBack}){
   ];
   const shards=currencies.treasureShards||0;
   const redeemPopupEl=redeemOpen&&React.createElement("div",{onClick:()=>setRedeemOpen(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:400,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 24px"}},
-    React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:22,padding:"24px 20px",width:"100%",maxWidth:340,boxShadow:"0 12px 48px rgba(0,0,0,0.2)"}},
+    React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 4px",width:"100%",maxWidth:340}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}},
         React.createElement("div",{style:{fontSize:17,fontWeight:800,color:"#111"}},"Redeem Shards"),
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4,background:"#f5f3ff",border:"1.5px solid #ddd6fe",borderRadius:20,padding:"3px 10px"}},

@@ -1,0 +1,249 @@
+{
+  "frames": [
+    {
+      "index": 0,
+      "durationMs": 30,
+      "spread": 0,
+      "drop": 0,
+      "head": 0,
+      "tilt": 0,
+      "expression": "normal",
+      "phase": "dazed"
+    },
+    {
+      "index": 1,
+      "durationMs": 30,
+      "spread": 0,
+      "drop": 0,
+      "head": -1,
+      "tilt": -0.5,
+      "expression": "normal",
+      "phase": "dazed"
+    },
+    {
+      "index": 2,
+      "durationMs": 30,
+      "spread": 0,
+      "drop": 0,
+      "head": -2,
+      "tilt": -1,
+      "expression": "dazed",
+      "phase": "dazed"
+    },
+    {
+      "index": 3,
+      "durationMs": 30,
+      "spread": 0,
+      "drop": 0,
+      "head": -2.5,
+      "tilt": -1.25,
+      "expression": "dazed",
+      "phase": "dazed"
+    },
+    {
+      "index": 4,
+      "durationMs": 30,
+      "spread": 0,
+      "drop": 0,
+      "head": -3,
+      "tilt": -1.5,
+      "expression": "defeat",
+      "phase": "dazed"
+    },
+    {
+      "index": 5,
+      "durationMs": 30,
+      "spread": 0.05,
+      "drop": 4.5,
+      "head": 3,
+      "tilt": -0.75,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 6,
+      "durationMs": 30,
+      "spread": 0.1,
+      "drop": 9,
+      "head": 9,
+      "tilt": 0,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 7,
+      "durationMs": 30,
+      "spread": 0.26,
+      "drop": 17,
+      "head": 18.5,
+      "tilt": 0.75,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 8,
+      "durationMs": 30,
+      "spread": 0.41999999999999993,
+      "drop": 25,
+      "head": 28,
+      "tilt": 1.5,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 9,
+      "durationMs": 30,
+      "spread": 0.5703703703703704,
+      "drop": 30.962962962962962,
+      "head": 36.55555555555556,
+      "tilt": 2.148148148148148,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 10,
+      "durationMs": 30,
+      "spread": 0.8496296296296296,
+      "drop": 42.03703703703704,
+      "head": 52.44444444444444,
+      "tilt": 3.3518518518518516,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 11,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 48,
+      "head": 61,
+      "tilt": 4,
+      "expression": "defeat",
+      "phase": "flop"
+    },
+    {
+      "index": 12,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45.5,
+      "head": 57.5,
+      "tilt": 3.5,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 13,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 43,
+      "head": 54,
+      "tilt": 3,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 14,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 43.77777777777778,
+      "head": 55.03703703703704,
+      "tilt": 3.259259259259259,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 15,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45.22222222222222,
+      "head": 56.96296296296296,
+      "tilt": 3.7407407407407405,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 16,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 46,
+      "head": 58,
+      "tilt": 4,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 17,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45.84375,
+      "head": 57.84375,
+      "tilt": 3.921875,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 18,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45.5,
+      "head": 57.5,
+      "tilt": 3.75,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 19,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45.15625,
+      "head": 57.15625,
+      "tilt": 3.578125,
+      "expression": "defeat",
+      "phase": "settle"
+    },
+    {
+      "index": 20,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45,
+      "head": 57,
+      "tilt": 3.5,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 21,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45,
+      "head": 57,
+      "tilt": 3.5,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 22,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45,
+      "head": 57,
+      "tilt": 3.5,
+      "expression": "defeat",
+      "phase": "defeated"
+    },
+    {
+      "index": 23,
+      "durationMs": 30,
+      "spread": 1,
+      "drop": 45,
+      "head": 57,
+      "tilt": 3.5,
+      "expression": "defeat",
+      "phase": "defeated"
+    }
+  ],
+  "columns": 6,
+  "rows": 4,
+  "totalDurationMs": 720,
+  "loop": false,
+  "holdLastFrame": true
+}

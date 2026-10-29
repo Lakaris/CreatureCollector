@@ -89,7 +89,7 @@ function DailyTabContent({setRewardPopup,onNavigate}){
     const allVisible=visibleCount>=rewardItems.length;
     return React.createElement("div",{onClick:allVisible?()=>setRewardItems(null):undefined,style:{position:"fixed",inset:0,display:"flex",flexDirection:"column",background:"#fff",zIndex:200,cursor:allVisible?"pointer":"default"}},
       localRewardPopup&&React.createElement("div",{onClick:()=>setLocalRewardPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center"}},
-        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:18,padding:"24px 28px",maxWidth:280,textAlign:"center"}},
+        React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 12px",maxWidth:280,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:36,marginBottom:8}},currencyIcon(localRewardPopup,REWARD_LABELS[localRewardPopup]?.split(" ")[0]||"🎁")),
           React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:6}},iconText(REWARD_LABELS[localRewardPopup]||localRewardPopup)),
           React.createElement("div",{style:{fontSize:13,color:"#555"}},REWARD_DESC[localRewardPopup]||""),

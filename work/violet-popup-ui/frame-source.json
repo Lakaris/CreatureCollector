@@ -1,0 +1,8 @@
+{
+  "id": "popup-frame",
+  "width": 256,
+  "height": 256,
+  "prompt": "Use case: precise-object-edit. Image 1 is the ACTUAL popup-frame sprite to recolour. Make a colour-only edit. Preserve its exact square composition, proportions, rounded outer and inner contours, four small diagonal corner facets, thick dark plum outlines, plain edge strips, completely transparent central hole and transparent exterior. Do not add or remove any shapes, details, thickness, shadow or decoration.\nReplace the cream/ivory main border bands with a visibly coloured but calm muted blue-violet/periwinkle, approximately #8582B5. Replace the taupe bevel shading with slate violet #62618A, and use pale lavender #BBB9DA for the small existing corner highlights. This must clearly read as a blue-violet border, not beige, not near-white, and not saturated neon purple. Keep the dark plum outlines exactly as dark and thick as in the original.\nVery simple flat game-art colours. No new gradients or texture. Do not recolour transparency. The central hole stays entirely clear: alpha zero, not a lavender or cream fill.\nTechnical invariants: final canvas 256x256. 9-slice cuts remain x80/x176 and y80/y176. All corner transitions must remain confined to the 80x80 corner regions, every middle edge strip is plain and straight. No unique decorations on edge middles. No drop shadow, text, guide marks, extra objects or mockup background.\nOutput only the recoloured production frame PNG with genuine alpha transparency.",
+  "reference": "C:\\Users\\Annie\\Desktop\\Stuff\\CreatureCollector\\images\\ui_panels\\neutral\\popup-frame.png",
+  "source": "C:\\Users\\Annie\\.codex\\generated_images\\01a17a9f-710d-7443-afd5-27a5468ab616\\exec-1f8ac206-5b1b-4eca-9c41-c52bfe9dd023.png"
+}

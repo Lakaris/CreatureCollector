@@ -21,6 +21,8 @@ while ($listener.IsListening) {
             '.json' { 'application/json' }
             '.png'  { 'image/png' }
             '.jpg'  { 'image/jpeg' }
+            '.ttf'  { 'font/ttf' }
+            '.woff2' { 'font/woff2' }
             default { 'application/octet-stream' }
         }
         $bytes = [System.IO.File]::ReadAllBytes($file)

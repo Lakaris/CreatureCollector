@@ -24,6 +24,7 @@ import AscensionPopup from "../../../ui/screens/CreatureDetail/AscensionPopup.js
 import FlairSection from "../../../ui/screens/CreatureDetail/FlairSection.js";
 import ScreenHeader from "../../../ui/components/ScreenHeader.js";
 import useSwipeNav from "../../../ui/hooks/useSwipeNav.js";
+import useShownFlair from "../../../ui/hooks/useShownFlair.js";
 import { formatNum } from "../../../core/format.js";
 
 // Must match TUTORIAL_ITEM_ID in TutorialOverlay.js -- the item the tutorial's
@@ -99,6 +100,10 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
   const [statInfoPopup,setStatInfoPopup]=useState(null);
   const [abilityTagPopup,setAbilityTagPopup]=useState(null);
   const def=CREATURE_MAP[ownedData.id];
+  // What the creature is shown wearing, with Random flair slots picked for
+  // this visit (useShownFlair). Display only -- everything that changes flair
+  // goes through ownedData.
+  const shownFlair=useShownFlair(ownedData);
   const stats=calcStats(def,ownedData);
   const equipBonusStats={hp:0,atk:0,def:0,spd:0,abilitySpeed:0,crit:0,critDmg:0};
   (ownedData.equipped||[null,null,null,null]).forEach(itemId=>{
@@ -491,7 +496,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     // it appears rather than only on the pill it was tapped from.
     const fmt=(v)=>formatStat(statInfoPopup,v);
     return React.createElement("div",{onClick:()=>setStatInfoPopup(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-      React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"20px 18px",width:280,maxHeight:"calc(70 * var(--vh))",overflowY:"auto",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"4px 4px",width:280,maxHeight:"calc(70 * var(--vh))",overflowY:"auto"}},
         React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"#111",marginBottom:8}},STAT_LABELS[statInfoPopup]),
         React.createElement("div",{style:{fontSize:13,color:"#555",lineHeight:1.4,marginBottom:16}},STAT_DESCRIPTIONS[statInfoPopup]),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0",borderTop:"1px solid #eee"}},
@@ -586,7 +591,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       statInfoPopupEl,
       notify&&React.createElement(Notify,{msg:notify}),
       equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-        React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:290,textAlign:"center"}},
           React.createElement("div",{style:{fontSize:32,marginBottom:8}},gearIcon(EQUIPMENT_MAP[equipConflict.itemId])),
           React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
           React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},(EQUIPMENT_MAP[equipConflict.itemId]?.name||"This item")+" is already equipped on "+equipConflict.otherPetName+". Unequip it from there and equip it here?"),
@@ -601,7 +606,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
           React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:52,style:{flexShrink:0}}),
           React.createElement("div",null,
-            React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#000"}},def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:"")),
+            React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#000"}},def.name+(shownFlair.equippedTitle?" the "+shownFlair.equippedTitle:"")),
             React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#666",marginBottom:6}},"Lv "+ownedData.level),
             React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap"}},
               def.type&&React.createElement("span",{style:{fontSize:11,fontWeight:600,background:"#f0f0f0",color:"#444",borderRadius:8,padding:"2px 7px"}},typeIcon(def.type), " " + def.type),
@@ -850,7 +855,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     );
   }
 
-  const backdrop=portraitBackdropStyle(ownedData);
+  const backdrop=portraitBackdropStyle(shownFlair);
   return React.createElement("div",swipeHandlers,
     statInfoPopupEl,
     abilityTagPopupEl,
@@ -865,7 +870,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     // left of the arrow and overlaps the end of the name, fading in over it
     // on a white gradient. 26px tall to match the Flair page's header slot,
     // so the art doesn't shift between the two pages.
-    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{position:"relative",display:"flex",alignItems:"center",height:26}},
+    React.createElement(ScreenHeader,{title:def.name+(shownFlair.equippedTitle?" the "+shownFlair.equippedTitle:""),onBack,backDisabled:equipTutorialLock,right:React.createElement("div",{style:{position:"relative",display:"flex",alignItems:"center",height:26}},
       infoOpen&&(()=>{
         const rar=EQUIP_RARITY_CONFIG[def.rarity];
         const icon=(key,label,glyph)=>React.createElement("span",{
@@ -890,6 +895,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         );
       })(),
       React.createElement("button",{
+        className:"no-ink",
         onClick:()=>{setInfoOpen(o=>!o);setTagBubble(null);},
         "aria-label":infoOpen?"Hide creature info":"Show creature info",
         "aria-expanded":infoOpen,
@@ -898,7 +904,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     )}),
     notify&&React.createElement(Notify,{msg:notify}),
     equipConflict&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:290,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:290,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},gearIcon(EQUIPMENT_MAP[equipConflict.itemId])),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Item Already Equipped"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:16}},
@@ -911,7 +917,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       )
     ),
     confirmMelon&&React.createElement("div",{className:"screen-fade",style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}},
-      React.createElement("div",{style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+      React.createElement("div",{className:"ui-panel",style:{padding:"8px 4px",width:280,textAlign:"center"}},
         React.createElement("div",{style:{fontSize:32,marginBottom:8}},currencyIcon(ascMelon.key,ascMelon.emoji)),
         React.createElement("div",{style:{fontSize:15,fontWeight:700,marginBottom:8}},"Use "+ascMelon.label+"s?"),
         React.createElement("div",{style:{fontSize:13,color:"#555",marginBottom:4}},
@@ -967,7 +973,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
       flairBuffs.forEach(b=>{totals[b.stat]=(totals[b.stat]||0)+b.pct;});
       Object.keys(totals).forEach(s=>{totals[s]=Math.round(totals[s]*100)/100;});
       return React.createElement("div",{onClick:()=>setShowFlairEffects(false),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-        React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+        React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 4px",width:280}},
           React.createElement("div",{style:{fontSize:15,fontWeight:700,textAlign:"center",marginBottom:4}},"✨ Flair Effects"),
           React.createElement("div",{style:{fontSize:11,color:"#888",textAlign:"center",marginBottom:16}},"Stat boosts from all unlocked flair"),
           React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
@@ -1036,13 +1042,15 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
         })
       )
     ),
-    React.createElement("div",{style:{display:"flex",gap:4,marginBottom:12,background:"#ebebeb",borderRadius:10,padding:4}},
+    // One segmented control, so the ink outline goes round the strip rather than each tab (.no-ink).
+    React.createElement("div",{className:"ink-border",style:{display:"flex",gap:4,marginBottom:12,background:"#ebebeb",borderRadius:10,padding:4}},
       tabs.map(t=>{
         const tabLocked=equipTutorialLock&&t.id!=="levelup";
         const showFlairGuideArrow=flairGuideStep==="flair"&&t.id==="flair";
         const showCandyGuideArrow=candyGuideStep==="candySkins"&&t.id==="skins";
         return React.createElement("button",{
           key:t.id,
+          className:"no-ink",
           disabled:tabLocked,
           "data-guide-target":t.id==="flair"?"flair":t.id==="skins"?"candySkins":undefined,
           onClick:()=>{if(tabLocked)return;setTab(t.id);if(flairGuideStep==="flair"&&t.id==="flair")setFlairGuideStep("feed");if(candyGuideStep==="candySkins"&&t.id==="skins")setCandyGuideStep("candyFeed");},
@@ -1165,6 +1173,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
                   // Specials without a charge cost (e.g. Overload Sting, gated
                   // purely by Restrained stacks) show no energy pill.
                   k==="special"&&def.abilities?.special?.charge!=null&&React.createElement("button",{
+                    className:"tag-pill",
                     onClick:(e)=>{e.stopPropagation();setAbilityTagPopup("energy");},
                     style:{fontSize:9,fontWeight:800,color:"#2563eb",background:"#DBEAFE",border:"1px solid rgba(59,130,246,0.4)",borderRadius:10,padding:"1px 8px",cursor:"pointer",lineHeight:1.5,flexShrink:0,whiteSpace:"nowrap"}
                   },"⚡ "+getSpecialChargeAt(def,displayIdx)),
@@ -1195,7 +1204,7 @@ function CreatureDetail({ownedData,onBack,onEvolve,onBananaUsed,onCandyUsed,onSw
     // hasFlairEffects/onShowFlairEffects drive the header button that used to
     // sit on this page. The popup it opens stays here -- it is a top-level
     // overlay and outranks the Flair page's own layer, so it still shows over it.
-    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep,hasFlairEffects:flairBuffs.length>0,onShowFlairEffects:()=>setShowFlairEffects(true)}),
+    tab==="flair"&&React.createElement(FlairSection,{unlockedSkins,def,onBack:()=>setTab("abilities"),onBananaUsed,ownedData,shownFlair,setOwned,currencies,setCurrencies,flairGuideStep,setFlairGuideStep,hasFlairEffects:flairBuffs.length>0,onShowFlairEffects:()=>setShowFlairEffects(true)}),
     tab==="skins"&&React.createElement(SkinSection,{
       ownedData,def,currencies,setCurrencies,setOwned,
       unlockedSkins,setUnlockedSkins,skinShards,setSkinShards,

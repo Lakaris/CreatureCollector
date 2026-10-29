@@ -62,7 +62,7 @@ function EquipmentPicker({ itemId, onBack, onEquipped }) {
 
   return React.createElement("div", null,
     replacePet && replaceDef && React.createElement("div", { onClick: () => setReplaceCreatureId(null), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300, padding: "0 24px" } },
-      React.createElement("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 16, padding: "20px 18px", width: "100%", maxWidth: 320, boxShadow: "0 8px 40px rgba(0,0,0,0.2)" } },
+      React.createElement("div", { className:"ui-panel",onClick: (e) => e.stopPropagation(), style: { padding: "4px 4px", width: "100%", maxWidth: 320 } },
         React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 4, textAlign: "center" } }, replaceDef.name + "'s gear is full"),
         React.createElement("div", { style: { fontSize: 12, color: "#666", marginBottom: 14, textAlign: "center" } }, "Choose an item to replace with " + item.name),
         React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } },

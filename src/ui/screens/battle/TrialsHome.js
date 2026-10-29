@@ -21,6 +21,7 @@ import { getSpecialChargeAt } from "../../../core/creatures.js";
 import { ARENA_GRID_COLS, ARENA_GRID_ROWS, ARENA_PLAYER_START_ROW } from "../../../battle/constants.js";
 import CreatureIcon from "../../components/CreatureIcon.js";
 import { AbilityTagPills, AbilityTagPopup } from "../../components/AbilityTagPills.js";
+import { PopupClose, AbilityIcon } from "../../components/PopupArt.js";
 import { iconText, currencyIcon, gearIcon, typeIcon, roleIcon, rangeIcon } from "../../components/IconText.js";
 import { REWARD_DESC } from "../../../data/quests.js";
 
@@ -30,13 +31,17 @@ const h = React.createElement;
 
 /** `fixed`: the card is one set height whatever it holds (the creature popup,
  * so every creature's is the same size); the caller scrolls its own body. */
+/** The card is the popup art's frame (.ui-panel); OVERLAY_PAD is the gap
+ * between the frame's inner edge and the content, which a scrolling body
+ * reaches back out across to run edge to edge. */
+const OVERLAY_PAD = 6;
 const overlay = (onClose, children, { fixed = false } = {}) =>
   h("div", { onClick: onClose, style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 18px" } },
-    h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 18, padding: "18px", width: "100%", maxWidth: 360, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", position: "relative", boxSizing: "border-box",
+    h("div", { className: "ui-panel", onClick: (e) => e.stopPropagation(), style: { padding: OVERLAY_PAD, width: "100%", maxWidth: 360, position: "relative",
       ...(fixed
         ? { height: "min(560px, calc(80 * var(--vh)))", display: "flex", flexDirection: "column", overflow: "hidden" }
         : { maxHeight: "calc(80 * var(--vh))", overflowY: "auto" }) } },
-      h("button", { onClick: onClose, style: { position: "absolute", top: 10, right: 10, width: 24, height: 24, borderRadius: "50%", background: "#f0f0f0", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#888", lineHeight: 1 } }, "×"),
+      h(PopupClose, { onClick: onClose, size: 24, style: { position: "absolute", top: 0, right: 0, zIndex: 1 } }),
       children));
 
 const label = (text) => h("div", { style: { fontSize: 9, fontWeight: 800, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 } }, text);
@@ -58,14 +63,15 @@ function GearSlots({ gear, onOpen }) {
     gear.slice(0, EQUIP_SLOTS).map((item) => h("div", {
       key: item.id,
       onClick: () => onOpen(item),
-      style: { flex: "0 0 " + basis, minWidth: 0, background: "#f7f7ff", border: "1.5px solid #d0ccf7", borderRadius: 10, padding: "8px 4px", textAlign: "center", cursor: "pointer", userSelect: "none", boxSizing: "border-box" },
+      className: "ui-slot",
+      style: { flex: "0 0 " + basis, minWidth: 0, padding: "2px 0", textAlign: "center", cursor: "pointer", userSelect: "none" },
     },
       h("div", { style: { fontSize: 22 } }, gearIcon(item)),
       h("div", { style: { fontSize: 10, fontWeight: 600, color: "#000", marginTop: 2, lineHeight: 1.2, overflowWrap: "anywhere" } }, item.name))));
 }
 
 /** One equipped item, laid out like its Equipment Dex entry, its level beside its name. */
-function ItemInfo({ item, level, onClose }) {
+function ItemInfo({ item, level, ascension = 0, onClose }) {
   const rar = EQUIP_RARITY_CONFIG[item.rarity];
   return overlay(onClose, [
     rar && h("div", { key: "r", style: { display: "inline-block", fontSize: 10, fontWeight: 700, color: rar.color, background: rar.bg, borderRadius: 4, padding: "2px 7px" } }, rar.label),
@@ -73,7 +79,7 @@ function ItemInfo({ item, level, onClose }) {
     h("div", { key: "b", style: { textAlign: "center", paddingTop: 10 } },
       h("div", { style: { fontSize: 64, marginBottom: 4 } }, gearIcon(item)),
       h("div", { style: { fontSize: 18, fontWeight: 700, color: "#000", marginBottom: 6 } }, "Lv. " + level + " " + item.name),
-      h("div", { style: { fontSize: 13, color: "#666", marginBottom: item.effect ? 6 : 0 } }, equipBonusStr(equipBonus(item.id, level))),
+      h("div", { style: { fontSize: 13, color: "#666", marginBottom: item.effect ? 6 : 0 } }, equipBonusStr(equipBonus(item.id, level, ascension))),
       item.effect && h("div", { style: { fontSize: 12, color: "#7F77DD", fontWeight: 600 } }, iconText("✦ " + item.effect))),
   ]);
 }
@@ -92,6 +98,7 @@ function TraitEmojis({ def }) {
   return h("div", { style: { display: "flex", alignItems: "center", gap: 4, marginTop: 3 } },
     traits.map((t) => h("button", {
       key: t.name,
+      className: "tag-pill",
       onClick: () => setShown((s) => (s === t.name ? null : t.name)),
       "aria-label": t.name,
       style: { fontSize: 16, lineHeight: 1, padding: "3px 4px", borderRadius: 8, border: "none", cursor: "pointer", background: shown === t.name ? "#EEEDFE" : "transparent" },
@@ -99,72 +106,70 @@ function TraitEmojis({ def }) {
     shown && h("span", { style: { fontSize: 11, fontWeight: 700, color: "#534AB7", marginLeft: 2 } }, shown));
 }
 
-/** An enemy's skills and equipment. */
 /**
- * A Trials enemy's header -- picture, "Lv. N Name", type/range/role emojis.
- * Shared by the popup below and the planning phase's info sheet (ArenaScreen),
- * so the two always read the same.
+ * A creature card's header -- picture, "Lv. N Name" (just the name when
+ * `level` is unknown) plus any `titleExtra`, and the type/range/role emojis.
+ * Shared by the Trials popup below and every planning phase's creature card
+ * (PlanInfoSheet's CreatureSheetBody), so they all read the same.
  */
-export function TrialsEnemyHeader({ enemy, enemyLevel }) {
-  const def = CREATURE_MAP[enemy.id];
+export function CreatureCardHeader({ def, level, titleExtra }) {
   return h("div", { style: { display: "flex", alignItems: "center", gap: 12, paddingRight: 28, flexShrink: 0 } },
     h(CreatureIcon, { def, size: 56, contain: true }),
     h("div", { style: { minWidth: 0 } },
-      h("div", { style: { fontSize: 16, fontWeight: 800, color: "#111", lineHeight: 1.2 } }, "Lv. " + enemyLevel + " " + def.name),
+      h("div", { style: { fontSize: 16, fontWeight: 800, color: "#111", lineHeight: 1.2, display: "flex", alignItems: "center", gap: 5 } },
+        level != null ? "Lv. " + level + " " + def.name : def.name, titleExtra),
       h(TraitEmojis, { def })));
 }
 
 /**
- * A Trials enemy's gear (tap an item for its info) and its abilities, worded
- * as the creature page words them. Shared like TrialsEnemyHeader.
+ * A creature card's gear (tap an item for its info) and its abilities, worded
+ * as the creature page words them. `gear` is [{ item, level, ascension }];
+ * `tierFor(k)` is the upgrade tier each ability reads at -- the max by
+ * default, which is what enemies fight with. Shared like CreatureCardHeader.
  */
-export function TrialsEnemyBody({ enemy, onTag }) {
-  const def = CREATURE_MAP[enemy.id];
-  const gear = (enemy.__equipped || []).map((id) => EQUIPMENT_MAP[id]).filter(Boolean);
-  const gearLevel = enemy.__equipLevel || 1;
+export function CreatureCardBody({ def, gear = [], tierFor = () => MAX_TIER, onTag }) {
   const [itemOpen, setItemOpen] = useState(null);
   return h(React.Fragment, null,
-    itemOpen && h(ItemInfo, { item: itemOpen, level: gearLevel, onClose: () => setItemOpen(null) }),
+    itemOpen && h(ItemInfo, { ...itemOpen, onClose: () => setItemOpen(null) }),
     gear.length > 0 && h("div", { style: { marginBottom: 14 } },
       label("Gear"),
-      h(GearSlots, { gear, onOpen: setItemOpen })),
-    ...["basic", "special", "unique"].map((k) => def.abilities?.[k] && h(AbilityCard, { key: k, def, k, onTag })));
+      h(GearSlots, { gear: gear.map((g) => g.item), onOpen: (item) => setItemOpen(gear.find((g) => g.item === item)) })),
+    ...["basic", "special", "unique"].map((k) => def.abilities?.[k] && h(AbilityCard, { key: k, def, k, tier: tierFor(k), onTag })));
+}
+
+/** A Trials enemy's worn gear, every item at the enemy's one gear level. */
+export function trialsGear(enemy) {
+  const level = enemy.__equipLevel || 1;
+  return (enemy.__equipped || []).map((id) => EQUIPMENT_MAP[id]).filter(Boolean).map((item) => ({ item, level }));
 }
 
 function EnemyDetail({ enemy, enemyLevel, onClose, onTag }) {
+  const def = CREATURE_MAP[enemy.id];
   // Every creature's popup is the same size: the header stays put and the gear
   // and abilities scroll beneath it when they run long.
   return overlay(onClose, [
-    h("div", { key: "head", style: { marginBottom: 12, flexShrink: 0 } }, h(TrialsEnemyHeader, { enemy, enemyLevel })),
-    h("div", { key: "body", style: { flex: 1, minHeight: 0, overflowY: "auto", margin: "0 -18px -18px", padding: "0 18px 18px" } },
-      h(TrialsEnemyBody, { enemy, onTag })),
+    h("div", { key: "head", style: { marginBottom: 12, flexShrink: 0 } }, h(CreatureCardHeader, { def, level: enemyLevel })),
+    h("div", { key: "body", style: { flex: 1, minHeight: 0, overflowY: "auto", margin: "0 " + -OVERLAY_PAD + "px " + -OVERLAY_PAD + "px", padding: "0 " + OVERLAY_PAD + "px " + OVERLAY_PAD + "px" } },
+      h(CreatureCardBody, { def, gear: trialsGear(enemy), onTag })),
   ], { fixed: true });
 }
 
-const ABILITY_COLORS = { basic: { bg: "#EAF3DE", color: "#173404" }, special: { bg: "#EEEDFE", color: "#26215C" }, unique: { bg: "#FFF3CD", color: "#5A3E00" } };
-
 /**
- * One ability, worded and badged exactly as the creature page shows it (its
- * Abilities tab): the same sentence, DMG / HEAL / SHIELD badges and the
- * Special's ⚡ charge cost -- at the max tier, which is what enemies fight
- * with. No pip row: an enemy's tier never changes.
+ * An ability's wording at upgrade `tier` as the creature page shows it: its
+ * sentence plus the DMG / HEAL / SHIELD amounts.
  */
-/**
- * An ability's max-tier wording as the creature page shows it: its sentence
- * plus the DMG / HEAL / SHIELD amounts.
- */
-function abilityText(def, k) {
+function abilityText(def, k, tier) {
   const abl = def.abilities[k];
-  const text = abl.upgrades[Math.min(MAX_TIER, abl.upgrades.length - 1)];
-  const starlit = formatStarlitAbilityLevel(def.id, k, abl.upgrades, MAX_TIER);
-  const plain = formatPlainAbilityLevel(def.id, k, text, MAX_TIER);
+  const text = abl.upgrades[tier];
+  const starlit = formatStarlitAbilityLevel(def.id, k, abl.upgrades, tier);
+  const plain = formatPlainAbilityLevel(def.id, k, text, tier);
   const fmt = starlit
     ? { label: starlit.label, amount: starlit.amount }
     : plain
       ? { label: plain.label, amount: plain.amount, shieldAmt: plain.shieldAmt }
-      : formatAbilityStep(text, abl.upgrades[MAX_TIER - 1] || null);
+      : formatAbilityStep(text, tier > 0 ? abl.upgrades[tier - 1] : null);
   let healAmt = starlit ? starlit.healAmt : null;
-  if (!starlit) for (let i = MAX_TIER; i >= 0; i--) { healAmt = extractHeal(abl.upgrades[i]); if (healAmt != null) break; }
+  if (!starlit) for (let i = tier; i >= 0; i--) { healAmt = extractHeal(abl.upgrades[i]); if (healAmt != null) break; }
   return { sentence: fmt.isPercent ? fmt.text : fmt.label, amount: fmt.amount, shieldAmt: fmt.shieldAmt, healAmt };
 }
 
@@ -177,36 +182,41 @@ function amountBadges(t) {
   ];
 }
 
-/** The Special's energy cost pill (none for a chargeless Special). */
-function chargePill(def, k, onTag) {
+/** The Special's energy cost pill at `tier` (none for a chargeless Special). */
+function chargePill(def, k, tier, onTag) {
   if (k !== "special" || def.abilities.special.charge == null) return null;
   return h("button", {
+    className: "tag-pill",
     onClick: (e) => { e.stopPropagation(); onTag("energy"); },
     style: { fontSize: 9, fontWeight: 800, color: "#2563eb", background: "#DBEAFE", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 10, padding: "1px 8px", cursor: "pointer", lineHeight: 1.5, flexShrink: 0, whiteSpace: "nowrap" },
-  }, "⚡ " + getSpecialChargeAt(def, MAX_TIER));
+  }, "⚡ " + getSpecialChargeAt(def, tier));
 }
 
-function AbilityCard({ def, k, onTag }) {
+/**
+ * One ability, worded and badged exactly as the creature page shows it (its
+ * Abilities tab) at upgrade `tier`: the same sentence, DMG / HEAL / SHIELD
+ * badges and the Special's ⚡ charge cost. No pip row -- the card only reads
+ * the tier, it never changes it.
+ */
+function AbilityCard({ def, k, tier: wanted, onTag }) {
   const abl = def.abilities[k];
-  const ac = ABILITY_COLORS[k];
-  const t = abilityText(def, k);
+  const tier = Math.max(0, Math.min(wanted, abl.upgrades.length - 1));
+  const t = abilityText(def, k, tier);
   // The creature page's card without its grey box: the ability sits straight
-  // on the popup, separated from the next by a hairline.
-  return h("div", { className: "ability-card", style: { background: "none", borderRadius: 0, padding: "8px 0", marginBottom: 0, borderTop: "1px solid #eee" } },
+  // on the popup, separated from the one above by the art's divider.
+  return h("div", { className: "ability-card", style: { background: "none", borderRadius: 0, padding: "0 0 8px", marginBottom: 0 } },
+    h("div", { className: "ui-divider", style: { marginBottom: 8 } }),
     h("div", { className: "ability-header", style: { alignItems: "center" } },
       h("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 3, flexShrink: 0 } },
         h("span", { style: { fontSize: 8, fontWeight: 800, color: "#555", background: "#e8e8e8", borderRadius: 20, padding: "2px 7px", textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap" } }, ABILITY_LABELS[k]),
-        h("div", { style: { width: 40, height: 40, borderRadius: 8, background: ac.bg, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" } },
-          abl.icon
-            ? h("img", { src: abl.icon, style: { width: "100%", height: "100%", objectFit: "cover" } })
-            : h("span", { style: { fontSize: 9, fontWeight: 700, color: ac.color, opacity: 0.5, userSelect: "none" } }, "No img"))),
+        h(AbilityIcon, { kind: k, icon: abl.icon })),
       // The pills always sit on their own line beneath the name (see
       // CreatureDetail).
       h("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 } },
         h("span", { className: "ability-name" }, abl.name),
         h("div", { style: { display: "flex", flexDirection: "row-reverse", alignItems: "center", gap: 5, justifyContent: "flex-end" } },
-          chargePill(def, k, onTag),
-          h(AbilityTagPills, { tags: getAbilityTags(def.id, k, MAX_TIER), onOpen: onTag })))),
+          chargePill(def, k, tier, onTag),
+          h(AbilityTagPills, { tags: getAbilityTags(def.id, k, tier), onOpen: onTag })))),
     h("p", { className: "ability-desc", style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } },
       h("span", null, t.sentence),
       h("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 } }, ...amountBadges(t))));
@@ -271,7 +281,7 @@ function TrialsHome({ onBack, viewIdx, progIdx, maxIdx, stage, enemyLevel, enemi
     teamOpen && showTeam && h(WinningTeam, { clear, stageName: levelName, onClose: () => setTeamOpen(false) }),
     // The reward's description -- the same popup the Arena's reward icons open.
     rewardOpen && reward && h("div", { onClick: () => setRewardOpen(false), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" } },
-      h("div", { onClick: (e) => e.stopPropagation(), style: { background: "#fff", borderRadius: 20, padding: "28px 24px", width: "100%", maxWidth: 320, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.18)" } },
+      h("div", { className:"ui-panel",onClick: (e) => e.stopPropagation(), style: { padding: "12px 8px", width: "100%", maxWidth: 320, textAlign: "center" } },
         h("div", { style: { fontSize: 52, lineHeight: 1, marginBottom: 12 } }, currencyIcon(reward.key, reward.emoji)),
         h("div", { style: { fontSize: 18, fontWeight: 700, color: "#111", marginBottom: 8 } }, reward.label),
         h("div", { style: { fontSize: 13, color: "#888", marginBottom: 4 } }, REWARD_DESC[reward.key] || ""),

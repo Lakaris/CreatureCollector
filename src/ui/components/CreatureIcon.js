@@ -78,8 +78,9 @@ function sheetAnimation(art) {
 // Sheets loaded and decoded ahead of use, by src. Switching a showcase
 // creature to a sheet the browser hasn't decoded yet draws nothing for a
 // moment -- a white flash -- so every state's sheet is fetched as soon as the
-// creature is on show, and a play waits for its sheet before switching. The
-// Image objects stay referenced here so the decoded pictures stay cached.
+// creature is on show, and every switch (to a play and back to idle) waits for
+// decodeSheet before it happens. The Image objects stay referenced here so the
+// files stay loaded.
 const preloaded = new Map();
 function preloadSheet(src) {
   if (!preloaded.has(src)) {
@@ -89,6 +90,18 @@ function preloadSheet(src) {
     preloaded.set(src, { img, ready });
   }
   return preloaded.get(src).ready;
+}
+
+/** Resolves once `src` is decoded and ready to draw NOW. Decoding once at
+ * preload isn't enough: a full sheet runs 25-40MB decoded, and the browser
+ * drops decoded copies it isn't drawing to save memory -- so by the time of a
+ * tap, a sheet preloaded seconds earlier may need decoding again, and drawing
+ * it before then is the white flash. Decoding again right before the switch
+ * is near-instant when the copy is still there and covers it when it isn't. */
+function decodeSheet(src) {
+  preloadSheet(src);
+  const { img, ready } = preloaded.get(src);
+  return img.decode ? img.decode().catch(() => {}) : ready;
 }
 
 /**
@@ -103,6 +116,10 @@ function useShowcase(enabled, def, ownedData, unlockedSkins) {
   const [plays, setPlays] = useState(0);
   const [playing, setPlaying] = useState(null);
   const sig = (def && def.id) + ":" + states.join();
+  // Bumped by every switch, so a decode that finishes after a newer switch
+  // was asked for doesn't override it (a tap mid-play, then the old play's
+  // return to idle landing on top of the new one).
+  const switchId = React.useRef(0);
 
   // Warm every sheet this creature can switch to, idle included (it's
   // remounted on the way back from a play).
@@ -111,11 +128,21 @@ function useShowcase(enabled, def, ownedData, unlockedSkins) {
     ["idle", ...states].forEach((s) => preloadSheet(getDisplayArt(def, ownedData, unlockedSkins, s).src));
   }, [sig]);
 
-  // Switch only once the sheet is decoded, so the swap is instant.
+  // Switch only once the sheet is decoded, so the swap is instant -- the
+  // current animation stays on screen while it decodes.
   const start = (s) => {
-    preloadSheet(getDisplayArt(def, ownedData, unlockedSkins, s).src).then(() => {
+    const id = ++switchId.current;
+    decodeSheet(getDisplayArt(def, ownedData, unlockedSkins, s).src).then(() => {
+      if (id !== switchId.current) return;
       setPlays((n) => n + 1);
       setPlaying(s);
+    });
+  };
+  // The way back to idle gets the same wait: idle's sheet is as big as any.
+  const finish = () => {
+    const id = ++switchId.current;
+    decodeSheet(getDisplayArt(def, ownedData, unlockedSkins, "idle").src).then(() => {
+      if (id === switchId.current) setPlaying(null);
     });
   };
 
@@ -125,7 +152,7 @@ function useShowcase(enabled, def, ownedData, unlockedSkins) {
       return;
     }
     let t;
-    if (playing) t = setTimeout(() => setPlaying(null), playMs(getDisplayArt(def, ownedData, unlockedSkins, playing)));
+    if (playing) t = setTimeout(finish, playMs(getDisplayArt(def, ownedData, unlockedSkins, playing)));
     else if (hasFlavor) t = setTimeout(() => start("flavor"), randBetween(plays === 0 ? FLAVOR_FIRST_MS : FLAVOR_GAP_MS));
     return () => clearTimeout(t);
   }, [sig, playing, plays]);

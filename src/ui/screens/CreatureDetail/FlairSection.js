@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "../../../react.js";
 import { iconText, uiIcon } from "../../components/IconText.js";
 import { useGame } from "../../../state/GameContext.js";
-import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE, PORTRAIT_CREATURE_PX } from "../../../data/flair.js";
+import { BUFF_STAT_LABEL, FLAIR_TITLES, FLAIR_AURAS, FLAIR_BACKGROUNDS, FLAIR_ITEMS, FLAIR_SHARD_VALUES, FLAIR_BANANAS, RARITY_COLORS_FLAIR, FLAIR_TITLE_MAP, FLAIR_AURA_MAP, FLAIR_BG_MAP, FLAIR_ITEM_MAP, RANDOM_FLAIR, portraitBackdropStyle, PORTRAIT_FEET_BOTTOM, PORTRAIT_STAGE_STYLE, PORTRAIT_CREATURE_PX } from "../../../data/flair.js";
 import { rollFlairRarity, feedFlair } from "../../../core/gacha.js";
 import { easternNoonDayKey } from "../../../core/dates.js";
 import FlairRaritySection from "../../../ui/screens/CreatureDetail/FlairRaritySection.js";
@@ -50,8 +50,11 @@ function categoryOf(r){
   return r.won?r.cat:(r.dupeCat||r.cat);
 }
 
-function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuideStep,setFlairGuideStep,hasFlairEffects,onShowFlairEffects}){
+function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,shownFlair,flairGuideStep,setFlairGuideStep,hasFlairEffects,onShowFlairEffects}){
   const { setOwned, currencies, setCurrencies, lastFreeBananaDate, setLastFreeBananaDate } = useGame();
+  // The creature page's picks for any Random slots, so this page shows the
+  // same outfit as the page it was opened from.
+  const shown=shownFlair||ownedData;
   const freeBananaAvailable = lastFreeBananaDate !== easternNoonDayKey();
   const [flairTab,setFlairTab]=useState("feed");
   const [feedResult,setFeedResult]=useState(null);
@@ -133,7 +136,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
     // header exactly as tall as the creature page's, whose own right-slot
     // button is taller than a bare title line, so the art below does not shift
     // as you move between the two.
-    React.createElement(ScreenHeader,{title:def.name+(ownedData.equippedTitle?" the "+ownedData.equippedTitle:""),onBack,edgeToEdge:false,
+    React.createElement(ScreenHeader,{title:def.name+(shown.equippedTitle?" the "+shown.equippedTitle:""),onBack,edgeToEdge:false,
       right:hasFlairEffects&&onShowFlairEffects
         ? React.createElement("button",{
             onClick:onShowFlairEffects,
@@ -156,7 +159,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
     // square was taller than the screen and squeezed the Titles/Aura/Background/
     // Item lists below it down to nothing. Past the cap the stage goes wider
     // than tall, and the cover sizing crops the art's top instead.
-    React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",maxHeight:"calc(var(--vh) * 55)",flexShrink:0,background:"#fff",...portraitBackdropStyle(ownedData)}},
+    React.createElement("div",{style:{position:"relative",...PORTRAIT_STAGE_STYLE,margin:"-12px 0 12px",borderRadius:0,width:"100%",aspectRatio:"1 / 1",maxHeight:"calc(var(--vh) * 55)",flexShrink:0,background:"#fff",...portraitBackdropStyle(shown)}},
       React.createElement(CreatureIcon,{def,ownedData,unlockedSkins,size:PORTRAIT_CREATURE_PX,showcase:true,style:{position:"absolute",bottom:PORTRAIT_FEET_BOTTOM,left:"50%",transform:"translateX(-50%)"}})
     ),
     React.createElement("div",{style:{flex:flairTab==="feed"?"1 0 auto":1,minHeight:0,overflow:flairTab==="feed"?"visible":"hidden",display:"flex",flexDirection:"column"}},
@@ -186,7 +189,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
                 boxShadow:"0 1px 4px rgba(0,0,0,0.08)",fontFamily:"inherit",cursor:"pointer"}},
                 React.createElement("div",{style:{fontSize:8,fontWeight:700,color:"#999",letterSpacing:".05em",textTransform:"uppercase"}},CAT_LABEL[cat]),
                 React.createElement("div",{style:{fontSize:18,lineHeight:1,opacity:entry?1:0.3}},(entry&&entry.emoji)||CAT_EMOJI[cat]),
-                React.createElement(AutoFitText,{size:10,minSize:7,style:{width:"100%",textAlign:"center",fontWeight:700,color:entry?tint:"#bbb",lineHeight:1.2}},entry?(entry.name||id):"None")
+                React.createElement(AutoFitText,{size:10,minSize:7,style:{width:"100%",textAlign:"center",fontWeight:700,color:entry?tint:"#bbb",lineHeight:1.2}},entry?(entry.name||id):id===RANDOM_FLAIR?"Random":"None")
               );
             })
           )
@@ -313,7 +316,7 @@ function FlairSection({unlockedSkins,def,onBack,onBananaUsed,ownedData,flairGuid
         ),
         // Banana info modal
         bananaInfo&&React.createElement("div",{onClick:()=>setBananaInfo(null),style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300}},
-          React.createElement("div",{onClick:e=>e.stopPropagation(),style:{background:"#fff",borderRadius:16,padding:"24px 20px",width:280,boxShadow:"0 8px 40px rgba(0,0,0,0.2)"}},
+          React.createElement("div",{className:"ui-panel",onClick:e=>e.stopPropagation(),style:{padding:"8px 4px",width:280}},
             bananaInfo.image
               ? React.createElement("img",{src:bananaInfo.image,alt:bananaInfo.name,draggable:false,style:{display:"block",width:88,height:88,objectFit:"contain",margin:"0 auto 8px"}})
               : React.createElement("div",{style:{fontSize:32,textAlign:"center",marginBottom:6}},iconText(bananaInfo.emoji)),
